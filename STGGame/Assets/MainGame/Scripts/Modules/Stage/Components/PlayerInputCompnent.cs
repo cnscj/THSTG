@@ -4,10 +4,12 @@ using Unity.Entities;
 namespace STGGame
 {
     [RequireComponent(typeof(GameObjectEntity))]
-    public class RotateComponent : MonoBehaviour
+    public class PlayerInputCompnent : InputCompnent
     {
-        //旋转速度
-        public int speed;
+        //玩家类型
+        public int type;
+
+
     }
 
 }

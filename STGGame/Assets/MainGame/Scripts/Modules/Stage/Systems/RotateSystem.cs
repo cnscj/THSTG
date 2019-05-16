@@ -1,14 +1,17 @@
 ﻿using UnityEngine;
 using Unity.Entities;
 
-public class RotateSystem : ComponentSystem
+namespace STGGame
 {
-    protected override void OnUpdate()
+    public class RotateSystem : ComponentSystem
     {
-        foreach (var item in GetEntities<RotateGroup>())
+        protected override void OnUpdate()
         {
-            item.transform.Rotate(0f, item.rotator.speed * Time.deltaTime, 0f);
+            foreach (var item in GetEntities<RotateGroup>())
+            {
+                item.transform.Rotate(0f, item.rotator.speed * Time.deltaTime, 0f);
+            }
         }
-    }
 
+    }
 }

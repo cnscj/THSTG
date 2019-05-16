@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace STGGame
 {
-    struct RotateGroup
+    struct PlayerInputGroup
     {
-        public RotateComponent rotator;
+        public PlayerInputCompnent playerInput;
         public Transform transform;
     }
 }
