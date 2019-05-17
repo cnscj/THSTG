@@ -14,12 +14,24 @@ namespace STGGame
         [SerializeField] public List<GameObject> players = new List<GameObject>();
         [SerializeField] public List<GameObject> emenies = new List<GameObject>();
 
-        private EntityManager m_manager;
+        public EntityManager manager;
 
         void Awake()
         {
             instance = this;
-            //m_manager = GameManager.instance.world.CreateManager<EntityManager>();
+        }
+
+        //GameObjectEntity必须最后添加才起效
+        GameObject ReturnEntityGO(GameObject GO)
+        {
+            if (GO)
+            {
+                if (!GO.GetComponent<GameObjectEntity>())
+                {
+                    GO.AddComponent<GameObjectEntity>();
+                }
+            }
+            return GO;
         }
 
         public GameObject CreatePlayer(int type)
@@ -36,7 +48,7 @@ namespace STGGame
             player.transform.SetParent(GameManager.instance.playerRoot.transform);
             players.Add(player);
 
-            return player;
+            return ReturnEntityGO(player);
         }
 
         public GameObject CreateEnemy()
@@ -54,26 +66,22 @@ namespace STGGame
             enemy.transform.SetParent(GameManager.instance.enemyRoot.transform);
             emenies.Add(enemy);
 
-            return enemy;
+            return ReturnEntityGO(enemy);
         }
 
         private GameObject CreateMoveable(string name = "Entity")
         {
-
-            //EntityArchetype entityArchetype = m_manager.CreateArchetype(typeof(Position), typeof(Rotation));
-            //Entity entity1 = m_manager.CreateEntity(entityArchetype);
-
-            GameObject entity = new GameObject(name);
-            entity.AddComponent<ModelComponent>();
+            GameObject GO = new GameObject(name);
+            GO.AddComponent<ModelComponent>();
 
             //子节点
             GameObject localNode = new GameObject("Local");
-            localNode.transform.SetParent(entity.transform);
+            localNode.transform.SetParent(GO.transform);
 
             GameObject modelNode = new GameObject("Model");
             modelNode.transform.SetParent(localNode.transform);
 
-            return entity;
+            return GO;
         }
 
 

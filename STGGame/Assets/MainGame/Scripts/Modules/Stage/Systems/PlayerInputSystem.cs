@@ -4,6 +4,12 @@ namespace STGGame
 {
     public class PlayerInputSystem : ComponentSystem
     {
+        struct PlayerInputGroup
+        {
+            public PlayerInputCompnent playerInput;
+            public Transform transform;
+        }
+
         protected override void OnUpdate()
         {
             foreach (var item in GetEntities<PlayerInputGroup>())

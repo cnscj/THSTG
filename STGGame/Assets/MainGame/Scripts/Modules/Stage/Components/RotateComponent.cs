@@ -1,9 +1,8 @@
 ﻿
 using UnityEngine;
-using Unity.Entities;
 namespace STGGame
 {
-    [RequireComponent(typeof(GameObjectEntity))]
+    //[RequireComponent(typeof(GameObjectEntity))]
     public class RotateComponent : MonoBehaviour
     {
         //旋转速度

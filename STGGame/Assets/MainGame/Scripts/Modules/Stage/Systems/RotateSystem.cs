@@ -5,6 +5,12 @@ namespace STGGame
 {
     public class RotateSystem : ComponentSystem
     {
+        struct RotateGroup
+        {
+            public RotateComponent rotator;
+            public Transform transform;
+        }
+
         protected override void OnUpdate()
         {
             foreach (var item in GetEntities<RotateGroup>())

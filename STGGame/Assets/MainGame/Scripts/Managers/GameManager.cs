@@ -15,20 +15,40 @@ namespace STGGame
         public GameObject effectRoot { get; private set; } = null;
         public GameObject playerRoot { get; private set; } = null;
         public GameObject enemyRoot { get; private set; } = null;
+
+        //
+        GameManager()
+        {
+
+        }
+
         void Awake()
         {
             instance = this;
-
-           
         }
 
         void Start()
         {
-            //初始化ECS-World
-            world = new World("Game");
-            World.Active = world;
+            InitGame();
+            InitNode();
+            InitGameObject();
+        }
 
-            //初始化节点
+        //游戏初始化
+        void InitGame()
+        {
+            //初始化ECS-World
+            //world = new World("Game");
+            //World.Active = world;
+
+            ////场景实体管理器
+            //StageEntityManager.instance.manager = world.GetOrCreateManager<EntityManager>();
+        }
+
+        //初始化节点
+        void InitNode()
+        {
+           
             nodeRoot = new GameObject("NodeRoot");
             nodeRoot.transform.SetParent(gameObject.transform, true);
             {
@@ -45,10 +65,14 @@ namespace STGGame
                     effectRoot.transform.SetParent(stageRoot.transform, true);
                 }
             }
+        }
 
-            //
-            StageEntityManager.instance.CreatePlayer(1);
+        //初始化实体
+        void InitGameObject()
+        {
+            //StageEntityManager.instance.CreatePlayer(1);
             StageEntityManager.instance.CreateEnemy();
         }
+
     }
 }
