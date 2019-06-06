@@ -34,7 +34,7 @@ namespace STGGame
             return GO;
         }
 
-        public GameObject CreatePlayer(int type)
+        public GameObject CreatePlayer(EPlayerType type)
         {
             GameObject player = CreateMoveable();
             player.name = string.Format("Player_{0}", type);
