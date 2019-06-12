@@ -21,11 +21,20 @@ namespace STGGame
             instance = this;
         }
 
+        GameObject CreateEmptyEntity(string name)
+        {
+            GameObject GO = new GameObject(name);
+
+
+            return GO;
+        }
+
         //GameObjectEntity必须最后添加才起效
         GameObject ReturnEntityGO(GameObject GO)
         {
             if (GO)
             {
+                //依据Code创建实体
                 if (!GO.GetComponent<GameObjectEntity>())
                 {
                     GO.AddComponent<GameObjectEntity>();
@@ -39,8 +48,8 @@ namespace STGGame
             GameObject player = CreateMoveable();
             player.name = string.Format("Player_{0}", type);
             //根节点组件
-            var inputComp = player.AddComponent<PlayerInputCompnent>();
-            inputComp.type = type;
+            var playerDataComp = player.GetComponent<PlayerDataComponent>();
+            playerDataComp.type = type;
 
             //子节点
 
@@ -71,7 +80,7 @@ namespace STGGame
 
         private GameObject CreateMoveable(string name = "Entity")
         {
-            GameObject GO = new GameObject(name);
+            GameObject GO = CreateEmptyEntity(name);
             GO.AddComponent<ModelComponent>();
 
             //子节点
@@ -83,6 +92,18 @@ namespace STGGame
 
             return GO;
         }
+
+        ////
+        GameObject CreateEntity(int code, string name)
+        {
+            GameObject GO = CreateEmptyEntity(name);
+
+
+            return GO;
+        }
+
+
+
 
 
     }
