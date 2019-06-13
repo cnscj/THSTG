@@ -3,9 +3,9 @@ namespace STGGame
 {
     public class BaseDataCompnent : MonoBehaviour
     {
-        public int code;            //代表code
+        public int code;                    //代表code
         [HideInInspector]
-        public EEntityType type;    //类型
+        public EEntityType entityType;    //实体类型
     }
 
 }

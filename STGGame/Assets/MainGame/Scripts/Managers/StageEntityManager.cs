@@ -48,7 +48,7 @@ namespace STGGame
             player.name = string.Format("Player_{0}", type);
             //根节点组件
             var playerDataComp = player.GetComponent<PlayerDataComponent>();
-            playerDataComp.type = type;
+            playerDataComp.playerType = type;
 
             //子节点
 

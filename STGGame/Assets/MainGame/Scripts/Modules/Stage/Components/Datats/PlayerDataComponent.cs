@@ -5,7 +5,7 @@ namespace STGGame
     {
         //玩家类型
         [HideInInspector]
-        public EPlayerType type;
+        public EPlayerType playerType;
 
 
     }
