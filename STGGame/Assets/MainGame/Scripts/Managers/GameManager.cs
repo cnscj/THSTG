@@ -1,11 +1,12 @@
 ﻿
 using UnityEngine;
 using Unity.Entities;
+using THGame;
 namespace STGGame
 {
-    public class GameManager : MonoBehaviour
+    public class GameManager : SingletonBehaviour<GameManager>
     {
-        public static GameManager instance { get; private set; } = null;
+
         public World world { get; private set; } = null;
 
         public GameObject nodeRoot { get; private set; } = null;
@@ -17,21 +18,21 @@ namespace STGGame
         public GameObject enemyRoot { get; private set; } = null;
 
         //
-        GameManager()
+        private GameManager()
         {
 
         }
 
         void Awake()
         {
-            instance = this;
+
         }
 
         void Start()
         {
-            InitGame();
-            InitNode();
-            InitGameObject();
+            //InitGame();
+            //InitNode();
+            //InitGameObject();
         }
 
         //游戏初始化
@@ -71,7 +72,7 @@ namespace STGGame
         void InitGameObject()
         {
             //StageEntityManager.instance.CreatePlayer(1);
-            StageEntityManager.instance.CreateEnemy();
+            StageEntityManager.GetInstance().CreateEnemy();
         }
 
     }

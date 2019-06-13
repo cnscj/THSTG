@@ -1,7 +1,7 @@
 ﻿using System;
 namespace STGGame
 {
-    public class EntityDataConfig
+    public static class EntityDataConfig
     {
 
     }

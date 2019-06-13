@@ -1,24 +1,23 @@
-﻿using System;
-using System.Collections;
+﻿
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Entities;
-using Unity.Transforms;
-
+using THGame;
 namespace STGGame
 {
-    public class StageEntityManager : MonoBehaviour
+    public class StageEntityManager : SingletonBehaviour<StageEntityManager>
     {
-        public static StageEntityManager instance { get; private set; } = null;
 
         [SerializeField] public List<GameObject> players = new List<GameObject>();
         [SerializeField] public List<GameObject> emenies = new List<GameObject>();
 
         public EntityManager manager;
 
+        private StageEntityManager(){ }
+
         void Awake()
         {
-            instance = this;
+
         }
 
         GameObject CreateEmptyEntity(string name)
@@ -54,7 +53,7 @@ namespace STGGame
             //子节点
 
 
-            player.transform.SetParent(GameManager.instance.playerRoot.transform);
+            player.transform.SetParent(GameManager.GetInstance().playerRoot.transform);
             players.Add(player);
 
             return ReturnEntityGO(player);
@@ -72,7 +71,7 @@ namespace STGGame
             GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
             cube.transform.SetParent(modelNode);
 
-            enemy.transform.SetParent(GameManager.instance.enemyRoot.transform);
+            enemy.transform.SetParent(GameManager.GetInstance().enemyRoot.transform);
             emenies.Add(enemy);
 
             return ReturnEntityGO(enemy);
@@ -97,7 +96,6 @@ namespace STGGame
         GameObject CreateEntity(int code, string name)
         {
             GameObject GO = CreateEmptyEntity(name);
-
 
             return GO;
         }
