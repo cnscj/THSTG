@@ -8,97 +8,97 @@ namespace STGGame
     public class StageEntityManager : SingletonBehaviour<StageEntityManager>
     {
 
-        [SerializeField] public List<GameObject> players = new List<GameObject>();
-        [SerializeField] public List<GameObject> emenies = new List<GameObject>();
+        //[SerializeField] public List<GameObject> players = new List<GameObject>();
+        //[SerializeField] public List<GameObject> emenies = new List<GameObject>();
 
-        public EntityManager manager;
+        //public EntityManager manager;
 
-        private StageEntityManager(){ }
+        //private StageEntityManager(){ }
 
-        void Awake()
-        {
+        //void Awake()
+        //{
 
-        }
+        //}
 
-        GameObject CreateEmptyEntity(string name)
-        {
-            GameObject GO = new GameObject(name);
-
-
-            return GO;
-        }
-
-        //GameObjectEntity必须最后添加才起效
-        GameObject ReturnEntityGO(GameObject GO)
-        {
-            if (GO)
-            {
-                //依据Code创建实体
-                if (!GO.GetComponent<GameObjectEntity>())
-                {
-                    GO.AddComponent<GameObjectEntity>();
-                }
-            }
-            return GO;
-        }
-
-        public GameObject CreatePlayer(EPlayerType type)
-        {
-            GameObject player = CreateMoveable();
-            player.name = string.Format("Player_{0}", type);
-            //根节点组件
-            var playerDataComp = player.GetComponent<PlayerDataComponent>();
-            playerDataComp.playerType = type;
-
-            //子节点
+        //GameObject CreateEmptyEntity(string name)
+        //{
+        //    GameObject GO = new GameObject(name);
 
 
-            player.transform.SetParent(GameManager.GetInstance().playerRoot.transform);
-            players.Add(player);
+        //    return GO;
+        //}
 
-            return ReturnEntityGO(player);
-        }
+        ////GameObjectEntity必须最后添加才起效
+        //GameObject ReturnEntityGO(GameObject GO)
+        //{
+        //    if (GO)
+        //    {
+        //        //依据Code创建实体
+        //        if (!GO.GetComponent<GameObjectEntity>())
+        //        {
+        //            GO.AddComponent<GameObjectEntity>();
+        //        }
+        //    }
+        //    return GO;
+        //}
 
-        public GameObject CreateEnemy()
-        {
-            GameObject enemy = CreateMoveable("Enemy");
-            //根节点组件
-            var rotateComp = enemy.AddComponent<RotateComponent>();
-            rotateComp.speed = 100;
+        //public GameObject CreatePlayer(EPlayerType type)
+        //{
+        //    GameObject player = CreateMoveable();
+        //    player.name = string.Format("Player_{0}", type);
+        //    //根节点组件
+        //    var playerDataComp = player.GetComponent<PlayerDataComponent>();
+        //    playerDataComp.playerType = type;
 
-            //子节点
-            Transform modelNode = enemy.transform.Find("Local/Model");
-            GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            cube.transform.SetParent(modelNode);
+        //    //子节点
 
-            enemy.transform.SetParent(GameManager.GetInstance().enemyRoot.transform);
-            emenies.Add(enemy);
 
-            return ReturnEntityGO(enemy);
-        }
+        //    player.transform.SetParent(GameManager.GetInstance().playerRoot.transform);
+        //    players.Add(player);
 
-        private GameObject CreateMoveable(string name = "Entity")
-        {
-            GameObject GO = CreateEmptyEntity(name);
-            GO.AddComponent<ModelComponent>();
+        //    return ReturnEntityGO(player);
+        //}
 
-            //子节点
-            GameObject localNode = new GameObject("Local");
-            localNode.transform.SetParent(GO.transform);
+        //public GameObject CreateEnemy()
+        //{
+        //    GameObject enemy = CreateMoveable("Enemy");
+        //    //根节点组件
+        //    var rotateComp = enemy.AddComponent<RotateComponent>();
+        //    rotateComp.speed = 100;
 
-            GameObject modelNode = new GameObject("Model");
-            modelNode.transform.SetParent(localNode.transform);
+        //    //子节点
+        //    Transform modelNode = enemy.transform.Find("Local/Model");
+        //    GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        //    cube.transform.SetParent(modelNode);
 
-            return GO;
-        }
+        //    enemy.transform.SetParent(GameManager.GetInstance().enemyRoot.transform);
+        //    emenies.Add(enemy);
 
-        ////
-        GameObject CreateEntity(int code, string name)
-        {
-            GameObject GO = CreateEmptyEntity(name);
+        //    return ReturnEntityGO(enemy);
+        //}
 
-            return GO;
-        }
+        //private GameObject CreateMoveable(string name = "Entity")
+        //{
+        //    GameObject GO = CreateEmptyEntity(name);
+        //    GO.AddComponent<ModelComponent>();
+
+        //    //子节点
+        //    GameObject localNode = new GameObject("Local");
+        //    localNode.transform.SetParent(GO.transform);
+
+        //    GameObject modelNode = new GameObject("Model");
+        //    modelNode.transform.SetParent(localNode.transform);
+
+        //    return GO;
+        //}
+
+        //////
+        //GameObject CreateEntity(int code, string name)
+        //{
+        //    GameObject GO = CreateEmptyEntity(name);
+
+        //    return GO;
+        //}
 
 
 
