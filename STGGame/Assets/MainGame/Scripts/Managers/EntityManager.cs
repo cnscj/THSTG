@@ -5,9 +5,10 @@ using Unity.Entities;
 using THGame;
 namespace STGGame
 {
-    public class EntityManager : SingletonBehaviour<StageEntityManager>
+    public class EntityManager : SingletonBehaviour<EntityManager>
     {
         public World world { get; private set; } = null;
+        public Unity.Entities.EntityManager manager { get; private set; } = null;
 
         public GameObject PlayerTmpl;
         public GameObject MobTmpl;
@@ -39,6 +40,7 @@ namespace STGGame
             //初始化ECS-World
             world = new World("Game");
             World.Active = world;
+            manager = world.GetOrCreateManager<Unity.Entities.EntityManager>();
         }
 
         private EntityManager()
