@@ -38,8 +38,8 @@ namespace STGGame
         private void Start()
         {
             //初始化ECS-World
-            world = new World("Game");
-            World.Active = world;
+            //TODO:默认的比它还好
+            world = World.Active;
             manager = world.GetOrCreateManager<Unity.Entities.EntityManager>();
         }
 
