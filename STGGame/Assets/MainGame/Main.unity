@@ -296,10 +296,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2125908312}
-  - component: {fileID: 2125908313}
   - component: {fileID: 2125908316}
   - component: {fileID: 2125908315}
   - component: {fileID: 2125908314}
+  - component: {fileID: 2125908313}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -346,11 +346,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50788656069924e0fb74a74a5d03d591, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerTmpl: {fileID: 5417156991793457501, guid: 1952b7ec5f2724869ab62d4c79261725,
+  PlayerPrefab: {fileID: 5417156991793457501, guid: 1952b7ec5f2724869ab62d4c79261725,
     type: 3}
-  MobTmpl: {fileID: 4562974591140096466, guid: 621a54a9cc5a44d5e9143b6696ca858c, type: 3}
+  MobPrefab: {fileID: 4562974591140096466, guid: 621a54a9cc5a44d5e9143b6696ca858c,
+    type: 3}
+  BossPrefab: {fileID: 8101344368813376635, guid: 067c1ba890e0a4b2abd9f49e0fdbed84,
+    type: 3}
   players: []
   mobs: []
+  bosses: []
 --- !u!114 &2125908315
 MonoBehaviour:
   m_ObjectHideFlags: 0

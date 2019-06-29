@@ -13,7 +13,7 @@ namespace STGGame
         public GameObject playerRoot = null;
         public GameObject enemyRoot = null;
 
-        private void Start()
+        private void Awake()
         {
             nodeRoot = new GameObject("NodeRoot");
             nodeRoot.transform.SetParent(gameObject.transform, true);
