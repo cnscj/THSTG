@@ -10,9 +10,6 @@ namespace STGGame
 {
     public class EntityManager : SingletonBehaviour<EntityManager>
     {
-        public World world { get; private set; } = null;
-        public Unity.Entities.EntityManager manager { get; private set; } = null;
-
         public GameObject PlayerPrefab;
         public GameObject MobPrefab;
         public GameObject BossPrefab;
@@ -21,40 +18,34 @@ namespace STGGame
         [SerializeField] public List<GameObject> mobs = new List<GameObject>();
         [SerializeField] public List<GameObject> bosses = new List<GameObject>();
 
-        public Entity CreatePlayer(EPlayerType type = EPlayerType.Player01)
+        public GameObject CreatePlayer(EPlayerType type = EPlayerType.Player01)
         {
             var entity = CreateEntity(PlayerPrefab);
             //修改玩家类型
-            var playerData = manager.GetComponentData<PlayerData>(entity);
+            var playerData = entity.GetComponent<PlayerDataComponent>();
             playerData.playerType = type;
+
             return entity;
         }
 
         //小怪,敌机子弹,全部当成Mob处理,用EntityType区别(因为是大量出现的东西)
-        public Entity CreateMob()
+        public GameObject CreateMob()
         {
             var entity = CreateEntity(MobPrefab);
             return entity;
         }
 
-        public Entity CreateBoss()
+        public GameObject CreateBoss()
         {
             var entity = CreateEntity(BossPrefab);
             return entity;
         }
 
-        public Entity CreateEntity(GameObject entityPrefab,Action<Entity> initFunc = null)
+        public GameObject CreateEntity(GameObject entityPrefab,Action<GameObject> initFunc = null)
         {
             if (entityPrefab == null)
             {
-                entityPrefab = new GameObject();
-                var entities = CreateEntities(entityPrefab, 1);
-                var entity = entities[0];
-                manager.AddComponentData(entity, new Position { position = new Vector3(0, 0, 0) });
-                manager.AddComponentData(entity, new Rotation { rotation = new Vector3(0, 0, 0) });
-                manager.AddComponentData(entity, new Movement { jumpSpeed = 0, moveSpeed = 0, rotateSpeed = 0});
-                initFunc?.Invoke(entity);
-                return entity;
+                return null;
             }
             else
             {
@@ -65,30 +56,43 @@ namespace STGGame
             }
         }
 
-        public Entity[] CreateEntities(GameObject entityPrefab, int amount, Action<Entity,int> initFunc = null)
+        public GameObject[] CreateEntities(GameObject entityPrefab, int amount, Action<GameObject,int> initFunc = null)
         {
-            NativeArray<Entity> entities = new NativeArray<Entity>(amount, Allocator.Temp);
-            manager.Instantiate(entityPrefab, entities);
-            if (initFunc != null)
+            if (entityPrefab == null)
+                return null;
+
+            GameObject fatherNode = NodeManager.GetInstance().GetNodeByEntity(entityPrefab);
+
+            GameObject[] entities = new GameObject[amount];
+            for(int i = 0; i < amount; i++)
             {
-                for (int i = 0; i < amount; i++)
+                entities[i] = Instantiate(entityPrefab, fatherNode.transform);
+                if (initFunc != null)
                 {
                     initFunc(entities[i], i);
                 }
             }
-            var array = entities.ToArray();
-            entities.Dispose();
-            return array;
+            return entities;
         }
 
+
+        //通过唯一索引编号
+        public GameObject CreateEntity(int code, Action<GameObject> initFunc = null)
+        {
+            return null;
+        }
+
+        public GameObject[] CreateEntities(int code, int amount, Action<GameObject, int> initFunc = null)
+        {
+         
+            return null;
+        }
 
         ///
 
         private void Awake()
         {
-            //初始化ECS-World
-            world = World.Active;   //直接使用默认的
-            manager = world.GetOrCreateManager<Unity.Entities.EntityManager>();
+          
         }
 
         private EntityManager()

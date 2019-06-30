@@ -1,30 +1,26 @@
 ﻿using Unity.Entities;
 using Unity.Jobs;
-
+using UnityEngine;
 namespace STGGame
 {
 
-    public class MovementSystem : JobComponentSystem
+    public class MovementSystem : ComponentSystem
     {
-
-        struct MovementJob : IJobProcessComponentData<Position, Rotation, Movement>
+        struct MovementGroup
         {
-            public void Execute(ref Position position, ref Rotation rotation, ref Movement movenent)
+            public MovementComponent movement;
+            public Transform transform;
+        }
+
+        protected override void OnUpdate()
+        {
+            foreach (var entity in GetEntities<MovementGroup>())
             {
-                
+                Vector3 pos = entity.transform.position + entity.movement.moveDir * entity.movement.moveSpeed * Time.deltaTime;
+                entity.transform.position = pos;
             }
         }
 
-        protected override JobHandle OnUpdate(JobHandle inputDeps)
-        {
-            MovementJob moveJob = new MovementJob
-            {
-
-            };
-            JobHandle moveHandle = moveJob.Schedule(this, inputDeps);
-
-            return moveHandle;
-        }
     }
 
 }

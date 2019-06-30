@@ -1,14 +1,14 @@
 ﻿
 using System;
-using Unity.Entities;
+using UnityEngine;
+
 namespace STGGame
 {
-    [Serializable]
-    public struct Movement : IComponentData
+    public class MovementComponent : MonoBehaviour
     {
+        public Vector3 moveDir;
+
         public float moveSpeed;
-        public float jumpSpeed;
         public float rotateSpeed;
     }
-    public class MovementComponent : ComponentDataWrapper<Movement> { }
 }

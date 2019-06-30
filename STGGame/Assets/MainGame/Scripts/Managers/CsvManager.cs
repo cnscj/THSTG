@@ -4,7 +4,7 @@ using System.IO;
 using THGame;
 namespace STGGame
 {
-    public class CsvManager : SingletonBehaviour<CsvManager>
+    public class CsvManager : Singleton<CsvManager>
     { 
         
       
