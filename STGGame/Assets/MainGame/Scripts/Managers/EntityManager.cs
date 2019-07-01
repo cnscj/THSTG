@@ -25,6 +25,9 @@ namespace STGGame
             var playerData = entity.GetComponent<PlayerDataComponent>();
             playerData.playerType = type;
 
+            //修改GameObject名称
+            entity.name = string.Format("{0}_{1:D2}", "Player", (int)type);
+
             return entity;
         }
 
@@ -67,10 +70,7 @@ namespace STGGame
             for(int i = 0; i < amount; i++)
             {
                 entities[i] = Instantiate(entityPrefab, fatherNode.transform);
-                if (initFunc != null)
-                {
-                    initFunc(entities[i], i);
-                }
+                initFunc?.Invoke(entities[i], i);
             }
             return entities;
         }

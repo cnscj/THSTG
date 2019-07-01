@@ -1,7 +1,7 @@
 ﻿using System;
 namespace THGame
 {
-    namespace CORE
+    namespace MVC
     {
         public class Cache
         {

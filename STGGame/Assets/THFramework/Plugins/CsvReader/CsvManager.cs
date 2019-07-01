@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.IO;
-using THGame;
-namespace STGGame
+namespace THGame
 {
     public class CsvManager : Singleton<CsvManager>
     { 

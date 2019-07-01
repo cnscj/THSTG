@@ -9,6 +9,5 @@ namespace STGGame
         public Vector3 moveDir;
 
         public float moveSpeed;
-        public float rotateSpeed;
     }
 }
