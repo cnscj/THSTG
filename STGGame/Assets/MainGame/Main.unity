@@ -265,6 +265,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1774189250}
+  - component: {fileID: 1774189251}
   m_Layer: 0
   m_Name: SceneCameraShaker
   m_TagString: Untagged
@@ -287,6 +288,20 @@ Transform:
   m_Father: {fileID: 668933855}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1774189251
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1774189249}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b748ca7bb5fe4a3ea4f0ef3af1572c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cameras:
+  - {fileID: 957877388}
 --- !u!1 &2125908311
 GameObject:
   m_ObjectHideFlags: 0
@@ -352,7 +367,7 @@ MonoBehaviour:
     type: 3}
   BossPrefab: {fileID: 8101344368813376635, guid: 067c1ba890e0a4b2abd9f49e0fdbed84,
     type: 3}
-  players: []
+  heros: []
   mobs: []
   bosses: []
 --- !u!114 &2125908315

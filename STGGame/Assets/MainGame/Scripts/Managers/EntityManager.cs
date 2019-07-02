@@ -14,7 +14,7 @@ namespace STGGame
         public GameObject MobPrefab;
         public GameObject BossPrefab;
 
-        [SerializeField] public List<GameObject> players = new List<GameObject>();
+        [SerializeField] public List<GameObject> heros = new List<GameObject>();
         [SerializeField] public List<GameObject> mobs = new List<GameObject>();
         [SerializeField] public List<GameObject> bosses = new List<GameObject>();
 
@@ -65,12 +65,14 @@ namespace STGGame
                 return null;
 
             GameObject fatherNode = NodeManager.GetInstance().GetNodeByEntity(entityPrefab);
+            List<GameObject> list = GetNodeListByEntity(entityPrefab);
 
             GameObject[] entities = new GameObject[amount];
             for(int i = 0; i < amount; i++)
             {
                 entities[i] = Instantiate(entityPrefab, fatherNode.transform);
                 initFunc?.Invoke(entities[i], i);
+                list.Add(entities[i]);
             }
             return entities;
         }
@@ -89,6 +91,28 @@ namespace STGGame
         }
 
         ///
+        private List<GameObject> GetNodeListByEntity(GameObject entity)
+        {
+            if (entity)
+            {
+                var entityData = entity.GetComponent<EntityDataComponent>();
+                if (entityData)
+                {
+                    var entityType = entityData.entityType;
+                    switch (entityType)
+                    {
+                        case EEntityType.Hero:
+                            return heros;
+                        case EEntityType.Mob:
+                            return mobs;
+                        case EEntityType.Boss:
+                            return bosses;
+                    }
+                }
+            }
+            return null;
+            
+        }
 
         private void Awake()
         {

@@ -5,42 +5,39 @@ using THGame;
 
 namespace THEditor
 {
-    [CustomEditor(typeof(CameraShakerEditor))]
-    public class CameraShakerEditorInspector : Editor
+    [CustomEditor(typeof(CameraShakerGenerator))]
+    public class CameraShakerGeneratorInspector : Editor
     {
         private static float s_scaleRate = 10f;
-        private static string[] s_propertys = { "posX", "posY", "posZ", "angleX", "angleY", "angleZ" };
         private static string[] s_editModes = { "简单", "详细" };
-        private static string[] s_simpleMode = { "角度", "位移" };
         private static int[] s_simpleIndex = { 2, 3, 5 };
         private static string[] s_simpleName = { "前后", "上下", "摇头" };
 
         private bool m_foldFinalCurve = false;
         private Transform m_relCamera;
-        private CameraShakerEditor effectShakeCameraInfo;
-
-
-        //详细
-        private SerializedProperty[] m_curCurves = new SerializedProperty[6];
+        private CameraShakerGenerator effectShakeCameraInfo;
 
         public override void OnInspectorGUI()
         {
             EditorGUILayout.BeginVertical();
 
-            m_relCamera = EditorGUILayout.ObjectField("Camera", m_relCamera, typeof(Transform), true) as Transform;
+            //m_relCamera = EditorGUILayout.ObjectField("Camera", m_relCamera, typeof(Transform), true) as Transform;
 
             //属性序列化
             serializedObject.Update();
+
             m_foldFinalCurve = EditorGUILayout.Foldout(m_foldFinalCurve, "Curves");
             if (m_foldFinalCurve)
             {
-                for (int i = 0; i < m_curCurves.Length; i++)
-                {
-                    EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.PropertyField(m_curCurves[i]);
-                    EditorGUILayout.EndHorizontal();
-                }
+                EditorGUILayout.CurveField("Position.X", effectShakeCameraInfo.animcurve.position.x);
+                EditorGUILayout.CurveField("Position.Y", effectShakeCameraInfo.animcurve.position.y);
+                EditorGUILayout.CurveField("Position.Z", effectShakeCameraInfo.animcurve.position.z);
+                EditorGUILayout.CurveField("Rotation.X", effectShakeCameraInfo.animcurve.rotation.x);
+                EditorGUILayout.CurveField("Rotation.Y", effectShakeCameraInfo.animcurve.rotation.y);
+                EditorGUILayout.CurveField("Rotation.Z", effectShakeCameraInfo.animcurve.rotation.z);
+
             }
+            effectShakeCameraInfo.isAutoPlay = EditorGUILayout.Toggle("自动播放", effectShakeCameraInfo.isAutoPlay);
             EditorGUILayout.Space();
             effectShakeCameraInfo.selectIndex = EditorGUILayout.Popup("模式", effectShakeCameraInfo.selectIndex, s_editModes);
             if (effectShakeCameraInfo.selectIndex == 0)
@@ -60,7 +57,6 @@ namespace THEditor
                 effectShakeCameraInfo.cycTime = EditorGUILayout.FloatField("周期", effectShakeCameraInfo.cycTime);
                 effectShakeCameraInfo.cycCount = EditorGUILayout.IntField("次数", effectShakeCameraInfo.cycCount);
                 effectShakeCameraInfo.isFixTime = EditorGUILayout.Toggle("振幅不减", effectShakeCameraInfo.isFixTime);
-                //effectShakeCameraInfo.modeRidio = EditorGUILayout.Popup("Mode", effectShakeCameraInfo.modeRidio, s_simpleMode);
                
                 if (GUILayout.Button("保存"))
                 {
@@ -76,7 +72,7 @@ namespace THEditor
                     for (int i = 0; i < effectShakeCameraInfo.timeLine.length - 1; i++)
                     {
                         Keyframe frame = effectShakeCameraInfo.timeLine[i];
-                        CameraShakerEditor.KeyExInfo keyExinfo = null;
+                        CameraShakerGenerator.KeyExInfo keyExinfo = null;
                         if (i < effectShakeCameraInfo.keyExInfos.Count)
                         {
                             keyExinfo = effectShakeCameraInfo.keyExInfos[i];
@@ -107,7 +103,7 @@ namespace THEditor
                         }
                         else
                         {
-                            keyExinfo = new CameraShakerEditor.KeyExInfo();
+                            keyExinfo = new CameraShakerGenerator.KeyExInfo();
                             keyExinfo.isShow = false;
                             keyExinfo.keyTime = frame.time;
                             keyExinfo.shakePosition = Vector3.zero;
@@ -142,7 +138,10 @@ namespace THEditor
 
             if (GUILayout.Button("测试播放"))
             {
-                Play();
+                if (CameraShakerManager.GetInstance())
+                {
+                    CameraShakerManager.GetInstance().Shake(effectShakeCameraInfo.animcurve);
+                }
             }
 
             serializedObject.ApplyModifiedProperties();
@@ -186,15 +185,7 @@ namespace THEditor
             AnimationCurve[] eachCurves = new AnimationCurve[6];
             for (int u = 0; u < eachCurves.Length; u++)
             {
-                if (effectShakeCameraInfo.modeRidio == 0)
-                {
-                    eachCurves[u] = (u < 3) ? AnimationCurve.Linear(0, 0, 0, 0) : new AnimationCurve();
-                }
-                else if (effectShakeCameraInfo.modeRidio == 1)
-                {
-                    eachCurves[u] = (u < 3) ? new AnimationCurve() : AnimationCurve.Linear(0, 0, 0, 0);
-                }
-
+                eachCurves[u] = AnimationCurve.Linear(0, 0, 0, 0);
             }
 
             for (int i = 0; i < effectShakeCameraInfo.eachTimeLines.Length; i++)
@@ -223,9 +214,9 @@ namespace THEditor
                     }
                 }
             }
-            for (int k = 0; k < eachCurves.Length; k++)
+            
             {
-                effectShakeCameraInfo.GetType().GetField(s_propertys[k]).SetValue(effectShakeCameraInfo, eachCurves[k]);
+                effectShakeCameraInfo.animcurve.SetCurves(eachCurves);
             }
 
         }
@@ -240,7 +231,7 @@ namespace THEditor
             for (int i = 0; i < effectShakeCameraInfo.timeLine.length; i++)
             {
                 Keyframe frame = effectShakeCameraInfo.timeLine[i];
-                CameraShakerEditor.KeyExInfo keyExinfo;
+                CameraShakerGenerator.KeyExInfo keyExinfo;
                 if (i < effectShakeCameraInfo.keyExInfos.Count)
                 {
                     keyExinfo = effectShakeCameraInfo.keyExInfos[i];
@@ -256,28 +247,18 @@ namespace THEditor
                     }
                 }
             }
-            for (int k = 0; k < eachCurves.Length; k++)
+            
             {
-                effectShakeCameraInfo.GetType().GetField(s_propertys[k]).SetValue(effectShakeCameraInfo, eachCurves[k]);
+                effectShakeCameraInfo.animcurve.SetCurves(eachCurves);
             }
 
         }
-        void Play()
-        {
-            Transform[] cameras = { m_relCamera };
-            effectShakeCameraInfo.Shake(cameras);
-        }
-
+      
         void OnEnable()
         {
-            effectShakeCameraInfo = (CameraShakerEditor)target;
-            for (int i = 0; i < m_curCurves.Length; i++)
-            {
-                m_curCurves[i] = serializedObject.FindProperty(s_propertys[i]);
-            }
-
+            effectShakeCameraInfo = (CameraShakerGenerator)target;
+            
             m_relCamera = Camera.main.transform;
-
         }
 
     }
