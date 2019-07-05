@@ -2,21 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace THGame
+namespace THEditor
 {
-    public class ResourceConfig : MonoBehaviour
+    public static class ResourceConfig
     {
-        // Start is called before the first frame update
-        void Start()
-        {
-
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
+        public static readonly string[] textureFileSuffixs = { "tga", "png", "jpg" };
     }
 
 }
