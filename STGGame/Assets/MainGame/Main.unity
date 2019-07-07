@@ -211,10 +211,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nodeRoot: {fileID: 0}
-  stageRoot: {fileID: 0}
+  uiRoot: {fileID: 0}
   heroRoot: {fileID: 0}
   bossRoot: {fileID: 0}
   mobRoot: {fileID: 0}
+  stageRoot: {fileID: 0}
   mapRoot: {fileID: 0}
 --- !u!1001 &8287892596728945978
 PrefabInstance:
