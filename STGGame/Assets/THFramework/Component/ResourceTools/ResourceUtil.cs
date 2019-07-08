@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace THEditor
 {
-    public static class ResourceUtils
+    public static class ResourceUtil
     {
         /// <summary>
         /// 判断是否为图片文件

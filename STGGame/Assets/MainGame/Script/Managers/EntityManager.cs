@@ -10,10 +10,16 @@ namespace STGGame
 {
     public class EntityManager : SingletonBehaviour<EntityManager>
     {
+        [HideInInspector] public GameObject stageRoot;
+        public GameObject mapRoot;
+        public GameObject heroRoot;
+        public GameObject bossRoot;
+        public GameObject mobRoot;
+
         public GameObject PlayerPrefab;
         public GameObject MobPrefab;
         public GameObject BossPrefab;
-
+        private Dictionary<EEntityType, GameObject> entitiesNode = new Dictionary<EEntityType, GameObject>();
         [SerializeField] public List<GameObject> heros = new List<GameObject>();
         [SerializeField] public List<GameObject> mobs = new List<GameObject>();
         [SerializeField] public List<GameObject> bosses = new List<GameObject>();
@@ -69,7 +75,7 @@ namespace STGGame
             if (entityPrefab == null)
                 return null;
 
-            GameObject fatherNode = NodeManager.GetInstance().GetNodeByEntity(entityPrefab);
+            GameObject fatherNode = GetNodeByEntity(entityPrefab);
             List<GameObject> list = GetNodeListByEntity(entityPrefab);
 
             GameObject[] entities = new GameObject[amount];
@@ -121,7 +127,48 @@ namespace STGGame
 
         private void Awake()
         {
-          
+            stageRoot = new GameObject("StageRoot");
+            stageRoot.transform.SetParent(gameObject.transform, true);
+            {
+
+                mapRoot = new GameObject("MapRoot");
+                mapRoot.transform.SetParent(stageRoot.transform, true);
+
+                heroRoot = new GameObject("HeroRoot");
+                heroRoot.transform.SetParent(stageRoot.transform, true);
+                entitiesNode.Add(EEntityType.Hero, heroRoot);
+
+                bossRoot = new GameObject("BossRoot");
+                bossRoot.transform.SetParent(stageRoot.transform, true);
+                entitiesNode.Add(EEntityType.Boss, bossRoot);
+
+                mobRoot = new GameObject("MobRoot");
+                mobRoot.transform.SetParent(stageRoot.transform, true);
+                entitiesNode.Add(EEntityType.Mob, mobRoot);
+            }
+        }
+
+        public GameObject GetNodeByEntity(GameObject entity)
+        {
+            if (entity)
+            {
+                var entityData = entity.GetComponent<EntityDataComponent>();
+                if (entityData)
+                {
+                    var entityType = entityData.entityType;
+                    return GetNodeEntityByType(entityType);
+                }
+            }
+            return null;
+        }
+
+        public GameObject GetNodeEntityByType(EEntityType type)
+        {
+            if (entitiesNode.ContainsKey(type))
+            {
+                return entitiesNode[type];
+            }
+            return null;
         }
 
         private EntityManager()
