@@ -9,7 +9,7 @@ namespace THEditor
 {
     public static class SpriteTools
     {
-        public static readonly float frameRate = 12.0f;
+        public static readonly float frameRate = 24.0f;//统一24帧
 
         ///
         public static TextureImporter LoadImporterFromTextureFile(string assetPath)
@@ -24,6 +24,17 @@ namespace THEditor
             return textureImporter;
         }
 
+        public static bool InitTextureImporterFromFile(string assetPath)
+        {
+            var importer = LoadImporterFromTextureFile(assetPath);
+            var ret = SetupTextureImporter(importer);
+            if (ret)
+            {
+                importer.SaveAndReimport();
+            }
+
+            return ret;
+        }
 
         //精灵数据
         class SpriteSheetFrameData
@@ -95,7 +106,7 @@ namespace THEditor
         /// sprite子项命名规则:组_动作名_编号,没有编号的一律不生成Anima
         /// </summary>
         /// <param name="assetPath"></param>
-        public static void GenerateAnimationClipFromTextureFile(string assetPath, string saveRootPath = "", System.Action<AnimationClip> callback = null)
+        public static Dictionary<string, Dictionary<string,AnimationClip>> GenerateAnimationClipFromTextureFile(string assetPath, string saveRootPath = "", System.Action<AnimationClip> callback = null)
         {
             string assetFileNonExtName = Path.GetFileNameWithoutExtension(assetPath);
             string assetRootPath = Path.GetDirectoryName(assetPath);
@@ -105,73 +116,116 @@ namespace THEditor
 
                 //判断是否是精灵图集
                 if (!(importer.textureType == TextureImporterType.Sprite && importer.spriteImportMode == SpriteImportMode.Multiple))
-                    return;
+                    return null;
 
                 //获取所有精灵帧
                 Object[] sheetObjs = AssetDatabase.LoadAllAssetsAtPath(assetPath);
-                Dictionary<string, SortedList<string, SpriteSheetFrameData>> dict = new Dictionary<string, SortedList<string, SpriteSheetFrameData>>();
+                var sheetDict = new Dictionary<string, Dictionary<string, SortedList<string, SpriteSheetFrameData>>>();
                 foreach (var obj in sheetObjs)
                 {
-                    string sheetName = obj.name;
                     SpriteSheetFrameData metadata = SpriteSheetFrameData.TryCreate(obj as Sprite);
                     if (metadata != null)
                     {
-                        string fileName = metadata.GetOutName();
-                        SortedList<string, SpriteSheetFrameData> sortlist = null;
-                        if (dict.ContainsKey(fileName))
+                        string groupName = metadata.groupName;
+                        Dictionary<string, SortedList<string, SpriteSheetFrameData>> actionMaps;
+                        if (sheetDict.ContainsKey(groupName))
                         {
-                            sortlist = dict[fileName];
+                            actionMaps = sheetDict[groupName];
                         }
                         else
                         {
-                            sortlist = new SortedList<string, SpriteSheetFrameData>();
-                            dict.Add(fileName, sortlist);
+                            actionMaps = new Dictionary<string, SortedList<string, SpriteSheetFrameData>>();
+                            sheetDict.Add(groupName, actionMaps);
                         }
-                        sortlist.Add(metadata.idName, metadata);
+                        //
+                        string actionName = metadata.actionName;
+                        SortedList<string, SpriteSheetFrameData> frameList;
+                        if (actionMaps.ContainsKey(actionName))
+                        {
+                            frameList = actionMaps[actionName];
+                        }
+                        else
+                        {
+                            frameList = new SortedList<string, SpriteSheetFrameData>();
+                            actionMaps.Add(actionName, frameList);
+                        }
+
+                        string idName = metadata.idName;
+                        frameList.Add(idName, metadata);
 
                     }
                 }
-                //TODO:没有动画帧???
-                foreach(var sheetPair in dict)
+
+                if (saveRootPath == "")
                 {
-                    EditorCurveBinding curveBinding = new EditorCurveBinding();
-                    curveBinding.type = typeof(SpriteRenderer);
-                    curveBinding.path = "";
-                    curveBinding.propertyName = "m_Sprite";
-                    float frameTime = 1 / 12f;
-                    int index = 0;
-                    List<ObjectReferenceKeyframe> keyFrames = new List<ObjectReferenceKeyframe>();
-                    foreach (var sheetData in sheetPair.Value)
-                    {
-                        ObjectReferenceKeyframe keyFrame = new ObjectReferenceKeyframe();
-                        keyFrame.time = frameTime * index;
-                        keyFrame.value = sheetData.Value.sprite;
-                        index++;
-                    }
-
-                    AnimationClip clip = new AnimationClip();
-                    clip.frameRate = 30;//动画帧率，30比较合适
-                    //AnimationUtility.SetAnimationType(clip, ModelImporterAnimationType.Generic);
-                    AnimationUtility.SetObjectReferenceCurve(clip, curveBinding, keyFrames.ToArray());
-                    
+                    saveRootPath = assetRootPath;
+                }
+                Dictionary<string, Dictionary<string, AnimationClip>> outMap = new Dictionary<string, Dictionary<string, AnimationClip>>();
+                foreach (var groupPair in sheetDict)
+                {
                     //保存资源
-                    if (saveRootPath == "")
+                    string groupName = groupPair.Key;
+                    string saveOutRootPath = PathUtil.Combine(saveRootPath, groupName);
+                    if (!XFolderTools.Exists(saveOutRootPath))
                     {
-                        saveRootPath = assetRootPath;
+                        XFolderTools.CreateDirectory(saveOutRootPath);
                     }
-                    string outName = sheetPair.Key;
-                    string saveName = string.Format("{0}.anim", outName);
-                    string savePath = Path.Combine(saveRootPath, saveName);
-
-                    AssetDatabase.CreateAsset(clip, savePath);
-                    AssetDatabase.SaveAssets();
-
-                    if (callback != null)
+                    Dictionary<string, AnimationClip> outActionMap;
+                    if (outMap.ContainsKey(groupName))
                     {
-                        callback(clip);
+                        outActionMap = outMap[groupName];
+                    }
+                    else
+                    {
+                        outActionMap = new Dictionary<string, AnimationClip>();
+                        outMap.Add(groupName, outActionMap);
+                    }
+                    
+                    foreach (var actionPair in groupPair.Value)
+                    {
+                        //动画曲线
+                        EditorCurveBinding curveBinding = new EditorCurveBinding();
+                        curveBinding.type = typeof(SpriteRenderer);
+                        curveBinding.path = "";
+                        curveBinding.propertyName = "m_Sprite";
+                        float frameTime = 1 / frameRate;                  
+                        int index = 0;
+                        List<ObjectReferenceKeyframe> keyFrames = new List<ObjectReferenceKeyframe>();
+                        foreach (var listPair in actionPair.Value)
+                        {
+                            ObjectReferenceKeyframe keyFrame = new ObjectReferenceKeyframe();
+                            keyFrame.time = (float)(frameTime * index);
+                            keyFrame.value = listPair.Value.sprite;
+                            keyFrames.Add(keyFrame);
+                            index++;
+                        }
+
+                        AnimationClip clip = new AnimationClip();
+                        clip.frameRate = frameRate;//动画帧率，30比较合适
+#if !UNITY_5
+                        AnimationUtility.SetAnimationType(clip, ModelImporterAnimationType.Generic);
+#endif
+                        AnimationUtility.SetObjectReferenceCurve(clip, curveBinding, keyFrames.ToArray());
+                        
+
+                        //保存动画Clip
+                        string outName = actionPair.Key;
+                        string saveName = string.Format("{0}.anim", outName);
+                        string savePath = Path.Combine(saveOutRootPath, saveName);
+
+                        AssetDatabase.CreateAsset(clip, savePath);
+                        AssetDatabase.SaveAssets();
+
+                        outActionMap.Add(actionPair.Key, clip);
+                        if (callback != null)
+                        {
+                            callback(clip);
+                        }
                     }
                 }
+                return outMap;
             }
+            return null;
         }
         public static AnimatorController GenerateAnimationControllerFromAnimationClipFile(string assetPath, string savePath, bool isDefault = false)
         {
@@ -194,7 +248,7 @@ namespace THEditor
                     string assetFileNonExtName = Path.GetFileNameWithoutExtension(assetPath);
                     string assetRootPath = Path.GetDirectoryName(assetPath);
 
-                    //SetupAnimationState(ctrl, animClip, isDefault);
+                    SetupAnimationState(ctrl, animClip, isDefault);
                 }
             }
 
@@ -202,9 +256,122 @@ namespace THEditor
             return ctrl;
         }
 
-        public static void GenerateSpriteFromJsonFile(string assetPath)
+        [System.Serializable]
+        public class DBSheet
         {
+            [System.Serializable]
+            public class DBFrame
+            {
+                public string name;
+                public int x;
+                public int y;
+                public int width;
+                public int height;
+            }
+            public string name;
+            public string imagePath;
+            public int width;
+            public int height;
+            public List<DBFrame> SubTexture = new List<DBFrame>();
+        }
 
+        /// <summary>
+        /// 从对应的json文件生成精灵帧(DragonBones 5.5)
+        /// </summary>
+        /// <param name="assetPath">图集路径</param>
+        public static void SetupSpriteFrameFromDBJsonFile(string assetPath)
+        {
+            string assetFileNonExtName = Path.GetFileNameWithoutExtension(assetPath);
+            string assetRootPath = Path.GetDirectoryName(assetPath);
+
+            //查看是否有对应的json文件
+           
+            string jsonFilePath = PathUtil.Combine(assetRootPath, string.Format("{0}.json", assetFileNonExtName));
+            
+            if (!XFileTools.Exists(jsonFilePath))
+            {
+                Debug.LogWarning("找不到DragonBones 5.5图集Json文件");
+                return;
+            }
+            TextureImporter importer = LoadImporterFromTextureFile(assetPath);
+            if (importer)
+            {
+                var jsonFile = AssetDatabase.LoadAssetAtPath(jsonFilePath, typeof(TextAsset)) as TextAsset;
+                if (jsonFile == null)
+                    return;
+
+                var atlas = JsonUtility.FromJson<DBSheet>(jsonFile.text);
+                if (atlas != null)
+                {
+                    if (atlas.SubTexture.Count > 0)
+                    {
+                        List<SpriteMetaData> spriteDataList = new List<SpriteMetaData>();
+                        foreach (var frameData in atlas.SubTexture)
+                        {
+                            SpriteMetaData md = new SpriteMetaData();
+
+                            int width = frameData.width;
+                            int height = frameData.height;
+                            int x = frameData.x;
+                            int y = atlas.height - height - frameData.y;//TexturePacker以左上为原点，Unity以左下为原点
+
+                            md.rect = new Rect(x, y, width, height);
+                            md.pivot = md.rect.center;
+                            md.name = frameData.name;
+
+                            spriteDataList.Add(md);
+                        }
+                        importer.textureType = TextureImporterType.Sprite;          //设置为精灵图集
+                        importer.spriteImportMode = SpriteImportMode.Multiple;      //设置为多个
+                        importer.spritesheet = spriteDataList.ToArray();
+                        importer.SaveAndReimport();
+                    }
+                    Debug.Log(string.Format("图集:{0},共生成{1}帧", atlas.name, atlas.SubTexture.Count));
+                }
+               
+            }
+        }
+
+        /////////////////////////Object设置///////////////////////////
+        public static bool SetupTextureImporter(TextureImporter textureImporter)
+        {
+            if (textureImporter == null)
+                return false;
+
+            textureImporter.textureType = TextureImporterType.Sprite;           //精灵
+            textureImporter.spriteImportMode = SpriteImportMode.Multiple;       //图集
+
+            return true;
+        }
+        //设置状态
+        public static bool SetupAnimationState(AnimatorController ctrl, AnimationClip clip, bool isDefault = false)
+        {
+            if (ctrl && clip)
+            {
+                //是否存在,没有就添加,有就覆盖
+                var stateMachine = ctrl.layers[0].stateMachine;
+                foreach (var stateInfo in stateMachine.states)
+                {
+                    if (stateInfo.state.name == clip.name)
+                    {
+                        stateInfo.state.motion = clip;
+                        if (isDefault)                      //默认状态也改下
+                        {
+                            stateMachine.defaultState = stateInfo.state;
+                        }
+                        AssetDatabase.SaveAssets(); //保存变更
+                        return true;
+                    }
+                }
+                var state = ctrl.AddMotion(clip);
+                if (isDefault)
+                {
+                    stateMachine.defaultState = state;
+                }
+                AssetDatabase.SaveAssets(); //保存变更
+                return true;
+            }
+            return false;
         }
     }
 
