@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace THEditor
 {
-    public class BundleBuildeConfig : ScriptableObject
+    public class BundleBuildeUtil
     {
 
     }
