@@ -18,10 +18,10 @@ namespace THEditor
 
 
         //需要手动设置
-        public string srcFolderSprite = "Assets/Asset/Source/Sprite";
-        public string srcFolderModel = "Assets/Asset/Source/Models";
-        public string srcFolderEffect = "Assets/Asset/Source/Effects";
-        public string srcFolderLevel = "Assets/Asset/Source/Level";
+        public string srcFolderSprite = "";
+        public string srcFolderModel = "";
+        public string srcFolderEffect = "";
+        public string srcFolderLevel = "";
 
         public bool isAutoGenModelPrefab = false;
         public bool isAutoGenSpriteClip = false;

@@ -9,7 +9,8 @@ namespace THEditor
 {
     public static class SpriteTools
     {
-        public static readonly float frameRate = 24.0f;//统一24帧
+        public static readonly string controllerName = "controller.controller";
+        public static readonly float frameRate = 12.0f;//统一12帧
 
         ///
         public static TextureImporter LoadImporterFromTextureFile(string assetPath)
@@ -151,8 +152,15 @@ namespace THEditor
                         }
 
                         string idName = metadata.idName;
-                        frameList.Add(idName, metadata);
+                        if (frameList.ContainsKey(idName))
+                        {
+                            Debug.LogWarning(string.Format("{0}_{1}重复ID:{2}", groupName, actionName, idName));
 
+                            metadata.idName = string.Format("{0}_{1}", metadata.idName, frameList.Count);
+                            idName = metadata.idName;
+
+                        }
+                        frameList.Add(idName, metadata);
                     }
                 }
 
@@ -227,7 +235,7 @@ namespace THEditor
             }
             return null;
         }
-        public static AnimatorController GenerateAnimationControllerFromAnimationClipFile(string assetPath, string savePath, bool isDefault = false)
+        public static AnimatorController GenerateAnimationControllerFromAnimationClipFile(string assetPath, string savePath = "", bool isDefault = false)
         {
             //没有就创建,有就添加
             AnimatorController ctrl = null;
@@ -245,8 +253,6 @@ namespace THEditor
                 AnimationClip animClip = AssetDatabase.LoadAssetAtPath<AnimationClip>(assetPath);
                 if (animClip)
                 {
-                    string assetFileNonExtName = Path.GetFileNameWithoutExtension(assetPath);
-                    string assetRootPath = Path.GetDirectoryName(assetPath);
 
                     SetupAnimationState(ctrl, animClip, isDefault);
                 }
@@ -256,8 +262,62 @@ namespace THEditor
             return ctrl;
         }
 
+        public static GameObject GeneratePrefabFromAnimationControllerFile(string assetPath, string savePath = "")
+        {
+            string assetFileNonExtName = Path.GetFileNameWithoutExtension(assetPath);
+            string assetRootPath = Path.GetDirectoryName(assetPath);
+
+            AnimatorController ctrl = AssetDatabase.LoadAssetAtPath<AnimatorController>(assetPath);
+            if (ctrl)
+            {
+                GameObject spriteGO = new GameObject();
+
+                var spriteRenderer = spriteGO.AddComponent<SpriteRenderer>();
+                var animator = spriteGO.AddComponent<Animator>();
+
+                animator.runtimeAnimatorController = ctrl;
+
+                
+                if (ctrl.animationClips.Length > 0)
+                {
+                    if (ctrl.layers.Length > 0)
+                    {
+                        var defaultState = ctrl.layers[0].stateMachine.defaultState;
+                        var clip = defaultState.motion as AnimationClip;
+                        if (clip)
+                        {
+                            var binds = AnimationUtility.GetObjectReferenceCurveBindings(clip);
+                            if (binds.Length > 0)
+                            {
+                                var keyFrames = AnimationUtility.GetObjectReferenceCurve(clip, binds[0]);
+                                if (keyFrames.Length > 0)
+                                {
+                                    spriteRenderer.sprite = keyFrames[0].value as Sprite;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+
+                if (savePath == "")
+                {
+                    string assetRootPathName = Path.GetFileNameWithoutExtension(assetRootPath);
+                    savePath = Path.Combine(assetRootPath, string.Format("{0}.prefab", assetRootPathName));
+                }
+                
+                GameObject outGO = PrefabUtility.SaveAsPrefabAsset(spriteGO,savePath);
+                Object.DestroyImmediate(spriteGO);
+
+                AssetDatabase.SaveAssets();
+                return outGO;
+            }
+
+            return null;
+        }
+
         [System.Serializable]
-        public class DBSheet
+        class DBSheet
         {
             [System.Serializable]
             public class DBFrame
@@ -273,6 +333,54 @@ namespace THEditor
             public int width;
             public int height;
             public List<DBFrame> SubTexture = new List<DBFrame>();
+        }
+
+        public static void GenerateDBJsonFromDBTextureFile(string assetPath, string savePath = "")
+        {
+            string assetFileNonExtName = Path.GetFileNameWithoutExtension(assetPath);
+            string assetRootPath = Path.GetDirectoryName(assetPath);
+            TextureImporter importer = LoadImporterFromTextureFile(assetPath);
+            if (importer)
+            {
+                //判断是否是精灵图集
+                if (!(importer.textureType == TextureImporterType.Sprite && importer.spriteImportMode == SpriteImportMode.Multiple))
+                    return ;
+
+                Texture texture = AssetDatabase.LoadAssetAtPath<Texture>(assetPath);
+
+                DBSheet sheet = new DBSheet();
+                sheet.name = assetFileNonExtName;
+                sheet.imagePath = Path.GetFileName(assetPath);
+                sheet.width = texture.width;
+                sheet.height = texture.height;
+
+
+                //获取所有精灵帧
+                Object[] sheetObjs = AssetDatabase.LoadAllAssetsAtPath(assetPath);
+                for(int i = 1; i < sheetObjs.Length; i++)   //第一张不是精灵帧
+                {
+                    Sprite sprite = sheetObjs[i] as Sprite;
+                    Rect rect = sprite.rect;
+                    DBSheet.DBFrame frame = new DBSheet.DBFrame();
+                    frame.name = sprite.name;
+                    frame.width = (int)rect.width;
+                    frame.height = (int)rect.height;
+                    frame.x = (int)rect.x;
+                    frame.y = (int)(sheet.height - frame.height - rect.y);
+
+                    sheet.SubTexture.Add(frame);
+                }
+
+                var jsonStr = JsonUtility.ToJson(sheet);
+
+                if (savePath == "")
+                {
+                    savePath = PathUtil.Combine(assetRootPath, string.Format("{0}.json", assetFileNonExtName));
+                }
+                File.WriteAllText(savePath, jsonStr, Encoding.UTF8);
+                AssetDatabase.Refresh();
+            }
+
         }
 
         /// <summary>
@@ -369,6 +477,18 @@ namespace THEditor
                     stateMachine.defaultState = state;
                 }
                 AssetDatabase.SaveAssets(); //保存变更
+                return true;
+            }
+            return false;
+        }
+
+        public static bool SetupAnimationClipLoop(AnimationClip clip, bool isLoop)
+        {
+            if (clip)
+            {
+                AnimationClipSettings clipSetting = AnimationUtility.GetAnimationClipSettings(clip);
+                clipSetting.loopTime = isLoop;
+                AnimationUtility.SetAnimationClipSettings(clip, clipSetting);
                 return true;
             }
             return false;
