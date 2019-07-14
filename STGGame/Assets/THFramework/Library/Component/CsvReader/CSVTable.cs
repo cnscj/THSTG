@@ -39,7 +39,7 @@ namespace THGame
             string content = sr.ReadToEnd();
             sr.Close();
             sr.Dispose();
-
+ 
             CSVTable table = new CSVTable(content);
             return table;
         }
@@ -79,7 +79,9 @@ namespace THGame
 
             string keyLine = lines[0];
             string[] keys = keyLine.Split(',');
-            CSVTable table = new CSVTable(keys);
+
+            _atrributeKeys = new List<string>(keys);
+            _dataObjDic = new Dictionary<string, CSVObject>();
 
             for (int i = 1; i < lines.Length; i++)
             {
@@ -93,7 +95,7 @@ namespace THGame
                     tempAttributeDic.Add(key, value);
                 }
                 CSVObject dataObj = new CSVObject(major, tempAttributeDic, keys);
-                table[dataObj.ID] = dataObj;
+                this[dataObj.ID] = dataObj;
             }
         }
 

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace THGame
 {
-    public class DispatcherManager : Singleton<DispatcherManager>
+    public static class DispatcherManager
     {
         private static int s_dispatcherId = 10000;
         private static Dictionary<int, Dispatcher> s_dispatcherMap = new Dictionary<int, Dispatcher>();
@@ -19,8 +19,6 @@ namespace THGame
             return pair;
         }
 
-
-       
     }
 }
 

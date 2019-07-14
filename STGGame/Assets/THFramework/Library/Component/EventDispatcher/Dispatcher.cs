@@ -8,7 +8,7 @@ namespace THGame
     /// </summary>
     public class Dispatcher
     {
-        public delegate void EventListener(Dictionary<string, object> args);
+        public delegate void EventListener(int eventId, Dictionary<string, object> args);
         private Dictionary<int, SortedList<int,EventListener>> m_listeners = new Dictionary<int, SortedList<int, EventListener>>();
 
         /// <summary>
@@ -19,9 +19,10 @@ namespace THGame
         public void Dispatch(int eventId, Dictionary<string, object> args = null)
         {
             var listeners = GetEventListeners(eventId);
-            for (var i = 0; i < listeners.Count; i++)
+            foreach(var pair in listeners)
             {
-                listeners[i].Invoke(args);
+                var listener = pair.Value;
+                listener.Invoke(eventId, args);
             }
         }
 
