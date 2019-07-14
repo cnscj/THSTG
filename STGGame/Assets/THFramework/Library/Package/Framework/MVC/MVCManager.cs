@@ -7,17 +7,28 @@ namespace THGame
     {
         public class MVCManager
         {
-            private Dictionary<string, Controller> controllerMaps = new Dictionary<string, Controller>();
-            public Controller AddController<T>(string name) where T : Controller, new()
+            private Dictionary<string, Module> moduleMaps = new Dictionary<string, Module>();
+            public Module AddModule<T>(string name) where T : Module, new()
             {
-                T controller = new T();
-                controllerMaps.Add(name, controller);
+                T module = new T();
+                bool ret = module.Init();
+                if (ret)
+                {
+                    moduleMaps.Add(name, module);
+                    return module;
+                }
+                
                 return null;
             }
 
-            public void RemoveController(string name)
+            public void RemoveModule(string name)
             {
-                controllerMaps.Remove(name);
+                moduleMaps.Remove(name);
+            }
+
+            public Module getModule(string name)
+            {
+                return moduleMaps[name];
             }
         }
     }
