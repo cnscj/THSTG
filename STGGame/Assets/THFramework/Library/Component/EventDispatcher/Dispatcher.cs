@@ -64,6 +64,16 @@ namespace THGame
             m_listeners.Clear();
         }
 
+        /// <summary>
+        /// 是否有该事件的监听器
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <returns></returns>
+        public bool HasListener(int eventId)
+        {
+            var listeners = GetEventListeners(eventId);
+            return listeners.Count > 0;
+        }
 
         private SortedList<int, EventListener> GetEventListeners(int eventId)
         {

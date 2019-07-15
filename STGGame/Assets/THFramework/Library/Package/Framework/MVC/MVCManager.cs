@@ -5,30 +5,30 @@ namespace THGame
 {
     namespace MVC
     {
-        public class MVCManager
+        public class MVCManager : Singleton<MVCManager>
         {
-            private Dictionary<string, Module> moduleMaps = new Dictionary<string, Module>();
-            public Module AddModule<T>(string name) where T : Module, new()
+            private Dictionary<string, Controller> controllerMaps = new Dictionary<string, Controller>();
+            public Controller AddController<T>(string name) where T : Controller, new()
             {
-                T module = new T();
-                bool ret = module.Init();
+                T controller = new T();
+                bool ret = controller.Initialize();
                 if (ret)
                 {
-                    moduleMaps.Add(name, module);
-                    return module;
+                    controllerMaps.Add(name, controller);
+                    return controller;
                 }
                 
                 return null;
             }
 
-            public void RemoveModule(string name)
+            public void RemoveController(string name)
             {
-                moduleMaps.Remove(name);
+                controllerMaps.Remove(name);
             }
 
-            public Module getModule(string name)
+            public Controller GetController(string name)
             {
-                return moduleMaps[name];
+                return controllerMaps[name];
             }
         }
     }
