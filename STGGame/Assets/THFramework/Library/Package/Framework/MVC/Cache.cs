@@ -1,14 +1,11 @@
 ﻿using System;
-namespace THGame
+namespace THGame.Package.MVC
 {
-    namespace MVC
+    public class Cache
     {
-        public class Cache
+        public virtual void Clear()
         {
-            public virtual void Clear()
-            {
 
-            }
         }
     }
 }

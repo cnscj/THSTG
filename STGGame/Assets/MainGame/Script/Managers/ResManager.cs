@@ -1,5 +1,7 @@
 ﻿using System.IO;
 using THGame;
+using THGame.Package;
+
 namespace STGGame
 {
     public class ResManager : Singleton<ResManager>

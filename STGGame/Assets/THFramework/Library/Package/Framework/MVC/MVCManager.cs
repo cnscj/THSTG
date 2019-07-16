@@ -1,35 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace THGame
+namespace THGame.Package.MVC
 {
-    namespace MVC
+    public class MVCManager
     {
-        public class MVCManager : Singleton<MVCManager>
+        private Dictionary<string, Controller> controllerMaps = new Dictionary<string, Controller>();
+        public Controller AddController<T>(string name) where T : Controller, new()
         {
-            private Dictionary<string, Controller> controllerMaps = new Dictionary<string, Controller>();
-            public Controller AddController<T>(string name) where T : Controller, new()
+            T controller = new T();
+            bool ret = controller.Initialize();
+            if (ret)
             {
-                T controller = new T();
-                bool ret = controller.Initialize();
-                if (ret)
-                {
-                    controllerMaps.Add(name, controller);
-                    return controller;
-                }
-                
-                return null;
+                controllerMaps.Add(name, controller);
+                return controller;
             }
 
-            public void RemoveController(string name)
-            {
-                controllerMaps.Remove(name);
-            }
+            return null;
+        }
 
-            public Controller GetController(string name)
-            {
-                return controllerMaps[name];
-            }
+        public void RemoveController(string name)
+        {
+            controllerMaps.Remove(name);
+        }
+
+        public Controller GetController(string name)
+        {
+            return controllerMaps[name];
         }
     }
 }

@@ -2,6 +2,8 @@
 using UnityEngine;
 using Unity.Entities;
 using THGame;
+using THGame.Package;
+
 namespace STGGame
 {
     public class GameManager : SingletonBehaviour<GameManager>
@@ -9,7 +11,7 @@ namespace STGGame
         private void Start()
         {
             EntityManager.GetInstance().CreatePlayer();
-            for (int i = 0;i < 1000; i++)
+            for (int i = 0;i < 5; i++)
             {
                 var entity = EntityManager.GetInstance().CreateMob();
                 Transform trsns = entity.GetComponent<Transform>();

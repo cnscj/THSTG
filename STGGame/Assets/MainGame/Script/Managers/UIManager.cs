@@ -2,6 +2,8 @@
 using UnityEngine;
 using Unity.Entities;
 using THGame;
+using THGame.Package;
+
 namespace STGGame
 {
     public class UIManager : SingletonBehaviour<UIManager>

@@ -1,18 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using THGame.Package.MVC;
 using UnityEngine;
 
-public class MainUIController : MonoBehaviour
+namespace STGGame
 {
-    // Start is called before the first frame update
-    void Start()
+    public class MainUIController : Controller
     {
-        
+        public MainUIController()
+        {
+            
+        }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

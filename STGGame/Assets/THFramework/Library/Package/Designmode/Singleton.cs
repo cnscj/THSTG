@@ -1,5 +1,5 @@
 ﻿using System;
-namespace THGame
+namespace THGame.Package
 {
     public class Singleton<T> where T : class//new()，new不支持非公共的无参构造函数 
     {

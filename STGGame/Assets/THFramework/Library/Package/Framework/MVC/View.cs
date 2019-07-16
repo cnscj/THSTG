@@ -1,11 +1,8 @@
 ﻿using System;
-namespace THGame
+namespace THGame.Package.MVC
 {
-    namespace MVC
+    public class View
     {
-        public class View
-        {
-           
-        }
+
     }
 }

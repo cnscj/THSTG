@@ -1,7 +1,7 @@
 ﻿
 using System;
 using UnityEngine;
-namespace THGame
+namespace THGame.Package
 {
     public class SingletonBehaviour<T> : MonoBehaviour where T : MonoBehaviour
     {

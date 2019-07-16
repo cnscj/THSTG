@@ -5,6 +5,7 @@ using Unity.Entities;
 using THGame;
 using Unity.Collections;
 using System;
+using THGame.Package;
 
 namespace STGGame
 {

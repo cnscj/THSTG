@@ -2,17 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MainUICache : MonoBehaviour
+namespace STGGame
 {
-    // Start is called before the first frame update
-    void Start()
+    public class MainUICache
     {
-        
+      
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
