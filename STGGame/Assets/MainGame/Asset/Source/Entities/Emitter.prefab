@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5664760783282695875}
   - component: {fileID: 8018057994453206761}
+  - component: {fileID: 3271932590645013538}
   m_Layer: 0
   m_Name: Emitter
   m_TagString: Untagged
@@ -43,3 +44,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bf10cdea1344482e91a4f2b58506b77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3271932590645013538
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9159601338654894042}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e35a4b2e50ed14997b48077ed71b98c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  launchEntities: []
+  launchFreq: 0
+  launchTimes: -1
+  launchNum: 1
+  launchSpeed: 1
+  launchType: 1
+  launchLineAngle: 0
+  launchLineDuration: 0
+  launchSurroundMinRadius: 0
+  launchRandomMinRadius: 0

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace THGame
 {
-    public class BehaviourMppper : MonoBehaviour
+    public class BehaviourMapper : MonoBehaviour
     {
         //记录按键状态
         [System.Serializable]
@@ -12,6 +12,12 @@ namespace THGame
         {
             public int behaviour;
             public List<KeyCode> keycodes = new List<KeyCode>();
+        }
+        enum EKeyStatus
+        {
+            At = 2 ^ 0,
+            Up = 2 ^ 1,
+            Down = 2 ^ 2,
         }
         public List<KeyPair> keyList = new List<KeyPair>();
         public Dictionary<KeyCode, int> keyMaps = new Dictionary<KeyCode, int>();                   //按键映射
@@ -26,7 +32,7 @@ namespace THGame
             return false;
         }
 
-        private void Start()
+        private void Awake()
         {
             foreach (var pair in keyList)
             {

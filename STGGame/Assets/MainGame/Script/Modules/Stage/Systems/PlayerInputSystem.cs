@@ -21,7 +21,7 @@ namespace STGGame
                     bool ret = false;
                     foreach(var keyCode in keyPair.keycodes)
                     {
-                        ret = ret | Input.GetKey(keyCode);
+                        ret |= Input.GetKey(keyCode);
                     }
                     entity.input.keyStatus[keyPair.behaviour] = ret;
                 }
