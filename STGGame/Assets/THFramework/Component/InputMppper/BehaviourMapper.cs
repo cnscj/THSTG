@@ -20,14 +20,15 @@ namespace THGame
             Down = 2 ^ 2,
         }
         public List<KeyPair> keyList = new List<KeyPair>();
-        public Dictionary<KeyCode, int> keyMaps = new Dictionary<KeyCode, int>();                   //按键映射
-        public Dictionary<int, bool> keyStatus = new Dictionary<int, bool>();                       //按键状态
+        public Dictionary<KeyCode, int> keyMaps = new Dictionary<KeyCode, int>();                       //按键映射
+        public Dictionary<int, short> keyStatus = new Dictionary<int, short>();                         //按键状态
 
         public bool IsAtBehaviour(int behaviour)
         {
             if (keyStatus.ContainsKey(behaviour))
             {
-                return keyStatus[behaviour];
+                short status = keyStatus[behaviour];
+                return ((status & (int)EKeyStatus.At) > 0);
             }
             return false;
         }
@@ -51,12 +52,18 @@ namespace THGame
             //把所有的按键记录到输入组件中
             foreach (var keyPair in keyList)
             {
-                bool ret = false;
+                short status = 0x0;
+                bool []rets = new bool[3];
                 foreach (var keyCode in keyPair.keycodes)
                 {
-                    ret = ret | Input.GetKey(keyCode);
+                    rets[0] = rets[0] | Input.GetKey(keyCode);
+                    rets[1] = rets[1] | Input.GetKeyDown(keyCode);
+                    rets[2] = rets[2] | Input.GetKeyUp(keyCode);
                 }
-                keyStatus[keyPair.behaviour] = ret;
+                status = rets[0] ? (short)(status | ((int)EKeyStatus.At)): status;
+                status = rets[1] ? (short)(status | ((int)EKeyStatus.Down)) : status;
+                status = rets[2] ? (short)(status | ((int)EKeyStatus.Up)) : status;
+                keyStatus[keyPair.behaviour] = status;
             }
         }
     }
