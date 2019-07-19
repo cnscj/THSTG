@@ -85,7 +85,8 @@ namespace THEditor
         private void OnEnable()
         {
             m_editor = (EntityEmitter)target;
-            normalProps.Clear();
+            Clear();
+
 
             AddPropertys(normalProps, "发射实体队列", "launchEntities");
             AddPropertys(normalProps, "发射频度(s)", "launchFreq");
@@ -108,6 +109,15 @@ namespace THEditor
             AddPropertys(randomProps, "最小半径", "launchRandomMinRadius");
             AddPropertys(randomProps, "最大半径", "launchRandomMaxRadius");
 
+        }
+        void Clear()
+        {
+            normalProps.Clear();
+            launchOrderProps.Clear();
+
+            lineProps.Clear();
+            surroundProps.Clear();
+            randomProps.Clear();
         }
 
         void Awake()

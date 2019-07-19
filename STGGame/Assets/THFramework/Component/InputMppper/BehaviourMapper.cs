@@ -33,6 +33,26 @@ namespace THGame
             return false;
         }
 
+        public bool IsBehaving(int behaviour)
+        {
+            if (keyStatus.ContainsKey(behaviour))
+            {
+                short status = keyStatus[behaviour];
+                return ((status & (int)EKeyStatus.Down) > 0);
+            }
+            return false;
+        }
+
+        public bool IsBehaved(int behaviour)
+        {
+            if (keyStatus.ContainsKey(behaviour))
+            {
+                short status = keyStatus[behaviour];
+                return ((status & (int)EKeyStatus.Up) > 0);
+            }
+            return false;
+        }
+
         private void Awake()
         {
             foreach (var pair in keyList)
