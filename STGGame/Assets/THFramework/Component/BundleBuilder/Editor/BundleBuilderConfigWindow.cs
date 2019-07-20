@@ -6,7 +6,7 @@ namespace THEditor
     public class BundleBuilderConfigWindow : EditorWindow
     {
 
-        [MenuItem("THFrameweok/打包工具/全局配置")]
+        [MenuItem("THFramework/资源工具/打包配置")]
         static void ShowWindow()
         {
             BundleBuilderConfigWindow myWindow = (BundleBuilderConfigWindow)EditorWindow.GetWindow(typeof(BundleBuilderConfigWindow), false, "ResourceConfig", false);//创建窗口

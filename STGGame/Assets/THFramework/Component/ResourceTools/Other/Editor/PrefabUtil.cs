@@ -8,7 +8,7 @@ namespace THEditor
     public class PrefabUtil : MonoBehaviour 
     {
 
-        [MenuItem("THSTG/PrefabUtil/Check Prefab Use ?")]
+        [MenuItem("THFramework/资源工具/Prefab是否被引用")]
         private static void OnSearchForReferences()
         {
         //确保鼠标右键选择的是一个Prefab

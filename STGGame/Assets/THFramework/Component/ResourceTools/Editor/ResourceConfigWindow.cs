@@ -6,7 +6,7 @@ namespace THEditor
     public class ResourceConfigWindow : EditorWindow
     {
 
-        [MenuItem("THFrameweok/资源工具/全局配置")]
+        [MenuItem("THFramework/资源工具/资源配置")]
         static void ShowWindow()
         {
             ResourceConfigWindow myWindow = (ResourceConfigWindow)EditorWindow.GetWindow(typeof(ResourceConfigWindow), false, "ResourceConfig", false);//创建窗口

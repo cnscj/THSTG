@@ -46,7 +46,6 @@ namespace THEditor
             m_editor = (CameraShakerSimple)target;
             Clear();
 
-            AddPropertys(normalProps, "震动", "shake");
             AddPropertys(normalProps, "上下", "shakeUpDown");
             AddPropertys(normalProps, "左右", "shakeLeftRight");
             AddPropertys(normalProps, "摇头", "shakeHead");
