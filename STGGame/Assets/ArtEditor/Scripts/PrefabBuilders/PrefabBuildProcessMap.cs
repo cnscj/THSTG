@@ -27,7 +27,6 @@ namespace STGEditor
 
         protected override void OnOnce(string assetPath)
         {
-            Debug.Log("!!!");
             // 处理开始
             var scene = EditorSceneManager.OpenScene(assetPath);
 
