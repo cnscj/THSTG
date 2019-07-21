@@ -9,25 +9,22 @@ namespace THEditor
     public class PostProcesser
     {
         private Md5Checker md5Checker;
-        private Dictionary<string, string> fileMaps;
+        private Dictionary<string, string> checkMaps;
 
         private string m_md5Folder;
         private string m_exportFolder;
 
+        private Md5Checker.CheckType m_md5CheckType = Md5Checker.CheckType.File;
+        private string m_exportFilePath = "";
+
         public PostProcesser(string md5Folder,string exportFolder)
         {
             md5Checker = new Md5Checker(md5Folder);
-            fileMaps = new Dictionary<string, string>();
+            checkMaps = new Dictionary<string, string>();
 
             m_md5Folder = md5Folder;
             m_exportFolder = exportFolder;
-            if (m_exportFolder != "")
-            {
-                if (!XFolderTools.Exists(m_exportFolder))
-                {
-                    XFolderTools.CreateDirectory(m_exportFolder);
-                }
-            }
+            
         }
 
         public virtual void Do()
@@ -47,6 +44,22 @@ namespace THEditor
         {
             //清空
             Clear();
+
+            if (m_md5Folder != "")
+            {
+                if (!XFolderTools.Exists(m_md5Folder))
+                {
+                    XFolderTools.CreateDirectory(m_md5Folder);
+                }
+            }
+
+            if (m_exportFolder != "")
+            {
+                if (!XFolderTools.Exists(m_exportFolder))
+                {
+                    XFolderTools.CreateDirectory(m_exportFolder);
+                }
+            }
         }
 
 
@@ -57,12 +70,13 @@ namespace THEditor
             {
                 string fileNameWithNotEx = Path.GetFileNameWithoutExtension(fullPath);
                 string fileEx = Path.GetExtension(fullPath);
-                if(fileEx.Contains("meta"))
+                string resId = GetResourceId(fileNameWithNotEx);
+                if (fileEx.Contains("meta"))
                 {
                     return;
                 }
                 
-                if (!fileMaps.ContainsKey(fileNameWithNotEx))
+                if (!checkMaps.ContainsKey(resId))
                 {
                     string relaPath = XFileTools.GetFileRelativePath(fullPath);
                     string relaRootPath = Path.GetDirectoryName(relaPath);
@@ -75,12 +89,13 @@ namespace THEditor
             {
                 string fileNameWithNotEx = Path.GetFileNameWithoutExtension(fullPath);
                 string fileEx = Path.GetExtension(fullPath);
+                string resId = GetResourceId(fileNameWithNotEx);
                 if (fileEx.Contains("meta"))
                 {
                     return;
                 }
 
-                if (!fileMaps.ContainsKey(fileNameWithNotEx))
+                if (!checkMaps.ContainsKey(resId))
                 {
                     string relaPath = XFileTools.GetFileRelativePath(fullPath);
                     string relaRootPath = Path.GetDirectoryName(relaPath);
@@ -94,7 +109,7 @@ namespace THEditor
                 }
             });
 
-
+            AssetDatabase.Refresh();
         }
 
         protected virtual List<string> OnFilter()
@@ -102,7 +117,10 @@ namespace THEditor
             List<string> filList = new List<string>();
             return filList;
         }
+        protected virtual void OnPreOnce(string assetPath)
+        {
 
+        }
         protected virtual void OnOnce(string assetPath)
         {
 
@@ -110,14 +128,33 @@ namespace THEditor
 
         public void Clear()
         {
-            fileMaps.Clear();
-        }
+            checkMaps.Clear();
+            m_md5CheckType = Md5Checker.CheckType.File;
+            m_exportFilePath = "";
 
-        protected string GetExportPath(string fileName)
+    }
+    protected void SetSaveMd5Name(string md5Name)
         {
-            return PathUtil.Combine(m_exportFolder, fileName);
+            md5Checker.SetSvaeMd5Name(md5Name);
+        }
+        protected void SetExportName(string exportName)
+        {
+            m_exportFilePath = PathUtil.Combine(m_exportFolder, exportName);
         }
 
+        protected void SetMd5CheckType(Md5Checker.CheckType type)
+        {
+            m_md5CheckType = type;
+        }
+
+        protected string GetExportPath(string fileName = "")
+        {
+            return m_exportFilePath == "" ? Path.Combine(m_exportFolder, fileName) : m_exportFilePath;
+        }
+        protected string GetResourceId(string path)
+        {
+            return XStringTools.SplitPathId(Path.GetFileNameWithoutExtension(path));
+        }
         private void DoOnce(string assetPath)
         {
             if (assetPath == "")
@@ -125,21 +162,24 @@ namespace THEditor
                 return;
             }
 
+            OnPreOnce(assetPath);
+
             string fileNameWithNotEx = Path.GetFileNameWithoutExtension(assetPath);
             string fileName = Path.GetFileName(assetPath);
+            string checkName = GetResourceId(fileName);
+            string saveFilePath = GetExportPath(fileName);
 
-            if (fileMaps.ContainsKey(fileName))
+            if (checkMaps.ContainsKey(checkName))
             {
                 return;
             }
 
-            if (!md5Checker.IsMd5Changed(Md5Checker.CheckType.File, assetPath))
+            if (!md5Checker.IsMd5Changed(m_md5CheckType, assetPath))
             {
                 //MD5没变,但是目标文件被删除
-                string exportFilePath = Path.Combine(m_exportFolder, fileName);
-                if (XFileTools.Exists(exportFilePath))
+                if (XFileTools.Exists(saveFilePath))
                 {
-                    fileMaps.Add(fileNameWithNotEx, assetPath);
+                    checkMaps.Add(checkName, assetPath);
                     return;
                 }
             }
@@ -148,7 +188,7 @@ namespace THEditor
                 OnOnce(assetPath);
 
                 md5Checker.SaveMd5Changed();
-                fileMaps.Add(fileNameWithNotEx, assetPath);
+                checkMaps.Add(checkName, assetPath);
             }
         }
     }

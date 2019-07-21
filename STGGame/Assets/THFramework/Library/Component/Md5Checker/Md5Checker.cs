@@ -1,8 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿
 using System.IO;
-using THGame;
-using UnityEngine;
 namespace THGame
 {
     public class Md5Checker
@@ -18,6 +15,7 @@ namespace THGame
 
         private string m_curRecPath;
         private string m_checkMd5;
+        private string m_saveMd5Name = "";
 
         public Md5Checker(string md5Folder = "")
         {
@@ -39,7 +37,7 @@ namespace THGame
             {
                 saveFolderPath = Path.GetDirectoryName(scrPath);
             }
-            m_curRecPath = PathUtil.Combine(saveFolderPath, string.Format("{0}{1}", fileNotExName, suffix));
+            m_curRecPath = PathUtil.Combine(saveFolderPath, string.Format("{0}{1}", (m_saveMd5Name == "" ? fileNotExName : m_saveMd5Name), suffix));
 
             m_checkMd5 = GetMd5(type, scrPath);
             string recMd5 = LoadMd5(m_curRecPath);
@@ -51,6 +49,16 @@ namespace THGame
 
             return false;
 
+        }
+
+        public void SetSvaeMd5Name(string fileName)
+        {
+            m_saveMd5Name = fileName;
+        }
+
+        public string GetSvaeMd5Name()
+        {
+            return m_saveMd5Name;
         }
 
         public void SaveMd5Changed()

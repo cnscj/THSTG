@@ -493,6 +493,17 @@ namespace THEditor
             }
             return false;
         }
+        public static bool SetupBoxCollider(GameObject Go)
+        {
+            if (Go)
+            {
+                if(!Go.GetComponent<BoxCollider2D>())
+                {
+                    Go.AddComponent<BoxCollider2D>();
+                }
+            }
+            return false;
+        }
     }
 
 }

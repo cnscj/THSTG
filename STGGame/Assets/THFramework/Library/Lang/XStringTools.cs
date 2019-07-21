@@ -99,20 +99,12 @@ namespace THGame
 		/// <returns></returns>
 		public static string SplitPathId(string path)
 		{
-			string fileId = "";
-			int startPos = path.LastIndexOf("/", System.StringComparison.Ordinal);
-			if (startPos != -1) //如果是路径,则取文件名
-			{
-				path = path.Substring(startPos + 1);
-			}
-			startPos = path.IndexOf("_", System.StringComparison.Ordinal);
-			if (startPos != -1) 
-			{
-				fileId = path.Substring(0, startPos);//取得编号
-			}
-			
-			return fileId;
-		}
+            string fileName = Path.GetFileNameWithoutExtension(path);
+            int indexOf_ = fileName.IndexOf('_');
+            string pathId = (indexOf_ == -1) ? fileName : fileName.Remove(indexOf_);
+            int iPathId;
+            return !int.TryParse(pathId, out iPathId) ? "" : pathId;
+        }
 
 	}
 }

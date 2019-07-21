@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using THGame;
 using THGame.Package;
 using UnityEngine;
@@ -11,16 +12,23 @@ namespace STGGame
         public static readonly string srcModel = PathUtil.Combine(srcResource, "Models");
         public static readonly string srcSprite = PathUtil.Combine(srcResource, "Sprites");
         //可能是AB,可能是源文件
-        public static GameObject GetModel(int id)
+        public GameObject GetModel(int id)
         {
 
             return null;
         }
 
-        public static GameObject GetSprite(int id)
+        public GameObject GetSprite(int id)
         {
             string filePath = PathUtil.Combine(srcSprite, string.Format("{0}.prefab", id));
             return Resources.Load<GameObject>(filePath);
+        }
+
+
+        public void LoadAsync(string path, Action<UnityEngine.Object> loaded, Action<float> progress = null)
+        {
+
+            
         }
     }
 }
