@@ -14,8 +14,8 @@ namespace THEditor
         private string m_md5Folder;
         private string m_exportFolder;
 
-        private Md5Checker.CheckType m_md5CheckType = Md5Checker.CheckType.File;
         private string m_exportFilePath = "";
+        private string[] m_checkList = null;
 
         public PostProcesser(string md5Folder,string exportFolder)
         {
@@ -129,31 +129,45 @@ namespace THEditor
         public void Clear()
         {
             checkMaps.Clear();
-            m_md5CheckType = Md5Checker.CheckType.File;
             m_exportFilePath = "";
 
-    }
-    protected void SetSaveMd5Name(string md5Name)
+        }
+
+        protected void SetSaveMd5Name(string md5Name)
         {
             md5Checker.SetSvaeMd5Name(md5Name);
         }
+
         protected void SetExportName(string exportName)
         {
             m_exportFilePath = PathUtil.Combine(m_exportFolder, exportName);
-        }
-
-        protected void SetMd5CheckType(Md5Checker.CheckType type)
-        {
-            m_md5CheckType = type;
         }
 
         protected string GetExportPath(string fileName = "")
         {
             return m_exportFilePath == "" ? Path.Combine(m_exportFolder, fileName) : m_exportFilePath;
         }
+
         protected string GetResourceId(string path)
         {
             return XStringTools.SplitPathId(Path.GetFileNameWithoutExtension(path));
+        }
+
+        protected void SetCheckList(string []filesList)
+        {
+            m_checkList = filesList;
+        }
+
+        protected string[] GetDependFiles(string filePath)
+        {
+            List<string> filesPath = new List<string>();
+            string[] oriDepends = AssetDatabase.GetDependencies(filePath, false);
+            foreach (var path in oriDepends)
+            {
+                filesPath.Add(path);
+            }
+            filesPath.Insert(0,filePath);
+            return filesPath.ToArray();
         }
         private void DoOnce(string assetPath)
         {
@@ -164,7 +178,7 @@ namespace THEditor
 
             OnPreOnce(assetPath);
 
-            string fileNameWithNotEx = Path.GetFileNameWithoutExtension(assetPath);
+            //string fileNameWithNotEx = Path.GetFileNameWithoutExtension(assetPath);
             string fileName = Path.GetFileName(assetPath);
             string checkName = GetResourceId(fileName);
             string saveFilePath = GetExportPath(fileName);
@@ -173,8 +187,8 @@ namespace THEditor
             {
                 return;
             }
-
-            if (!md5Checker.IsMd5Changed(m_md5CheckType, assetPath))
+            string[] checkList = m_checkList != null ? m_checkList : GetDependFiles(assetPath);
+            if (!md5Checker.IsMd5Changed(checkList))
             {
                 //MD5没变,但是目标文件被删除
                 if (XFileTools.Exists(saveFilePath))
