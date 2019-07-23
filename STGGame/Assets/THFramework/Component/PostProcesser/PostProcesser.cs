@@ -8,7 +8,7 @@ namespace THEditor
 {
     public class PostProcesser
     {
-        private Md5Checker md5Checker;
+        private FilesChecker fileChecker;
         private Dictionary<string, string> checkMaps;
 
         private string m_md5Folder;
@@ -19,7 +19,7 @@ namespace THEditor
 
         public PostProcesser(string md5Folder,string exportFolder)
         {
-            md5Checker = new Md5Checker(md5Folder);
+            fileChecker = new FilesChecker(md5Folder);
             checkMaps = new Dictionary<string, string>();
 
             m_md5Folder = md5Folder;
@@ -133,9 +133,9 @@ namespace THEditor
 
         }
 
-        protected void SetSaveMd5Name(string md5Name)
+        protected void SetSaveCodeName(string codeName)
         {
-            md5Checker.SetSvaeMd5Name(md5Name);
+            fileChecker.SetSvaeCodeName(codeName);
         }
 
         protected void SetExportName(string exportName)
@@ -188,7 +188,7 @@ namespace THEditor
                 return;
             }
             string[] checkList = m_checkList != null ? m_checkList : GetDependFiles(assetPath);
-            if (!md5Checker.IsMd5Changed(checkList))
+            if (!fileChecker.IsCodeChanged(checkList))
             {
                 //MD5没变,但是目标文件被删除
                 if (XFileTools.Exists(saveFilePath))
@@ -201,7 +201,7 @@ namespace THEditor
             {
                 OnOnce(assetPath);
 
-                md5Checker.SaveMd5Changed();
+                fileChecker.SaveCodeChanged();
                 checkMaps.Add(checkName, assetPath);
             }
         }

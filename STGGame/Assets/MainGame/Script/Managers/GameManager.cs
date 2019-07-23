@@ -6,7 +6,7 @@ using THGame.Package;
 
 namespace STGGame
 {
-    public class GameManager : SingletonBehaviour<GameManager>
+    public class GameManager : MonoSingleton<GameManager>
     {
         private void Start()
         {

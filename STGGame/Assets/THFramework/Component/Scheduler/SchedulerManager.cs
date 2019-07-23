@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace THGame
 {
-    public class SchedulerManager : SingletonBehaviour<SchedulerManager>
+    public class SchedulerManager : MonoSingleton<SchedulerManager>
     {
 		private int m_id = 0;
 		private SortedDictionary<int, Coroutine> m_coroutines = new SortedDictionary<int, Coroutine>();

@@ -9,7 +9,7 @@ using THGame.Package;
 
 namespace STGGame
 {
-    public class EntityManager : SingletonBehaviour<EntityManager>
+    public class EntityManager : MonoSingleton<EntityManager>
     {
         [HideInInspector] public GameObject stageRoot;
         public GameObject mapRoot;

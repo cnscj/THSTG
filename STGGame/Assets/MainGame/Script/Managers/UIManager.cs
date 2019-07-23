@@ -6,7 +6,7 @@ using THGame.Package;
 
 namespace STGGame
 {
-    public class UIManager : SingletonBehaviour<UIManager>
+    public class UIManager : MonoSingleton<UIManager>
     {
         [HideInInspector]public GameObject uiRoot;
         public GameObject mainRoot;

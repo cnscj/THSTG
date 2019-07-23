@@ -6,31 +6,38 @@ using UnityEngine;
 
 namespace THGame
 {
-    public class Md5Checker
+    public class FilesChecker
     {
-        private string m_saveMd5Folder;
+        public enum CodeType
+        {
+            Md5,
+
+        }
+        private string m_saveCodeFolder;
+        private CodeType m_CheckCodeType;
 
         private string m_curRecPath;
-        private string m_checkMd5;
+        private string m_checkCode;
         private string m_saveMd5Name = "";
 
-        public Md5Checker(string md5Folder = "")
+        public FilesChecker(string codeFolder = "", CodeType codeType = CodeType.Md5)
         {
-            m_saveMd5Folder = md5Folder;
-            if(m_saveMd5Folder != "")
+            m_saveCodeFolder = codeFolder;
+            m_CheckCodeType = codeType;
+            if (m_saveCodeFolder != "")
             {
-                if (!XFolderTools.Exists(m_saveMd5Folder))
+                if (!XFolderTools.Exists(m_saveCodeFolder))
                 {
-                    XFolderTools.CreateDirectory(m_saveMd5Folder);
+                    XFolderTools.CreateDirectory(m_saveCodeFolder);
                 }
             }
         }
         
-        public bool IsMd5Changed(string []paths, string md5FileName = "")
+        public bool IsCodeChanged(string []paths, string codeFileName = "")
         {
-            string fileNotExName = md5FileName;
-            string saveFolderPath = m_saveMd5Folder;
-            if (md5FileName == "")
+            string fileNotExName = codeFileName;
+            string saveFolderPath = m_saveCodeFolder;
+            if (codeFileName == "")
             {
                 if (paths.Length >= 1)
                 {
@@ -62,11 +69,11 @@ namespace THGame
             }
 
             m_curRecPath = PathUtil.Combine(saveFolderPath, string.Format("{0}", (m_saveMd5Name == "" ? fileNotExName : m_saveMd5Name)));
-            m_checkMd5 = GetMd5(paths);
+            m_checkCode = GetCode(paths);
 
-            string recMd5 = LoadMd5(m_curRecPath);
+            string recMd5 = LoadCode(m_curRecPath);
 
-            if (m_checkMd5 != recMd5)
+            if (m_checkCode != recMd5)
             {
                 return true;
             }
@@ -75,53 +82,62 @@ namespace THGame
 
         }
 
-        public void SetSvaeMd5Name(string fileName)
+        public void SetSvaeCodeName(string fileName)
         {
             m_saveMd5Name = fileName;
         }
 
-        public string GetSvaeMd5Name()
+        public string GetSvaeCodeName()
         {
             return m_saveMd5Name;
         }
 
-        public void SaveMd5Changed()
+        public void SaveCodeChanged()
         {
-            SaveMd5(m_checkMd5, m_curRecPath);
+            SaveCode(m_checkCode, m_curRecPath);
         }
 
-        public string GetMd5(string []paths)
+        public string GetCode(string []paths)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            SortedList<string, string> codeList = new SortedList<string, string>();
             foreach (var path in paths)
             {
+                string code = "";
                 if (Directory.Exists(path))    //是文件夹
                 {
-                    stringBuilder.Append(GetFolderMd5(path));
+                    code = GetFolderCode(path);
                 }
                 else if (File.Exists(path))
                 {
-                    stringBuilder.Append(GetFileMd5(path));
+                    code = GetFileMd5(path);
                 }
+                codeList.Add(code, path);
+            }
+
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (var codePair in codeList)
+            {
+                string code = codePair.Key;
+                stringBuilder.Append(code);
                 stringBuilder.Append("|");
             }
             stringBuilder.Remove(stringBuilder.Length-1,1);
             return stringBuilder.ToString();
         }
 
-        public string LoadMd5(string path)
+        public string LoadCode(string path)
         {
-            string md5 = "";
+            string code = "";
             if (XFileTools.Exists(path))
             {
-                md5 = File.ReadAllText(path);
+                code = File.ReadAllText(path);
             }
-            return md5;
+            return code;
         }
 
-        public void SaveMd5(string md5, string path)
+        public void SaveCode(string code, string path)
         {
-            File.WriteAllText(path, md5);
+            File.WriteAllText(path, code);
         }
 
         private string GetFileMd5(string filePath)
@@ -129,35 +145,47 @@ namespace THGame
             return XStringTools.FileToMd5(filePath);
         }
 
-        private string GetFilesMd5(string []filePaths)
+        private string GetFileHash(string filePath)
         {
-            SortedList<string, string> md5List = new SortedList<string, string>();
+            return XStringTools.FileToMd5(filePath);
+        }
+
+        private string GetFilesCode(string []filePaths)
+        {
+            SortedList<string, string> codeList = new SortedList<string, string>();
             foreach(var filePath in filePaths)
             {
-                string md5 = GetFileMd5(filePath);
-                md5List.Add(md5, filePath);
+                string code = "";
+                switch (m_CheckCodeType)
+                {
+                    case CodeType.Md5:
+                        code = GetFileMd5(filePath);
+                        break;
+                }
+                
+                codeList.Add(code, filePath);
             }
             //遍历文件夹,遍历所有文件Md5
             StringBuilder stringBuilder = new StringBuilder();
-            foreach (var md5 in md5List)
+            foreach (var code in codeList)
             {
-                stringBuilder.Append(md5.Key);
+                stringBuilder.Append(code.Key);
                 stringBuilder.Append("|");
             }
             
             return stringBuilder.ToString();
         }
 
-        private string GetFolderMd5(string folderPath)
+        private string GetFolderCode(string folderPath)
         {
-            //遍历文件夹,遍历所有文件Md5
+            //遍历文件夹,遍历所有文件Code
             List<string> filePaths = new List<string>();
             XFolderTools.TraverseFiles(folderPath, (fullPath) => {
                 string path = XFileTools.GetFolderPath(fullPath);
                 filePaths.Add(path);
             }, true);
 
-            string md5s = GetFilesMd5(filePaths.ToArray());  
+            string md5s = GetFilesCode(filePaths.ToArray());  
             return XStringTools.StringToMD5(md5s);
         }
 

@@ -29,7 +29,7 @@ namespace STGEditor
         protected override void OnPreOnce(string assetPath)
         {
             string resId = GetResourceId(assetPath);
-            SetSaveMd5Name(string.Format("{0}{1}", resId, "_pubfx"));
+            SetSaveCodeName(string.Format("{0}{1}", resId, "_pubfx"));
             SetExportName(string.Format("{0}.prefab", resId));
         }
 

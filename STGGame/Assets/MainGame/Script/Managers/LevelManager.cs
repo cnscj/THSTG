@@ -7,7 +7,7 @@ using UnityEngine;
 namespace STGGame
 {
     //关卡管理器
-    public class LevelManager : SingletonBehaviour<LevelManager>
+    public class LevelManager : MonoSingleton<LevelManager>
     {
   
     }

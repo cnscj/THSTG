@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace THGame
 {
-    public class ObjectPool
+    public interface IPoolObject
     {
+        void Init();
 
+        void Release();
     }
 }

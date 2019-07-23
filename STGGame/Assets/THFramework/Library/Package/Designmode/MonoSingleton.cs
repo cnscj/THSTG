@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 namespace THGame.Package
 {
-    public class SingletonBehaviour<T> : MonoBehaviour where T : MonoBehaviour
+    public class MonoSingleton<T> : MonoBehaviour where T : MonoBehaviour
     {
         private static T _instance;
         private static object _lock = new object();
