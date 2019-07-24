@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace STGEditor
 {
-    public static class AssetBuildMenu
+    public static class AssetBuilderMenu
     {
         [MenuItem("THSTG/资源/后处理+打包", false, 12)]
         public static void MenuOneKeyAll()
