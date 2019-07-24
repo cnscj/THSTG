@@ -26,21 +26,39 @@ namespace THEditor
 
             //路径设置
             EditorGUILayout.Space();
-            ShowPathBar("源特效路径:", ref ResourceConfig.GetInstance().srcFolderEffect, "Source Effect Path");
-            ShowPathBar("源精灵路径:", ref ResourceConfig.GetInstance().srcFolderSprite, "Source Sprite Path");
-            ShowPathBar("源模型路径:", ref ResourceConfig.GetInstance().srcFolderModel, "Source Model Path");
-            ShowPathBar("源关卡路径:", ref ResourceConfig.GetInstance().srcFolderLevel, "Source Level Path");
+            ShowEditorResList();
 
             //参数设置
             EditorGUILayout.Space();
-            ShowToggle("自动处理模型源文件", ref ResourceConfig.GetInstance().isAutoGenModelPrefab);
-            ShowToggle("自动处理精灵源文件", ref ResourceConfig.GetInstance().isAutoGenSpriteClip);
 
             GUILayout.EndVertical();
         }
 
+        void ShowEditorResList()
+        {
+            foreach (var infos in ResourceConfig.GetInstance().editorResList)
+            {
+                infos.resName = EditorGUILayout.TextField("资源名", infos.resName);
+                ShowPathBar("资源路径:", ref infos.editorFolder);
+                infos.isAutoProcess = EditorGUILayout.Toggle("是否自动预处理", infos.isAutoProcess);
+                if (GUILayout.Button("移除"))
+                {
+                    ResourceConfig.GetInstance().editorResList.Remove(infos);
+                    return;
+                }
+                EditorGUILayout.Space();
+
+            }
+            if (GUILayout.Button("...."))
+            {
+                ResourceConfig.ReourcesConfigInfos info = new ResourceConfig.ReourcesConfigInfos();
+                var buildList = ResourceConfig.GetInstance().editorResList;
+                buildList.Add(info);
+            }
+        }
+
         //路径条
-        void ShowPathBar(string text,ref string path,string desc)
+        void ShowPathBar(string text,ref string path,string desc = "Select Folder Path")
         {
             EditorGUILayout.BeginHorizontal();
             path = EditorGUILayout.TextField(text, path);

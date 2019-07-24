@@ -27,7 +27,7 @@ namespace THEditor
             return processer;
         }
 
-        public void Process()
+        public void ProcessAll()
         {
             foreach(var process in m_processers)
             {
