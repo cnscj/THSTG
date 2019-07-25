@@ -7,15 +7,6 @@ namespace THEditor
 {
     public class BundleBuilderConfig : ScriptableObject
     {
-        [System.Serializable]
-        public class BundleBuilderInfos
-        {
-            public string srcName;
-            public string srcResFolder;
-            public string exportFolder;
-            public string bundleLabel;
-
-        }
         public static readonly string resourcePath = "Assets/Resources";
         public static readonly string configAssetsPath = PathUtil.Combine(resourcePath, "THBundleBuilderConfig.asset");
 

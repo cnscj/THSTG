@@ -51,7 +51,7 @@ namespace THEditor
             }
             if (GUILayout.Button("...."))
             {
-                BundleBuilderConfig.BundleBuilderInfos info = new BundleBuilderConfig.BundleBuilderInfos();
+                BundleBuilderInfos info = new BundleBuilderInfos();
                 var buildList = BundleBuilderConfig.GetInstance().buildInfoList;
                 buildList.Add(info);
             }

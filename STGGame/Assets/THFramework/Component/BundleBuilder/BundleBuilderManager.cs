@@ -10,6 +10,7 @@ namespace THEditor
         //不同平台下打各自的包
         //公共的抽出来打一个(就是依赖数>1的
         private List<BundleBuilder> m_builders = new List<BundleBuilder>();
+        private List<BundleBuilder> m_defaultBuilders = new List<BundleBuilder>();
 
         public BundleBuilderManager(BundleBuilder [] builders)
         {
@@ -20,47 +21,29 @@ namespace THEditor
         }
         public void BuildAll()
         {
-            foreach (var builer in m_builders)
-            {
-                builer.Build();
-            }
-
+            m_defaultBuilders.Clear();
             foreach (var info in BundleBuilderConfig.GetInstance().buildInfoList)
             {
                 string srcName = info.srcName.ToLower();
                 if (srcName == "shader" || srcName == "shaders")
                 {
-                    BuildShader(info);
+                    m_defaultBuilders.Add(new BundleBuilderShader(info));
                 }
                 else
                 {
-                    BuildOnce(info);
+                    m_defaultBuilders.Add(new BundleBuilderDefault(info));
                 }
             }
 
-        }
+            foreach (var builer in m_builders)
+            {
+                builer.Build();
+            }
 
-        void BuildOnce(BundleBuilderConfig.BundleBuilderInfos info)
-        {
-
-
-        }
-
-        void BuildShader(BundleBuilderConfig.BundleBuilderInfos info)
-        {
-
-
-        }
-
-        void BuildCommon()
-        {
-
-
-        }
-
-        void BuildShare()
-        {
-
+            foreach (var builer in m_defaultBuilders)
+            {
+                builer.Build();
+            }
 
         }
     }
