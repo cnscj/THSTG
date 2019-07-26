@@ -7,7 +7,7 @@ using UnityEngine;
 using THGame;
 namespace THEditor
 {
-    public static class SpriteTools
+    public static class SpriteEditorTools
     {
         public static readonly string controllerName = "controller.controller";
         public static readonly float frameRate = 12.0f;//统一12帧

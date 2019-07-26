@@ -179,12 +179,12 @@ namespace THEditor
             string selectRootPath = Path.GetDirectoryName(assetPath);
             string selectFileName = Path.GetFileNameWithoutExtension(assetPath);
             //处理逻辑
-            var ctrlMap = SpriteTools.GenerateAnimationClipFromTextureFile(assetPath,"",(clip) =>
+            var ctrlMap = SpriteEditorTools.GenerateAnimationClipFromTextureFile(assetPath,"",(clip) =>
             {
                 bool isLoop = SpriteConfig.IsNeedLoop(clip.name);
                 if (isLoop)
                 {
-                    SpriteTools.SetupAnimationClipLoop(clip, isLoop);
+                    SpriteEditorTools.SetupAnimationClipLoop(clip, isLoop);
                 }
             });
             foreach(var groupPair in ctrlMap)
@@ -195,16 +195,16 @@ namespace THEditor
                     string clipFilePath = AssetDatabase.GetAssetPath(clip);
                     string clipRootPath = Path.GetDirectoryName(clipFilePath);
 
-                    string ctrlSavePath = PathUtil.Combine(clipRootPath, SpriteTools.controllerName);
-                    var ctrl = SpriteTools.GenerateAnimationControllerFromAnimationClipFile("", ctrlSavePath);
+                    string ctrlSavePath = PathUtil.Combine(clipRootPath, SpriteEditorTools.controllerName);
+                    var ctrl = SpriteEditorTools.GenerateAnimationControllerFromAnimationClipFile("", ctrlSavePath);
 
                     bool isDefault = SpriteConfig.isDefaultState(clip.name);
-                    SpriteTools.SetupAnimationState(ctrl, clip, isDefault);
+                    SpriteEditorTools.SetupAnimationState(ctrl, clip, isDefault);
 
                 }
                 string clipSavePath = PathUtil.Combine(selectRootPath, groupPair.Key);
-                string ctrlFilePath = PathUtil.Combine(clipSavePath, SpriteTools.controllerName);
-                SpriteTools.GeneratePrefabFromAnimationControllerFile(ctrlFilePath);
+                string ctrlFilePath = PathUtil.Combine(clipSavePath, SpriteEditorTools.controllerName);
+                SpriteEditorTools.GeneratePrefabFromAnimationControllerFile(ctrlFilePath);
             }
         }
 
@@ -212,14 +212,14 @@ namespace THEditor
         {
             string selectRootPath = Path.GetDirectoryName(assetPath);
             string selectFileName = Path.GetFileNameWithoutExtension(assetPath);
-            SpriteTools.SetupSpriteFrameFromDBJsonFile(assetPath);
+            SpriteEditorTools.SetupSpriteFrameFromDBJsonFile(assetPath);
         }
 
         public static void GenSheetJson(string assetPath)
         {
             string selectRootPath = Path.GetDirectoryName(assetPath);
             string selectFileName = Path.GetFileNameWithoutExtension(assetPath);
-            SpriteTools.GenerateDBJsonFromDBTextureFile(assetPath);
+            SpriteEditorTools.GenerateDBJsonFromDBTextureFile(assetPath);
         }
     
     }

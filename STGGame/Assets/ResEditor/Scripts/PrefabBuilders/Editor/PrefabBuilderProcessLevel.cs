@@ -4,19 +4,19 @@ using System.IO;
 using THEditor;
 using UnityEditor;
 using UnityEngine;
-
+using UnityEditor.SceneManagement;
 namespace STGEditor
 {
-    public class PrefabBuildProcessSprite : PostProcesser
+    public class PrefabBuilderProcessLevel : PostProcesser
     {
-        public PrefabBuildProcessSprite(string md5Folder, string exportFolder) : base(md5Folder, exportFolder)
+        public PrefabBuilderProcessLevel(string md5Folder, string exportFolder) : base(md5Folder, exportFolder)
         {
         }
 
         protected override List<string> OnFilter()
         {
             List<string> filList = new List<string>();
-            string[] guids = AssetDatabase.FindAssets("t:Prefab", new string[1] { PrefabBuildConfig.srcSprites });
+            string[] guids = AssetDatabase.FindAssets("t:Scene", new string[1] { PrefabBuildConfig.srcLevels });
             foreach (string guid in guids)
             {
                 string assetPath = AssetDatabase.GUIDToAssetPath(guid);
@@ -27,13 +27,12 @@ namespace STGEditor
 
         protected override void OnOnce(string assetPath)
         {
-            GameObject srcPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
-            GameObject newPrefab = Object.Instantiate(srcPrefab);
+            // 处理开始
+            var scene = EditorSceneManager.OpenScene(assetPath);
 
-
+            // 保存新场景
             string savePath = GetExportPath(Path.GetFileName(assetPath));
-            PrefabUtility.SaveAsPrefabAsset(newPrefab, savePath);
-            Object.DestroyImmediate(newPrefab);
+            EditorSceneManager.SaveScene(scene, savePath);
         }
     }
 }

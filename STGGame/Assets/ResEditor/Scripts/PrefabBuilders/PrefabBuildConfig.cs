@@ -24,12 +24,6 @@ namespace STGEditor
         public static readonly string tempPublicFxMd5s = PathUtil.Combine(temMd5, "Effects");
         public static readonly string tempLevelMd5s = PathUtil.Combine(temMd5, "Levels");
 
-        public static PostProcesserManager processManager = new PostProcesserManager(new PostProcesser[]{
-            new PrefabBuildProcessSprite(tempSpriteMd5s,tempSprites),
-            new PrefabBuildProcessPublicFx(tempPublicFxMd5s,tempPublicFx),
-            new PrefabBuildProcessLevel(tempLevelMd5s,tempLevels),
-
-        });
     }
 }
 

@@ -13,8 +13,8 @@ namespace STGEditor
         {
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             sw.Start();
-            PrefabBuildConfig.processManager.ProcessAll();
-            AssetBuilderConfig.builderManager.BuildAll();
+            PrefabBuilderMain.processManager.ProcessAll();
+            AssetBuilderMain.builderManager.BuildAll();
             sw.Stop();
             Debug.Log(string.Format("处理完成,耗时:{0} s", sw.ElapsedMilliseconds / 1000f));
            
@@ -25,7 +25,7 @@ namespace STGEditor
         {
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             sw.Start();
-            AssetBuilderConfig.builderManager.BuildAll();
+            AssetBuilderMain.builderManager.BuildAll();
             sw.Stop();
             Debug.Log(string.Format("打包完成,耗时:{0} s", sw.ElapsedMilliseconds / 1000f));
         }
