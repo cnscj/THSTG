@@ -8,7 +8,7 @@ namespace THEditor
     public class BundleBuilderDefault : BundleBuilder
     {
         protected BundleBuilderInfos m_buildInfo;
-        public BundleBuilderDefault(BundleBuilderInfos infos)
+        public BundleBuilderDefault(BundleBuilderInfos infos) :base(infos.exportFolder)
         {
             m_buildInfo = infos;
         }

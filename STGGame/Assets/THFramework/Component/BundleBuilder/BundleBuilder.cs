@@ -1,14 +1,23 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using THGame;
 
 namespace THEditor
 {
     public class BundleBuilder
     {
-        public BundleBuilder()
+        private string m_outFolder = "";
+        public BundleBuilder(string outFolder)
         {
-
+            m_outFolder = outFolder;
+            if (m_outFolder != "")
+            {
+                if (!XFolderTools.Exists(m_outFolder))
+                {
+                    XFolderTools.CreateDirectory(m_outFolder);
+                }
+            }
         }
         public virtual void Build()
         {
