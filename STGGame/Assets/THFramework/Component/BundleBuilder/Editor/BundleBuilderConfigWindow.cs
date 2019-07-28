@@ -25,12 +25,18 @@ namespace THEditor
             GUI.skin.label.alignment = TextAnchor.MiddleCenter;
             GUILayout.Label("打包配置");
 
-
+            ShowBundleConfig();
             ShowListItem();
 
 
 
             GUILayout.EndVertical();
+        }
+
+        void ShowBundleConfig()
+        {
+            BundleBuilderConfig.GetInstance().targetType = (BundleBuilderConfig.BuildPlatform)EditorGUILayout.EnumPopup("当前平台", BundleBuilderConfig.GetInstance().targetType);
+            EditorGUILayout.Space();
         }
 
         void ShowListItem()

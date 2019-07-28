@@ -2,6 +2,7 @@
 using System.Collections;
 using THGame.Package;
 using System.Collections.Generic;
+using UnityEditor;
 
 namespace THEditor
 {
@@ -44,7 +45,6 @@ namespace THEditor
             {
                 builer.Build();
             }
-
         }
     }
 }

@@ -164,6 +164,12 @@ namespace THEditor
             string[] oriDepends = AssetDatabase.GetDependencies(filePath, false);
             foreach (var path in oriDepends)
             {
+                string extension = Path.GetExtension(path).ToLower();
+                if (extension.Contains("cs"))
+                {
+                    continue;
+                }
+
                 filesPath.Add(path);
             }
             filesPath.Insert(0,filePath);

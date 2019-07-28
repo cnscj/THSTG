@@ -24,15 +24,9 @@ namespace THEditor
             return filList;
         }
 
-
-        protected override void OnPreOnce(string assetPath)
-        {
-
-        }
-
         protected override void OnOnce(string assetPath)
         {
-
+            SetBundleName(assetPath, m_buildInfo.bundleLabel);
         }
 
     }
