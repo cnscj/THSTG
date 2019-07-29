@@ -1,4 +1,5 @@
-﻿using THEditor;
+﻿using STGGame;
+using THEditor;
 using THGame;
 namespace STGEditor
 {

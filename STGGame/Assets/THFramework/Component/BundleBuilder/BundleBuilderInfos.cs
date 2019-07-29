@@ -1,23 +1,22 @@
 ﻿
-namespace THEditor
+namespace THGame
 {
     [System.Serializable]
     public class BundleBuilderInfos
     {
         public string srcName = "";
         public string srcResFolder = "";
-        public string exportFolder = "";
 
-        private string m_bundleLabel = "";
-        public string bundleLabel
+        private string m_bundleName = "";
+        public string bundleName
         {
             get
             {
-                return m_bundleLabel;
+                return m_bundleName;
             }
             set
             {
-                m_bundleLabel = value.ToLower();
+                m_bundleName = value.ToLower();
             }
         }
     }

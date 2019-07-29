@@ -3,7 +3,7 @@ using System.Collections;
 using THEditor;
 using THGame;
 
-namespace STGEditor
+namespace STGGame
 {
     public static class AssetBuilderConfig
     {
@@ -14,9 +14,7 @@ namespace STGEditor
         public static readonly string tempPublicFx = PathUtil.Combine(temResource, "Effects");
         public static readonly string tempLevels = PathUtil.Combine(temResource, "Levels");
 
-        public static readonly string bundleFolder = "Assets/ResEditor/Z_AutoProcess";
-        public static readonly string bundleResource = PathUtil.Combine(bundleFolder, "AssetBundle");
-        public static readonly string bundleLevels = PathUtil.Combine(bundleResource, "Levels");
-        public static readonly string bundleEffects = PathUtil.Combine(bundleResource, "Effects");
+        public static readonly string bundleNameLevels = "levels/{0}.ab";
+        public static readonly string bundleNameEffects = "effects/{0}.ab";
     }
 }

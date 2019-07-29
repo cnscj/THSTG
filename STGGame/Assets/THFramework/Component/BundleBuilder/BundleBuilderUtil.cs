@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-namespace THEditor
+namespace THGame
 {
     public class BundleBuilderUtil
     {

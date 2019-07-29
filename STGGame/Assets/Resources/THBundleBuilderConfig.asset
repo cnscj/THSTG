@@ -9,16 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a55c3dfb8ad74daab8380d047d194eb, type: 3}
+  m_Script: {fileID: 11500000, guid: a54d1d7c91cbc491296caf2000d0c6e6, type: 3}
   m_Name: THBundleBuilderConfig
   m_EditorClassIdentifier: 
-  buildInfoList:
-  - srcResFolder: 
-    exportFolder: 
-    bundleLabel: 
-  - srcResFolder: 
-    exportFolder: 
-    bundleLabel: 
-  - srcResFolder: 
-    exportFolder: 
-    bundleLabel: 
+  targetType: 0
+  isBuildShare: 0
+  exportFolder: 
+  buildInfoList: []

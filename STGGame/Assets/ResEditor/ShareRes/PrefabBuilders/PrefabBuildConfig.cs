@@ -1,6 +1,6 @@
 ﻿using THEditor;
 using THGame;
-namespace STGEditor
+namespace STGGame
 {
     public static class PrefabBuildConfig
     {

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using STGGame;
 using THEditor;
 using THGame;
 using UnityEditor;

@@ -40,7 +40,7 @@ TextureImporter:
     21300070: player00_31
     21300072: player00_32
   externalObjects: {}
-  serializedVersion: 7
+  serializedVersion: 9
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -872,5 +872,5 @@ TextureImporter:
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
   userData: 
-  assetBundleName: 
+  assetBundleName: sprites/share.ab
   assetBundleVariant: 

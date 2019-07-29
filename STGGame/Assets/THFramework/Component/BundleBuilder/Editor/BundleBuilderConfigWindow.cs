@@ -29,13 +29,14 @@ namespace THEditor
             ShowListItem();
 
 
-
             GUILayout.EndVertical();
         }
 
         void ShowBundleConfig()
         {
             BundleBuilderConfig.GetInstance().targetType = (BundleBuilderConfig.BuildPlatform)EditorGUILayout.EnumPopup("当前平台", BundleBuilderConfig.GetInstance().targetType);
+            BundleBuilderConfig.GetInstance().isBuildShare = EditorGUILayout.Toggle("公共部分单独打包", BundleBuilderConfig.GetInstance().isBuildShare);
+            ShowPathBar("导出路径:", ref BundleBuilderConfig.GetInstance().exportFolder);
             EditorGUILayout.Space();
         }
 
@@ -45,8 +46,7 @@ namespace THEditor
             {
                 infos.srcName = EditorGUILayout.TextField("资源名", infos.srcName);
                 ShowPathBar("资源路径:", ref infos.srcResFolder);
-                ShowPathBar("导出路径:", ref infos.exportFolder);
-                infos.bundleLabel = EditorGUILayout.TextField("包标签", infos.bundleLabel);
+                infos.bundleName = EditorGUILayout.TextField("包名", infos.bundleName);
                 if (GUILayout.Button("移除"))
                 {
                     BundleBuilderConfig.GetInstance().buildInfoList.Remove(infos);

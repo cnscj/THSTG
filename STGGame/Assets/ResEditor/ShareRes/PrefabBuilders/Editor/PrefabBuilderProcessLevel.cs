@@ -5,6 +5,8 @@ using THEditor;
 using UnityEditor;
 using UnityEngine;
 using UnityEditor.SceneManagement;
+using STGGame;
+
 namespace STGEditor
 {
     public class PrefabBuilderProcessLevel : PostProcesser
