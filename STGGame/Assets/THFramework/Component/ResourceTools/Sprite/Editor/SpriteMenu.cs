@@ -202,9 +202,20 @@ namespace THEditor
                     SpriteEditorTools.SetupAnimationState(ctrl, clip, isDefault);
 
                 }
-                string clipSavePath = PathUtil.Combine(selectRootPath, groupPair.Key);
+                string groupPath = SpriteEditorTools.GroupName2Path(groupPair.Key);
+                string clipSavePath = PathUtil.Combine(selectRootPath, groupPath);
                 string ctrlFilePath = PathUtil.Combine(clipSavePath, SpriteEditorTools.controllerName);
-                SpriteEditorTools.GeneratePrefabFromAnimationControllerFile(ctrlFilePath);
+
+                string folderId = ResourceUtil.GetFolderId(clipSavePath);
+                string spriteSavePath = PathUtil.Combine(clipSavePath, string.Format("{0}.prefab", folderId));
+                string materialSavePath = PathUtil.Combine(clipSavePath, string.Format("{0}.mat", folderId));
+                var sprite = SpriteEditorTools.GeneratePrefabFromAnimationControllerFile(ctrlFilePath, spriteSavePath);
+                var material = SpriteEditorTools.GenerateMaterialFromAnimationControllerFile(ctrlFilePath, materialSavePath);
+
+                SpriteEditorTools.SetupMaterial(sprite, material);
+                SpriteEditorTools.SetupBoxCollider(sprite);
+                AssetDatabase.SaveAssets();
+
             }
         }
 

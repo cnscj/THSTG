@@ -71,10 +71,10 @@ namespace THEditor
                 }
                 return null;
             }
-
+            //组(上层@下层)#动作名#序列
             private static bool GetSheetNameInfo(string ori, ref string groupName, ref string actionName, ref string idName)
             {
-                string[] segStrs = ori.Split(new char[] { '_' });
+                string[] segStrs = ori.Split(new char[] { '#' });
                 if (segStrs.Length < 3)
                     return false;
 
@@ -85,7 +85,7 @@ namespace THEditor
                 for (int i = 1; i < segStrs.Length - 1; i++)
                 {
                     stringbuilder.Append(segStrs[i]);
-                    stringbuilder.Append("_");
+                    stringbuilder.Append("#");
                 }
                 stringbuilder.Remove(stringbuilder.Length - 1, 1);
                 actionName = stringbuilder.ToString();
@@ -173,11 +173,17 @@ namespace THEditor
                 {
                     //保存资源
                     string groupName = groupPair.Key;
-                    string saveOutRootPath = PathUtil.Combine(saveRootPath, groupName);
-                    if (!XFolderTools.Exists(saveOutRootPath))
+                    string[] subFolders = groupName.Split(new char[] { '@' });
+                    string saveOutRootPath = saveRootPath;
+                    for(int i = 0; i< subFolders.Length; i++)
                     {
-                        XFolderTools.CreateDirectory(saveOutRootPath);
+                        saveOutRootPath = PathUtil.Combine(saveOutRootPath, subFolders[i]);
+                        if (!XFolderTools.Exists(saveOutRootPath))
+                        {
+                            XFolderTools.CreateDirectory(saveOutRootPath);
+                        }
                     }
+                    
                     Dictionary<string, AnimationClip> outActionMap;
                     if (outMap.ContainsKey(groupName))
                     {
@@ -214,7 +220,7 @@ namespace THEditor
                         AnimationUtility.SetAnimationType(clip, ModelImporterAnimationType.Generic);
 #endif
                         AnimationUtility.SetObjectReferenceCurve(clip, curveBinding, keyFrames.ToArray());
-                        
+
 
                         //保存动画Clip
                         string outName = actionPair.Key;
@@ -314,6 +320,28 @@ namespace THEditor
             }
 
             return null;
+        }
+
+        public static Material GenerateMaterialFromAnimationControllerFile(string assetPath, string savePath = "")
+        {
+            string assetFileNonExtName = Path.GetFileNameWithoutExtension(assetPath);
+            string assetRootPath = Path.GetDirectoryName(assetPath);
+
+            if (savePath == "")
+            {
+                string assetRootPathName = Path.GetFileNameWithoutExtension(assetRootPath);
+                savePath = Path.Combine(assetRootPath, string.Format("{0}.mat", assetRootPathName));
+            }
+            Material mat = new Material(Shader.Find(SpriteConfig.defaultMaterial));
+            if (XFileTools.Exists(savePath))
+            {
+                mat = AssetDatabase.LoadAssetAtPath<Material>(savePath);
+            }
+            else
+            {
+                AssetDatabase.CreateAsset(mat, savePath);
+            }
+            return mat;
         }
 
         [System.Serializable]
@@ -499,10 +527,35 @@ namespace THEditor
             {
                 if(!Go.GetComponent<BoxCollider2D>())
                 {
-                    Go.AddComponent<BoxCollider2D>();
+                    var box = Go.AddComponent<BoxCollider2D>();
+                    box.isTrigger = true;
+                    return true;
                 }
             }
             return false;
+        }
+
+        public static bool SetupMaterial(GameObject Go,Material material)
+        {
+            if (Go && material)
+            {
+                var spriteRenderer = Go.GetComponent<SpriteRenderer>();
+                if(spriteRenderer)
+                {
+                    spriteRenderer.material = material;
+                }
+                return true;
+            }
+            return false;
+        }
+
+        ////
+        ///
+
+        public static string GroupName2Path(string groupName)
+        {
+            string newPath = groupName.Replace("@", "/");
+            return newPath;
         }
     }
 

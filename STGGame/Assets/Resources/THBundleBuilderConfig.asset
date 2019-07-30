@@ -19,3 +19,4 @@ MonoBehaviour:
   buildInfoList:
   - srcName: Sprite
     srcResFolder: Assets/ResEditor/Z_AutoProcess/ResTemp/Sprites
+    bundleName: sprites/{0}.ab

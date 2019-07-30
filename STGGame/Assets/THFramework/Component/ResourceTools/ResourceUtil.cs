@@ -30,6 +30,14 @@ namespace THGame
             return false;
         }
 
-      
+        public static string GetFolderId(string assetPath)
+        {
+            assetPath = assetPath.Replace("\\", "/");
+            string fileName = Path.GetFileNameWithoutExtension(assetPath);
+            int indexOf_ = fileName.IndexOf('_');
+            string modelId = (indexOf_ == -1) ? fileName : fileName.Remove(indexOf_);
+            int iModelId;
+            return !int.TryParse(modelId, out iModelId) ? "" : modelId;
+        }
     }
 }
