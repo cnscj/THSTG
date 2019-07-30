@@ -67,7 +67,7 @@ namespace THEditor
         protected virtual void OnOnce(string assetPath)
         {
             string fileNameNotEx = Path.GetFileNameWithoutExtension(assetPath);
-            SetBundleName(assetPath, fileNameNotEx);
+            SetBundleName(assetPath, string.Format("{0}.ab", fileNameNotEx));
         }
 
         void BuildBegin()

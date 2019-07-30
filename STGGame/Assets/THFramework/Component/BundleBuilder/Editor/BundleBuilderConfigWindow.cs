@@ -79,6 +79,11 @@ namespace THEditor
 
             EditorGUILayout.EndHorizontal();
         }
+        private void OnDestroy()
+        {
+            EditorUtility.SetDirty(BundleBuilderConfig.GetInstance());
+            AssetDatabase.SaveAssets();
+        }
 
     }
 }

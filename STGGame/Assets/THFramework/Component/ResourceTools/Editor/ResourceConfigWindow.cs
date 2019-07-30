@@ -78,7 +78,11 @@ namespace THEditor
         {
             isOpen = EditorGUILayout.Toggle(title, isOpen);
         }
-       
 
+        private void OnDestroy()
+        {
+            EditorUtility.SetDirty(ResourceConfig.GetInstance());
+            AssetDatabase.SaveAssets();
+        }
     }
 }

@@ -9,6 +9,8 @@ namespace STGGame
     //关卡管理器
     public class LevelManager : MonoSingleton<LevelManager>
     {
-  
+        //切换场景
+
+        //
     }
 }

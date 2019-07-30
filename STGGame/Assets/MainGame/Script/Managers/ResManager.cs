@@ -3,32 +3,59 @@ using System.IO;
 using THGame;
 using THGame.Package;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace STGGame
 {
-    public class ResManager : Singleton<ResManager>
+    public class ResManager : MonoSingleton<ResManager>
     {
-        public static readonly string srcResource = "Assets/ArtEditor/Temp";
-        public static readonly string srcModel = PathUtil.Combine(srcResource, "Models");
-        public static readonly string srcSprite = PathUtil.Combine(srcResource, "Sprites");
+        public static readonly string srcResource = "Assets/ResEditor/Z_AutoProcess/AssetBundle";
+        public static readonly string srcModelPath = PathUtil.Combine(srcResource,"models");
+        public static readonly string srcSpritePath = PathUtil.Combine(srcResource, "sprites");
+        public static readonly string[] residentABPaths =
+        {
+            PathUtil.Combine(srcModelPath, "share.ab"),
+            PathUtil.Combine(srcSpritePath, "share.ab"),
+
+        };
+
+        private ResourceLoader m_loader;
+
         //可能是AB,可能是源文件
-        public GameObject GetModel(int id)
+        public GameObject GetModel(string uid)
         {
-
-            return null;
+            string assetPath = PathUtil.Combine(srcModelPath, string.Format("{0}.ab", uid));
+            string assetName = string.Format("{0}.prefab", uid);
+            return m_loader.LoadFromFileSync(assetPath, assetName) as GameObject;
         }
 
-        public GameObject GetSprite(int id)
+        public GameObject GetSprite(string uid)
         {
-            string filePath = PathUtil.Combine(srcSprite, string.Format("{0}.prefab", id));
-            return Resources.Load<GameObject>(filePath);
+            string assetPath = PathUtil.Combine(srcSpritePath, string.Format("{0}.ab", uid));
+            string assetName = string.Format("{0}.prefab", uid);
+            return m_loader.LoadFromFileSync(assetPath, assetName) as GameObject;
         }
 
-
-        public void LoadAsync(string path, Action<UnityEngine.Object> loaded, Action<float> progress = null)
+        public GameObject GetUI(string name)
         {
+            return  null;
+        }
 
-            
+        private void Awake()
+        {
+            m_loader = ResourceLoader.GetInstance();
+        }
+
+        private void Start()
+        {
+            //优先加载公共包
+            foreach (var abPath in residentABPaths)
+            {
+                if (File.Exists(abPath))
+                {
+                    m_loader.LoadFromFileSync(abPath);
+                }
+            }
         }
     }
 }
