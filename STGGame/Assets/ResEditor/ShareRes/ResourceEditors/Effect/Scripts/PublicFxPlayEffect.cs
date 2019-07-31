@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace STGGame
+namespace STGGame.Editor
 {
     public class PublicFxPlayEffect : MonoBehaviour
     {

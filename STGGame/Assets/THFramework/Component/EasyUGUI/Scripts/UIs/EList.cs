@@ -1,14 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-namespace THGame
+
+namespace THGame.UI
 {
-    namespace UI
+    public class EList : EComponent
     {
-        public class Button : MonoBehaviour
-        {
-     
-        }
+        public GameObject itemTmpl;
     }
 
 }

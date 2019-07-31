@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using THGame.Package;
 using UnityEngine;
 
-namespace STGGame
+namespace STGGame.Editor
 {
     public class PublicFxEditor : MonoSingleton<PublicFxEditor>
     {
