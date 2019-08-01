@@ -1,11 +1,17 @@
 ﻿using System;
 namespace THGame.Package.MVC
 {
-    public class Cache
+    public class Cache<T> : BaseCache where T : class,new()
     {
-        public virtual void Clear()
-        {
+        private static T s_instance;
 
+        public static T GetInstance()
+        {
+            if (s_instance == null)
+            {
+                s_instance = new T();
+            }
+            return s_instance;
         }
     }
 }

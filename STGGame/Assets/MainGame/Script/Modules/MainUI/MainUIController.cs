@@ -7,9 +7,9 @@ namespace STGGame
 {
     public class MainUIController : Controller
     {
-        public MainUIController()
+        protected override void OnOpen()
         {
-            
+            DispatcherManager.GetInstance().Dispatch(EventType.TEST_EVENT);
         }
     }
 

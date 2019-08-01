@@ -5,26 +5,15 @@ namespace THGame.Package.MVC
 {
     public class MVCManager
     {
-        private static MVCManager m_instance;
-
         private Dictionary<string, Controller> controllerMaps = new Dictionary<string, Controller>();
 
-
-        public static MVCManager GetInstance()
-        {
-            if (m_instance == null)
-            {
-                m_instance = new MVCManager();
-            }
-            return m_instance;
-        }
-
-        public Controller AddController<T>(string name) where T : Controller, new()
+        public Controller AddController<T>(string name = null) where T : Controller, new()
         {
             T controller = new T();
             bool ret = controller.Initialize();
             if (ret)
             {
+                name = name == null ? controller.GetType().Name : name;
                 controllerMaps.Add(name, controller);
                 return controller;
             }
@@ -34,7 +23,13 @@ namespace THGame.Package.MVC
 
         public void RemoveController(string name)
         {
-            controllerMaps.Remove(name);
+            Controller controller = null;
+            if (controllerMaps.TryGetValue(name,out controller))
+            {
+                controller.Clear();
+                controllerMaps.Remove(name);
+            }
+            
         }
 
         public Controller GetController(string name)

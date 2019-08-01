@@ -12,11 +12,14 @@ namespace STGGame
         public static readonly string srcResource = "Assets/ResEditor/Z_AutoProcess/AssetBundle";
         public static readonly string srcModelPath = PathUtil.Combine(srcResource,"models");
         public static readonly string srcSpritePath = PathUtil.Combine(srcResource, "sprites");
+
+        public static readonly string srcUIPath = PathUtil.Combine(srcResource, "ui");
+
         public static readonly string[] residentABPaths =
         {
             PathUtil.Combine(srcModelPath, "share.ab"),
             PathUtil.Combine(srcSpritePath, "share.ab"),
-
+            PathUtil.Combine(srcUIPath, "share.ab"),
         };
 
         private ResourceLoader m_loader;
@@ -36,9 +39,9 @@ namespace STGGame
             return m_loader.LoadFromFileSync(assetPath, assetName) as GameObject;
         }
 
-        public GameObject GetUI(string name)
+        public GameObject GetUI(string module,string vieww)
         {
-            return  null;
+            return null;
         }
 
         private void Awake()
