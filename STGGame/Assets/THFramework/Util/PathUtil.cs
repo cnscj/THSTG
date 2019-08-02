@@ -11,6 +11,7 @@ namespace THGame
             return combinePath.Replace("\\", "/");
         }
 
+        //取根目录
         public static string GetFileRootPath(string assetPath)
         {
             if (Directory.Exists(assetPath))
@@ -24,6 +25,23 @@ namespace THGame
             }
         }
 
+        //获取上层目录
+        public static string GetParentPath(string curPath)
+        {
+            curPath = curPath.Replace("\\", "/");
+            int lastIndex = curPath.LastIndexOf("/", System.StringComparison.Ordinal);
+            if (lastIndex >= 0)
+            {
+                string lastPath = curPath.Substring(0, lastIndex);
+                return lastPath;
+            }
+            else
+            {
+                return "/";
+            }
+        }
+
+        //遍历并获取一个唯一路径
         public static string GetUniquePath(string savePath)
         {
             string fileNameNotEx = Path.GetFileNameWithoutExtension(savePath);

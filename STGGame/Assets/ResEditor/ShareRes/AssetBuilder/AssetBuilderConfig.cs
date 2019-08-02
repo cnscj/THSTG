@@ -16,5 +16,6 @@ namespace STGGame
 
         public static readonly string bundleNameLevels = "levels/{0}.ab";
         public static readonly string bundleNameEffects = "effects/{0}.ab";
+        public static readonly string bundleNameSprites = "sprites/{0}.ab";
     }
 }

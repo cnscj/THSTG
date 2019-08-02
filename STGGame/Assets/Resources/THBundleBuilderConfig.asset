@@ -13,10 +13,7 @@ MonoBehaviour:
   m_Name: THBundleBuilderConfig
   m_EditorClassIdentifier: 
   targetType: 0
-  isBuildShare: 0
+  isBuildShare: 1
   shareBundleName: share
   exportFolder: Assets/ResEditor/Z_AutoProcess/AssetBundle
-  buildInfoList:
-  - srcName: Sprite
-    srcResFolder: Assets/ResEditor/Z_AutoProcess/ResTemp/Sprites
-    bundleName: sprites/{0}.ab
+  buildInfoList: []

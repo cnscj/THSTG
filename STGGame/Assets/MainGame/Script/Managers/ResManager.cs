@@ -23,7 +23,11 @@ namespace STGGame
         };
 
         private ResourceLoader m_loader;
-
+        //
+        public UnityEngine.Object GetObject(string assetPath,string assetName)
+        {
+            return m_loader.LoadFromFileSync(assetPath, assetName);
+        }
         //可能是AB,可能是源文件
         public GameObject GetModel(string uid)
         {
