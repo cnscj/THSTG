@@ -25,13 +25,21 @@ namespace THEditor
             GUILayout.Label("资源配置");
 
             //路径设置
-            EditorGUILayout.Space();
+            
+            ShowNormalProps();
             ShowEditorResList();
 
             //参数设置
             EditorGUILayout.Space();
 
             GUILayout.EndVertical();
+        }
+        void ShowNormalProps()
+        {
+            ResourceConfig.GetInstance().defaultEffectShader = (Shader)EditorGUILayout.ObjectField("默认特效Shade:", ResourceConfig.GetInstance().defaultEffectShader, typeof(Shader));
+            ResourceConfig.GetInstance().defaultModelShader = (Shader)EditorGUILayout.ObjectField("默认模型Shade:", ResourceConfig.GetInstance().defaultModelShader, typeof(Shader));
+            ResourceConfig.GetInstance().defaultSpriteShader = (Shader)EditorGUILayout.ObjectField("默认精灵Shade:", ResourceConfig.GetInstance().defaultSpriteShader,typeof(Shader));
+            EditorGUILayout.Space();
         }
 
         void ShowEditorResList()
@@ -55,6 +63,7 @@ namespace THEditor
                 var buildList = ResourceConfig.GetInstance().editorResList;
                 buildList.Add(info);
             }
+            EditorGUILayout.Space();
         }
 
         //路径条

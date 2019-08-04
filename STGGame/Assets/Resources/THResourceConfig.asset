@@ -12,4 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc7ef9c4d6ff345fdb9aa06f82f69537, type: 3}
   m_Name: THResourceConfig
   m_EditorClassIdentifier: 
+  defaultEffectShader: {fileID: 4800000, guid: 93d06aef37a5d784caca6ef4b7240e86, type: 3}
+  defaultModelShader: {fileID: 4800000, guid: 39c50a9ed2e409f42b4e16e4ef05512b, type: 3}
+  defaultSpriteShader: {fileID: 4800000, guid: f85b7c46ee0bc92499e09b4bbf499d2a, type: 3}
   editorResList: []

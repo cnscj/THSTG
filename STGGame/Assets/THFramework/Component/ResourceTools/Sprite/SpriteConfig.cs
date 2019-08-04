@@ -11,7 +11,6 @@ namespace THEditor
             public Dictionary<string, bool> defaultStateMap;
         }
 
-        public static readonly string defaultMaterial = "Sprites/Default";
         private static GlobalConfigInfos s_global = new GlobalConfigInfos
         {
             stateLoopMap = new Dictionary<string, bool>

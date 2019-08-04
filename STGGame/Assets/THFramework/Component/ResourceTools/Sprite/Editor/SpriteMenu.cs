@@ -169,12 +169,48 @@ namespace THEditor
 
         public static void GenSpriteOneKey(string assetPath)
         {
+            List<string> rootList = new List<string>();
             GenSpriteFrames(assetPath);
-            GenAnimaAndCtrler(assetPath);
- 
+            GenAnimaAndCtrler(assetPath, rootList);
+            GenPrefabAndmaterial(assetPath, rootList);
         }
+        public static void GenPrefabAndmaterial(string assetPath, List<string> exportPathList = null)
+        {
+            if (exportPathList == null)
+            {
+                exportPathList = new List<string>();
+                string selectRootPath = Path.GetDirectoryName(assetPath);
+                string selectFileName = Path.GetFileNameWithoutExtension(assetPath);
+                XFolderTools.TraverseFiles(selectRootPath, (fullPath) =>
+                {
+                    string fileEx = Path.GetExtension(fullPath).ToLower();
+                    if (fileEx.Contains("controller"))
+                    {
+                        string fleRelaPath = XFileTools.GetFileRelativePath(fullPath);
+                        string fileRootPath = Path.GetDirectoryName(fleRelaPath);
 
-        public static void GenAnimaAndCtrler(string assetPath)
+                        exportPathList.Add(fileRootPath);
+                    }
+                },true);
+            }
+            foreach (var exportRootPath in exportPathList)
+            {
+                string ctrlFilePath = PathUtil.Combine(exportRootPath, SpriteEditorTools.controllerName);
+
+                string folderId = ResourceUtil.GetFolderId(exportRootPath);
+                string spriteSavePath = PathUtil.Combine(exportRootPath, string.Format("{0}.prefab", folderId));
+                string materialSavePath = PathUtil.Combine(exportRootPath, string.Format("{0}.mat", folderId));
+                var sprite = SpriteEditorTools.GeneratePrefabFromAnimationControllerFile(ctrlFilePath, spriteSavePath);
+                var material = SpriteEditorTools.GenerateMaterialFromAnimationControllerFile(ctrlFilePath, materialSavePath);
+
+                SpriteEditorTools.SetupMaterial(sprite, material);
+                SpriteEditorTools.SetupBoxCollider(sprite);
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+            }
+
+        }
+        public static void GenAnimaAndCtrler(string assetPath, List<string> exportPathList = null)
         {
             string selectRootPath = Path.GetDirectoryName(assetPath);
             string selectFileName = Path.GetFileNameWithoutExtension(assetPath);
@@ -202,21 +238,17 @@ namespace THEditor
                     SpriteEditorTools.SetupAnimationState(ctrl, clip, isDefault);
 
                 }
-                string groupPath = SpriteEditorTools.GroupName2Path(groupPair.Key);
-                string clipSavePath = PathUtil.Combine(selectRootPath, groupPath);
-                string ctrlFilePath = PathUtil.Combine(clipSavePath, SpriteEditorTools.controllerName);
 
-                string folderId = ResourceUtil.GetFolderId(clipSavePath);
-                string spriteSavePath = PathUtil.Combine(clipSavePath, string.Format("{0}.prefab", folderId));
-                string materialSavePath = PathUtil.Combine(clipSavePath, string.Format("{0}.mat", folderId));
-                var sprite = SpriteEditorTools.GeneratePrefabFromAnimationControllerFile(ctrlFilePath, spriteSavePath);
-                var material = SpriteEditorTools.GenerateMaterialFromAnimationControllerFile(ctrlFilePath, materialSavePath);
+                if (exportPathList != null)
+                {
+                    string groupPath = SpriteEditorTools.GroupName2Path(groupPair.Key);
+                    string exportRootPath = PathUtil.Combine(selectRootPath, groupPath);
 
-                SpriteEditorTools.SetupMaterial(sprite, material);
-                SpriteEditorTools.SetupBoxCollider(sprite);
-                AssetDatabase.SaveAssets();
-
+                    exportPathList.Add(exportRootPath);
+                }
             }
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
         }
 
         public static void GenSpriteFrames(string assetPath)

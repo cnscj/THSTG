@@ -24,6 +24,10 @@ namespace THEditor
 
 
         //需要手动设置
+        public Shader defaultEffectShader;
+        public Shader defaultModelShader;
+        public Shader defaultSpriteShader;
+
         public List<ReourcesConfigInfos> editorResList = new List<ReourcesConfigInfos>();
         private Dictionary<string,ReourcesConfigInfos> m_editorInfoMap;
 
@@ -34,6 +38,13 @@ namespace THEditor
                 s_asset = GetOrCreateAsset();
             }
             return s_asset;
+        }
+
+        void OnEnable()
+        {
+            defaultEffectShader = defaultEffectShader ? defaultEffectShader :Shader.Find("Standard");
+            defaultModelShader = defaultModelShader ? defaultModelShader : Shader.Find("Standard");
+            defaultSpriteShader = defaultSpriteShader? defaultSpriteShader : Shader.Find("Sprites/Default");
         }
 
         public ReourcesConfigInfos GetResourceInfos(string key)

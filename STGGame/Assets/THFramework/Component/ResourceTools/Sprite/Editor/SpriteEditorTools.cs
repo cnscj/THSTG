@@ -332,7 +332,7 @@ namespace THEditor
                 string assetRootPathName = Path.GetFileNameWithoutExtension(assetRootPath);
                 savePath = Path.Combine(assetRootPath, string.Format("{0}.mat", assetRootPathName));
             }
-            Material mat = new Material(Shader.Find(SpriteConfig.defaultMaterial));
+            Material mat = new Material(ResourceConfig.GetInstance().defaultSpriteShader);
             if (XFileTools.Exists(savePath))
             {
                 mat = AssetDatabase.LoadAssetAtPath<Material>(savePath);
