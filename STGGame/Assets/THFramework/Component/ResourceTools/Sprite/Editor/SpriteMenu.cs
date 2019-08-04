@@ -10,7 +10,7 @@ namespace THEditor
     public class SpriteMenu
     {
 
-        [MenuItem("Assets/Guangyv/精灵菜单/一键生成所有", false, 12)]
+        [MenuItem("Assets/THEditor/精灵菜单/一键生成所有", false, 12)]
         public static void MenuGenSpriteOneKey()
         {
             var selected = Selection.activeObject;
@@ -50,7 +50,7 @@ namespace THEditor
         }
 
        
-        [MenuItem("Assets/Guangyv/精灵菜单/图集/生成精灵图集(DB)")]
+        [MenuItem("Assets/THEditor/精灵菜单/图集/生成精灵图集(DB)")]
         public static void MenuGenAtlasSheets()
         {
             var selected = Selection.activeObject;
@@ -89,7 +89,7 @@ namespace THEditor
 
         }
 
-        [MenuItem("Assets/Guangyv/精灵菜单/图集/生成DB精灵Json数据")]
+        [MenuItem("Assets/THEditor/精灵菜单/图集/生成DB精灵Json数据")]
         public static void MenuGenSheetJson()
         {
             var selected = Selection.activeObject;
@@ -128,7 +128,7 @@ namespace THEditor
 
         }
 
-        [MenuItem("Assets/Guangyv/精灵菜单/动画/生成动画及控制器")]
+        [MenuItem("Assets/THEditor/精灵菜单/动画/生成动画及控制器")]
         public static void MenuGenAnimaAndController()
         {
             var selected = Selection.activeObject;

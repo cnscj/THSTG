@@ -5,10 +5,15 @@ namespace THGame
 {
     public static class PathUtil
     {
-        public static string Combine(string p1,string p2)
+        public static string NormalizePath(string path)
         {
-            string combinePath = Path.Combine(p1, p2);
-            return combinePath.Replace("\\", "/");
+            return path.Replace("\\", "/");
+        }
+
+        public static string Combine(params string[] path)
+        {
+            string combinePath = Path.Combine(path);
+            return NormalizePath(combinePath);
         }
 
         //取根目录
@@ -25,10 +30,23 @@ namespace THGame
             }
         }
 
+        //相对某目录的相对路径
+        public static string GetRelativePath(string relaPath,string filePath)
+        {
+            relaPath = NormalizePath(relaPath);
+            filePath = NormalizePath(filePath);
+            int startPos = filePath.IndexOf(relaPath);
+            if (startPos >= 0)
+            {
+                return filePath.Substring(startPos + relaPath.Length);
+            }
+            return filePath;
+        }
+
         //获取上层目录
         public static string GetParentPath(string curPath)
         {
-            curPath = curPath.Replace("\\", "/");
+            curPath = NormalizePath(curPath);
             int lastIndex = curPath.LastIndexOf("/", System.StringComparison.Ordinal);
             if (lastIndex >= 0)
             {

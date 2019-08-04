@@ -43,7 +43,7 @@ namespace STGGame
             return m_loader.LoadFromFileSync(assetPath, assetName) as GameObject;
         }
 
-        public GameObject GetUI(string module,string vieww)
+        public GameObject GetUI(string module,string view)
         {
             return null;
         }

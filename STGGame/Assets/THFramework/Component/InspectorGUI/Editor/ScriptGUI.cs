@@ -5,9 +5,9 @@ using THGame;
 using System.Collections.Generic;
 using THGame.UI;
 
-namespace THEditor.UI
+namespace THEditor
 {
-	public class EBaseInspector<T> : Editor where T : Object
+	public class ScriptGUI<T> : Editor where T : Object
     {
 		protected T m_editor;
         protected Dictionary<string, List<KeyValuePair<string, SerializedProperty>>> m_propsMaps = new Dictionary<string, List<KeyValuePair<string, SerializedProperty>>>();

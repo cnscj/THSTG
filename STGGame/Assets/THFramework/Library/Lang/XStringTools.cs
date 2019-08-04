@@ -8,6 +8,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
+using UnityEngine;
 
 namespace THGame
 {
@@ -34,28 +35,6 @@ namespace THGame
 				ext = path.Substring(refPoint + 1).ToLower();
 			if (!string.IsNullOrEmpty(fileName))
 				trimExt = fileName.Replace("." + ext, "");
-		}
-
-		public static string GetAssetBundleExtName(string ext)
-		{
-			if (ext.Equals("jpg") || ext.Equals("png"))
-			{
-				return "_tex";
-			}
-			else if (ext.Equals("mat"))
-			{
-				return "_mat";
-			}
-			else if (ext.Equals("anim"))
-			{
-				return "_ani";
-			}
-			else if (ext.Equals("font"))
-			{
-				return "_fnt";
-			}
-			else
-				return null;
 		}
 
 		public static string StringToMD5(string str)
@@ -106,5 +85,25 @@ namespace THGame
             return !int.TryParse(pathId, out iPathId) ? "" : pathId;
         }
 
-	}
+        /// <summary>
+        /// 把内容弄到剪贴板
+        /// </summary>
+        /// <param name="input"></param>
+        public static void CopyToClipboard(string input)
+        {
+#if UNITY_EDITOR
+            TextEditor t = new TextEditor();
+            t.text = input;
+            t.OnFocus();
+            t.Copy();
+#elif UNITY_IPHONE
+        CopyTextToClipboard_iOS(input);  
+#elif UNITY_ANDROID
+        AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+        AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+        AndroidJavaClass tool = new AndroidJavaClass("com.my.ugcf.Tool");
+        tool.CallStatic("CopyTextToClipboard", currentActivity, input);
+#endif
+        }
+    }
 }

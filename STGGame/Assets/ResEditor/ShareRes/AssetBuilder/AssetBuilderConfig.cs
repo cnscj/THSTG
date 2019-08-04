@@ -13,9 +13,11 @@ namespace STGGame
         public static readonly string tempSprites = PathUtil.Combine(temResource, "Sprites");
         public static readonly string tempPublicFx = PathUtil.Combine(temResource, "Effects");
         public static readonly string tempLevels = PathUtil.Combine(temResource, "Levels");
+        public static readonly string tempUIs = PathUtil.Combine(temResource, "UIs");
 
         public static readonly string bundleNameLevels = "levels/{0}.ab";
         public static readonly string bundleNameEffects = "effects/{0}.ab";
         public static readonly string bundleNameSprites = "sprites/{0}.ab";
+        public static readonly string bundleNameUIs = "uis/{0}.ab";
     }
 }

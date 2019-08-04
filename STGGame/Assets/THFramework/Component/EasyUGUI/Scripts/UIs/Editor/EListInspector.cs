@@ -8,7 +8,7 @@ using THGame.UI;
 namespace THEditor.UI
 {
     [CustomEditor(typeof(EList))]
-    public class EListInspector : EBaseInspector<EList>
+    public class EListInspector : ScriptGUI<EList>
     {
         protected override void OnProps()
         {
