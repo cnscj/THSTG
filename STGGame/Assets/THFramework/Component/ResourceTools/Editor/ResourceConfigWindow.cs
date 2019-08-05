@@ -36,9 +36,9 @@ namespace THEditor
         }
         void ShowNormalProps()
         {
-            ResourceConfig.GetInstance().defaultEffectShader = (Shader)EditorGUILayout.ObjectField("默认特效Shade:", ResourceConfig.GetInstance().defaultEffectShader, typeof(Shader));
-            ResourceConfig.GetInstance().defaultModelShader = (Shader)EditorGUILayout.ObjectField("默认模型Shade:", ResourceConfig.GetInstance().defaultModelShader, typeof(Shader));
-            ResourceConfig.GetInstance().defaultSpriteShader = (Shader)EditorGUILayout.ObjectField("默认精灵Shade:", ResourceConfig.GetInstance().defaultSpriteShader,typeof(Shader));
+            ResourceConfig.GetInstance().defaultEffectShader = (Shader)EditorGUILayout.ObjectField("默认特效Shader:", ResourceConfig.GetInstance().defaultEffectShader, typeof(Shader));
+            ResourceConfig.GetInstance().defaultModelShader = (Shader)EditorGUILayout.ObjectField("默认模型Shader:", ResourceConfig.GetInstance().defaultModelShader, typeof(Shader));
+            ResourceConfig.GetInstance().defaultSpriteShader = (Shader)EditorGUILayout.ObjectField("默认精灵Shader:", ResourceConfig.GetInstance().defaultSpriteShader,typeof(Shader));
             EditorGUILayout.Space();
         }
 

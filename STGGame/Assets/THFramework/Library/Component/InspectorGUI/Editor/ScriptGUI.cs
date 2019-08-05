@@ -17,7 +17,7 @@ namespace THEditor
 			EditorGUILayout.BeginVertical();
 			serializedObject.Update();//属性序列化
 
-            OnIGUI();
+            OnShow();
 
             serializedObject.ApplyModifiedProperties();
 			EditorGUILayout.EndVertical();
@@ -28,7 +28,7 @@ namespace THEditor
 
         }
 
-        protected virtual void OnIGUI()
+        protected virtual void OnShow()
         {
             
         }
@@ -41,19 +41,46 @@ namespace THEditor
 
         }
 
+        protected SerializedProperty FindProperty(string property)
+        {
+            return serializedObject.FindProperty(property);
+        }
 
-		protected void AddPropertys(string group, string name, string property)
+        protected SerializedProperty GetProperty(string group, string name)
+        {
+            if (group != null)
+            {
+                List<KeyValuePair<string, SerializedProperty>> list = null;
+                bool ret = m_propsMaps.TryGetValue(group, out list);
+                if (ret)
+                {
+                    foreach (var pair in list)
+                    {
+
+                        if (pair.Key == name)
+                        {
+                            return pair.Value;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        protected SerializedProperty AddProperty(string property, string group, string name = null)
 		{
-            SerializedProperty prop = serializedObject.FindProperty(property);
+            SerializedProperty prop = FindProperty(property);
             if (prop != null)
             {
+                name = name != null ? name : property;
                 KeyValuePair<string, SerializedProperty> pair = new KeyValuePair<string, SerializedProperty>(name, prop);
                 var list = GetOrCreateList(group);
                 list.Add(pair);
             }
+            return prop;
         }
 
-        protected void RemovePropertys(string group, string name = null)
+        protected void RemoveProperty(string group, string name = null)
         {
             if (name != null)
             {
@@ -77,7 +104,10 @@ namespace THEditor
             }
             
         }
-
+        protected void ShowPropertys(string name, SerializedProperty prop)
+        {
+            EditorGUILayout.PropertyField(prop, new GUIContent(name), true);
+        }
         protected void ShowPropertys(string group = null)
 		{
    
@@ -89,15 +119,12 @@ namespace THEditor
                 {
                     foreach (var pair in list)
                     {
-                        
-                        EditorGUILayout.PropertyField(pair.Value, new GUIContent(pair.Key), true);
+
+                        ShowPropertys(pair.Key, pair.Value);
                     }
                 }
             }
-            else
-            {
-                
-            }
+            
         }
 
         private List<KeyValuePair<string, SerializedProperty>> GetOrCreateList(string group)
@@ -112,7 +139,7 @@ namespace THEditor
             return list;
         }
 
-        void Clear()
+        public virtual void Clear()
 		{
             m_propsMaps.Clear();
         }

@@ -12,10 +12,10 @@ namespace THEditor.UI
     {
         protected override void OnProps()
         {
-            AddPropertys("Group1", "预制", "itemTmpl");
+            AddProperty("itemTmpl", "Group1", "预制");
         }
 
-        protected override void OnIGUI()
+        protected override void OnShow()
         {
             ShowPropertys("Group1");
 
