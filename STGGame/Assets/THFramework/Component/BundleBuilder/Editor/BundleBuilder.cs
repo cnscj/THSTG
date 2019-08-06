@@ -36,7 +36,8 @@ namespace THEditor
             {
                 if (assetImporter.assetBundleName == "")
                 {
-                    assetImporter.assetBundleName = name;               //包名
+                    string bundleName = BundleBuilderConfig.GetInstance().isUseLower ? name.ToLower() : name;
+                    assetImporter.assetBundleName = bundleName;         //包名
                     if (variant != null)
                     {
                         assetImporter.assetBundleVariant = variant;     //设置扩展名

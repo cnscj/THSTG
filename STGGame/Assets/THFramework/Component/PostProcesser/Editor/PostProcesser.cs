@@ -158,14 +158,30 @@ namespace THEditor
             m_checkList = filesList;
         }
 
-        protected string[] GetDependFiles(string filePath)
+        protected string[] GetDependFiles(string filePath,string []excludeEx = null)
         {
+            Dictionary<string, bool> excludeMap = null;
+            if (excludeEx != null)
+            {
+                excludeMap = new Dictionary<string, bool>();
+                foreach (var ex in excludeEx)
+                {
+                    string exLower = ex.ToLower();
+                    if (!excludeMap.ContainsKey(exLower))
+                    {
+                        excludeMap.Add(exLower, true);
+                    }
+                }
+
+            }
+            
             List<string> filesPath = new List<string>();
             string[] oriDepends = AssetDatabase.GetDependencies(filePath, false);
             foreach (var path in oriDepends)
             {
                 string extension = Path.GetExtension(path).ToLower();
-                if (extension.Contains("cs"))
+
+                if (excludeMap != null && excludeMap.ContainsKey(extension))
                 {
                     continue;
                 }
@@ -193,7 +209,7 @@ namespace THEditor
             {
                 return;
             }
-            string[] checkList = m_checkList != null ? m_checkList : GetDependFiles(assetPath);
+            string[] checkList = m_checkList != null ? m_checkList : GetDependFiles(assetPath,new string[] {"cs"});
             if (!fileChecker.IsCodeChanged(checkList))
             {
                 //MD5没变,但是目标文件被删除

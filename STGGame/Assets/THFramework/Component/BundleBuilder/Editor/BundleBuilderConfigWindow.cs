@@ -36,6 +36,7 @@ namespace THEditor
         {
             BundleBuilderConfig.GetInstance().targetType = (BundleBuilderConfig.BuildPlatform)EditorGUILayout.EnumPopup("当前平台", BundleBuilderConfig.GetInstance().targetType);
             BundleBuilderConfig.GetInstance().isBuildShare = EditorGUILayout.Toggle("公共部分单独打包", BundleBuilderConfig.GetInstance().isBuildShare);
+            BundleBuilderConfig.GetInstance().isUseLower = EditorGUILayout.Toggle("使用全小写路径", BundleBuilderConfig.GetInstance().isUseLower);
             ShowPathBar("导出路径:", ref BundleBuilderConfig.GetInstance().exportFolder);
             EditorGUILayout.Space();
         }
