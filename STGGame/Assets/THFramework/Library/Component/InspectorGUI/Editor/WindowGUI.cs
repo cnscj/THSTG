@@ -7,15 +7,22 @@ using THGame.UI;
 
 namespace THEditor
 {
-	public class ScriptGUI<T> : Editor where T : Object
+	public class WindowGUI<T> : EditorWindow where T : EditorWindow
     {
-		protected T m_editor;
+        protected SerializedObject m_serializedObject;   //序列化对象
         protected Dictionary<string, List<KeyValuePair<string, SerializedProperty>>> m_propsMaps = new Dictionary<string, List<KeyValuePair<string, SerializedProperty>>>();
 
-		public override void OnInspectorGUI()
-		{
-			
-			serializedObject.Update();//属性序列化
+        public static void ShowWindow(string title)
+        {
+            T myWindow = (T)EditorWindow.GetWindow(typeof(T), false, title, false);//创建窗口
+            myWindow.Show();//展示
+
+        }
+
+        protected void OnGUI()
+        {
+            
+            m_serializedObject.Update();//属性序列化
             EditorGUI.BeginChangeCheck();//开始检查是否有修改
 
             EditorGUILayout.BeginVertical();
@@ -24,10 +31,10 @@ namespace THEditor
 
             if (EditorGUI.EndChangeCheck())//结束检查是否有修改
             {
-                serializedObject.ApplyModifiedProperties();
+                m_serializedObject.ApplyModifiedProperties();
             }
-			
-		}
+            
+        }
 
         protected virtual void OnProps()
         {
@@ -41,15 +48,16 @@ namespace THEditor
 
 		void OnEnable()
 		{
-			m_editor = (T)target;
-			Clear();
+            //使用当前类初始化
+            m_serializedObject = new SerializedObject(this);
+            Clear();
             OnProps();
 
         }
 
         protected SerializedProperty FindProperty(string property)
         {
-            return serializedObject.FindProperty(property);
+            return m_serializedObject.FindProperty(property);
         }
 
         protected SerializedProperty GetProperty(string group, string name)
@@ -74,7 +82,7 @@ namespace THEditor
         }
 
         protected SerializedProperty AddProperty(string property, string group, string name = null)
-		{
+        {
             SerializedProperty prop = FindProperty(property);
             if (prop != null)
             {
@@ -94,10 +102,10 @@ namespace THEditor
                 bool ret = m_propsMaps.TryGetValue(group, out list);
                 if (ret)
                 {
-                    for(int i = list.Count - 1; i >= 0; i--)
+                    for (int i = list.Count - 1; i >= 0; i--)
                     {
                         var pair = list[i];
-                        if(pair.Key == name)
+                        if (pair.Key == name)
                         {
                             list.Remove(pair);
                         }
@@ -108,7 +116,7 @@ namespace THEditor
             {
                 m_propsMaps.Remove(group);
             }
-            
+
         }
         protected void ShowProperty(SerializedProperty prop, string name = null)
         {
@@ -117,11 +125,10 @@ namespace THEditor
                 name = name == null ? prop.displayName : name;
                 EditorGUILayout.PropertyField(prop, new GUIContent(name), true);
             }
-            
         }
         protected void ShowPropertys(string group = null)
-		{
-   
+        {
+
             if (group != null)
             {
                 List<KeyValuePair<string, SerializedProperty>> list = null;
@@ -135,13 +142,13 @@ namespace THEditor
                     }
                 }
             }
-            
+
         }
 
         private List<KeyValuePair<string, SerializedProperty>> GetOrCreateList(string group)
         {
             List<KeyValuePair<string, SerializedProperty>> list = null;
-            bool ret = m_propsMaps.TryGetValue(group,out list);
+            bool ret = m_propsMaps.TryGetValue(group, out list);
             if (!ret)
             {
                 list = new List<KeyValuePair<string, SerializedProperty>>();
@@ -151,9 +158,10 @@ namespace THEditor
         }
 
         public virtual void Clear()
-		{
+        {
             m_propsMaps.Clear();
         }
 
-	}
+
+    }
 }

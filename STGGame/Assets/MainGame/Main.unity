@@ -128,14 +128,14 @@ GameObject:
   m_Component:
   - component: {fileID: 2125908312}
   - component: {fileID: 2125908321}
-  - component: {fileID: 2125908315}
-  - component: {fileID: 2125908314}
-  - component: {fileID: 2125908313}
   - component: {fileID: 2125908316}
   - component: {fileID: 2125908317}
   - component: {fileID: 2125908319}
   - component: {fileID: 2125908320}
   - component: {fileID: 2125908318}
+  - component: {fileID: 2125908315}
+  - component: {fileID: 2125908314}
+  - component: {fileID: 2125908313}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
