@@ -8,14 +8,15 @@ using UnityEngine;
 
 namespace STGEditor
 {
-    public class AssetBuilderEffect : BundleBuilder
+    public class AssetBuilderShader : BundleBuilder
     {
         protected override List<string> OnFilter()
         {
             List<string> filList = new List<string>();
-            string[] guids = AssetDatabase.FindAssets("t:Prefab", new string[1] { AssetBuilderConfig.tempPublicFx });
+            string[] guids = AssetDatabase.FindAssets("t:Shader", new string[1] { AssetBuilderConfig.srcShaders });
             foreach (string guid in guids)
             {
+                
                 string assetPath = AssetDatabase.GUIDToAssetPath(guid);
                 filList.Add(assetPath);
             }
@@ -25,11 +26,7 @@ namespace STGEditor
         protected override void OnOnce(string assetPath)
         {
             string fileNameNotEx = Path.GetFileNameWithoutExtension(assetPath);
-            SetBundleName(assetPath, string.Format(AssetBuilderConfig.bundleNameEffects, fileNameNotEx));
-        }
-        protected override void OnShareOnce(string assetPath, int dependCount)
-        {
-            SetBundleName(assetPath, string.Format(AssetBuilderConfig.bundleNameSprites, "share.ab"));
+            SetBundleName(assetPath, string.Format(AssetBuilderConfig.bundleNameShaders, "share"));
         }
     }
 }

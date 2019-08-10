@@ -36,5 +36,7 @@ namespace STGEditor
             PrefabUtility.SaveAsPrefabAsset(newPrefab, savePath);
             Object.DestroyImmediate(newPrefab);
         }
+
+
     }
 }

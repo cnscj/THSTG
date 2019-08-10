@@ -34,10 +34,12 @@ namespace THEditor
         {
             string fileNameNotEx = Path.GetFileNameWithoutExtension(assetPath);
             SetBundleName(assetPath, string.Format(m_buildInfo.bundleName, fileNameNotEx));
-
-            SetShareBundleName(string.Format(m_buildInfo.bundleName, BundleBuilderConfig.GetInstance().shareBundleName));
         }
 
+        protected override void OnShareOnce(string assetPath, int dependCount)
+        {
+            SetBundleName(assetPath, string.Format(m_buildInfo.bundleName, "share.ab"));
+        }
     }
 }
 

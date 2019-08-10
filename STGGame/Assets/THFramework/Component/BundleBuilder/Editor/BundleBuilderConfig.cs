@@ -26,7 +26,7 @@ namespace THEditor
         public BuildPlatform targetType = BuildPlatform.Auto;
         public bool isBuildShare = true;
         public bool isUseLower = true;
-        public string shareBundleName = "share";
+        public string shareBundleName = "share.ab";
         public string exportFolder = "";
 
         public List<BundleBuilderInfos> buildInfoList = new List<BundleBuilderInfos>();

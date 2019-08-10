@@ -28,5 +28,9 @@ namespace STGEditor
             SetBundleName(assetPath, string.Format(AssetBuilderConfig.bundleNameSprites, fileNameNotEx));
         }
 
+        protected override void OnShareOnce(string assetPath, int dependCount)
+        {
+            SetBundleName(assetPath, string.Format(AssetBuilderConfig.bundleNameSprites, "share"));
+        }
     }
 }

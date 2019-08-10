@@ -4,6 +4,7 @@ using THGame.Package;
 using System.Collections.Generic;
 using UnityEditor;
 using THGame;
+using System;
 
 namespace THEditor
 {
@@ -57,11 +58,15 @@ namespace THEditor
             string exportFolder = BundleBuilderConfig.GetInstance().exportFolder;
             if (exportFolder != "")
             {
-                if (!XFolderTools.Exists(exportFolder))
+                var buildPlatform = BundleBuilderConfig.GetInstance().GetBuildType();
+                string buildPlatformStr = Enum.GetName(typeof(BuildTarget), buildPlatform);
+                string finalExportFolder = PathUtil.Combine(exportFolder, buildPlatformStr).Replace("\\", "/");
+
+                if (!XFolderTools.Exists(finalExportFolder))
                 {
-                    XFolderTools.CreateDirectory(exportFolder);
+                    XFolderTools.CreateDirectory(finalExportFolder);
                 }
-                BuildPipeline.BuildAssetBundles(exportFolder, m_bundleOptions, BundleBuilderConfig.GetInstance().GetBuildType());
+                BuildPipeline.BuildAssetBundles(finalExportFolder, m_bundleOptions, buildPlatform);
                 AssetDatabase.Refresh();//打包后刷新，不加这行代码的话要手动刷新才可以看得到打包后的Assetbundle包
             }
             else

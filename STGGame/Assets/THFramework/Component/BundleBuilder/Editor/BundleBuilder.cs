@@ -11,7 +11,6 @@ namespace THEditor
     {
        
         protected Dictionary<string, int> m_dependencies;
-        protected string m_shareBundleName = "share";
         public BundleBuilder()
         {
      
@@ -49,11 +48,6 @@ namespace THEditor
             }
         }
 
-        protected void SetShareBundleName(string name)
-        {
-            m_shareBundleName = name;
-        }
-
         protected virtual List<string> OnFilter()
         {
             List<string> filList = new List<string>();
@@ -69,6 +63,12 @@ namespace THEditor
         {
             string fileNameNotEx = Path.GetFileNameWithoutExtension(assetPath);
             SetBundleName(assetPath, string.Format("{0}.ab", fileNameNotEx));
+        }
+
+        protected virtual void OnShareOnce(string assetPath,int dependCount)
+        {
+            string defShareBundleName = BundleBuilderConfig.GetInstance().shareBundleName;
+            SetBundleName(assetPath, string.Format("{0}", defShareBundleName == "" ? "share.ab" : defShareBundleName));
         }
 
         void BuildBegin()
@@ -90,7 +90,7 @@ namespace THEditor
                     if (pair.Value > 1)
                     {
                         string assetPath = pair.Key;
-                        SetBundleName(assetPath, m_shareBundleName);
+                        OnShareOnce(assetPath, pair.Value);
                     }
                 }
             }

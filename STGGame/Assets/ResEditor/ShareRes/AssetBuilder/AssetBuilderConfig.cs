@@ -7,6 +7,12 @@ namespace STGGame
 {
     public static class AssetBuilderConfig
     {
+        public static readonly string artSourceFolder = "Assets/ResEditor/";
+
+        public static readonly string srcProgramResource = PathUtil.Combine(artSourceFolder, "Program");
+        public static readonly string srcShaders = PathUtil.Combine(srcProgramResource, "Shaders");
+
+
         public static readonly string artTempFolder = "Assets/ResEditor/Z_AutoProcess";
         public static readonly string temResource = PathUtil.Combine(artTempFolder, "ResTemp");
         public static readonly string tempModels = PathUtil.Combine(temResource, "Models");
@@ -15,6 +21,7 @@ namespace STGGame
         public static readonly string tempLevels = PathUtil.Combine(temResource, "Levels");
         public static readonly string tempUIs = PathUtil.Combine(temResource, "UIs");
 
+        public static readonly string bundleNameShaders = "shaders/{0}.ab";
         public static readonly string bundleNameLevels = "levels/{0}.ab";
         public static readonly string bundleNameEffects = "effects/{0}.ab";
         public static readonly string bundleNameSprites = "sprites/{0}.ab";

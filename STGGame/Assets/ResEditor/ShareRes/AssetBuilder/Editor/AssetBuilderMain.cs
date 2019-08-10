@@ -9,7 +9,9 @@ namespace STGEditor
         
         public static BundleBuilderManager builderManager = new BundleBuilderManager(new BundleBuilder[]
         {
+            new AssetBuilderShader(),
             new AssetBuilderEffect(),
+            new AssetBuilderSprite(),
         });
     }
 }

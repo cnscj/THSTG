@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetType: 0
   isBuildShare: 1
+  isUseLower: 1
   shareBundleName: share
   exportFolder: Assets/ResEditor/Z_AutoProcess/AssetBundle
   buildInfoList: []
