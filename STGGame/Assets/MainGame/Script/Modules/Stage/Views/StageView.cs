@@ -4,9 +4,13 @@ using UnityEngine;
 
 namespace STGGame.UI
 {
-    public class StageView : MonoBehaviour
+    public class StageView : BaseView
     {
-        
+
+        private void Start()
+        {
+            
+        }
     }
 }
 

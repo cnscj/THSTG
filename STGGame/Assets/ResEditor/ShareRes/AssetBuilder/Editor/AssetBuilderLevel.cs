@@ -27,6 +27,9 @@ namespace STGEditor
             string fileNameNotEx = Path.GetFileNameWithoutExtension(assetPath);
             SetBundleName(assetPath, string.Format(AssetBuilderConfig.bundleNameLevels, fileNameNotEx));
         }
-
+        protected override void OnShareOnce(string assetPath, int dependCount)
+        {
+            SetBundleName(assetPath, string.Format(AssetBuilderConfig.bundleNameLevels, "share"));
+        }
     }
 }

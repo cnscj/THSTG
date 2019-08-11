@@ -12,18 +12,18 @@ namespace STGGame
     public class EntityManager : MonoSingleton<EntityManager>
     {
         [HideInInspector] public GameObject stageRoot;
-        public GameObject mapRoot;
-        public GameObject heroRoot;
-        public GameObject bossRoot;
-        public GameObject mobRoot;
+        [HideInInspector] public GameObject mapRoot;
+        [HideInInspector] public GameObject heroRoot;
+        [HideInInspector] public GameObject bossRoot;
+        [HideInInspector] public GameObject mobRoot;
 
-        public GameObject PlayerPrefab;
-        public GameObject MobPrefab;
-        public GameObject BossPrefab;
-        private Dictionary<EEntityType, GameObject> entitiesNode = new Dictionary<EEntityType, GameObject>();
-        [SerializeField] public List<GameObject> heros = new List<GameObject>();
-        [SerializeField] public List<GameObject> mobs = new List<GameObject>();
-        [SerializeField] public List<GameObject> bosses = new List<GameObject>();
+        [HideInInspector] public GameObject PlayerPrefab;
+        [HideInInspector] public GameObject MobPrefab;
+        [HideInInspector] public GameObject BossPrefab;
+        [HideInInspector] private Dictionary<EEntityType, GameObject> entitiesNode = new Dictionary<EEntityType, GameObject>();
+        [HideInInspector] [SerializeField] public List<GameObject> heros = new List<GameObject>();
+        [HideInInspector] [SerializeField] public List<GameObject> mobs = new List<GameObject>();
+        [HideInInspector] [SerializeField] public List<GameObject> bosses = new List<GameObject>();
 
         public GameObject CreatePlayer(EPlayerType type = EPlayerType.Player01)
         {

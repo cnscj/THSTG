@@ -62,7 +62,7 @@ TextureImporter:
     21300114: Role@400002_yukari#moveleft#06
     21300116: Role@400002_yukari#moveleft#07
   externalObjects: {}
-  serializedVersion: 9
+  serializedVersion: 7
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0

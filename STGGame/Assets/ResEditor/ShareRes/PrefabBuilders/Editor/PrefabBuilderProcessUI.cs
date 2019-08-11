@@ -31,9 +31,13 @@ namespace STGEditor
         protected string GetModuleName(string assetPath)
         {
             string moduleName = "";
-            string relaPath = assetPath.Replace(PrefabBuildConfig.srcUIs, "");
-            string[] splitArray = moduleName.Split('/');
-            moduleName = splitArray.Length > 0 ? splitArray[0] : moduleName;
+            if (assetPath.Contains(PrefabBuildConfig.srcUIs))
+            {
+                string relaPath = assetPath.Replace(PrefabBuildConfig.srcUIs, "").Replace("\\", "/");
+                string[] splitArray = relaPath.Split('/');
+
+                moduleName = splitArray.Length > 1 ? splitArray[1] : moduleName;
+            }
             return moduleName;
         }
 
@@ -43,9 +47,17 @@ namespace STGEditor
             //取得模块名
             string moduleName = GetModuleName(assetPath);
             string fileNameNotEx = Path.GetFileNameWithoutExtension(assetPath);
+            if (moduleName == "")
+            {
+                SetSaveCodeName(string.Format("{0}", fileNameNotEx));
+                SetExportName(string.Format("{0}.prefab", fileNameNotEx));
+            }
+            else
+            {
+                SetSaveCodeName(string.Format("{0}_{1}", moduleName, fileNameNotEx));
+                SetExportName(string.Format("{0}_{1}.prefab", moduleName, fileNameNotEx));
+            }
 
-            SetSaveCodeName(string.Format("{0}_{1}", moduleName, fileNameNotEx));
-            SetExportName(string.Format("{0}_{1}.prefab", moduleName, fileNameNotEx));
         }
 
         protected override void OnOnce(string assetPath)
