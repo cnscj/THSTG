@@ -6,12 +6,12 @@ using System.Text;
 
 namespace THEditor
 {
-    public class ExcelTools : EditorWindow
+    public class ExcelWindow : EditorWindow
     {
         /// <summary>
         /// 当前编辑器窗口实例
         /// </summary>
-        private static ExcelTools instance;
+        private static ExcelWindow instance;
 
         /// <summary>
         /// Excel文件列表
@@ -130,8 +130,9 @@ namespace THEditor
             {
                 //获取Excel文件的绝对路径
                 string excelPath = pathRoot + "/" + assetsPath;
-                //构造Excel工具类
-                ExcelUtility excel = new ExcelUtility(excelPath);
+
+                //构造转换基类
+                BaseExcelConverter converter;
 
                 //判断编码类型
                 Encoding encoding = null;
@@ -148,23 +149,27 @@ namespace THEditor
                 string output = "";
                 if (indexOfFormat == 0)
                 {
+                    converter = new Excel2Json(excelPath);
                     output = excelPath.Replace(".xlsx", ".json");
-                    excel.ConvertToJson(output, encoding);
+                    converter.Export(output, encoding);
                 }
                 else if (indexOfFormat == 1)
                 {
+                    converter = new Excel2CSV(excelPath);
                     output = excelPath.Replace(".xlsx", ".csv");
-                    excel.ConvertToCSV(output, encoding);
+                    converter.Export(output, encoding);
                 }
                 else if (indexOfFormat == 2)
                 {
+                    converter = new Excel2Xml(excelPath);
                     output = excelPath.Replace(".xlsx", ".xml");
-                    excel.ConvertToXml(output);
+                    converter.Export(output, encoding);
                 }
                 else if (indexOfFormat == 3)
                 {
+                    converter = new Excel2Lua(excelPath);
                     output = excelPath.Replace(".xlsx", ".lua");
-                    excel.ConvertToLua(output, encoding);
+                    converter.Export(output, encoding);
                 }
 
                 //判断是否保留源文件
@@ -210,7 +215,7 @@ namespace THEditor
         private static void Init()
         {
             //获取当前实例
-            instance = EditorWindow.GetWindow<ExcelTools>();
+            instance = EditorWindow.GetWindow<ExcelWindow>();
             //初始化
             pathRoot = Application.dataPath;
             //注意这里需要对路径进行处理

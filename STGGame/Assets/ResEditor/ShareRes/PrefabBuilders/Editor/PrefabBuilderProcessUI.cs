@@ -22,6 +22,7 @@ namespace STGEditor
             string[] guids = AssetDatabase.FindAssets("t:Prefab", new string[1] { PrefabBuildConfig.srcUIs });
             foreach (string guid in guids)
             {
+                
                 string assetPath = AssetDatabase.GUIDToAssetPath(guid);
                 filList.Add(assetPath);
             }

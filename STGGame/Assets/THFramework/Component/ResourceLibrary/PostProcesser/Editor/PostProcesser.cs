@@ -71,6 +71,8 @@ namespace THEditor
                 string fileNameWithNotEx = Path.GetFileNameWithoutExtension(fullPath);
                 string fileEx = Path.GetExtension(fullPath);
                 string resId = GetResourceId(fileNameWithNotEx);
+                resId = resId == "" ? fileNameWithNotEx : resId;
+
                 if (fileEx.Contains("meta"))
                 {
                     return;
@@ -87,9 +89,11 @@ namespace THEditor
 
             XFolderTools.TraverseFiles(m_exportFolder, (fullPath) =>
             {
+                //XXX:检测机制有误(源文件名可能与输出文件名不一致)
                 string fileNameWithNotEx = Path.GetFileNameWithoutExtension(fullPath);
                 string fileEx = Path.GetExtension(fullPath);
                 string resId = GetResourceId(fileNameWithNotEx);
+                resId = resId == "" ? fileNameWithNotEx : resId;
                 if (fileEx.Contains("meta"))
                 {
                     return;
@@ -200,11 +204,13 @@ namespace THEditor
 
             OnPreOnce(assetPath);
 
-            //string fileNameWithNotEx = Path.GetFileNameWithoutExtension(assetPath);
+            string fileNameWithNotEx = Path.GetFileNameWithoutExtension(assetPath);
             string fileName = Path.GetFileName(assetPath);
             string checkName = GetResourceId(fileName);
             string saveFilePath = GetExportPath(fileName);
-
+            string saveFileName = Path.GetFileNameWithoutExtension(saveFilePath);
+            checkName = checkName == "" ? saveFileName.ToLower() : checkName;
+            
             if (checkMaps.ContainsKey(checkName))
             {
                 return;
