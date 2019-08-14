@@ -8,15 +8,15 @@ using System;
 
 namespace THEditor
 {
-    public class BundleBuilderManager : Singleton<BundleBuilderManager>
+    public class ResourceBuilderManager : Singleton<ResourceBuilderManager>
     {
         //不同平台下打各自的包
         //公共的抽出来打一个(就是依赖数>1的
-        private List<BundleBuilder> m_builders = new List<BundleBuilder>();
-        private List<BundleBuilder> m_defaultBuilders = new List<BundleBuilder>();
+        private List<ResourceBuilder> m_builders = new List<ResourceBuilder>();
+        private List<ResourceBuilder> m_defaultBuilders = new List<ResourceBuilder>();
         protected BuildAssetBundleOptions m_bundleOptions;
 
-        public BundleBuilderManager(BundleBuilder [] builders)
+        public ResourceBuilderManager(ResourceBuilder [] builders)
         {
             foreach (var builer in builders)
             {
@@ -33,10 +33,10 @@ namespace THEditor
         {
             Clear();
             //
-            foreach (var info in BundleBuilderConfig.GetInstance().buildInfoList)
+            foreach (var info in ResourceBuilderConfig.GetInstance().buildInfoList)
             {
                 string srcName = info.srcName.ToLower();
-                m_defaultBuilders.Add(new BundleBuilderSimple(info)); 
+                m_defaultBuilders.Add(new ResourceBuilderSimple(info)); 
             }
 
             foreach (var builer in m_builders)
@@ -55,10 +55,10 @@ namespace THEditor
 
         void Build()
         {
-            string exportFolder = BundleBuilderConfig.GetInstance().exportFolder;
+            string exportFolder = ResourceBuilderConfig.GetInstance().exportFolder;
             if (exportFolder != "")
             {
-                var buildPlatform = BundleBuilderConfig.GetInstance().GetBuildType();
+                var buildPlatform = ResourceBuilderConfig.GetInstance().GetBuildType();
                 string buildPlatformStr = Enum.GetName(typeof(BuildTarget), buildPlatform);
                 string finalExportFolder = PathUtil.Combine(exportFolder, buildPlatformStr).Replace("\\", "/");
 

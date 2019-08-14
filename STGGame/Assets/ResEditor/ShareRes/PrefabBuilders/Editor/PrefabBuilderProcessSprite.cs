@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace STGEditor
 {
-    public class PrefabBuilderProcessSprite : PostProcesser
+    public class PrefabBuilderProcessSprite : ResourceProcesser
     {
         public PrefabBuilderProcessSprite(string md5Folder, string exportFolder) : base(md5Folder, exportFolder)
         {

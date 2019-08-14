@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace STGEditor
 {
-    public class AssetBuilderShader : BundleBuilder
+    public class AssetBuilderShader : ResourceBuilder
     {
         protected override List<string> OnFilter()
         {

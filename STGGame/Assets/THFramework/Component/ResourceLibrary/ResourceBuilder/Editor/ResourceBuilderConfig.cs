@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 namespace THEditor
 {
-    public class BundleBuilderConfig : ScriptableObject
+    public class ResourceBuilderConfig : ScriptableObject
     {
         public enum BuildPlatform
         {
@@ -18,9 +18,9 @@ namespace THEditor
 
 
         public static readonly string resourcePath = "Assets/Resources";
-        public static readonly string configAssetsPath = PathUtil.Combine(resourcePath, "THBundleBuilderConfig.asset");
+        public static readonly string configAssetsPath = PathUtil.Combine(resourcePath, "THResourceBuilderConfig.asset");
 
-        private static BundleBuilderConfig s_asset;
+        private static ResourceBuilderConfig s_asset;
 
         //手动设置
         public BuildPlatform targetType = BuildPlatform.Auto;
@@ -29,10 +29,10 @@ namespace THEditor
         public string shareBundleName = "share.ab";
         public string exportFolder = "";
 
-        public List<BundleBuilderInfos> buildInfoList = new List<BundleBuilderInfos>();
+        public List<ResourceBuilderInfos> buildInfoList = new List<ResourceBuilderInfos>();
 
 
-        public static BundleBuilderConfig GetInstance()
+        public static ResourceBuilderConfig GetInstance()
         {
             if (!s_asset)
             {
@@ -59,16 +59,16 @@ namespace THEditor
             return EditorUserBuildSettings.activeBuildTarget;
         }
 
-        static BundleBuilderConfig GetOrCreateAsset()
+        static ResourceBuilderConfig GetOrCreateAsset()
         {
-            BundleBuilderConfig asset = null;
+            ResourceBuilderConfig asset = null;
             if (XFileTools.Exists(configAssetsPath))
             {
-                asset = AssetDatabase.LoadAssetAtPath<BundleBuilderConfig>(configAssetsPath);
+                asset = AssetDatabase.LoadAssetAtPath<ResourceBuilderConfig>(configAssetsPath);
             }
             else
             {
-                asset = ScriptableObject.CreateInstance<BundleBuilderConfig>();
+                asset = ScriptableObject.CreateInstance<ResourceBuilderConfig>();
                 if (!XFolderTools.Exists(resourcePath))
                 {
                     XFolderTools.CreateDirectory(resourcePath);

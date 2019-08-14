@@ -7,11 +7,11 @@ using System.IO;
 
 namespace THEditor
 {
-    public class BundleBuilder
+    public class ResourceBuilder
     {
        
         protected Dictionary<string, int> m_dependencies;
-        public BundleBuilder()
+        public ResourceBuilder()
         {
      
         }
@@ -35,7 +35,7 @@ namespace THEditor
             {
                 if (assetImporter.assetBundleName == "")
                 {
-                    string bundleName = BundleBuilderConfig.GetInstance().isUseLower ? name.ToLower() : name;
+                    string bundleName = ResourceBuilderConfig.GetInstance().isUseLower ? name.ToLower() : name;
                     assetImporter.assetBundleName = bundleName;         //包名
                     if (variant != null)
                     {
@@ -67,14 +67,14 @@ namespace THEditor
 
         protected virtual void OnShareOnce(string assetPath,int dependCount)
         {
-            string defShareBundleName = BundleBuilderConfig.GetInstance().shareBundleName;
+            string defShareBundleName = ResourceBuilderConfig.GetInstance().shareBundleName;
             SetBundleName(assetPath, string.Format("{0}", defShareBundleName == "" ? "share.ab" : defShareBundleName));
         }
 
         void BuildBegin()
         {
             Clear();
-            if (BundleBuilderConfig.GetInstance().isBuildShare)
+            if (ResourceBuilderConfig.GetInstance().isBuildShare)
             {
                 m_dependencies = new Dictionary<string, int>();
             }

@@ -9,7 +9,7 @@ using STGGame;
 
 namespace STGEditor
 {
-    public class PrefabBuilderProcessLevel : PostProcesser
+    public class PrefabBuilderProcessLevel : ResourceProcesser
     {
         public PrefabBuilderProcessLevel(string md5Folder, string exportFolder) : base(md5Folder, exportFolder)
         {

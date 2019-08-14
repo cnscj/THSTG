@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 namespace THEditor
 {
-    public class PostProcesser
+    public class ResourceProcesser
     {
         private FilesChecker fileChecker;
         private Dictionary<string, string> checkMaps;
@@ -17,14 +17,14 @@ namespace THEditor
         private string m_exportFilePath = "";
         private string[] m_checkList = null;
 
-        public PostProcesser(string md5Folder,string exportFolder)
+        public ResourceProcesser(string md5Folder, string exportFolder)
         {
             fileChecker = new FilesChecker(md5Folder);
             checkMaps = new Dictionary<string, string>();
 
             m_md5Folder = md5Folder;
             m_exportFolder = exportFolder;
-            
+
         }
 
         public virtual void Do()
@@ -71,13 +71,13 @@ namespace THEditor
                 string fileNameWithNotEx = Path.GetFileNameWithoutExtension(fullPath);
                 string fileEx = Path.GetExtension(fullPath);
                 string resId = GetResourceId(fileNameWithNotEx);
-                resId = resId == "" ? fileNameWithNotEx : resId;
+                resId = resId == "" ? fileNameWithNotEx.ToLower() : resId;
 
                 if (fileEx.Contains("meta"))
                 {
                     return;
                 }
-                
+
                 if (!checkMaps.ContainsKey(resId))
                 {
                     string relaPath = XFileTools.GetFileRelativePath(fullPath);
@@ -93,7 +93,7 @@ namespace THEditor
                 string fileNameWithNotEx = Path.GetFileNameWithoutExtension(fullPath);
                 string fileEx = Path.GetExtension(fullPath);
                 string resId = GetResourceId(fileNameWithNotEx);
-                resId = resId == "" ? fileNameWithNotEx : resId;
+                resId = resId == "" ? fileNameWithNotEx.ToLower() : resId;
                 if (fileEx.Contains("meta"))
                 {
                     return;
@@ -157,12 +157,12 @@ namespace THEditor
             return XStringTools.SplitPathId(Path.GetFileNameWithoutExtension(path));
         }
 
-        protected void SetCheckList(string []filesList)
+        protected void SetCheckList(string[] filesList)
         {
             m_checkList = filesList;
         }
 
-        protected string[] GetDependFiles(string filePath,string []excludeEx = null)
+        protected string[] GetDependFiles(string filePath, string[] excludeEx = null)
         {
             Dictionary<string, bool> excludeMap = null;
             if (excludeEx != null)
@@ -178,7 +178,7 @@ namespace THEditor
                 }
 
             }
-            
+
             List<string> filesPath = new List<string>();
             string[] oriDepends = AssetDatabase.GetDependencies(filePath, false);
             foreach (var path in oriDepends)
@@ -192,7 +192,7 @@ namespace THEditor
 
                 filesPath.Add(path);
             }
-            filesPath.Insert(0,filePath);
+            filesPath.Insert(0, filePath);
             return filesPath.ToArray();
         }
         private void DoOnce(string assetPath)
@@ -204,18 +204,19 @@ namespace THEditor
 
             OnPreOnce(assetPath);
 
-            string fileNameWithNotEx = Path.GetFileNameWithoutExtension(assetPath);
+            //string fileNameWithNotEx = Path.GetFileNameWithoutExtension(assetPath);
+            //TODO:检测有问题,应该与源文件存在关联,且是在名字上的关联
             string fileName = Path.GetFileName(assetPath);
             string checkName = GetResourceId(fileName);
             string saveFilePath = GetExportPath(fileName);
             string saveFileName = Path.GetFileNameWithoutExtension(saveFilePath);
             checkName = checkName == "" ? saveFileName.ToLower() : checkName;
-            
+
             if (checkMaps.ContainsKey(checkName))
             {
                 return;
             }
-            string[] checkList = m_checkList != null ? m_checkList : GetDependFiles(assetPath,new string[] {"cs"});
+            string[] checkList = m_checkList != null ? m_checkList : GetDependFiles(assetPath, new string[] { "cs" });
             if (!fileChecker.IsCodeChanged(checkList))
             {
                 //MD5没变,但是目标文件被删除

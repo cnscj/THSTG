@@ -4,15 +4,15 @@ using THGame.Package;
 using UnityEngine;
 namespace THEditor
 {
-    public class PostProcesserManager
+    public class ResourceProcesserManager
     {
-        private List<PostProcesser> m_processers = new List<PostProcesser>();
+        private List<ResourceProcesser> m_processers = new List<ResourceProcesser>();
 
-        public PostProcesserManager()
+        public ResourceProcesserManager()
         {
 
         }
-        public PostProcesserManager(PostProcesser[] list)
+        public ResourceProcesserManager(ResourceProcesser[] list)
         {
             foreach(var pcer in list)
             {
@@ -20,7 +20,7 @@ namespace THEditor
             }
         }
 
-        public PostProcesser AddProcesser<T>() where T: PostProcesser,new()
+        public ResourceProcesser AddProcesser<T>() where T: ResourceProcesser,new()
         {
             T processer = new T();
             m_processers.Add(processer);

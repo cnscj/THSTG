@@ -4,13 +4,13 @@ using THGame;
 
 namespace THEditor
 {
-    public class BundleBuilderConfigWindow : EditorWindow
+    public class ResourceBuilderConfigWindow : EditorWindow
     {
 
         [MenuItem("THFramework/资源工具/打包配置")]
         static void ShowWindow()
         {
-            BundleBuilderConfigWindow myWindow = (BundleBuilderConfigWindow)EditorWindow.GetWindow(typeof(BundleBuilderConfigWindow), false, "BundleBuilderConfig", false);//创建窗口
+            ResourceBuilderConfigWindow myWindow = (ResourceBuilderConfigWindow)EditorWindow.GetWindow(typeof(ResourceBuilderConfigWindow), false, "ResourceBuilderConfig", false);//创建窗口
             myWindow.Show();//展示
         }
 
@@ -34,23 +34,23 @@ namespace THEditor
 
         void ShowBundleConfig()
         {
-            BundleBuilderConfig.GetInstance().targetType = (BundleBuilderConfig.BuildPlatform)EditorGUILayout.EnumPopup("当前平台", BundleBuilderConfig.GetInstance().targetType);
-            BundleBuilderConfig.GetInstance().isBuildShare = EditorGUILayout.Toggle("公共部分单独打包", BundleBuilderConfig.GetInstance().isBuildShare);
-            BundleBuilderConfig.GetInstance().isUseLower = EditorGUILayout.Toggle("使用全小写路径", BundleBuilderConfig.GetInstance().isUseLower);
-            ShowPathBar("导出路径:", ref BundleBuilderConfig.GetInstance().exportFolder);
+            ResourceBuilderConfig.GetInstance().targetType = (ResourceBuilderConfig.BuildPlatform)EditorGUILayout.EnumPopup("当前平台", ResourceBuilderConfig.GetInstance().targetType);
+            ResourceBuilderConfig.GetInstance().isBuildShare = EditorGUILayout.Toggle("公共部分单独打包", ResourceBuilderConfig.GetInstance().isBuildShare);
+            ResourceBuilderConfig.GetInstance().isUseLower = EditorGUILayout.Toggle("使用全小写路径", ResourceBuilderConfig.GetInstance().isUseLower);
+            ShowPathBar("导出路径:", ref ResourceBuilderConfig.GetInstance().exportFolder);
             EditorGUILayout.Space();
         }
 
         void ShowListItem()
         {
-            foreach (var infos in BundleBuilderConfig.GetInstance().buildInfoList)
+            foreach (var infos in ResourceBuilderConfig.GetInstance().buildInfoList)
             {
                 infos.srcName = EditorGUILayout.TextField("资源名", infos.srcName);
                 ShowPathBar("资源路径:", ref infos.srcResFolder);
                 infos.bundleName = EditorGUILayout.TextField("包名", infos.bundleName);
                 if (GUILayout.Button("移除"))
                 {
-                    BundleBuilderConfig.GetInstance().buildInfoList.Remove(infos);
+                    ResourceBuilderConfig.GetInstance().buildInfoList.Remove(infos);
                     return;
                 }
                 EditorGUILayout.Space();
@@ -58,8 +58,8 @@ namespace THEditor
             }
             if (GUILayout.Button("...."))
             {
-                BundleBuilderInfos info = new BundleBuilderInfos();
-                var buildList = BundleBuilderConfig.GetInstance().buildInfoList;
+                ResourceBuilderInfos info = new ResourceBuilderInfos();
+                var buildList = ResourceBuilderConfig.GetInstance().buildInfoList;
                 buildList.Add(info);
             }
         }
@@ -82,7 +82,7 @@ namespace THEditor
         }
         private void OnDestroy()
         {
-            EditorUtility.SetDirty(BundleBuilderConfig.GetInstance());
+            EditorUtility.SetDirty(ResourceBuilderConfig.GetInstance());
             AssetDatabase.SaveAssets();
         }
 

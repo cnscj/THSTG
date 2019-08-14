@@ -5,7 +5,7 @@ namespace STGEditor
 {
     public static class PrefabBuilderMain
     {
-        public static PostProcesserManager processManager = new PostProcesserManager(new PostProcesser[]{
+        public static ResourceProcesserManager processManager = new ResourceProcesserManager(new ResourceProcesser[]{
             new PrefabBuilderProcessSprite(PrefabBuildConfig.tempSpriteMd5s,PrefabBuildConfig.tempSprites),
             new PrefabBuilderProcessPublicFx(PrefabBuildConfig.tempPublicFxMd5s,PrefabBuildConfig.tempPublicFx),
             new PrefabBuilderProcessLevel(PrefabBuildConfig.tempLevelMd5s,PrefabBuildConfig.tempLevels),

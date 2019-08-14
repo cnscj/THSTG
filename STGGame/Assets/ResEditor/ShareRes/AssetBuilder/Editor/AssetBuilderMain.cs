@@ -7,7 +7,7 @@ namespace STGEditor
     public static class AssetBuilderMain
     {
         
-        public static BundleBuilderManager builderManager = new BundleBuilderManager(new BundleBuilder[]
+        public static ResourceBuilderManager builderManager = new ResourceBuilderManager(new ResourceBuilder[]
         {
             new AssetBuilderShader(),
             new AssetBuilderEffect(),

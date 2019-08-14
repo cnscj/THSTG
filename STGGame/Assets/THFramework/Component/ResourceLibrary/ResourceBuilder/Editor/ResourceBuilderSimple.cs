@@ -6,10 +6,10 @@ using System.IO;
 
 namespace THEditor
 {
-    public class BundleBuilderSimple : BundleBuilder
+    public class ResourceBuilderSimple : ResourceBuilder
     {
-        protected BundleBuilderInfos m_buildInfo;
-        public BundleBuilderSimple(BundleBuilderInfos infos)
+        protected ResourceBuilderInfos m_buildInfo;
+        public ResourceBuilderSimple(ResourceBuilderInfos infos)
         {
             m_buildInfo = infos;
         }

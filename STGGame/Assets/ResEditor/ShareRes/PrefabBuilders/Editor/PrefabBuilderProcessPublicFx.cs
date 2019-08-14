@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace STGEditor
 {
-    public class PrefabBuilderProcessPublicFx : PostProcesser
+    public class PrefabBuilderProcessPublicFx : ResourceProcesser
     {
         public PrefabBuilderProcessPublicFx(string md5Folder, string exportFolder) : base(md5Folder, exportFolder)
         {
