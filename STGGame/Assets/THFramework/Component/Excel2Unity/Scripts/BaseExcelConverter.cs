@@ -5,7 +5,17 @@ using System.IO;
 using System.Text;
 using Excel;
 using UnityEngine;
-
+/*
+ *  Excel解析说明
+ *  表一:
+ *   第一行为注释         (可以没有)
+ *   第二行为字段名       (这行没有则不导出)
+ *   第三行为类型         (不支持类型不导出)
+ *   第四行保留          (可以没有)
+ *   第五行保留          (可以没有)
+ *  表二(如果有):
+ *   一些配置
+ */
 namespace THEditor
 {
     public abstract class BaseExcelConverter

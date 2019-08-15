@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4098926767338598808}
   - component: {fileID: 3242322128978418941}
   - component: {fileID: 1399705570396385608}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: titleBg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -85,7 +85,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5681729047775108645}
   - component: {fileID: 6063432958347946050}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: UWindow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 6136454119163690398}
   - component: {fileID: 8039742147337237606}
   - component: {fileID: 7238699519811829953}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -210,7 +210,7 @@ GameObject:
   - component: {fileID: 8233290200642865250}
   - component: {fileID: 3764739963025042994}
   - component: {fileID: 2439085252455421340}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: mainBg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
