@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using THGame;
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEngine;
 
 namespace THEditor
@@ -10,7 +11,7 @@ namespace THEditor
     public class SpriteMenu
     {
 
-        [MenuItem("Assets/THEditor/精灵菜单/一键生成所有", false, 12)]
+        [MenuItem("Assets/THEditor/资源工具/精灵菜单/一键生成所有", false, 12)]
         public static void MenuGenSpriteOneKey()
         {
             var selected = Selection.activeObject;
@@ -50,7 +51,7 @@ namespace THEditor
         }
 
        
-        [MenuItem("Assets/THEditor/精灵菜单/图集/生成精灵图集(DB)")]
+        [MenuItem("Assets/THEditor/资源工具/精灵菜单/图集/生成精灵图集(DB)")]
         public static void MenuGenAtlasSheets()
         {
             var selected = Selection.activeObject;
@@ -89,7 +90,7 @@ namespace THEditor
 
         }
 
-        [MenuItem("Assets/THEditor/精灵菜单/图集/生成DB精灵Json数据")]
+        [MenuItem("Assets/THEditor/资源工具/精灵菜单/图集/生成DB精灵Json数据")]
         public static void MenuGenSheetJson()
         {
             var selected = Selection.activeObject;
@@ -128,7 +129,7 @@ namespace THEditor
 
         }
 
-        [MenuItem("Assets/THEditor/精灵菜单/动画/生成动画及控制器")]
+        [MenuItem("Assets/THEditor/资源工具/精灵菜单/动画/生成动画及控制器")]
         public static void MenuGenAnimaAndController()
         {
             var selected = Selection.activeObject;
@@ -217,7 +218,7 @@ namespace THEditor
             //处理逻辑
             var ctrlMap = SpriteEditorTools.GenerateAnimationClipFromTextureFile(assetPath,"",(clip) =>
             {
-                bool isLoop = SpriteConfig.IsNeedLoop(clip.name);
+                bool isLoop = SpriteConfig.GetInstance().IsNeedLoop(clip.name);
                 if (isLoop)
                 {
                     SpriteEditorTools.SetupAnimationClipLoop(clip, isLoop);
@@ -231,12 +232,32 @@ namespace THEditor
                     string clipFilePath = AssetDatabase.GetAssetPath(clip);
                     string clipRootPath = Path.GetDirectoryName(clipFilePath);
 
-                    string ctrlSavePath = PathUtil.Combine(clipRootPath, SpriteEditorTools.controllerName);
-                    var ctrl = SpriteEditorTools.GenerateAnimationControllerFromAnimationClipFile("", ctrlSavePath);
+                    bool isDefault = SpriteConfig.GetInstance().IsDefaultState(clip.name);
 
-                    bool isDefault = SpriteConfig.isDefaultState(clip.name);
-                    SpriteEditorTools.SetupAnimationState(ctrl, clip, isDefault);
+                    //上层目录检查
+                    //如果上层有公共的,直接用公共的
+                    //如果上层有模板,生成继承控制器
+                    string prevRootPath = PathUtil.GetParentPath(clipRootPath);
+                    string parentCtrl = PathUtil.Combine(prevRootPath, SpriteEditorTools.controllerName);
+                    string parentCtrlTmpl = PathUtil.Combine(prevRootPath, SpriteEditorTools.controllerTmplName);
+                    if (XFileTools.Exists(parentCtrl))
+                    {
+                        var ctrl = AssetDatabase.LoadAssetAtPath<AnimatorController>(parentCtrl);
+                        SpriteEditorTools.SetupAnimationState(ctrl, clip, isDefault);
+                    }
+                    else if(XFileTools.Exists(parentCtrlTmpl))
+                    {
+                        string overrideCtrlSavePath = PathUtil.Combine(clipRootPath, SpriteEditorTools.overrideControllerName);
+                        var overrideCtrl = SpriteEditorTools.GenerateAnimationOverrideControllerFromAnimationClipFile("", parentCtrlTmpl, overrideCtrlSavePath);
+                        SpriteEditorTools.SetupOverrideMotion(overrideCtrl, clip);
+                    }
+                    else
+                    {
+                        string ctrlSavePath = PathUtil.Combine(clipRootPath, SpriteEditorTools.controllerName);
 
+                        var ctrl = SpriteEditorTools.GenerateAnimationControllerFromAnimationClipFile("", ctrlSavePath);
+                        SpriteEditorTools.SetupAnimationState(ctrl, clip, isDefault);
+                    }
                 }
 
                 if (exportPathList != null)

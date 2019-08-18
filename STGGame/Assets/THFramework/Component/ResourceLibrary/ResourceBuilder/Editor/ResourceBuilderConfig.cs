@@ -24,10 +24,11 @@ namespace THEditor
 
         //手动设置
         public BuildPlatform targetType = BuildPlatform.Auto;
+        public bool isUsePlatformName = true;
         public bool isBuildShare = true;
         public bool isUseLower = true;
         public string shareBundleName = "share.ab";
-        public string exportFolder = "";
+        public string exportFolder = "Assets/StreamingAssets";
 
         public List<ResourceBuilderInfos> buildInfoList = new List<ResourceBuilderInfos>();
 

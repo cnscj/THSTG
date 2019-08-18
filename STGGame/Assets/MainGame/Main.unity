@@ -141,6 +141,7 @@ GameObject:
   - component: {fileID: 2125908318}
   - component: {fileID: 2125908314}
   - component: {fileID: 2125908313}
+  - component: {fileID: 2125908315}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -202,6 +203,18 @@ MonoBehaviour:
   heros: []
   mobs: []
   bosses: []
+--- !u!114 &2125908315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2125908311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7480a76dafba45a4924d9a5dc85b3cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &2125908316
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -411,6 +424,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2125908312}
     m_Modifications:
+    - target: {fileID: 8287892597242938340, guid: fdfae3b3b90245046a9a8c450e9b8251,
+        type: 3}
+      propertyPath: m_Name
+      value: SceneCamera
+      objectReference: {fileID: 0}
     - target: {fileID: 8287892597242938341, guid: fdfae3b3b90245046a9a8c450e9b8251,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -465,11 +483,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8287892597242938340, guid: fdfae3b3b90245046a9a8c450e9b8251,
-        type: 3}
-      propertyPath: m_Name
-      value: SceneCamera
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fdfae3b3b90245046a9a8c450e9b8251, type: 3}

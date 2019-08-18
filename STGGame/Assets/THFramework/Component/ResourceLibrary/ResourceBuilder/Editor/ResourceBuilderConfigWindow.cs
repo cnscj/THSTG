@@ -35,9 +35,11 @@ namespace THEditor
         void ShowBundleConfig()
         {
             ResourceBuilderConfig.GetInstance().targetType = (ResourceBuilderConfig.BuildPlatform)EditorGUILayout.EnumPopup("当前平台", ResourceBuilderConfig.GetInstance().targetType);
+
             ResourceBuilderConfig.GetInstance().isBuildShare = EditorGUILayout.Toggle("公共部分单独打包", ResourceBuilderConfig.GetInstance().isBuildShare);
             ResourceBuilderConfig.GetInstance().isUseLower = EditorGUILayout.Toggle("使用全小写路径", ResourceBuilderConfig.GetInstance().isUseLower);
             ShowPathBar("导出路径:", ref ResourceBuilderConfig.GetInstance().exportFolder);
+            ResourceBuilderConfig.GetInstance().isUsePlatformName = EditorGUILayout.Toggle("使用平台名称", ResourceBuilderConfig.GetInstance().isUsePlatformName);
             EditorGUILayout.Space();
         }
 

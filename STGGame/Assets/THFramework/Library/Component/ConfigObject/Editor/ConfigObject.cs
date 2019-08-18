@@ -39,5 +39,17 @@ namespace THEditor
             }
             return asset;
         }
+
+        //修改加载目录
+        protected static string ChangeAssetPath(string path)
+        {
+            if (path != null && path != "")
+            {
+                configAssetsPath = path;
+                return path;
+            }
+            return configAssetsPath;
+        }
+
     }
 }

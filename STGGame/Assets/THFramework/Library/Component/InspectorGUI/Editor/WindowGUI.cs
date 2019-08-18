@@ -9,7 +9,7 @@ namespace THEditor
 {
 	public class WindowGUI<T> : EditorWindow where T : EditorWindow
     {
-        protected SerializedObject m_serializedObject;   //序列化对象
+        protected List<SerializedObject> m_serializedObjectList = new List<SerializedObject>();   //序列化对象列表
         protected Dictionary<string, List<KeyValuePair<string, SerializedProperty>>> m_propsMaps = new Dictionary<string, List<KeyValuePair<string, SerializedProperty>>>();
 
         public static void ShowWindow(string title)
@@ -22,7 +22,10 @@ namespace THEditor
         protected void OnGUI()
         {
             
-            m_serializedObject.Update();//属性序列化
+            foreach (var serializedObject in m_serializedObjectList)
+            {
+                serializedObject.ApplyModifiedProperties();
+            }
             EditorGUI.BeginChangeCheck();//开始检查是否有修改
 
             EditorGUILayout.BeginVertical();
@@ -31,9 +34,17 @@ namespace THEditor
 
             if (EditorGUI.EndChangeCheck())//结束检查是否有修改
             {
-                m_serializedObject.ApplyModifiedProperties();
+                foreach (var serializedObject in m_serializedObjectList)
+                {
+                    serializedObject.ApplyModifiedProperties();
+                }
             }
             
+        }
+
+        protected virtual void OnObjs()
+        {
+
         }
 
         protected virtual void OnProps()
@@ -49,15 +60,34 @@ namespace THEditor
 		void OnEnable()
 		{
             //使用当前类初始化
-            m_serializedObject = new SerializedObject(this);
             Clear();
+            AddObject(this);
+            OnObjs();
             OnProps();
 
+        }
+        protected SerializedObject AddObject(Object obj)
+        {
+            SerializedObject serializedObject = new SerializedObject(obj);
+            if (serializedObject != null)
+            {
+                m_serializedObjectList.Add(serializedObject);
+                return serializedObject;
+            }
+            return null;
         }
 
         protected SerializedProperty FindProperty(string property)
         {
-            return m_serializedObject.FindProperty(property);
+            foreach(var serializedObject in m_serializedObjectList)
+            {
+                SerializedProperty prop = serializedObject.FindProperty(property);
+                if (prop != null)
+                {
+                    return prop;
+                }
+            }
+            return null;
         }
 
         protected SerializedProperty GetProperty(string group, string name)
@@ -159,9 +189,18 @@ namespace THEditor
 
         public virtual void Clear()
         {
+            m_serializedObjectList.Clear();
             m_propsMaps.Clear();
         }
 
-
+        private void OnDestroy()
+        {
+            foreach (var serializedObject in m_serializedObjectList)
+            {
+                EditorUtility.SetDirty(serializedObject.targetObject);
+            }
+           
+            AssetDatabase.SaveAssets();
+        }
     }
 }

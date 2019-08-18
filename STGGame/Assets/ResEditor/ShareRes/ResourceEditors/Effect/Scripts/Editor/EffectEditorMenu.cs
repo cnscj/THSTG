@@ -13,7 +13,7 @@ namespace STGEditor
         public static readonly string editorLevelScenePath = PathUtil.Combine(editorLevelFolder, string.Format("EffectEditor.unity"));
         public static readonly string saveDefaultName = "EffectEditor.unity";
 
-        [MenuItem("Assets/STGEditor/特效编辑/生成特效编辑模板")]
+        [MenuItem("Assets/STGEditor/资源编辑器/特效编辑器/生成特效编辑场景")]
         public static void MenuCreateEditor()
         {
             var selected = Selection.activeObject;

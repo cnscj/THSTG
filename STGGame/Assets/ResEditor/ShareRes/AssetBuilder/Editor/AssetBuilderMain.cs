@@ -12,6 +12,7 @@ namespace STGEditor
             new AssetBuilderShader(),
             new AssetBuilderEffect(),
             new AssetBuilderSprite(),
+            new AssetBuilderLevel(),
             new AssetBuilderUI(),
         });
     }

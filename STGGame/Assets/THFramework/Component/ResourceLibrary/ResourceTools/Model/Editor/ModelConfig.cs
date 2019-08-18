@@ -1,162 +1,66 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
+using THGame;
+using UnityEditor;
 using UnityEngine;
+
 namespace THEditor
 {
-    public static class ModelConfig
+    public class ModelConfig : BaseResourceConfig<ModelConfig>
     {
-        private class GlobalConfigInfos
-        {
-            public Dictionary<string, bool> stateLoopMap;
-            public Dictionary<string, bool> defaultStateMap;
-        }
+        static string assetPath = ChangeAssetPath(string.Format("Assets/Resources/THModelConfig.asset"));
 
-        private class ConfigInfos
+        [SerializeField] public Shader defaultShader;
+        [SerializeField] public List<string> defaultStateList = new List<string>()
         {
-            public Dictionary<string, bool> stateLoopMap;
-            public bool isGenColliderBox;
-            public string defaultState;
-        }
-        private static GlobalConfigInfos s_global = new GlobalConfigInfos
-        {
-            stateLoopMap = new Dictionary<string, bool>
-            {
-                { "stand" , true},
-                { "run", true },
-
-                { "ridestand" , true},
-                { "riderun", true },
-            },
-            defaultStateMap = new Dictionary<string, bool>
-            {
-                //因类型不同而不同,这里默认stand,不能多个,否则会冲突
-                { "stand" , true},
-                { "ridestand" , true},
-            },
+            "idle","stand",
         };
-        private static Dictionary<string, ConfigInfos> s_unique = new Dictionary<string, ConfigInfos>
+        [SerializeField] public List<string> loopStateList = new List<string>()
         {
-            {
-                "Role",
-                new ConfigInfos
-                {
-                    stateLoopMap = new Dictionary<string, bool>
-                    {
-
-                    },
-                    isGenColliderBox = true,
-                    defaultState = "stand",
-                }
-            },
-            {
-                "Pet",
-                new ConfigInfos
-                {
-                    stateLoopMap = new Dictionary<string, bool>
-                    {
-
-                    },
-                    isGenColliderBox = true,
-                    defaultState = "stand",
-                }
-            },
-            {
-                "Ride",
-                new ConfigInfos
-                {
-                    stateLoopMap = new Dictionary<string, bool>
-                    {
-
-                    },
-                    isGenColliderBox = true,
-                    defaultState = "ridestand",             //坐骑就ridestan默认
-                }
-            },
-            {
-                "Npc",
-                new ConfigInfos
-                {
-                    stateLoopMap = new Dictionary<string, bool>
-                    {
-
-                    },
-                    isGenColliderBox = true,
-                    defaultState = "stand",
-                }
-            },
-            {
-                "Mob",
-                new ConfigInfos
-                {
-                    stateLoopMap = new Dictionary<string, bool>
-                    {
-
-                    },
-                    isGenColliderBox = true,
-                    defaultState = "stand",
-                }
-            },
-            {
-                "Boss",
-                new ConfigInfos
-                {
-                    stateLoopMap = new Dictionary<string, bool>
-                    {
-
-                    },
-                    isGenColliderBox = true,
-                    defaultState = "stand",
-                }
-            },
+            "idle","stand",
         };
+        Dictionary<string, bool> defaultStateMap = new Dictionary<string, bool>();
+        Dictionary<string, bool> loopStateMap = new Dictionary<string, bool>();
 
-        /////
 
-        public static bool IsNeedLoop(string folder, string stateName)
+        private void OnEnable()
         {
-            if (s_unique.ContainsKey(folder))
+            defaultShader = defaultShader ? defaultShader : Shader.Find("Standard");
+            foreach (var state in defaultStateList)
             {
-                var map = s_unique[folder];
-                if (map.stateLoopMap.ContainsKey(stateName))
+                if (!defaultStateMap.ContainsKey(state))
                 {
-                    return true;
+                    defaultStateMap.Add(state, true);
                 }
             }
-            if(s_global.stateLoopMap.ContainsKey(stateName))
+
+            foreach (var state in loopStateList)
+            {
+                if (!loopStateMap.ContainsKey(state))
+                {
+                    loopStateMap.Add(state, true);
+                }
+            }
+
+        }
+
+        public bool IsDefaultState(string stateName)
+        {
+            if (defaultStateMap.ContainsKey(stateName))
             {
                 return true;
             }
             return false;
         }
 
-        public static bool isNeedCollider(string folder)
+        public bool IsNeedLoop(string stateName)
         {
-            if (s_unique.ContainsKey(folder))
+            if (loopStateMap.ContainsKey(stateName))
             {
-                var info = s_unique[folder];
-                return info.isGenColliderBox;
+                return true;
             }
             return false;
         }
 
-        public static bool isDefaultState(string folder, string stateName)
-        {
-            if (s_unique.ContainsKey(folder))
-            {
-                var info = s_unique[folder];
-                return (stateName.Equals(info.defaultState));
-            }
-            return s_global.defaultStateMap.ContainsKey(stateName);
-        }
-
-        public static string GetDefaultState(string folder)
-        {
-            if (s_unique.ContainsKey(folder))
-            {
-                var info = s_unique[folder];
-                return info.defaultState == null ? info.defaultState : "";
-            }
-            return "";
-        }
     }
 }

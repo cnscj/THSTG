@@ -81,8 +81,8 @@ namespace THGame
             string fileName = Path.GetFileNameWithoutExtension(path);
             int indexOf_ = fileName.IndexOf('_');
             string pathId = (indexOf_ == -1) ? fileName : fileName.Remove(indexOf_);
-            int iPathId;
-            return !int.TryParse(pathId, out iPathId) ? "" : pathId;
+            long iPathId;
+            return !long.TryParse(pathId, out iPathId) ? "" : pathId;
         }
 
         /// <summary>

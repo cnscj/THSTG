@@ -9,6 +9,7 @@ namespace STGGame
     public class CameraManager : MonoSingleton<CameraManager>
     {
         public Camera mainCamera;
+        public Camera mapCamera;
         public Camera uiCamera;
 
 

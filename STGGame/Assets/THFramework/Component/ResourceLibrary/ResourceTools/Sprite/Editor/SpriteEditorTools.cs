@@ -9,7 +9,10 @@ namespace THEditor
 {
     public static class SpriteEditorTools
     {
-        public static readonly string controllerName = "controller.controller";
+        public static readonly string controllerName = "controller.controller";                 //共用/私有控制器
+        public static readonly string controllerTmplName = "controllerTmpl.controller";         //模板控制器
+        public static readonly string overrideControllerName = "overrideController.overrideController";         //模板控制器
+
         public static readonly float frameRate = 12.0f;//统一12帧
 
         ///
@@ -268,6 +271,44 @@ namespace THEditor
             return ctrl;
         }
 
+        public static AnimatorOverrideController GenerateAnimationOverrideControllerFromAnimationClipFile(string assetPath, string ctrlTmplPath, string savePath = "")
+        {
+            //没有就创建,有就添加
+            AnimatorOverrideController ovrrideCtrl = null;
+            if (XFileTools.Exists(ctrlTmplPath))
+            {
+                AnimatorController ctrlTmpl = AssetDatabase.LoadAssetAtPath<AnimatorController>(ctrlTmplPath);
+                if (ctrlTmpl != null)
+                {
+                    if (!XFileTools.Exists(savePath))
+                    {
+                        //不存在就创建
+                        ovrrideCtrl = new AnimatorOverrideController();
+                        AssetDatabase.CreateAsset(ovrrideCtrl, savePath);
+                    }
+                    else
+                    {
+                        ovrrideCtrl = AssetDatabase.LoadAssetAtPath<AnimatorOverrideController>(savePath);
+                    }
+                    //赋予模板
+                    ovrrideCtrl.runtimeAnimatorController = ovrrideCtrl.runtimeAnimatorController != null ? ovrrideCtrl.runtimeAnimatorController : ctrlTmpl;
+
+                    if (assetPath != "")
+                    {
+                        AnimationClip animClip = AssetDatabase.LoadAssetAtPath<AnimationClip>(assetPath);
+                        if (animClip)
+                        {
+                            SetupOverrideMotion(ovrrideCtrl, animClip);
+                        }
+                    }
+
+                    AssetDatabase.SaveAssets(); //保存变更,不然没得内容
+                }
+            }
+            
+            return ovrrideCtrl;
+        }
+
         public static GameObject GeneratePrefabFromAnimationControllerFile(string assetPath, string savePath = "")
         {
             string assetFileNonExtName = Path.GetFileNameWithoutExtension(assetPath);
@@ -332,7 +373,7 @@ namespace THEditor
                 string assetRootPathName = Path.GetFileNameWithoutExtension(assetRootPath);
                 savePath = Path.Combine(assetRootPath, string.Format("{0}.mat", assetRootPathName));
             }
-            Material mat = new Material(ResourceConfig.GetInstance().defaultSpriteShader);
+            Material mat = new Material(SpriteConfig.GetInstance().defaultShader);
             if (XFileTools.Exists(savePath))
             {
                 mat = AssetDatabase.LoadAssetAtPath<Material>(savePath);
@@ -479,6 +520,20 @@ namespace THEditor
 
             return true;
         }
+        //
+        public static bool SetupOverrideMotion(AnimatorOverrideController overrideCtrl, AnimationClip clip)
+        {
+            if (overrideCtrl && clip)
+            {
+                if (overrideCtrl[clip.name])
+                {
+                    overrideCtrl[clip.name] = clip;
+                    return true;
+                }
+            }
+            return false;
+        }
+
         //设置状态
         public static bool SetupAnimationState(AnimatorController ctrl, AnimationClip clip, bool isDefault = false)
         {

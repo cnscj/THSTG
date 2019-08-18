@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8260f140153ca4484a14fe3fd21418a3, type: 3}
   m_Name: THResourceBuilderConfig
   m_EditorClassIdentifier: 
-  targetType: 0
+  targetType: 1
+  isUsePlatformName: 1
   isBuildShare: 1
   isUseLower: 1
   shareBundleName: share.ab
-  exportFolder: Assets/ResEditor/Z_AutoProcess/AssetBundle
+  exportFolder: Assets/StreamingAssets/ABRes
   buildInfoList: []

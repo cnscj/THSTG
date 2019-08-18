@@ -58,9 +58,21 @@ namespace THEditor
             string exportFolder = ResourceBuilderConfig.GetInstance().exportFolder;
             if (exportFolder != "")
             {
+                string finalExportFolder = exportFolder;
                 var buildPlatform = ResourceBuilderConfig.GetInstance().GetBuildType();
-                string buildPlatformStr = Enum.GetName(typeof(BuildTarget), buildPlatform);
-                string finalExportFolder = PathUtil.Combine(exportFolder, buildPlatformStr).Replace("\\", "/");
+                if (ResourceBuilderConfig.GetInstance().isUsePlatformName)
+                {
+                    if (ResourceBuilderConfig.GetInstance().targetType == ResourceBuilderConfig.BuildPlatform.Auto)
+                    {
+                        string buildPlatformStr = Enum.GetName(typeof(BuildTarget), buildPlatform);
+                        finalExportFolder = PathUtil.Combine(exportFolder, buildPlatformStr).Replace("\\", "/");
+                    }else
+                    {
+                        string buildPlatformStr = Enum.GetName(typeof(ResourceBuilderConfig.BuildPlatform), ResourceBuilderConfig.GetInstance().targetType);
+                        finalExportFolder = PathUtil.Combine(exportFolder, buildPlatformStr).Replace("\\", "/");
+                    }
+                    
+                }
 
                 if (!XFolderTools.Exists(finalExportFolder))
                 {

@@ -13,7 +13,7 @@ namespace STGEditor
         public static readonly string editorUIScenePath = PathUtil.Combine(editorUIFolder, string.Format("UIEditor.unity"));
         public static readonly string saveDefaultName = "UIEditor.unity";
 
-        [MenuItem("Assets/STGEditor/UI编辑/生成UI编辑模板")]
+        [MenuItem("Assets/STGEditor/资源编辑器/UI编辑器/生成UI编辑模板")]
         public static void MenuCreateEditor()
         {
             var selected = Selection.activeObject;
