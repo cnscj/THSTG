@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311992, g: 0.38074034, b: 0.35872713, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074, b: 0.35872698, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -424,11 +424,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2125908312}
     m_Modifications:
-    - target: {fileID: 8287892597242938340, guid: fdfae3b3b90245046a9a8c450e9b8251,
-        type: 3}
-      propertyPath: m_Name
-      value: SceneCamera
-      objectReference: {fileID: 0}
     - target: {fileID: 8287892597242938341, guid: fdfae3b3b90245046a9a8c450e9b8251,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -483,6 +478,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8287892597242938340, guid: fdfae3b3b90245046a9a8c450e9b8251,
+        type: 3}
+      propertyPath: m_Name
+      value: SceneCamera
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fdfae3b3b90245046a9a8c450e9b8251, type: 3}

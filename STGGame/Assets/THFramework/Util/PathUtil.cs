@@ -7,7 +7,7 @@ namespace THGame
     {
         public static string NormalizePath(string path)
         {
-            return path.Replace("\\", "/");
+            return path.Replace(@"\", "/");
         }
 
         public static string Combine(params string[] path)
@@ -35,7 +35,7 @@ namespace THGame
         {
             relaPath = NormalizePath(relaPath);
             filePath = NormalizePath(filePath);
-            int startPos = filePath.IndexOf(relaPath);
+            int startPos = filePath.IndexOf(relaPath, StringComparison.Ordinal);
             if (startPos >= 0)
             {
                 return filePath.Substring(startPos + relaPath.Length);
