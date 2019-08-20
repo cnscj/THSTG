@@ -20,6 +20,7 @@ namespace THEditor
         protected override void OnProps()
         {
             AddProperty("defaultShader", "Normal", "默认Shader");
+            AddProperty("defaultFrameRate", "Normal", "默认动画帧率");
             AddProperty("defaultStateList", "Normal", "默认动作列表");
             AddProperty("loopStateList", "Normal", "循环动作列表");
         }

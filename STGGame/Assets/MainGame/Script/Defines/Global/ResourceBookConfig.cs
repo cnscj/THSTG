@@ -4,7 +4,7 @@ using THGame;
 
 namespace STGGame
 {
-	public static class ResourceBook
+	public static class ResourceBookConfig
     {
         //public static readonly string dataPath = Application.dataPath;
         //public static readonly string streamingAssetsPath = Application.streamingAssetsPath;

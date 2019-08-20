@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using THGame;
 using THGame.Package.MVC;
 using UnityEngine;
 

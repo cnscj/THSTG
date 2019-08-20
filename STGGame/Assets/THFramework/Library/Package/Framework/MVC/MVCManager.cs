@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace THGame.Package.MVC
 {
-    public class MVCManager
+    public class MVCManager : Singleton<MVCManager>
     {
         private Dictionary<string, Controller> controllerMaps = new Dictionary<string, Controller>();
 

@@ -11,6 +11,7 @@ namespace THEditor
         static string assetPath = ChangeAssetPath(string.Format("Assets/Resources/THSpriteConfig.asset"));
 
         [SerializeField] public Shader defaultShader;
+        [SerializeField] public float defaultFrameRate = 12.0f;
         [SerializeField] public List<string> defaultStateList = new List<string>()
         {
             "idle","stand",

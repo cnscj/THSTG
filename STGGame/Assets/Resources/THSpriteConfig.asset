@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: THSpriteConfig
   m_EditorClassIdentifier: 
   defaultShader: {fileID: 4800000, guid: f85b7c46ee0bc92499e09b4bbf499d2a, type: 3}
+  defaultFrameRate: 12
   defaultStateList:
   - idle
   - stand

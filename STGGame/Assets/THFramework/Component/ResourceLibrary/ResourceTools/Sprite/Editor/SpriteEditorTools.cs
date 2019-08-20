@@ -13,8 +13,6 @@ namespace THEditor
         public static readonly string controllerTmplName = "controllerTmpl.controller";         //模板控制器
         public static readonly string overrideControllerName = "overrideController.overrideController";         //模板控制器
 
-        public static readonly float frameRate = 12.0f;//统一12帧
-
         ///
         public static TextureImporter LoadImporterFromTextureFile(string assetPath)
         {
@@ -205,7 +203,7 @@ namespace THEditor
                         curveBinding.type = typeof(SpriteRenderer);
                         curveBinding.path = "";
                         curveBinding.propertyName = "m_Sprite";
-                        float frameTime = 1 / frameRate;                  
+                        float frameTime = 1 / SpriteConfig.GetInstance().defaultFrameRate;                  
                         int index = 0;
                         List<ObjectReferenceKeyframe> keyFrames = new List<ObjectReferenceKeyframe>();
                         foreach (var listPair in actionPair.Value)
@@ -218,7 +216,7 @@ namespace THEditor
                         }
 
                         AnimationClip clip = new AnimationClip();
-                        clip.frameRate = frameRate;//动画帧率，30比较合适
+                        clip.frameRate = SpriteConfig.GetInstance().defaultFrameRate;//动画帧率，30比较合适
 #if !UNITY_5
                         AnimationUtility.SetAnimationType(clip, ModelImporterAnimationType.Generic);
 #endif

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace STGGame
 {
-    public class ResourceManager : BaseResourceManager<ResourceManager>
+    public class ResourceManager : MonoSingleton<ResourceManager>
     {
         public static readonly string srcResource = PathUtil.Combine(Application.streamingAssetsPath,"ABRes", PlatformUtil.GetCurPlatformName());
         public static readonly string srcShaderPath = PathUtil.Combine(srcResource, "shaders");
@@ -40,21 +40,21 @@ namespace STGGame
         //
         public UnityEngine.Object GetObject(string assetPath,string assetName)
         {
-            return m_loader.LoadFromFileSync(assetPath, assetName);
+            return ResourceLoader.GetInstance().LoadFromFileSync(assetPath, assetName);
         }
         //可能是AB,可能是源文件
         public GameObject LoadModel(string uid)
         {
             string assetPath = PathUtil.Combine(srcModelPath, string.Format("{0}.ab", uid));
             string assetName = string.Format("{0}.prefab", uid);
-            return m_loader.LoadFromFileSync(assetPath, assetName) as GameObject;
+            return ResourceLoader.GetInstance().LoadFromFileSync(assetPath, assetName) as GameObject;
         }
 
         public GameObject LoadSprite(string uid)
         {
             string assetPath = PathUtil.Combine(srcSpritePath, string.Format("{0}.ab", uid));
             string assetName = string.Format("{0}.prefab", uid);
-            return m_loader.LoadFromFileSync(assetPath, assetName) as GameObject;
+            return ResourceLoader.GetInstance().LoadFromFileSync(assetPath, assetName) as GameObject;
         }
 
         public GameObject LoadUI(string module,string view)
@@ -109,7 +109,7 @@ namespace STGGame
             {
                 if (File.Exists(abPath))
                 {
-                    m_loader.LoadFromFileSync(abPath);
+                    ResourceLoader.GetInstance().LoadFromFileSync(abPath);
                 }
             }
         }
