@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace STGGame
 {
-    public class ResourceManager : MonoSingleton<ResourceManager>
+    public class AssetManager : MonoSingleton<AssetManager>
     {
         public static readonly string srcResource = PathUtil.Combine(Application.streamingAssetsPath,"ABRes", PlatformUtil.GetCurPlatformName());
         public static readonly string srcShaderPath = PathUtil.Combine(srcResource, "shaders");
@@ -27,34 +27,19 @@ namespace STGGame
             PathUtil.Combine(srcLevelPath, "share.ab"),
         };
 
-        public T LoadAsset<T>(string uid) where T : UnityEngine.Object
-        {
-            return null;
-        }
-
-        public GameObject InstanceAsset(string uid)
-        {
-            return null;
-        }
-
-        //
-        public UnityEngine.Object GetObject(string assetPath,string assetName)
-        {
-            return ResourceLoader.GetInstance().LoadFromFileSync(assetPath, assetName);
-        }
         //可能是AB,可能是源文件
         public GameObject LoadModel(string uid)
         {
             string assetPath = PathUtil.Combine(srcModelPath, string.Format("{0}.ab", uid));
             string assetName = string.Format("{0}.prefab", uid);
-            return ResourceLoader.GetInstance().LoadFromFileSync(assetPath, assetName) as GameObject;
+            return ResourceLoader.GetInstance().LoadFromFile<GameObject>(assetPath);
         }
 
         public GameObject LoadSprite(string uid)
         {
             string assetPath = PathUtil.Combine(srcSpritePath, string.Format("{0}.ab", uid));
             string assetName = string.Format("{0}.prefab", uid);
-            return ResourceLoader.GetInstance().LoadFromFileSync(assetPath, assetName) as GameObject;
+            return ResourceLoader.GetInstance().LoadFromFile<GameObject>(assetPath);
         }
 
         public GameObject LoadUI(string module,string view)
@@ -109,7 +94,7 @@ namespace STGGame
             {
                 if (File.Exists(abPath))
                 {
-                    ResourceLoader.GetInstance().LoadFromFileSync(abPath);
+                    //ResourceLoader.GetInstance().LoadAsset(abPath);
                 }
             }
         }

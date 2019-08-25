@@ -19,8 +19,6 @@ namespace STGGame
                 bodyNode.SetParent(entity.transform);
             }
             //实例化
-            //读取配置,查找资源路径
-            ResourceManager.GetInstance().LoadAsset<GameObject>(resourceCode);
         }
     }
 }
