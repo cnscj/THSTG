@@ -19,14 +19,9 @@ namespace THGame
 
             string abPath;
             string assetName;
-            ResourceLoaderUtil.SplitBundlePath(path, out abPath, out assetName);
-
-            Debug.Log("[LoadAsset]: " + path);
-            //打的ab包都资源名称和文件名都是小写的
-            string assetBundleName = path;
+            ResourceLoaderUtil.SplitBundlePath(path, out abPath, out assetName, typeof(T));
 
             AssetBundle assetBundle = null;
-            Debug.Log("[AssetBundle]加载目标资源: " + path);
             assetBundle = AssetBundle.LoadFromFile(abPath);
 
             Object obj;
@@ -41,10 +36,6 @@ namespace THGame
             {
                 obj = assetBundle;
             }
-            
-
-            //加入缓存
-            ResourceManager.GetInstance().PushCache(path, obj);
 
             return obj as T;
         }
@@ -55,14 +46,12 @@ namespace THGame
 
             string abPath;
             string assetName;
-            ResourceLoaderUtil.SplitBundlePath(path, out abPath, out assetName);
-
-            Debug.Log("[LoadAssetAsync]: " + path);
+            ResourceLoaderUtil.SplitBundlePath(path, out abPath, out assetName, typeof(T));
 
             ////加载目标资源
             AssetBundleCreateRequest createRequest;
             AssetBundle assetBundle = null;
-            Debug.Log("[AssetBundle]加载目标资源: " + path);
+
             createRequest = AssetBundle.LoadFromFileAsync(abPath);
             yield return createRequest;
             if (createRequest.isDone)
@@ -72,9 +61,6 @@ namespace THGame
             AssetBundleRequest abr = assetBundle.LoadAssetAsync(assetName, typeof(T));
             yield return abr;
             Object obj = abr.asset;
-
-            //加入缓存
-            ResourceManager.GetInstance().PushCache(path, obj);
 
             callback(obj as T);
 

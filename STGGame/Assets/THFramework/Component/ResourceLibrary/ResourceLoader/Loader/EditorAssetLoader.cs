@@ -10,11 +10,13 @@ namespace THGame
     public class EditorAssetLoader : IFileLoader
     {
 
-        public T LoadAsset<T>(string path) where T : class {
+        public T LoadAsset<T>(string path) where T : class
+        {
             return load<T>(path);
         }
 
-        public IEnumerator LoadAssetAsync<T>(string path, UnityAction<T> callback) where T : class {
+        public IEnumerator LoadAssetAsync<T>(string path, UnityAction<T> callback) where T : class
+        {
             if (callback != null) {
                 callback(load<T>(path));
             }
@@ -22,7 +24,8 @@ namespace THGame
         }
 
 
-        T load<T>(string path) where T : class {
+        T load<T>(string path) where T : class
+        {
 #if UNITY_EDITOR
             path = PathUtil.NormalizePath(path);
 
@@ -32,14 +35,13 @@ namespace THGame
 
             //绝对路径转为相对Assets文件夹的相对路径
             path = XFileTools.GetFileRelativePath(resPath);
-            Debug.Log("[LoadAsset(Editor)]: " + resPath);
+
             Object obj = UnityEditor.AssetDatabase.LoadAssetAtPath(resPath, typeof(T));
             if (obj == null)
             {
                 Debug.LogError("Asset not found - path:" + resPath);
             }
 
-            ResourceManager.GetInstance().PushCache(resPath, obj);
             return obj as T;
 #endif
             return null;

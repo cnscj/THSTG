@@ -116,7 +116,7 @@ namespace THGame
         /// <summary>
         /// 提供类似于键值对的访问方式便捷获取和设置数据对象
         /// </summary>
-        /// <param name="key"> 数据对象主键 </param>
+        /// <param name="dataMajorKey"> 数据对象主键 </param>
         /// <returns> 数据对象 </returns>
         public CSVObject this[string dataMajorKey]
         {

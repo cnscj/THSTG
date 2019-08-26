@@ -13,14 +13,27 @@ namespace THGame
 
         public T LoadAsset<T>(string path) where T : class
         {
-            return null;
+            string urlPath;
+            string assetName;
+            ResourceLoaderUtil.SplitBundlePath(path, out urlPath, out assetName, typeof(T));
+
+            UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle(urlPath);
+            request.SendWebRequest();
+            Object res = DownloadHandlerAssetBundle.GetContent(request);
+            if (assetName != null && assetName != "")
+            {
+                AssetBundle ab = res as AssetBundle;
+                res = ab.LoadAsset(assetName);
+            }
+            return res as T;
         }
 
         public IEnumerator LoadAssetAsync<T>(string path, UnityAction<T> callback, UnityAction<float> progress) where T : class
         {
-            string[] pathArray = path.Split('|');
-            string urlPath = pathArray[0];
-            string assetName = pathArray[1];
+            string urlPath;
+            string assetName;
+            ResourceLoaderUtil.SplitBundlePath(path, out urlPath, out assetName, typeof(T));
+
             UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle(urlPath);
             if (progress == null)
             {
@@ -39,7 +52,7 @@ namespace THGame
                 while (!request.isDone)
                 {
                     progress.Invoke(request.downloadProgress);
-                    yield return 1;
+                    yield return 1f;
                 }
                 if (request.isDone)
                 {
@@ -54,7 +67,7 @@ namespace THGame
                 }
                 else if (request.isNetworkError || request.isHttpError)
                 {
-                    progress.Invoke(-1);
+                    progress.Invoke(-1f);
                 }
 
             }

@@ -56,7 +56,12 @@ namespace THGame
             }
             else
             {
-                return m_localLoader.LoadAsset<T>(path);
+                var obj = m_localLoader.LoadAsset<T>(path);
+
+                //加入缓存
+                ResourceManager.GetInstance().PushCache(path, obj);
+
+                return obj;
             }
         }
 
@@ -75,7 +80,14 @@ namespace THGame
             }
             else
             {
-                StartCoroutine(m_localLoader.LoadAssetAsync<T>(path, onLoadComplate));
+                StartCoroutine(m_localLoader.LoadAssetAsync<T>(path, (obj)=>
+                {
+                    //加入缓存
+                    ResourceManager.GetInstance().PushCache(path, obj);
+
+                    onLoadComplate(obj);
+
+                }));
             }
         }
 
@@ -99,11 +111,16 @@ namespace THGame
             }
             else
             {
-                return m_networkLoader.LoadAsset<T>(path);
+                var obj = m_networkLoader.LoadAsset<T>(path);
+
+                //加入缓存
+                ResourceManager.GetInstance().PushCache(path, obj);
+
+                return obj;
             }
         }
 
-        public void LoadFromWWWAsync<T>(string path, UnityAction<T> onLoadComplate, UnityAction<float> progress = null) where T : Object
+        public void LoadFromWWWAsync<T>(string path, UnityAction<T> onLoadComplate, UnityAction<float> onLoadProgress = null) where T : Object
         {
             ResourceCacheDataInfo info = ResourceManager.GetInstance().QueryCache(path);
             if (info != null)
@@ -116,7 +133,14 @@ namespace THGame
             }
             else
             {
-                StartCoroutine(m_networkLoader.LoadAssetAsync<T>(path, onLoadComplate, progress));
+                StartCoroutine(m_networkLoader.LoadAssetAsync<T>(path, (obj)=>
+                {
+                    //加入缓存
+                    ResourceManager.GetInstance().PushCache(path, obj);
+
+                    onLoadComplate(obj);
+
+                }, onLoadProgress));
             }
         }
     }

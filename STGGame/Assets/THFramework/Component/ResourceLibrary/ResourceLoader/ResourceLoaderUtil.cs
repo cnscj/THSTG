@@ -1,16 +1,18 @@
 ﻿
+using System;
 using System.IO;
+using UnityEngine;
 
 namespace THGame
 {
     public static class ResourceLoaderUtil 
     {
-        public static bool SplitBundlePath(string fullpath, out string abPath, out string assetName)
+        public static bool SplitBundlePath(string fullpath, out string abPath, out string assetName, Type type = null)
         {
             if (fullpath != null && fullpath != "")
             {
                 string[] strArray = fullpath.Split('|');
-                if (strArray.Length >= 1)
+                if (strArray.Length > 1)
                 {
                     abPath = strArray[0];
                     assetName = strArray[1];
@@ -23,6 +25,11 @@ namespace THGame
                 {
                     abPath = fullpath;
                     assetName = null;
+                    if (type != null && type != typeof(AssetBundle))
+                    {
+                        assetName = Path.GetFileNameWithoutExtension(abPath);
+                    }
+                    
                 }
 
                 return true;

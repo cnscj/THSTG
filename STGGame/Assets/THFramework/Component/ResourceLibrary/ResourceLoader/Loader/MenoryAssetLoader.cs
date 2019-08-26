@@ -12,8 +12,16 @@ namespace THGame
 
         public T LoadAsset<T>(byte[] binary, string assetName) where T : class
         {
-            Object res = AssetBundle.LoadFromMemory(binary);
-            return res as T;
+            Object obj = AssetBundle.LoadFromMemory(binary);
+            if (assetName != null && assetName != "")
+            {
+                AssetBundle ab = obj as AssetBundle;
+                obj = ab.LoadAsset(assetName);
+
+                ab.Unload(false);
+            }
+
+            return obj as T;
         }
 
         public IEnumerator LoadAssetAsync<T>(byte[] binary, string assetName, UnityAction<T> callback) where T : class
@@ -21,13 +29,13 @@ namespace THGame
             AssetBundleCreateRequest request = AssetBundle.LoadFromMemoryAsync(binary);
             yield return request;
 
-            Object res = request.assetBundle;
+            Object obj = request.assetBundle;
             if (assetName != null && assetName != "")
             {
-                AssetBundle ab = res as AssetBundle;
-                res = ab.LoadAsset(assetName);
+                AssetBundle ab = obj as AssetBundle;
+                obj = ab.LoadAsset(assetName);
             }
-            callback?.Invoke(res as T);
+            callback?.Invoke(obj as T);
         }
     }
 
