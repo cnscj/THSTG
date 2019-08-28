@@ -23,11 +23,12 @@ namespace THEditor
                 m_builders.Add(builer);
             }
 
-            //打包设置
+            //打包设置:
             m_bundleOptions = BuildAssetBundleOptions.None;
             m_bundleOptions |= BuildAssetBundleOptions.ChunkBasedCompression;
+            //听大佬说,使用全路径加载会快一点.....
             m_bundleOptions |= BuildAssetBundleOptions.DisableLoadAssetByFileName;
-            m_bundleOptions |= BuildAssetBundleOptions.DisableLoadAssetByFileNameWithExtension;
+            //m_bundleOptions |= BuildAssetBundleOptions.DisableLoadAssetByFileNameWithExtension;
         }
         public void BuildAll()
         {

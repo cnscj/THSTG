@@ -48,7 +48,7 @@ namespace THGame
         //同步加载
         public T LoadFromFile<T>(string path) where T : Object
         {
-            ResourceCacheDataInfo info = ResourceManager.GetInstance().QueryCache(path);
+            ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(path);
             if (info != null)
             {
                 info.UpdateTick();
@@ -59,7 +59,7 @@ namespace THGame
                 var obj = m_localLoader.LoadAsset<T>(path);
 
                 //加入缓存
-                ResourceManager.GetInstance().PushCache(path, obj);
+                ResourceLoaderCache.GetInstance().PushCache(path, obj);
 
                 return obj;
             }
@@ -69,7 +69,7 @@ namespace THGame
         public void LoadFromFileAsync<T>(string path, UnityAction<T> onLoadComplate) where T : Object
         {
 
-            ResourceCacheDataInfo info = ResourceManager.GetInstance().QueryCache(path);
+            ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(path);
             if (info != null)
             {
                 info.UpdateTick();
@@ -83,7 +83,7 @@ namespace THGame
                 StartCoroutine(m_localLoader.LoadAssetAsync<T>(path, (obj)=>
                 {
                     //加入缓存
-                    ResourceManager.GetInstance().PushCache(path, obj);
+                    ResourceLoaderCache.GetInstance().PushCache(path, obj);
 
                     onLoadComplate(obj);
 
@@ -103,7 +103,7 @@ namespace THGame
 
         public T LoadFromWWW<T>(string path) where T : Object
         {
-            ResourceCacheDataInfo info = ResourceManager.GetInstance().QueryCache(path);
+            ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(path);
             if (info != null)
             {
                 info.UpdateTick();
@@ -114,7 +114,7 @@ namespace THGame
                 var obj = m_networkLoader.LoadAsset<T>(path);
 
                 //加入缓存
-                ResourceManager.GetInstance().PushCache(path, obj);
+                ResourceLoaderCache.GetInstance().PushCache(path, obj);
 
                 return obj;
             }
@@ -122,7 +122,7 @@ namespace THGame
 
         public void LoadFromWWWAsync<T>(string path, UnityAction<T> onLoadComplate, UnityAction<float> onLoadProgress = null) where T : Object
         {
-            ResourceCacheDataInfo info = ResourceManager.GetInstance().QueryCache(path);
+            ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(path);
             if (info != null)
             {
                 info.UpdateTick();
@@ -136,7 +136,7 @@ namespace THGame
                 StartCoroutine(m_networkLoader.LoadAssetAsync<T>(path, (obj)=>
                 {
                     //加入缓存
-                    ResourceManager.GetInstance().PushCache(path, obj);
+                    ResourceLoaderCache.GetInstance().PushCache(path, obj);
 
                     onLoadComplate(obj);
 

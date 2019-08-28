@@ -9,7 +9,7 @@ namespace THGame
 {
 
     //资源管理器 (资源管理器 仅会把资源加载入内存)
-    public class ResourceManager : MonoSingleton<ResourceManager>
+    public class ResourceLoaderCache : MonoSingleton<ResourceLoaderCache>
     {
         [Header("定时清理缓存间隔(秒):")]
         public float clearCacheDuration = 10f;
@@ -19,10 +19,10 @@ namespace THGame
         private float m_cacheTimeTemp;
 
         //缓冲区[key 为绝对路径]
-        private Dictionary<string, ResourceCacheDataInfo> cacheDataDic = new Dictionary<string, ResourceCacheDataInfo>();
+        private Dictionary<string, ResourceLoaderCacheDataInfo> cacheDataDic = new Dictionary<string, ResourceLoaderCacheDataInfo>();
 
         //检测缓冲区
-        public ResourceCacheDataInfo QueryCache(string key)
+        public ResourceLoaderCacheDataInfo QueryCache(string key)
         {
             if (cacheDataDic.ContainsKey(key))
             {
@@ -34,7 +34,8 @@ namespace THGame
         //加入缓冲区
         public void PushCache(string key, Object obj)
         {
-            Debug.Log("[ResourceManager]加入缓存:" + key);
+            if (obj == null)
+                return;
 
             lock (cacheDataDic)
             {
@@ -44,7 +45,7 @@ namespace THGame
                 }
                 else
                 {
-                    ResourceCacheDataInfo info = new ResourceCacheDataInfo(key, obj);
+                    ResourceLoaderCacheDataInfo info = new ResourceLoaderCacheDataInfo(key, obj);
                     cacheDataDic.Add(key, info);
                     info.UpdateTick();
                 }
@@ -60,12 +61,10 @@ namespace THGame
         //清理缓冲区
         private void updateCache()
         {
-            Debug.Log("[ResourceManager]清理缓存");
             foreach (var iter in cacheDataDic.ToList())
             {
                 if (iter.Value.startTick + cacheDataStayTime <= Time.realtimeSinceStartup)
                 {
-                    Debug.Log("过期清理:" + iter.Value.cacheName);
                     cacheDataDic.Remove(iter.Key);
                 }
             }

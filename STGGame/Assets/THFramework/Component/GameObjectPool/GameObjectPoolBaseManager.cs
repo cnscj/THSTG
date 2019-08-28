@@ -46,7 +46,6 @@ namespace THGame
             }
             GameObject obj = new GameObject(poolName);
             obj.transform.SetParent(m_parentTrans);
-            obj.AddComponent<GameObjectPoolInfo>();
 
             T pool = new T();
             pool.Init(poolName, obj.transform);

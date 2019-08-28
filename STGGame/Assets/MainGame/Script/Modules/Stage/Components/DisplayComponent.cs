@@ -18,7 +18,13 @@ namespace STGGame
                 bodyNode = new GameObject("Body").transform;
                 bodyNode.SetParent(entity.transform);
             }
-            //实例化
+            //TODO:实例化
+            var sprite = AssetManager.GetInstance().LoadSprite("400001");
+            Debug.Log(sprite);
+            if (sprite)
+            {
+                displayGO = Instantiate(sprite, bodyNode.transform);
+            }
         }
     }
 }
