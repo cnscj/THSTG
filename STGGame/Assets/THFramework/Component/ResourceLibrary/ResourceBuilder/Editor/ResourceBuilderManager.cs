@@ -52,6 +52,11 @@ namespace THEditor
 
             //
             Build();
+
+            if (ResourceBuilderConfig.GetInstance().isClearAfterBuilded)
+            {
+                Clear();
+            }
         }
 
         void Build()

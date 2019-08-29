@@ -25,7 +25,7 @@ namespace THEditor
 
         private void OnEnable()
         {
-            defaultShader = defaultShader ? defaultShader : Shader.Find("Standard");
+            defaultShader = (defaultShader != null ) ? defaultShader : Shader.Find("Standard");
             foreach (var state in defaultStateList)
             {
                 if (!defaultStateMap.ContainsKey(state))

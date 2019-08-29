@@ -18,4 +18,5 @@ MonoBehaviour:
   isUseLower: 1
   shareBundleName: share.ab
   exportFolder: Assets/StreamingAssets/ABRes
+  isClearAfterBuilded: 0
   buildInfoList: []

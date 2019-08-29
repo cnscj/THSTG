@@ -39,7 +39,8 @@ namespace THEditor
             ResourceBuilderConfig.GetInstance().isBuildShare = EditorGUILayout.Toggle("公共部分单独打包", ResourceBuilderConfig.GetInstance().isBuildShare);
             ResourceBuilderConfig.GetInstance().isUseLower = EditorGUILayout.Toggle("使用全小写路径", ResourceBuilderConfig.GetInstance().isUseLower);
             ShowPathBar("导出路径:", ref ResourceBuilderConfig.GetInstance().exportFolder);
-            ResourceBuilderConfig.GetInstance().isUsePlatformName = EditorGUILayout.Toggle("使用平台名称", ResourceBuilderConfig.GetInstance().isUsePlatformName);
+            ResourceBuilderConfig.GetInstance().isUsePlatformName = EditorGUILayout.Toggle("导出路径衔接平台名称", ResourceBuilderConfig.GetInstance().isUsePlatformName);
+            ResourceBuilderConfig.GetInstance().isClearAfterBuilded = EditorGUILayout.Toggle("打包后自动清空包名", ResourceBuilderConfig.GetInstance().isClearAfterBuilded);
             EditorGUILayout.Space();
         }
 

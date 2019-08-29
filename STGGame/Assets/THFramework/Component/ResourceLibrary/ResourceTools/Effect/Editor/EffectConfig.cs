@@ -12,10 +12,9 @@ namespace THEditor
 
         public Shader defaultShader;
 
-
-        void OnEnable()
+        private void OnDisable()
         {
-            defaultShader = defaultShader ? defaultShader : Shader.Find("Standard");
+            defaultShader = (defaultShader != null) ? defaultShader : Shader.Find("Standard");
         }
 
     }
