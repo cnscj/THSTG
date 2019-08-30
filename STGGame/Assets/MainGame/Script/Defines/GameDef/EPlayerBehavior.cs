@@ -7,5 +7,11 @@
         MoveRight,
         MoveUp,
         MoveDown,
+
+        Attack,
+        Defense,
+        Shift,
+        Bomb,
+        Skill,
     }
 }

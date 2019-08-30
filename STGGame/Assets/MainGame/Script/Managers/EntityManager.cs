@@ -34,8 +34,8 @@ namespace STGGame
             playerData.heroType = EHeroType.Reimu;
 
             //赋予可视化身体
-
-
+            var displayComp = entity.GetComponent<DisplayComponent>();
+            displayComp.spriteCode = "400001";  //TODO:应该读取配置
 
             //修改GameObject名称
             entity.name = string.Format("{0}_{1:D2}", "Player", (int)type);
