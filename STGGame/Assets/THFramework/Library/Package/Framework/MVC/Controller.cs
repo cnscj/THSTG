@@ -10,11 +10,10 @@ namespace THGame.Package.MVC
             return true;
         }
 
-        public void Clear()
+        public void Dispost()
         {
             OnClose();
         }
-
 
         protected virtual void OnOpen()
         {

@@ -29,7 +29,8 @@ namespace THEditor
         public bool isUseLower = true;
         public string shareBundleName = "share.ab";
         public string exportFolder = "Assets/StreamingAssets";
-        public bool isClearAfterBuilded = false;
+        public bool isClearAfterBuilded = true;
+        public bool bundleIsUseFullPath = false;    //只允许全路径加载Bundle
 
         public List<ResourceBuilderInfos> buildInfoList = new List<ResourceBuilderInfos>();
 

@@ -28,7 +28,7 @@ namespace STGGame
         public static readonly string tempUIs = PathUtil.Combine(temResource, "UIs");
         public static readonly string tempConfigs = PathUtil.Combine(temResource, "Configs");
 
-        public static readonly string temMd5 = PathUtil.Combine(temResource, "Md5");
+        public static readonly string temMd5 = PathUtil.Combine(temResource, "_Md5");
         public static readonly string tempModelMd5s = PathUtil.Combine(temMd5, "Models");
         public static readonly string tempSpriteMd5s = PathUtil.Combine(temMd5, "Sprites");
         public static readonly string tempPublicFxMd5s = PathUtil.Combine(temMd5, "Effects");

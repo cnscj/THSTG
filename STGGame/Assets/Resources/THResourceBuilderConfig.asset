@@ -19,4 +19,5 @@ MonoBehaviour:
   shareBundleName: share.ab
   exportFolder: Assets/StreamingAssets/ABRes
   isClearAfterBuilded: 0
+  bundleIsUseFullPath: 0
   buildInfoList: []

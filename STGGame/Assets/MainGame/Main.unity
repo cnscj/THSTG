@@ -139,6 +139,7 @@ GameObject:
   - component: {fileID: 2125908315}
   - component: {fileID: 2125908317}
   - component: {fileID: 2125908316}
+  - component: {fileID: 2125908318}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -236,6 +237,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 022d041cf049e4a0593f59e5f03f986b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2125908318
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2125908311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 256d2142201aa64429639dbb739e547f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &2125908319
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -320,7 +333,8 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 517428470}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1680411467020898593, guid: 03a04ab8c5d9f914bb321e2a889d4727, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 03a04ab8c5d9f914bb321e2a889d4727, type: 3}
 --- !u!4 &4814777455088229653 stripped
 Transform:
@@ -335,6 +349,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2125908312}
     m_Modifications:
+    - target: {fileID: 8287892597242938340, guid: fdfae3b3b90245046a9a8c450e9b8251,
+        type: 3}
+      propertyPath: m_Name
+      value: GameCamera
+      objectReference: {fileID: 0}
     - target: {fileID: 8287892597242938341, guid: fdfae3b3b90245046a9a8c450e9b8251,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -389,11 +408,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8287892597242938340, guid: fdfae3b3b90245046a9a8c450e9b8251,
-        type: 3}
-      propertyPath: m_Name
-      value: SceneCamera
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fdfae3b3b90245046a9a8c450e9b8251, type: 3}

@@ -41,6 +41,7 @@ namespace THEditor
             ShowPathBar("导出路径:", ref ResourceBuilderConfig.GetInstance().exportFolder);
             ResourceBuilderConfig.GetInstance().isUsePlatformName = EditorGUILayout.Toggle("导出路径衔接平台名称", ResourceBuilderConfig.GetInstance().isUsePlatformName);
             ResourceBuilderConfig.GetInstance().isClearAfterBuilded = EditorGUILayout.Toggle("打包后自动清空包名", ResourceBuilderConfig.GetInstance().isClearAfterBuilded);
+            ResourceBuilderConfig.GetInstance().bundleIsUseFullPath = EditorGUILayout.Toggle("只允许全路径加载资源", ResourceBuilderConfig.GetInstance().bundleIsUseFullPath);
             EditorGUILayout.Space();
         }
 

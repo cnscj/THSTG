@@ -27,8 +27,12 @@ namespace THEditor
             m_bundleOptions = BuildAssetBundleOptions.None;
             m_bundleOptions |= BuildAssetBundleOptions.ChunkBasedCompression;
             //听大佬说,使用全路径加载会快一点.....
-            m_bundleOptions |= BuildAssetBundleOptions.DisableLoadAssetByFileName;
-            //m_bundleOptions |= BuildAssetBundleOptions.DisableLoadAssetByFileNameWithExtension;
+            m_bundleOptions |= BuildAssetBundleOptions.DisableLoadAssetByFileNameWithExtension;
+            if (ResourceBuilderConfig.GetInstance().bundleIsUseFullPath)
+            {
+                m_bundleOptions |= BuildAssetBundleOptions.DisableLoadAssetByFileName;
+            }
+
         }
         public void BuildAll()
         {

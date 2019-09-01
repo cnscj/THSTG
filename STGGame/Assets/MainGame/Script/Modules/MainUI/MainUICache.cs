@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace STGGame
 {
-    public class MainUICache : Cache<MainUICache>
+    public class MainUICache : SingletonCache<MainUICache>
     {
       
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using THGame;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 namespace THEditor
 {
@@ -60,6 +61,7 @@ namespace THEditor
                     XFolderTools.CreateDirectory(m_exportFolder);
                 }
             }
+           
         }
 
 

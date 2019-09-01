@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using THGame;
 using THGame.Package;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 namespace THEditor
 {
@@ -29,9 +31,16 @@ namespace THEditor
 
         public void ProcessAll()
         {
-            foreach(var process in m_processers)
+            string curScenePath = EditorSceneManager.GetActiveScene().path;
+
+            foreach (var process in m_processers)
             {
                 process.Do();
+            }
+
+            if (XFileTools.Exists(curScenePath))
+            {
+                EditorSceneManager.OpenScene(curScenePath);
             }
         }
 

@@ -21,13 +21,8 @@ namespace STGGame
 
         public void LoadLevelScene(string uid)
         {
-            var bundle = AssetManager.GetInstance().LoadLevel(uid);
-            if(bundle.isStreamedSceneAssetBundle)
-            {
-                var scenePaths = bundle.GetAllScenePaths();
-                string sceneName = Path.GetFileNameWithoutExtension(scenePaths[0]);
-                UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive);
-            }
+            var sceneName = AssetManager.GetInstance().LoadLevel(uid);
+            UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive);
         }
     }
 }

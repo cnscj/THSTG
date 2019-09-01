@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8701628228829848645}
-  - component: {fileID: 1925543001100161800}
   m_Layer: 5
   m_Name: MainUIView
   m_TagString: Untagged
@@ -32,18 +31,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1925543001100161800
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2122429911709242765}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 24728fdd0b2204eddb31d752d0c71212, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1304373759
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -55,11 +42,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Button01
-      objectReference: {fileID: 0}
-    - target: {fileID: 84306352038339500, guid: 002e3894b4b504a4a8f7928c0e3f1685,
-        type: 3}
-      propertyPath: m_Layer
-      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4904431286648837458, guid: 002e3894b4b504a4a8f7928c0e3f1685,
         type: 3}
@@ -165,16 +147,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 7793835883643091729, guid: 002e3894b4b504a4a8f7928c0e3f1685,
-        type: 3}
-      propertyPath: m_Layer
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2064211567311033658, guid: 002e3894b4b504a4a8f7928c0e3f1685,
-        type: 3}
-      propertyPath: m_Text
-      value: Ok
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 002e3894b4b504a4a8f7928c0e3f1685, type: 3}

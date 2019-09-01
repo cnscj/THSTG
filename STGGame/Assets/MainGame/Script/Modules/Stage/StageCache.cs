@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace STGGame
 {
-    public class StageCache : Cache<StageCache>
+    public class StageCache : SingletonCache<StageCache>
     {
         public string testString = "测试";
     }
