@@ -30,6 +30,7 @@ namespace THGame
             //生成一个新的GameObject存放所有的对象池对象
             GameObject go = new GameObject("GameObjectPoolManager");
             m_parentTrans = go.transform;
+            DontDestroyOnLoad(go);
         }
 
         /// <summary>

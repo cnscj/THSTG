@@ -40,6 +40,10 @@ namespace STGGame
             //修改GameObject名称
             entity.name = string.Format("{0}_{1:D2}", "Player", (int)type);
 
+            //层级设置
+            int layerIndex = LayerMask.NameToLayer("Hero");
+            entity.layer = layerIndex;
+
             return entity;
         }
 

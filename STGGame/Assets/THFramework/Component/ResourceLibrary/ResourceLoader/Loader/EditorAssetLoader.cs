@@ -10,12 +10,12 @@ namespace THGame
     public class EditorAssetLoader : IFileLoader
     {
 
-        public T LoadAsset<T>(string path) where T : class
+        public T LoadAsset<T>(string path, string assetName) where T : class
         {
             return load<T>(path);
         }
 
-        public IEnumerator LoadAssetAsync<T>(string path, UnityAction<T> callback) where T : class
+        public IEnumerator LoadAssetAsync<T>(string path, string assetName, UnityAction<T> callback) where T : class
         {
             if (callback != null) {
                 callback(load<T>(path));

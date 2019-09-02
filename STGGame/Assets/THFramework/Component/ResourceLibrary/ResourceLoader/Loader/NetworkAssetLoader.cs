@@ -11,12 +11,8 @@ namespace THGame
     public class NetworkAssetLoader : INetworkLoader
     {
 
-        public T LoadAsset<T>(string path) where T : class
+        public T LoadAsset<T>(string urlPath, string assetName) where T : class
         {
-            string urlPath;
-            string assetName;
-            ResourceLoaderUtil.SplitBundlePath(path, out urlPath, out assetName, typeof(T));
-
             UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle(urlPath);
             request.SendWebRequest();
             Object res = DownloadHandlerAssetBundle.GetContent(request);
@@ -28,12 +24,8 @@ namespace THGame
             return res as T;
         }
 
-        public IEnumerator LoadAssetAsync<T>(string path, UnityAction<T> callback, UnityAction<float> progress) where T : class
+        public IEnumerator LoadAssetAsync<T>(string urlPath, string assetName, UnityAction<T> callback, UnityAction<float> progress) where T : class
         {
-            string urlPath;
-            string assetName;
-            ResourceLoaderUtil.SplitBundlePath(path, out urlPath, out assetName, typeof(T));
-
             UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle(urlPath);
             if (progress == null)
             {

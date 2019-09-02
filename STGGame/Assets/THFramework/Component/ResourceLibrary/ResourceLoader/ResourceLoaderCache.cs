@@ -13,8 +13,6 @@ namespace THGame
     {
         [Header("定时清理缓存间隔(秒):")]
         public float clearCacheDuration = 10f;
-        [Header("缓存数据驻留时间(秒)")]
-        public float cacheDataStayTime = 30f;
 
         private float m_cacheTimeTemp;
 
@@ -32,8 +30,11 @@ namespace THGame
         }
 
         //加入缓冲区
-        public void PushCache(string key, Object obj)
+        public void PushCache(string key, Object obj, float stayTime = 30f)
         {
+            if (key == null)
+                return;
+
             if (obj == null)
                 return;
 
@@ -45,7 +46,7 @@ namespace THGame
                 }
                 else
                 {
-                    ResourceLoaderCacheDataInfo info = new ResourceLoaderCacheDataInfo(key, obj);
+                    ResourceLoaderCacheDataInfo info = new ResourceLoaderCacheDataInfo(key, obj, stayTime);
                     cacheDataDic.Add(key, info);
                     info.UpdateTick();
                 }
@@ -63,7 +64,7 @@ namespace THGame
         {
             foreach (var iter in cacheDataDic.ToList())
             {
-                if (iter.Value.startTick + cacheDataStayTime <= Time.realtimeSinceStartup)
+                if (iter.Value.startTick + iter.Value.stayTime <= Time.realtimeSinceStartup)
                 {
                     cacheDataDic.Remove(iter.Key);
                 }

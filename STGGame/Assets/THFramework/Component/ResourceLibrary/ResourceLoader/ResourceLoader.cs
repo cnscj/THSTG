@@ -14,15 +14,21 @@ namespace THGame
         [Header("当前资源加载模式:")]
         public ResourceLoadMode loadMode = ResourceLoadMode.AssetBundler;
 
-        private IFileLoader m_localLoader = new FileAssetLoader();
+        private IFileLoader m_fileLoader = new FileAssetLoader();
         private IMenoryLoader m_menoryLoader = new MenoryAssetLoader();
         private INetworkLoader m_networkLoader = new NetworkAssetLoader();
+
+        public ResourceLoader()
+        {
+
+        }
+
         //设置加载器
-        public void SetLocalLoader(IFileLoader loader)
+        public void SetFileLoader(IFileLoader loader)
         {
             if (loader != null)
             {
-                m_localLoader = loader;
+                m_fileLoader = loader;
             }
         }
         public void SetMenoryLoader(IMenoryLoader loader)
@@ -40,15 +46,10 @@ namespace THGame
             }
         }
 
-        public ResourceLoader()
+        ///
+        public T LoadFromFile<T>(ResourceLoadParams args) where T : Object
         {
-
-        }
-
-        //同步加载
-        public T LoadFromFile<T>(string path) where T : Object
-        {
-            ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(path);
+            ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(args.GetUID());
             if (info != null)
             {
                 info.UpdateTick();
@@ -56,92 +57,123 @@ namespace THGame
             }
             else
             {
-                var obj = m_localLoader.LoadAsset<T>(path);
+                var obj = m_fileLoader.LoadAsset<T>(args.resPath, args.assetName);
 
                 //加入缓存
-                ResourceLoaderCache.GetInstance().PushCache(path, obj);
+                ResourceLoaderCache.GetInstance().PushCache(args.GetUID(), obj, args.stayTime);
 
                 return obj;
             }
         }
-
-        //异步加载
-        public void LoadFromFileAsync<T>(string path, UnityAction<T> onLoadComplate) where T : Object
+        public ResourceLoadListener<T> LoadFromFileAsync<T>(ResourceLoadParams args) where T : Object
         {
-
-            ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(path);
+            ResourceLoadListener<T> listener = new ResourceLoadListener<T>();
+            ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(args.GetUID());
             if (info != null)
             {
                 info.UpdateTick();
-                if (onLoadComplate != null)
-                {
-                    onLoadComplate(info.cacheObj as T);
-                }
+
+                listener.CallCompeleted(info.cacheObj as T);
+                
             }
             else
             {
-                StartCoroutine(m_localLoader.LoadAssetAsync<T>(path, (obj)=>
+                StartCoroutine(m_fileLoader.LoadAssetAsync<T>(args.resPath, args.assetName, (obj) =>
                 {
                     //加入缓存
-                    ResourceLoaderCache.GetInstance().PushCache(path, obj);
+                    ResourceLoaderCache.GetInstance().PushCache(args.GetUID(), obj, args.stayTime);
 
-                    onLoadComplate(obj);
+                    listener.CallCompeleted(obj);
 
                 }));
             }
+
+            return listener;
+        }
+        public T LoadFromMenory<T>(ResourceLoadParams args) where T : Object
+        {
+            return m_menoryLoader.LoadAsset<T>(args.resData, args.assetName);
+        }
+        public ResourceLoadListener<T> LoadFromMenoryAsync<T>(ResourceLoadParams args) where T : Object
+        {
+            ResourceLoadListener<T> listener = new ResourceLoadListener<T>();
+            StartCoroutine(m_menoryLoader.LoadAssetAsync<T>(args.resData, args.assetName, listener.CallCompeleted));
+            return listener;
+        }
+        public T LoadFromWWW<T>(ResourceLoadParams args) where T : Object
+        {
+            ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(args.resPath);
+            if (info != null)
+            {
+                info.UpdateTick();
+                return info.cacheObj as T;
+            }
+            else
+            {
+                var obj = m_networkLoader.LoadAsset<T>(args.resPath, args.assetName);
+
+                //加入缓存
+                ResourceLoaderCache.GetInstance().PushCache(args.resPath, obj, args.stayTime);
+
+                return obj;
+            }
+        }
+        public ResourceLoadListener<T> LoadFromWWWAsync<T>(ResourceLoadParams args) where T : Object
+        {
+            ResourceLoadListener<T> listener = new ResourceLoadListener<T>();
+            ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(args.resPath);
+            if (info != null)
+            {
+                info.UpdateTick();
+
+                listener.CallCompeleted(info.cacheObj as T);
+                
+            }
+            else
+            {
+                StartCoroutine(m_networkLoader.LoadAssetAsync<T>(args.resPath, args.assetName, (obj) =>
+                {
+                    //加入缓存
+                    ResourceLoaderCache.GetInstance().PushCache(args.resPath, obj);
+
+                    listener.CallCompeleted(obj);
+
+                }, listener.CallProgress));
+            }
+            return listener;
+        }
+
+        ////////////////////////
+        //同步加载
+        public T LoadFromFile<T>(string path) where T : Object
+        {
+            return LoadFromFile<T>(new ResourceLoadParams(path,typeof(T)));
+        }
+
+        //异步加载
+        public ResourceLoadListener<T> LoadFromFileAsync<T>(string path) where T : Object
+        {
+            return LoadFromFileAsync<T>(new ResourceLoadParams(path, typeof(T)));
         }
 
         public T LoadFromMenory<T>(byte[] binary, string assetName) where T : Object
         {
-            return m_menoryLoader.LoadAsset<T>(binary, assetName);
+            return LoadFromMenory<T>(new ResourceLoadParams(binary, assetName));
         }
 
-        public void LoadFromMenoryAsync<T>(byte[] binary, string assetName ,UnityAction<T> onLoadComplate) where T : Object
+        public ResourceLoadListener<T> LoadFromMenoryAsync<T>(byte[] binary, string assetName) where T : Object
         {
-            StartCoroutine(m_menoryLoader.LoadAssetAsync<T>(binary, assetName, onLoadComplate));
+            return LoadFromMenoryAsync<T>(new ResourceLoadParams(binary, assetName));
         }
 
-        public T LoadFromWWW<T>(string path) where T : Object
+        public T LoadFromWWW<T>(string url) where T : Object
         {
-            ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(path);
-            if (info != null)
-            {
-                info.UpdateTick();
-                return info.cacheObj as T;
-            }
-            else
-            {
-                var obj = m_networkLoader.LoadAsset<T>(path);
-
-                //加入缓存
-                ResourceLoaderCache.GetInstance().PushCache(path, obj);
-
-                return obj;
-            }
+            return LoadFromWWW<T>(new ResourceLoadParams(url));
         }
 
-        public void LoadFromWWWAsync<T>(string path, UnityAction<T> onLoadComplate, UnityAction<float> onLoadProgress = null) where T : Object
+        public ResourceLoadListener<T> LoadFromWWWAsync<T>(string url) where T : Object
         {
-            ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(path);
-            if (info != null)
-            {
-                info.UpdateTick();
-                if (onLoadComplate != null)
-                {
-                    onLoadComplate(info.cacheObj as T);
-                }
-            }
-            else
-            {
-                StartCoroutine(m_networkLoader.LoadAssetAsync<T>(path, (obj)=>
-                {
-                    //加入缓存
-                    ResourceLoaderCache.GetInstance().PushCache(path, obj);
-
-                    onLoadComplate(obj);
-
-                }, onLoadProgress));
-            }
+            return LoadFromWWWAsync<T>(new ResourceLoadParams(url));
         }
     }
 

@@ -12,27 +12,27 @@ namespace THGame
         private IFileLoader editorLoader = new EditorAssetLoader();
         private IFileLoader abLoader = new AssetBundleLoader();
 
-        public T LoadAsset<T>(string path) where T : class
+        public T LoadAsset<T>(string path, string assetName) where T : class
         {
             switch (ResourceLoader.GetInstance().loadMode)
             {
                 case ResourceLoadMode.Editor:
-                    return editorLoader.LoadAsset<T>(path);
+                    return editorLoader.LoadAsset<T>(path, assetName);
                 case ResourceLoadMode.AssetBundler:
-                    return abLoader.LoadAsset<T>(path);
+                    return abLoader.LoadAsset<T>(path, assetName);
             }
             return null;
         }
 
-        public IEnumerator LoadAssetAsync<T>(string path, UnityAction<T> callback) where T : class
+        public IEnumerator LoadAssetAsync<T>(string path, string assetName, UnityAction<T> callback) where T : class
         {
             switch (ResourceLoader.GetInstance().loadMode)
             {
                 case ResourceLoadMode.Editor:
-                    yield return editorLoader.LoadAssetAsync<T>(path, callback);
+                    yield return editorLoader.LoadAssetAsync<T>(path, assetName, callback);
                     break;
                 case ResourceLoadMode.AssetBundler:
-                    yield return abLoader.LoadAssetAsync<T>(path, callback);
+                    yield return abLoader.LoadAssetAsync<T>(path, assetName, callback);
                     break;
             }
             yield return null;

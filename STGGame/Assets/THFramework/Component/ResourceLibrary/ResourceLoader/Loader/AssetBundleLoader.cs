@@ -13,14 +13,8 @@ namespace THGame
         {
         }
 
-        public T LoadAsset<T>(string path) where T : class
+        public T LoadAsset<T>(string abPath, string assetName) where T : class
         {
-            path = PathUtil.NormalizePath(path);
-
-            string abPath;
-            string assetName;
-            ResourceLoaderUtil.SplitBundlePath(path, out abPath, out assetName, typeof(T));
-
             AssetBundle assetBundle = null;
             assetBundle = AssetBundle.LoadFromFile(abPath);
 
@@ -40,14 +34,8 @@ namespace THGame
             return obj as T;
         }
 
-        public IEnumerator LoadAssetAsync<T>(string path, UnityAction<T> callback) where T : class
+        public IEnumerator LoadAssetAsync<T>(string abPath, string assetName, UnityAction<T> callback) where T : class
         {
-            path = PathUtil.NormalizePath(path);
-
-            string abPath;
-            string assetName;
-            ResourceLoaderUtil.SplitBundlePath(path, out abPath, out assetName, typeof(T));
-
             ////加载目标资源
             AssetBundleCreateRequest createRequest;
             AssetBundle assetBundle = null;

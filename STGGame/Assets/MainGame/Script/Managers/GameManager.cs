@@ -8,6 +8,10 @@ namespace STGGame
 {
     public class GameManager : MonoSingleton<GameManager>
     {
+        private void Awake()
+        {
+            DontDestroyOnLoad(this.gameObject);
+        }
         private void Start()
         {
             EntityManager.GetInstance().CreatePlayer();
