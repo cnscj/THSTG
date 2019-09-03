@@ -28,7 +28,7 @@ namespace THGame.Package.MVC
             Controller controller = null;
             if (m_controllerMaps.TryGetValue(name,out controller))
             {
-                controller.Dispost();
+                controller.Dispose();
                 m_controllerMaps.Remove(name);
             }
             

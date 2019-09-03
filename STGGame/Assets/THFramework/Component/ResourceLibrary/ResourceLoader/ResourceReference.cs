@@ -11,7 +11,7 @@ namespace THGame
 
         }
 
-        public ResourceLoadListener<T> LoadAsnyc<T>() where T : Object
+        public ResourceLoadHandle<T> LoadAsnyc<T>() where T : Object
         {
             return ResourceLoader.GetInstance().LoadFromFileAsync<T>(m_args);
         }

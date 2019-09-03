@@ -3,11 +3,11 @@ using UnityEngine;
 
 namespace THGame
 {
-    public class ResourceLoadListener<T>
+    public class ResourceLoadHandle<T>
     {
         public delegate void CompeletedCall<T0>(T0 obj);
         public delegate void ProgressCall(float percent);
-        public bool completed
+        public bool isDone
         {
             get
             {
@@ -20,10 +20,9 @@ namespace THGame
 
         public void CallCompeleted(T obj)
         {
-            //TODO:当加载速度比设置速度快时,这里循序有问题
             if (Compeleted != null)
             {
-                Compeleted.Invoke(obj);
+                Compeleted(obj);
             }
             m_isCompleted = true;
         }
@@ -32,7 +31,7 @@ namespace THGame
         {
             if (Progress != null)
             {
-                Progress.Invoke(percent);
+                Progress(percent);
             }
         }
 

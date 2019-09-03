@@ -10,7 +10,7 @@ namespace THGame.Package.MVC
             return true;
         }
 
-        public void Dispost()
+        public void Dispose()
         {
             OnClose();
         }

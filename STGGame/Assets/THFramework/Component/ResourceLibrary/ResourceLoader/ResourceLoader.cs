@@ -5,6 +5,7 @@ using System.Linq;
 using Object = UnityEngine.Object;
 using THGame.Package;
 using System.IO;
+using System.Collections;
 
 namespace THGame
 {
@@ -46,7 +47,8 @@ namespace THGame
             }
         }
 
-        ///
+
+
         public T LoadFromFile<T>(ResourceLoadParams args) where T : Object
         {
             ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(args.GetUID());
@@ -65,9 +67,9 @@ namespace THGame
                 return obj;
             }
         }
-        public ResourceLoadListener<T> LoadFromFileAsync<T>(ResourceLoadParams args) where T : Object
+        public ResourceLoadHandle<T> LoadFromFileAsync<T>(ResourceLoadParams args) where T : Object
         {
-            ResourceLoadListener<T> listener = new ResourceLoadListener<T>();
+            ResourceLoadHandle<T> listener = new ResourceLoadHandle<T>();
             ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(args.GetUID());
             if (info != null)
             {
@@ -78,26 +80,64 @@ namespace THGame
             }
             else
             {
-                StartCoroutine(m_fileLoader.LoadAssetAsync<T>(args.resPath, args.assetName, (obj) =>
+                ExecuteNextFrame(()=>
                 {
-                    //加入缓存
-                    ResourceLoaderCache.GetInstance().PushCache(args.GetUID(), obj, args.stayTime);
+                    StartCoroutine(m_fileLoader.LoadAssetAsync<T>(args.resPath, args.assetName, (obj) =>
+                    {
+                        //加入缓存
+                        ResourceLoaderCache.GetInstance().PushCache(args.GetUID(), obj, args.stayTime);
 
-                    listener.CallCompeleted(obj);
+                        listener.CallCompeleted(obj);
 
-                }));
+                    }));
+                });
             }
 
             return listener;
         }
         public T LoadFromMenory<T>(ResourceLoadParams args) where T : Object
         {
-            return m_menoryLoader.LoadAsset<T>(args.resData, args.assetName);
+            ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(args.GetUID());
+            if (info != null)
+            {
+                info.UpdateTick();
+                return info.cacheObj as T;
+            }
+            else
+            {
+                var obj = m_menoryLoader.LoadAsset<T>(args.resData, args.assetName);
+
+                //加入缓存
+                ResourceLoaderCache.GetInstance().PushCache(args.GetUID(), obj, args.stayTime);
+
+                return obj;
+            }
         }
-        public ResourceLoadListener<T> LoadFromMenoryAsync<T>(ResourceLoadParams args) where T : Object
+        public ResourceLoadHandle<T> LoadFromMenoryAsync<T>(ResourceLoadParams args) where T : Object
         {
-            ResourceLoadListener<T> listener = new ResourceLoadListener<T>();
-            StartCoroutine(m_menoryLoader.LoadAssetAsync<T>(args.resData, args.assetName, listener.CallCompeleted));
+            ResourceLoadHandle<T> listener = new ResourceLoadHandle<T>();
+            ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(args.GetUID());
+            if (info != null)
+            {
+                info.UpdateTick();
+
+                listener.CallCompeleted(info.cacheObj as T);
+
+            }
+            else
+            {
+                ExecuteNextFrame(() =>
+                {
+                    StartCoroutine(m_menoryLoader.LoadAssetAsync<T>(args.resData, args.assetName, (obj) =>
+                    {
+                        //加入缓存
+                        ResourceLoaderCache.GetInstance().PushCache(args.GetUID(), obj, args.stayTime);
+
+                        listener.CallCompeleted(obj);
+
+                    }));
+                });
+            }
             return listener;
         }
         public T LoadFromWWW<T>(ResourceLoadParams args) where T : Object
@@ -118,9 +158,9 @@ namespace THGame
                 return obj;
             }
         }
-        public ResourceLoadListener<T> LoadFromWWWAsync<T>(ResourceLoadParams args) where T : Object
+        public ResourceLoadHandle<T> LoadFromWWWAsync<T>(ResourceLoadParams args) where T : Object
         {
-            ResourceLoadListener<T> listener = new ResourceLoadListener<T>();
+            ResourceLoadHandle<T> listener = new ResourceLoadHandle<T>();
             ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(args.resPath);
             if (info != null)
             {
@@ -131,14 +171,17 @@ namespace THGame
             }
             else
             {
-                StartCoroutine(m_networkLoader.LoadAssetAsync<T>(args.resPath, args.assetName, (obj) =>
+                ExecuteNextFrame(() =>
                 {
-                    //加入缓存
-                    ResourceLoaderCache.GetInstance().PushCache(args.resPath, obj);
+                    StartCoroutine(m_networkLoader.LoadAssetAsync<T>(args.resPath, args.assetName, (obj) =>
+                    {
+                        //加入缓存
+                        ResourceLoaderCache.GetInstance().PushCache(args.resPath, obj);
 
-                    listener.CallCompeleted(obj);
+                        listener.CallCompeleted(obj);
 
-                }, listener.CallProgress));
+                    }, listener.CallProgress));
+                });
             }
             return listener;
         }
@@ -151,7 +194,7 @@ namespace THGame
         }
 
         //异步加载
-        public ResourceLoadListener<T> LoadFromFileAsync<T>(string path) where T : Object
+        public ResourceLoadHandle<T> LoadFromFileAsync<T>(string path) where T : Object
         {
             return LoadFromFileAsync<T>(new ResourceLoadParams(path, typeof(T)));
         }
@@ -161,7 +204,7 @@ namespace THGame
             return LoadFromMenory<T>(new ResourceLoadParams(binary, assetName));
         }
 
-        public ResourceLoadListener<T> LoadFromMenoryAsync<T>(byte[] binary, string assetName) where T : Object
+        public ResourceLoadHandle<T> LoadFromMenoryAsync<T>(byte[] binary, string assetName) where T : Object
         {
             return LoadFromMenoryAsync<T>(new ResourceLoadParams(binary, assetName));
         }
@@ -171,9 +214,21 @@ namespace THGame
             return LoadFromWWW<T>(new ResourceLoadParams(url));
         }
 
-        public ResourceLoadListener<T> LoadFromWWWAsync<T>(string url) where T : Object
+        public ResourceLoadHandle<T> LoadFromWWWAsync<T>(string url) where T : Object
         {
             return LoadFromWWWAsync<T>(new ResourceLoadParams(url));
+        }
+
+        ///
+        IEnumerator ExecuteNextFrameCoro(UnityAction action)
+        {
+            yield return null;
+            action?.Invoke();
+        }
+
+        void ExecuteNextFrame(UnityAction action)
+        {
+            StartCoroutine(ExecuteNextFrameCoro(action));
         }
     }
 
