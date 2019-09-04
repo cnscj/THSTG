@@ -182,7 +182,7 @@ namespace THEditor
             }
 
             List<string> filesPath = new List<string>();
-            string[] oriDepends = AssetDatabase.GetDependencies(filePath, false);
+            string[] oriDepends = AssetDatabase.GetDependencies(filePath, true);
             foreach (var path in oriDepends)
             {
                 string extension = Path.GetExtension(path).ToLower();

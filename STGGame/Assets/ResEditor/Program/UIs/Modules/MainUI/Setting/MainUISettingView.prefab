@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 9097563344051717320}
   - component: {fileID: 7042322289735121982}
   - component: {fileID: 9187449866273332421}
-  - component: {fileID: 506470028693943619}
   m_Layer: 0
   m_Name: MainUISettingView
   m_TagString: Untagged
@@ -75,15 +74,3 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
---- !u!114 &506470028693943619
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3205380380999117701}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1849b5f6270810f43a7747e392bd297c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

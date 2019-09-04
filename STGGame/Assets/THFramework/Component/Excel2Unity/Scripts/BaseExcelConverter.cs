@@ -65,6 +65,68 @@ namespace THEditor
             Write2File(content, savePath, encoding);
         }
 
+        public Excel2UnityData Parse(DataSet dataSet)
+        {
+            //无效参数
+            if (dataSet == null)
+                return null;
+
+            //判断Excel文件中是否存在数据表
+            if (dataSet.Tables.Count < 1)
+                return null;
+
+            //默认读取第一个数据表
+            DataTable mSheet = dataSet.Tables[0];
+
+            //判断数据表内是否存在数据
+            if (mSheet.Rows.Count < 1)
+                return null;
+
+            //读取数据表行数和列数
+            int rowCount = mSheet.Rows.Count;
+            int colCount = mSheet.Columns.Count;
+
+            Excel2UnityData sheetData = new Excel2UnityData();
+       
+            for (int j = 0; j < colCount; j++)
+            {
+                Excel2UnityHeadData coldata = new Excel2UnityHeadData();
+                
+                for (int i = 0; i < 5; i++)
+                {
+                    if (i == 0)
+                    {
+                        coldata.note = string.Format("{0}", mSheet.Rows[i][j]);
+                    }
+                    else if (i == 1)
+                    {
+                        coldata.field = string.Format("{0}", mSheet.Rows[i][j]);
+                    }
+                    else if (i == 2)
+                    {
+                        coldata.type = string.Format("{0}", mSheet.Rows[i][j]);
+                    }
+                    else if (i == 3)
+                    {
+                        coldata.client = string.Format("{0}", mSheet.Rows[i][j]);
+                    }
+                    else if (i == 4)
+                    {
+                        coldata.server = string.Format("{0}", mSheet.Rows[i][j]);
+                    }
+                }
+                sheetData.headData.Add(coldata);
+            }
+
+            sheetData.valTable = mSheet.Copy();
+            //倒序删,防止移动报错
+            sheetData.valTable.Rows.RemoveAt(4);
+            sheetData.valTable.Rows.RemoveAt(3);
+            sheetData.valTable.Rows.RemoveAt(2);
+            sheetData.valTable.Rows.RemoveAt(0);
+
+            return sheetData;
+        }
     }
 
 }

@@ -16,20 +16,11 @@ namespace THEditor
         }
         public override string Convert(DataSet dataSet)
         {
-            //判断Excel文件中是否存在数据表
-            if (dataSet.Tables.Count < 1)
-                return null;
-
-            //默认读取第一个数据表
-            DataTable mSheet = dataSet.Tables[0];
-
-            //判断数据表内是否存在数据
-            if (mSheet.Rows.Count < 1)
-                return null;
+            var sheetData = Parse(dataSet);
 
             //读取数据表行数和列数
-            int rowCount = mSheet.Rows.Count;
-            int colCount = mSheet.Columns.Count;
+            int rowCount = sheetData.valTable.Rows.Count;
+            int colCount = sheetData.valTable.Columns.Count;
 
             //准备一个列表存储整个表的数据
             List<Dictionary<string, object>> table = new List<Dictionary<string, object>>();
@@ -41,10 +32,18 @@ namespace THEditor
                 Dictionary<string, object> row = new Dictionary<string, object>();
                 for (int j = 0; j < colCount; j++)
                 {
+                    if (null == sheetData.headData[j].type || "" == sheetData.headData[j].type)
+                        continue;
+
                     //读取第1行数据作为表头字段
-                    string field = mSheet.Rows[0][j].ToString();
+                    string field = sheetData.headData[j].field;
                     //Key-Value对应
-                    row[field] = mSheet.Rows[i][j];
+                    if (sheetData.headData[j].type == "int")
+                        row[field] = int.Parse(sheetData.valTable.Rows[i][j].ToString());
+                    else if (sheetData.headData[j].type == "string")
+                        row[field] = sheetData.valTable.Rows[i][j].ToString();
+                    else
+                        row[field] = sheetData.valTable.Rows[i][j];
                 }
 
                 //添加到表数据中

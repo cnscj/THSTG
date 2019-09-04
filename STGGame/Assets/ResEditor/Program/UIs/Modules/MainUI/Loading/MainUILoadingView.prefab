@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 1998120621571781621}
   - component: {fileID: 3960802971034012136}
   - component: {fileID: 7799328554318750998}
-  - component: {fileID: 3315495805867856788}
   m_Layer: 0
   m_Name: MainUILoadingView
   m_TagString: Untagged
@@ -75,15 +74,3 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
---- !u!114 &3315495805867856788
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7887525775648697754}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1849b5f6270810f43a7747e392bd297c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

@@ -111,7 +111,8 @@ namespace THGame
                 {
                     code = GetFileMd5(path);
                 }
-                codeList.Add(code, path);
+                if (!codeList.ContainsKey(code))
+                    codeList.Add(code, path);
             }
 
             StringBuilder stringBuilder = new StringBuilder();
