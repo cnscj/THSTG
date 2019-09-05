@@ -10,7 +10,7 @@ namespace STGGame
     public class AssetManager : MonoSingleton<AssetManager>
     {
         public static readonly string bundleRes = PathUtil.Combine(Application.streamingAssetsPath, "ABRes", PlatformUtil.GetCurPlatformName());
-        public static readonly string srcRes = PathUtil.Combine("Assets", "ResEditor" , "Z_AutoProcess" , "ResTemp");
+        public static readonly string srcRes = PathUtil.Combine("Assets", "GameAssets" );
 
         public static readonly Dictionary<EResType, string> m_resType = new Dictionary<EResType, string>()
         {
@@ -23,6 +23,7 @@ namespace STGGame
 
             [EResType.UI] = "uis",
             [EResType.Shader] = "shaders",
+            [EResType.Config] = "configs",
         };
 
         public static readonly string[] residentABPaths =
@@ -32,6 +33,7 @@ namespace STGGame
             Combine2BundlePath(EResType.Sprite, "share.ab", null),
             Combine2BundlePath(EResType.UI, "share.ab", null),
             Combine2BundlePath(EResType.Level, "share.ab", null),
+            Combine2BundlePath(EResType.Config, "share.ab", null),
         };
         public static string Combine2BundlePath(EResType resType, string fileName, string assetName)
         {
@@ -95,6 +97,16 @@ namespace STGGame
             string resPath = Combine2FixPath(EResType.UI, string.Format("{0}_{1}.ab", module, view), string.Format("{0}_{1}.prefab", module, view));
 
             return ResourceLoader.GetInstance().LoadFromFile<GameObject>(resPath);
+        }
+
+        public string LoadConfig(string fileName)
+        {
+            string fileNameWithoutEx = Path.GetFileNameWithoutExtension(fileName);
+            string fileExtName = Path.GetExtension(fileName);
+            fileExtName = fileExtName == "" ? ".csv" : fileExtName;
+            string resPath = Combine2FixPath(EResType.Config, string.Format("{0}.ab", fileNameWithoutEx), string.Format("{0}{1}", fileNameWithoutEx, fileExtName));
+            var textAsset = ResourceLoader.GetInstance().LoadFromFile<TextAsset>(resPath);
+            return textAsset.text;
         }
 
         public string LoadLevel(string uid)

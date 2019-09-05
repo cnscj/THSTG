@@ -47,8 +47,6 @@ namespace THGame
             }
         }
 
-
-
         public T LoadFromFile<T>(ResourceLoadParams args) where T : Object
         {
             ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(args.GetUID());
@@ -140,7 +138,7 @@ namespace THGame
             }
             return listener;
         }
-        public T LoadFromWWW<T>(ResourceLoadParams args) where T : Object
+        public T LoadFromWeb<T>(ResourceLoadParams args) where T : Object
         {
             ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(args.resPath);
             if (info != null)
@@ -158,7 +156,7 @@ namespace THGame
                 return obj;
             }
         }
-        public ResourceLoadHandle<T> LoadFromWWWAsync<T>(ResourceLoadParams args) where T : Object
+        public ResourceLoadHandle<T> LoadFromWebAsync<T>(ResourceLoadParams args) where T : Object
         {
             ResourceLoadHandle<T> listener = new ResourceLoadHandle<T>();
             ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(args.resPath);
@@ -209,14 +207,14 @@ namespace THGame
             return LoadFromMenoryAsync<T>(new ResourceLoadParams(binary, assetName));
         }
 
-        public T LoadFromWWW<T>(string url) where T : Object
+        public T LoadFromWeb<T>(string url) where T : Object
         {
-            return LoadFromWWW<T>(new ResourceLoadParams(url));
+            return LoadFromWeb<T>(new ResourceLoadParams(url));
         }
 
-        public ResourceLoadHandle<T> LoadFromWWWAsync<T>(string url) where T : Object
+        public ResourceLoadHandle<T> LoadFromWebAsync<T>(string url) where T : Object
         {
-            return LoadFromWWWAsync<T>(new ResourceLoadParams(url));
+            return LoadFromWebAsync<T>(new ResourceLoadParams(url));
         }
 
         ///

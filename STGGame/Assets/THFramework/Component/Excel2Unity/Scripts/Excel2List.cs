@@ -17,7 +17,7 @@ namespace THEditor
 
         }
 
-        public override string Convert(DataSet dataSet)
+        public override string OnConvert(DataSet dataSet)
         {
 			return "";
         }

@@ -19,8 +19,8 @@ namespace STGGame
         public static readonly string srcConfigs = PathUtil.Combine(srcDesignResource, "Configs");
 
         ///
-        public static readonly string artTempFolder = "Assets/ResEditor/Z_AutoProcess";
-        public static readonly string temResource = PathUtil.Combine(artTempFolder, "ResTemp");
+        public static readonly string artTempFolder = "Assets/GameAssets";
+        public static readonly string temResource = PathUtil.Combine(artTempFolder, "");
         public static readonly string tempModels = PathUtil.Combine(temResource, "Models");
         public static readonly string tempSprites = PathUtil.Combine(temResource, "Sprites");
         public static readonly string tempPublicFx = PathUtil.Combine(temResource, "Effects");

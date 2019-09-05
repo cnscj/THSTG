@@ -108,7 +108,7 @@ namespace THEditor
         /// sprite子项命名规则:组_动作名_编号,没有编号的一律不生成Anima
         /// </summary>
         /// <param name="assetPath"></param>
-        public static Dictionary<string, Dictionary<string,AnimationClip>> GenerateAnimationClipFromTextureFile(string assetPath, string saveRootPath = "", System.Action<AnimationClip> callback = null)
+        public static Dictionary<string, Dictionary<string, AnimationClip>> GenerateAnimationClipFromTextureFile(string assetPath, string saveRootPath = "", System.Action<AnimationClip> callback = null)
         {
             string assetFileNonExtName = Path.GetFileNameWithoutExtension(assetPath);
             string assetRootPath = Path.GetDirectoryName(assetPath);
@@ -176,7 +176,7 @@ namespace THEditor
                     string groupName = groupPair.Key;
                     string[] subFolders = groupName.Split(new char[] { '@' });
                     string saveOutRootPath = saveRootPath;
-                    for(int i = 0; i< subFolders.Length; i++)
+                    for (int i = 0; i < subFolders.Length; i++)
                     {
                         saveOutRootPath = PathUtil.Combine(saveOutRootPath, subFolders[i]);
                         if (!XFolderTools.Exists(saveOutRootPath))
@@ -184,7 +184,7 @@ namespace THEditor
                             XFolderTools.CreateDirectory(saveOutRootPath);
                         }
                     }
-                    
+
                     Dictionary<string, AnimationClip> outActionMap;
                     if (outMap.ContainsKey(groupName))
                     {
@@ -195,7 +195,7 @@ namespace THEditor
                         outActionMap = new Dictionary<string, AnimationClip>();
                         outMap.Add(groupName, outActionMap);
                     }
-                    
+
                     foreach (var actionPair in groupPair.Value)
                     {
                         //动画曲线
@@ -203,7 +203,7 @@ namespace THEditor
                         curveBinding.type = typeof(SpriteRenderer);
                         curveBinding.path = "";
                         curveBinding.propertyName = "m_Sprite";
-                        float frameTime = 1 / SpriteConfig.GetInstance().defaultFrameRate;                  
+                        float frameTime = 1 / SpriteConfig.GetInstance().defaultFrameRate;
                         int index = 0;
                         List<ObjectReferenceKeyframe> keyFrames = new List<ObjectReferenceKeyframe>();
                         foreach (var listPair in actionPair.Value)
@@ -303,7 +303,7 @@ namespace THEditor
                     AssetDatabase.SaveAssets(); //保存变更,不然没得内容
                 }
             }
-            
+
             return ovrrideCtrl;
         }
 
@@ -322,7 +322,7 @@ namespace THEditor
 
                 animator.runtimeAnimatorController = ctrl;
 
-                
+
                 if (ctrl.animationClips.Length > 0)
                 {
                     if (ctrl.layers.Length > 0)
@@ -343,15 +343,15 @@ namespace THEditor
                         }
                     }
                 }
-                
+
 
                 if (savePath == "")
                 {
                     string assetRootPathName = Path.GetFileNameWithoutExtension(assetRootPath);
                     savePath = Path.Combine(assetRootPath, string.Format("{0}.prefab", assetRootPathName));
                 }
-                
-                GameObject outGO = PrefabUtility.SaveAsPrefabAsset(spriteGO,savePath);
+
+                GameObject outGO = PrefabUtility.SaveAsPrefabAsset(spriteGO, savePath);
                 Object.DestroyImmediate(spriteGO);
 
                 AssetDatabase.SaveAssets();
@@ -411,7 +411,7 @@ namespace THEditor
             {
                 //判断是否是精灵图集
                 if (!(importer.textureType == TextureImporterType.Sprite && importer.spriteImportMode == SpriteImportMode.Multiple))
-                    return ;
+                    return;
 
                 Texture texture = AssetDatabase.LoadAssetAtPath<Texture>(assetPath);
 
@@ -424,7 +424,7 @@ namespace THEditor
 
                 //获取所有精灵帧
                 Object[] sheetObjs = AssetDatabase.LoadAllAssetsAtPath(assetPath);
-                for(int i = 1; i < sheetObjs.Length; i++)   //第一张不是精灵帧
+                for (int i = 1; i < sheetObjs.Length; i++)   //第一张不是精灵帧
                 {
                     Sprite sprite = sheetObjs[i] as Sprite;
                     Rect rect = sprite.rect;
@@ -460,9 +460,9 @@ namespace THEditor
             string assetRootPath = Path.GetDirectoryName(assetPath);
 
             //查看是否有对应的json文件
-           
+
             string jsonFilePath = PathUtil.Combine(assetRootPath, string.Format("{0}.json", assetFileNonExtName));
-            
+
             if (!XFileTools.Exists(jsonFilePath))
             {
                 Debug.LogWarning("找不到DragonBones 5.5图集Json文件");
@@ -503,7 +503,7 @@ namespace THEditor
                     }
                     Debug.Log(string.Format("图集:{0},共生成{1}帧", atlas.name, atlas.SubTexture.Count));
                 }
-               
+
             }
         }
 
@@ -578,7 +578,7 @@ namespace THEditor
         {
             if (Go)
             {
-                if(!Go.GetComponent<BoxCollider2D>())
+                if (!Go.GetComponent<BoxCollider2D>())
                 {
                     var box = Go.AddComponent<BoxCollider2D>();
                     box.isTrigger = true;
@@ -588,12 +588,12 @@ namespace THEditor
             return false;
         }
 
-        public static bool SetupMaterial(GameObject Go,Material material)
+        public static bool SetupMaterial(GameObject Go, Material material)
         {
             if (Go && material)
             {
                 var spriteRenderer = Go.GetComponent<SpriteRenderer>();
-                if(spriteRenderer)
+                if (spriteRenderer)
                 {
                     spriteRenderer.material = material;
                 }

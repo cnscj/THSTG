@@ -9,6 +9,6 @@ EditorBuildSettings:
     path: Assets/MainGame/Main.unity
     guid: 71984fa89ad314e86b583e08cad013bb
   - enabled: 1
-    path: Assets/ResEditor/Z_AutoProcess/ResTemp/Levels/200001.unity
+    path: Assets/GameAssets/Levels/200001.unity
     guid: 9e5944b2f9df14aca93651f453f2157b
   m_configObjects: {}

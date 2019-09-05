@@ -50,7 +50,7 @@ namespace THEditor
             }
         }
 
-       
+
         [MenuItem("Assets/THEditor/资源工具/精灵菜单/图集/生成精灵图集(DB)")]
         public static void MenuGenAtlasSheets()
         {
@@ -192,7 +192,7 @@ namespace THEditor
 
                         exportPathList.Add(fileRootPath);
                     }
-                },true);
+                }, true);
             }
             foreach (var exportRootPath in exportPathList)
             {
@@ -216,17 +216,17 @@ namespace THEditor
             string selectRootPath = Path.GetDirectoryName(assetPath);
             string selectFileName = Path.GetFileNameWithoutExtension(assetPath);
             //处理逻辑
-            var ctrlMap = SpriteEditorTools.GenerateAnimationClipFromTextureFile(assetPath,"",(clip) =>
+            var ctrlMap = SpriteEditorTools.GenerateAnimationClipFromTextureFile(assetPath, "", (clip) =>
+              {
+                  bool isLoop = SpriteConfig.GetInstance().IsNeedLoop(clip.name);
+                  if (isLoop)
+                  {
+                      SpriteEditorTools.SetupAnimationClipLoop(clip, isLoop);
+                  }
+              });
+            foreach (var groupPair in ctrlMap)
             {
-                bool isLoop = SpriteConfig.GetInstance().IsNeedLoop(clip.name);
-                if (isLoop)
-                {
-                    SpriteEditorTools.SetupAnimationClipLoop(clip, isLoop);
-                }
-            });
-            foreach(var groupPair in ctrlMap)
-            {
-                foreach(var clipPair in groupPair.Value)
+                foreach (var clipPair in groupPair.Value)
                 {
                     var clip = clipPair.Value;
                     string clipFilePath = AssetDatabase.GetAssetPath(clip);
@@ -245,7 +245,7 @@ namespace THEditor
                         var ctrl = AssetDatabase.LoadAssetAtPath<AnimatorController>(parentCtrl);
                         SpriteEditorTools.SetupAnimationState(ctrl, clip, isDefault);
                     }
-                    else if(XFileTools.Exists(parentCtrlTmpl))
+                    else if (XFileTools.Exists(parentCtrlTmpl))
                     {
                         string overrideCtrlSavePath = PathUtil.Combine(clipRootPath, SpriteEditorTools.overrideControllerName);
                         var overrideCtrl = SpriteEditorTools.GenerateAnimationOverrideControllerFromAnimationClipFile("", parentCtrlTmpl, overrideCtrlSavePath);
@@ -285,6 +285,6 @@ namespace THEditor
             string selectFileName = Path.GetFileNameWithoutExtension(assetPath);
             SpriteEditorTools.GenerateDBJsonFromDBTextureFile(assetPath);
         }
-    
+
     }
 }

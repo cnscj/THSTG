@@ -45,17 +45,10 @@ namespace THGame
         }
 
         /// <summary>
-        /// 空的构造方法
-        /// </summary>
-        public CSVTable()
-        {
-
-        }
-        /// <summary>
         /// 构造方法
         /// </summary>
         /// <param name="attributeKeys"> 属性表 </param>
-        public CSVTable(string[] attributeKeys)
+        public CSVTable(string[] attributeKeys = null)
         {
             // init 
             _atrributeKeys = new List<string>(attributeKeys);

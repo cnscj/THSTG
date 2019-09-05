@@ -16,7 +16,7 @@ namespace THEditor
         private List<ResourceBuilder> m_defaultBuilders = new List<ResourceBuilder>();
         protected BuildAssetBundleOptions m_bundleOptions;
 
-        public ResourceBuilderManager(ResourceBuilder [] builders)
+        public ResourceBuilderManager(ResourceBuilder[] builders)
         {
             foreach (var builer in builders)
             {
@@ -27,10 +27,10 @@ namespace THEditor
             m_bundleOptions = BuildAssetBundleOptions.None;
             m_bundleOptions |= BuildAssetBundleOptions.ChunkBasedCompression;
             //听大佬说,使用全路径加载会快一点.....
-            m_bundleOptions |= BuildAssetBundleOptions.DisableLoadAssetByFileNameWithExtension;
+            m_bundleOptions |= BuildAssetBundleOptions.DisableLoadAssetByFileName;  //没有扩展的加载直接禁用了
             if (ResourceBuilderConfig.GetInstance().bundleIsUseFullPath)
             {
-                m_bundleOptions |= BuildAssetBundleOptions.DisableLoadAssetByFileName;
+                m_bundleOptions |= BuildAssetBundleOptions.DisableLoadAssetByFileNameWithExtension;
             }
 
         }
@@ -41,7 +41,7 @@ namespace THEditor
             foreach (var info in ResourceBuilderConfig.GetInstance().buildInfoList)
             {
                 string srcName = info.srcName.ToLower();
-                m_defaultBuilders.Add(new ResourceBuilderSimple(info)); 
+                m_defaultBuilders.Add(new ResourceBuilderSimple(info));
             }
 
             foreach (var builer in m_builders)
@@ -76,12 +76,13 @@ namespace THEditor
                     {
                         string buildPlatformStr = Enum.GetName(typeof(BuildTarget), buildPlatform);
                         finalExportFolder = PathUtil.Combine(exportFolder, buildPlatformStr).Replace("\\", "/");
-                    }else
+                    }
+                    else
                     {
                         string buildPlatformStr = Enum.GetName(typeof(ResourceBuilderConfig.BuildPlatform), ResourceBuilderConfig.GetInstance().targetType);
                         finalExportFolder = PathUtil.Combine(exportFolder, buildPlatformStr).Replace("\\", "/");
                     }
-                    
+
                 }
 
                 if (!XFolderTools.Exists(finalExportFolder))
@@ -95,7 +96,7 @@ namespace THEditor
             {
                 Debug.LogWarning("输出目录不能为空");
             }
-            
+
         }
         void Clear()
         {

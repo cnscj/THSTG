@@ -32,8 +32,8 @@ namespace THGame
                 }
             }
         }
-        
-        public bool IsCodeChanged(string []paths, string codeFileName = "")
+
+        public bool IsCodeChanged(string[] paths, string codeFileName = "")
         {
             string fileNotExName = codeFileName;
             string saveFolderPath = m_saveCodeFolder;
@@ -97,7 +97,7 @@ namespace THGame
             SaveCode(m_checkCode, m_curRecPath);
         }
 
-        public string GetCode(string []paths)
+        public string GetCode(string[] paths)
         {
             SortedList<string, string> codeList = new SortedList<string, string>();
             foreach (var path in paths)
@@ -122,7 +122,7 @@ namespace THGame
                 stringBuilder.Append(code);
                 stringBuilder.Append("|");
             }
-            stringBuilder.Remove(stringBuilder.Length-1,1);
+            stringBuilder.Remove(stringBuilder.Length - 1, 1);
             return stringBuilder.ToString();
         }
 
@@ -151,10 +151,10 @@ namespace THGame
             return XStringTools.FileToMd5(filePath);
         }
 
-        private string GetFilesCode(string []filePaths)
+        private string GetFilesCode(string[] filePaths)
         {
             SortedList<string, string> codeList = new SortedList<string, string>();
-            foreach(var filePath in filePaths)
+            foreach (var filePath in filePaths)
             {
                 string code = "";
                 switch (m_CheckCodeType)
@@ -163,7 +163,7 @@ namespace THGame
                         code = GetFileMd5(filePath);
                         break;
                 }
-                
+
                 codeList.Add(code, filePath);
             }
             //遍历文件夹,遍历所有文件Md5
@@ -173,7 +173,7 @@ namespace THGame
                 stringBuilder.Append(code.Key);
                 stringBuilder.Append("|");
             }
-            
+
             return stringBuilder.ToString();
         }
 
@@ -181,12 +181,13 @@ namespace THGame
         {
             //遍历文件夹,遍历所有文件Code
             List<string> filePaths = new List<string>();
-            XFolderTools.TraverseFiles(folderPath, (fullPath) => {
+            XFolderTools.TraverseFiles(folderPath, (fullPath) =>
+            {
                 string path = XFileTools.GetFolderPath(fullPath);
                 filePaths.Add(path);
             }, true);
 
-            string md5s = GetFilesCode(filePaths.ToArray());  
+            string md5s = GetFilesCode(filePaths.ToArray());
             return XStringTools.StringToMD5(md5s);
         }
 

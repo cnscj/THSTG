@@ -26,7 +26,7 @@ namespace THEditor
         private DataSet m_ResultSet;
 
 
-        public abstract string Convert(DataSet dataSet);
+        public abstract string OnConvert(DataSet dataSet);
 
         ////////
         public BaseExcelConverter()
@@ -53,6 +53,11 @@ namespace THEditor
             
         }
 
+        public string Convert()
+        {
+            return OnConvert(m_ResultSet);
+        }
+
         public void Export(string savePath, Encoding encoding = null)
         {
             Export(m_ResultSet, savePath, encoding);
@@ -61,7 +66,7 @@ namespace THEditor
         public void Export(DataSet dataSet, string savePath, Encoding encoding = null)
         {
             encoding = encoding != null ? encoding : Encoding.GetEncoding("utf-8");
-            string content = Convert(dataSet);
+            string content = OnConvert(dataSet);
             Write2File(content, savePath, encoding);
         }
 

@@ -11,6 +11,9 @@ namespace STGGame
         protected override void OnOpen()
         {
             DispatcherManager.GetInstance().AddListener(EventType.TEST_EVENT, this.Test);
+
+
+            Debug.Log(ResourceConfiger.GetResSrc("reimu"));
         }
 
         protected void Test(int eventId, Dictionary<string, object> args)

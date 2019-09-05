@@ -38,7 +38,7 @@ namespace THGame
             int startPos = filePath.IndexOf(relaPath, StringComparison.Ordinal);
             if (startPos >= 0)
             {
-                return filePath.Substring(startPos + relaPath.Length);
+                return filePath.Substring(startPos + relaPath.Length + 1);
             }
             return filePath;
         }

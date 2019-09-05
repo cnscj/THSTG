@@ -14,6 +14,9 @@ namespace STGEditor
             new AssetBuilderSprite(),
             new AssetBuilderLevel(),
             new AssetBuilderUI(),
+            new AssetBuilderCfg(),
+
+            new AssetBuilderCustom(),
         });
     }
 }

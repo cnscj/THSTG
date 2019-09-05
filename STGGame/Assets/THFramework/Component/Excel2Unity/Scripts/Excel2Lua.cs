@@ -15,7 +15,7 @@ namespace THEditor
 
         }
 
-        public override string Convert(DataSet dataSet)
+        public override string OnConvert(DataSet dataSet)
         {
             //判断Excel文件中是否存在数据表
             if (dataSet.Tables.Count < 1)

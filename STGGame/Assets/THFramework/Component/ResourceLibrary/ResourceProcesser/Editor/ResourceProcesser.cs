@@ -9,6 +9,9 @@ namespace THEditor
 {
     public class ResourceProcesser
     {
+        public bool isCheckInvainFile = true;   //检查无效文件
+
+
         private FilesChecker fileChecker;
         private Dictionary<string, string> checkMaps;
 
@@ -61,12 +64,15 @@ namespace THEditor
                     XFolderTools.CreateDirectory(m_exportFolder);
                 }
             }
-           
+
         }
 
 
         protected void DoEnd()
         {
+            if (!isCheckInvainFile)
+                return;
+
             // 移除无效的二次转化文件（源文件不在了）
             XFolderTools.TraverseFiles(m_md5Folder, (fullPath) =>
             {

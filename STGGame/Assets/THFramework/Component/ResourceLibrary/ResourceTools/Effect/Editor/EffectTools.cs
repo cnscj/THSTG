@@ -11,9 +11,9 @@ namespace THEditor
         public const int defaultLv = 1;
 
         [MenuItem("GameObject/Guangyv/特效分级/Level_01")]
-        public static void MenuChangeLevelOne(){ChangEffectLevel(1);}
+        public static void MenuChangeLevelOne() { ChangEffectLevel(1); }
         [MenuItem("GameObject/Guangyv/特效分级/Level_02")]
-        public static void MenuChangeLevelTwo(){ChangEffectLevel(2);}
+        public static void MenuChangeLevelTwo() { ChangEffectLevel(2); }
         [MenuItem("GameObject/Guangyv/特效分级/Level_03")]
         public static void MenuChangeLevelThree() { ChangEffectLevel(3); }
         [MenuItem("GameObject/Guangyv/特效分级/Level_04")]
@@ -34,10 +34,10 @@ namespace THEditor
 
         public static void ChangEffectLevel(int level)
         {
-            if (Selection.transforms.Length > 0 )
+            if (Selection.transforms.Length > 0)
             {
-                Transform []GOs = Selection.transforms;
-                foreach(var GO in GOs)
+                Transform[] GOs = Selection.transforms;
+                foreach (var GO in GOs)
                 {
                     //需要递归往上做检查
                     int minLv = level;
@@ -63,7 +63,7 @@ namespace THEditor
                     EffectUtil.SetEffectLevel(GO.gameObject, level);
                 }
 
-               
+
             }
             else
             {
@@ -154,10 +154,10 @@ namespace THEditor
                     }
 
                 }
-                foreach(var pair in nodeMap)
+                foreach (var pair in nodeMap)
                 {
                     int level = pair.Key;
-                    for(int i = 0; i < pair.Value.Count; i++)
+                    for (int i = 0; i < pair.Value.Count; i++)
                     {
                         pair.Value[i].name = string.Format("{0:D2}_{1}", level, i);
                     }
@@ -171,7 +171,7 @@ namespace THEditor
                 var ctrl = newGO.AddComponent<EffectController>();
                 ctrl.metadataList = new List<EffectMetadata>();
 
-                for(int i = maxLevel; i >= defaultLv ; i--)
+                for (int i = maxLevel; i >= defaultLv; i--)
                 {
                     if (nodeMap.ContainsKey(i))
                     {
