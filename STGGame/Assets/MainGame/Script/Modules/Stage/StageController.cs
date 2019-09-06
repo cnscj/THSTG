@@ -12,8 +12,8 @@ namespace STGGame
         {
             DispatcherManager.GetInstance().AddListener(EventType.TEST_EVENT, this.Test);
 
-
-            Debug.Log(ResourceConfiger.GetResSrc("reimu"));
+            Debug.Log(ResourceConfiger.GetResSrc("1001"));
+            Debug.Log(TestConfiger.GetResSrc("reimu"));
         }
 
         protected void Test(int eventId, Dictionary<string, object> args)

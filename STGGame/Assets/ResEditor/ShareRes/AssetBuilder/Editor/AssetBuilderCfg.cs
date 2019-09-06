@@ -17,7 +17,7 @@ namespace STGEditor
             XFolderTools.TraverseFiles(new string[] { AssetBuilderConfig.tempConfigs }, (fullPath) =>
             {
                 string fileExName = Path.GetExtension(fullPath).ToLower();
-                if (fileExName.Contains("csv"))
+                if (fileExName.Contains("csv") || fileExName.Contains("json"))
                 {
                     string fileRelaPath = XFileTools.GetFileRelativePath(fullPath);
                     filList.Add(fileRelaPath);

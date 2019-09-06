@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87a4c690154c2024db5efde4dd30bc63, type: 3}
   m_Name: THSpriteConfig
   m_EditorClassIdentifier: 
-  defaultShader: {fileID: 4800000, guid: f85b7c46ee0bc92499e09b4bbf499d2a, type: 3}
+  defaultShader: {fileID: 10753, guid: 0000000000000000f000000000000000, type: 0}
+  spriteRootPath: 
   defaultFrameRate: 12
   defaultStateList:
   - idle
@@ -20,4 +21,3 @@ MonoBehaviour:
   loopStateList:
   - idle
   - stand
-  - movesu

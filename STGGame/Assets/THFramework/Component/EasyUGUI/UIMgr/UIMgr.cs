@@ -53,7 +53,7 @@ public class UIMgr : EventNode
     internal Transform UIROOT = null;
     void Awake()
     {
-        UIROOT = this.transform.FindChild("UIRoot");
+        UIROOT = this.transform.Find("UIRoot");
         mInstance = this;
         DontDestroyOnLoad(this.gameObject);
     }

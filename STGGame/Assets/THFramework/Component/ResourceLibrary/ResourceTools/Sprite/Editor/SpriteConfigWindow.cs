@@ -7,6 +7,7 @@ namespace THEditor
 {
     public class SpriteConfigWindow : BaseResourceConfigWindow<SpriteConfigWindow>
     {
+
         [MenuItem("THFramework/资源工具/资源配置/精灵配置")]
         static void ShowWnd()
         {
@@ -27,7 +28,11 @@ namespace THEditor
 
         protected override void OnShow()
         {
+            GUIUtil.ShowPathBar("精灵编辑根路径;", ref SpriteConfig.GetInstance().spriteRootPath);
             ShowPropertys("Normal");
         }
+
+
+        
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace STGGame
 {
-    public static class TestConfiger
+    public static class ResourceConfiger
     {
         private static CSVTable s_resTb;
 
@@ -13,7 +13,7 @@ namespace STGGame
         {
             if (s_resTb == null)
             {
-                s_resTb = CSVUtil.Decode(AssetManager.GetInstance().LoadConfig("G_Resource.csv"));
+                s_resTb = CSVUtil.Decode(AssetManager.GetInstance().LoadConfig("H_Test.csv"));
             }
             return s_resTb;
         }
@@ -21,7 +21,8 @@ namespace STGGame
         public static string GetResSrc(string key)
         {
             var tb = _GetOriTable();
-            return tb[key]["src"];
+            return tb[key]["姓名"];
+
         }
 
 

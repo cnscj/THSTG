@@ -87,9 +87,8 @@ namespace THGame
 		{
 			if (string.IsNullOrEmpty(fullPath))
 				return null;
-			int pathLength = Application.dataPath.Length - "Assets".Length;
-			return fullPath.Substring(pathLength);
-		}
+            return fullPath.Replace(Application.dataPath, "Assets");
+        }
 
 		//没用
 		public static string GetFolderPath(string filePath)

@@ -227,10 +227,15 @@ namespace THGame
                 yield break;
             }
 
-            foreach (var data in _dataObjDic.Values)
+            foreach (CSVObject data in _dataObjDic.Values)
             {
                 yield return data;
             }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            yield return GetEnumerator();
         }
 
         /// <summary>
@@ -247,7 +252,9 @@ namespace THGame
             }
 
             return content;
-        }   
+        }
+
+
     }
 }
 
