@@ -26,5 +26,20 @@ namespace THGame
         public bool ToBool() { return bool.Parse(m_content); }
         public double ToDouble() { return double.Parse(m_content); }
 
+        //隐式转换
+        public static implicit operator CSVValue(string v)
+        {
+            return new CSVValue(v);
+        }
+
+        public static implicit operator string(CSVValue v)
+        {
+            return v.ToString();
+        }
+
+        public static implicit operator CSVValue(int v)
+        {
+            return new CSVValue(v);
+        }
     }
 }

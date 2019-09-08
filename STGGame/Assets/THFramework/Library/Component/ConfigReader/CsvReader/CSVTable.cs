@@ -80,12 +80,12 @@ namespace THGame
             {
                 string[] values = lines[i].Split(',');
                 string major = values[0].Trim();
-                Dictionary<string, string> tempAttributeDic = new Dictionary<string, string>();
+                Dictionary<string, CSVValue> tempAttributeDic = new Dictionary<string, CSVValue>();
                 for (int j = 1; j < values.Length; j++)
                 {
                     string key = keys[j].Trim();
                     string value = values[j].Trim();
-                    tempAttributeDic.Add(key, value);
+                    tempAttributeDic.Add(key, new CSVValue(value));
                 }
                 CSVObject dataObj = new CSVObject(major, tempAttributeDic, keys);
                 this[dataObj.ID] = dataObj;

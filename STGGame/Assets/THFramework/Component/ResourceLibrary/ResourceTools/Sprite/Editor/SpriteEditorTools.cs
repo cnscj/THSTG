@@ -438,7 +438,7 @@ namespace THEditor
                     sheet.SubTexture.Add(frame);
                 }
 
-                var jsonStr = JsonUtility.ToJson(sheet);
+                var jsonStr = JsonUtility.ToJson(sheet,true);
 
                 if (savePath == "")
                 {

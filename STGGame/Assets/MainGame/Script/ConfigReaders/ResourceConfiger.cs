@@ -21,7 +21,7 @@ namespace STGGame
         public static string GetResSrc(string key)
         {
             var tb = _GetOriTable();
-            return tb[key]["src"];
+            return tb[key]["src"].ToString();
         }
 
 

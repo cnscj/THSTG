@@ -36,7 +36,8 @@ namespace STGEditor
         protected override void OnOnce(string assetPath)
         {
             string fileNameNotEx = Path.GetFileNameWithoutExtension(assetPath);
-            SetBundleName(assetPath, string.Format(AssetBuilderConfig.bundleNameUIs, fileNameNotEx));
+            string[] splitArray = fileNameNotEx.Split('_');
+            SetBundleName(assetPath, string.Format(AssetBuilderConfig.bundleNameUIs, splitArray[0].ToLower()));
         }
         protected override void OnShareOnce(string assetPath, int dependCount)
         {
@@ -47,7 +48,7 @@ namespace STGEditor
             }
             else
             {
-                SetBundleName(assetPath, string.Format(AssetBuilderConfig.bundleNameUIs, "share_{0}", moduleName.ToLower()));
+                SetBundleName(assetPath, string.Format(AssetBuilderConfig.bundleNameUIs, string.Format("{0}", moduleName.ToLower())));
             }
             
         }

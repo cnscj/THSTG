@@ -7,6 +7,8 @@ namespace THGame
         public string srcName = "";
         public string srcResFolder = "";
         public string bundleName = "";
+
+        public bool isSubFolderBuildOne = false;
     }
 
 }

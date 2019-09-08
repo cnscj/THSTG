@@ -30,15 +30,39 @@ namespace THEditor
             return filList;
         }
 
+        protected string GetModulePath(string assetPath)
+        {
+            string srcResFolder = m_buildInfo.srcResFolder.Replace("\\", "/");
+            string newAssetPath = assetPath.Replace("\\", "/");
+            if (assetPath.Contains(srcResFolder))
+            {
+                string relaPath = assetPath.Replace(string.Format("/{0}", srcResFolder),"");
+                string relaParentPath = relaPath.Replace(Path.GetFileName(newAssetPath), "");
+                return relaParentPath;
+            }
+            return Path.GetDirectoryName(newAssetPath);
+        }
+
         protected override void OnOnce(string assetPath)
         {
-            string fileNameNotEx = Path.GetFileNameWithoutExtension(assetPath);
-            SetBundleName(assetPath, string.Format(m_buildInfo.bundleName, fileNameNotEx));
+            if (!m_buildInfo.isSubFolderBuildOne)
+            {
+                string fileNameNotEx = Path.GetFileNameWithoutExtension(assetPath).ToLower();
+                SetBundleName(assetPath, string.Format(m_buildInfo.bundleName, fileNameNotEx));
+            }
+            else
+            {
+                string modelName = GetModulePath(assetPath).ToLower();
+                SetBundleName(assetPath, string.Format(m_buildInfo.bundleName, modelName));
+            }
         }
 
         protected override void OnShareOnce(string assetPath, int dependCount)
         {
-            SetBundleName(assetPath, string.Format(m_buildInfo.bundleName, "share.ab"));
+            if (!m_buildInfo.isSubFolderBuildOne)
+            {
+                SetBundleName(assetPath, string.Format(m_buildInfo.bundleName, "share.ab"));
+            }
         }
     }
 }

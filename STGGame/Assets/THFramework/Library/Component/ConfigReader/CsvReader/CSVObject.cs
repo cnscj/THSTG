@@ -27,14 +27,14 @@ namespace THGame
         public string[] AllKeys { get { return _allKeys; } }
         private readonly string[] _allKeys;
 
-        private Dictionary<string, string> _atrributesDic;
+        private Dictionary<string, CSVValue> _atrributesDic;
 
         /// <summary>
         /// 初始化，获取唯一标识与除主键之外所有属性的键与值
         /// </summary>
         /// <param name="major"> 唯一标识，主键 </param>
         /// <param name="atrributeDic"> 除主键值外的所有属性键值字典 </param>
-        public CSVObject(string major, Dictionary<string, string> atrributeDic, string[] allKeys)
+        public CSVObject(string major, Dictionary<string, CSVValue> atrributeDic, string[] allKeys)
         {
             _major = major;
             _atrributesDic = atrributeDic;
@@ -55,21 +55,21 @@ namespace THGame
             return format;
         }
 
-        public string this[string key]
+        public CSVValue this[string key]
         {
             get { return GetValue(key); }
-            set { SetKey(key, value); }
+            set { SetKey(key,value); }
         }
 
-        private void SetKey(string key, string value)
+        private void SetKey(string key, CSVValue value)
         {
             if (_atrributesDic.ContainsKey(key))
                 _atrributesDic[key] = value;
         }
 
-        private string GetValue(string key)
+        private CSVValue GetValue(string key)
         {
-            string value = string.Empty;
+            CSVValue value = new CSVValue(string.Empty);
 
             if (_atrributesDic.ContainsKey(key))
                 value = _atrributesDic[key];

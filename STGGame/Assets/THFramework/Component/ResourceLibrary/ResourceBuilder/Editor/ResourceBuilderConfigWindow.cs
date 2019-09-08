@@ -52,6 +52,7 @@ namespace THEditor
                 infos.srcName = EditorGUILayout.TextField("资源名", infos.srcName);
                 ShowPathBar("资源路径:", ref infos.srcResFolder);
                 infos.bundleName = EditorGUILayout.TextField("包名", infos.bundleName);
+                infos.isSubFolderBuildOne = EditorGUILayout.Toggle("子目录单独打", infos.isSubFolderBuildOne);
                 if (GUILayout.Button("移除"))
                 {
                     ResourceBuilderConfig.GetInstance().buildInfoList.Remove(infos);

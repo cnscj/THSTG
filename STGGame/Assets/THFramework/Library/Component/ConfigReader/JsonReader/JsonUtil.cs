@@ -7,7 +7,7 @@ namespace THGame
 {
     public static class JsonUtil 
     {
-        public static string Encode(Object obj)
+        public static string Encode(object obj)
         {
             return JsonMapper.ToJson(obj);
         }
