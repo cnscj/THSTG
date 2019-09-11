@@ -116,7 +116,7 @@ namespace THEditor
                     string relaFoldePath = PathUtil.Combine(relaRootPath, fileNameWithNotEx);
                     if (XFolderTools.Exists(relaFoldePath))
                     {
-                        XFolderTools.DeleteDirectory(relaFoldePath);
+                        XFolderTools.DeleteDirectory(relaFoldePath, true);
                     }
                 }
             });

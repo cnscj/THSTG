@@ -26,6 +26,7 @@ namespace THEditor
             //打包设置:
             m_bundleOptions = BuildAssetBundleOptions.None;
             m_bundleOptions |= BuildAssetBundleOptions.ChunkBasedCompression;
+            m_bundleOptions |= BuildAssetBundleOptions.DeterministicAssetBundle;
             //听大佬说,使用全路径加载会快一点.....
             m_bundleOptions |= BuildAssetBundleOptions.DisableLoadAssetByFileName;  //没有扩展的加载直接禁用了
             if (ResourceBuilderConfig.GetInstance().bundleIsUseFullPath)
