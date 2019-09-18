@@ -1,7 +1,4 @@
-﻿using System;
-using THGame;
-using THGame.Package;
-using UnityEngine;
+﻿using XLibrary;
 
 namespace STGGame
 {

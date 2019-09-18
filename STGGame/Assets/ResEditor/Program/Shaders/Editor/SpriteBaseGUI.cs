@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using THEditor;
-using UnityEngine;
+﻿
+using XLibraryEditor;
 
 namespace STGEditor
 {

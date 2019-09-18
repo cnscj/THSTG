@@ -1,8 +1,7 @@
 ﻿
 using UnityEngine;
 using Unity.Entities;
-using THGame;
-using THGame.Package;
+using XLibrary.Package;
 
 namespace STGGame
 {

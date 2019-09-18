@@ -1,11 +1,8 @@
 ﻿
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.Entities;
-using THGame;
-using Unity.Collections;
 using System;
-using THGame.Package;
+using XLibrary.Package;
 
 namespace STGGame
 {

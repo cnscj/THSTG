@@ -1,7 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using THGame.UI;
-using UnityEngine;
+﻿
+
+using ASGame.UI;
 
 namespace STGGame.UI
 {

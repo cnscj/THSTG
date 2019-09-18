@@ -1,9 +1,10 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
 using System.IO;
-using THGame;
-using THGame.Package;
+using ASGame;
 using UnityEngine;
+using XLibrary;
+using XLibrary.Package;
 
 namespace STGGame
 {

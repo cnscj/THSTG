@@ -1,6 +1,6 @@
-﻿using THGame.Package;
-using THGame.Package.MVC;
-using UnityEngine;
+﻿
+using XLibrary.MVC;
+using XLibrary.Package;
 
 namespace STGGame
 {
