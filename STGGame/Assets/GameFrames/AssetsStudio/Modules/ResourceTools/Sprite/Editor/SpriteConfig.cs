@@ -9,7 +9,6 @@ namespace ASEditor
         static string assetPath = ChangeAssetPath(string.Format("Assets/Resources/ASSpriteConfig.asset"));
 
         [SerializeField] public Shader defaultShader;
-        [SerializeField] public string spriteRootPath;
         [SerializeField] public float defaultFrameRate = 12.0f;
         [SerializeField] public List<string> defaultStateList = new List<string>()
         {

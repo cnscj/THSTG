@@ -212,7 +212,8 @@ namespace ASEditor
             OnPreOnce(assetPath);
 
             //string fileNameWithNotEx = Path.GetFileNameWithoutExtension(assetPath);
-            //TODO:检测有问题,应该与源文件存在关联,且是在名字上的关联
+            //FIXME:检测有问题,应该与源文件存在关联,且是在名字上的关联
+            //目前是以ID做关联,没有则是全名
             string fileName = Path.GetFileName(assetPath);
             string checkName = GetResourceId(fileName);
             string saveFilePath = GetExportPath(fileName);

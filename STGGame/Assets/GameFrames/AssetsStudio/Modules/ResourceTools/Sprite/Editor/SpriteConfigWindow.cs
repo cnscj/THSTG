@@ -26,7 +26,6 @@ namespace ASEditor
 
         protected override void OnShow()
         {
-            GUIUtil.ShowPathBar("精灵编辑根路径;", ref SpriteConfig.GetInstance().spriteRootPath);
             ShowPropertys("Normal");
         }
 

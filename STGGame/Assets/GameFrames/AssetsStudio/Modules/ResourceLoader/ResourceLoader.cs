@@ -46,7 +46,7 @@ namespace ASGame
 
         public T LoadFromFile<T>(ResourceLoadParams args) where T : Object
         {
-            ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(args.GetUID());
+            ResourceLoadCacheDataInfo info = ResourceLoadCache.GetInstance().QueryCache(args.GetUID());
             if (info != null)
             {
                 info.UpdateTick();
@@ -57,15 +57,15 @@ namespace ASGame
                 var obj = m_fileLoader.LoadAsset<T>(args.resPath, args.assetName);
 
                 //加入缓存
-                ResourceLoaderCache.GetInstance().PushCache(args.GetUID(), obj, args.stayTime);
+                ResourceLoadCache.GetInstance().PushCache(args.GetUID(), obj, args.stayTime);
 
                 return obj;
             }
         }
-        public ResourceLoadHandle<T> LoadFromFileAsync<T>(ResourceLoadParams args) where T : Object
+        public ResourceLoadHandler<T> LoadFromFileAsync<T>(ResourceLoadParams args) where T : Object
         {
-            ResourceLoadHandle<T> listener = new ResourceLoadHandle<T>();
-            ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(args.GetUID());
+            ResourceLoadHandler<T> listener = new ResourceLoadHandler<T>();
+            ResourceLoadCacheDataInfo info = ResourceLoadCache.GetInstance().QueryCache(args.GetUID());
             if (info != null)
             {
                 info.UpdateTick();
@@ -80,7 +80,7 @@ namespace ASGame
                     StartCoroutine(m_fileLoader.LoadAssetAsync<T>(args.resPath, args.assetName, (obj) =>
                     {
                         //加入缓存
-                        ResourceLoaderCache.GetInstance().PushCache(args.GetUID(), obj, args.stayTime);
+                        ResourceLoadCache.GetInstance().PushCache(args.GetUID(), obj, args.stayTime);
 
                         listener.CallCompeleted(obj);
 
@@ -92,7 +92,7 @@ namespace ASGame
         }
         public T LoadFromMenory<T>(ResourceLoadParams args) where T : Object
         {
-            ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(args.GetUID());
+            ResourceLoadCacheDataInfo info = ResourceLoadCache.GetInstance().QueryCache(args.GetUID());
             if (info != null)
             {
                 info.UpdateTick();
@@ -103,15 +103,15 @@ namespace ASGame
                 var obj = m_menoryLoader.LoadAsset<T>(args.resData, args.assetName);
 
                 //加入缓存
-                ResourceLoaderCache.GetInstance().PushCache(args.GetUID(), obj, args.stayTime);
+                ResourceLoadCache.GetInstance().PushCache(args.GetUID(), obj, args.stayTime);
 
                 return obj;
             }
         }
-        public ResourceLoadHandle<T> LoadFromMenoryAsync<T>(ResourceLoadParams args) where T : Object
+        public ResourceLoadHandler<T> LoadFromMenoryAsync<T>(ResourceLoadParams args) where T : Object
         {
-            ResourceLoadHandle<T> listener = new ResourceLoadHandle<T>();
-            ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(args.GetUID());
+            ResourceLoadHandler<T> listener = new ResourceLoadHandler<T>();
+            ResourceLoadCacheDataInfo info = ResourceLoadCache.GetInstance().QueryCache(args.GetUID());
             if (info != null)
             {
                 info.UpdateTick();
@@ -126,7 +126,7 @@ namespace ASGame
                     StartCoroutine(m_menoryLoader.LoadAssetAsync<T>(args.resData, args.assetName, (obj) =>
                     {
                         //加入缓存
-                        ResourceLoaderCache.GetInstance().PushCache(args.GetUID(), obj, args.stayTime);
+                        ResourceLoadCache.GetInstance().PushCache(args.GetUID(), obj, args.stayTime);
 
                         listener.CallCompeleted(obj);
 
@@ -137,7 +137,7 @@ namespace ASGame
         }
         public T LoadFromWeb<T>(ResourceLoadParams args) where T : Object
         {
-            ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(args.resPath);
+            ResourceLoadCacheDataInfo info = ResourceLoadCache.GetInstance().QueryCache(args.resPath);
             if (info != null)
             {
                 info.UpdateTick();
@@ -148,15 +148,15 @@ namespace ASGame
                 var obj = m_networkLoader.LoadAsset<T>(args.resPath, args.assetName);
 
                 //加入缓存
-                ResourceLoaderCache.GetInstance().PushCache(args.resPath, obj, args.stayTime);
+                ResourceLoadCache.GetInstance().PushCache(args.resPath, obj, args.stayTime);
 
                 return obj;
             }
         }
-        public ResourceLoadHandle<T> LoadFromWebAsync<T>(ResourceLoadParams args) where T : Object
+        public ResourceLoadHandler<T> LoadFromWebAsync<T>(ResourceLoadParams args) where T : Object
         {
-            ResourceLoadHandle<T> listener = new ResourceLoadHandle<T>();
-            ResourceLoaderCacheDataInfo info = ResourceLoaderCache.GetInstance().QueryCache(args.resPath);
+            ResourceLoadHandler<T> listener = new ResourceLoadHandler<T>();
+            ResourceLoadCacheDataInfo info = ResourceLoadCache.GetInstance().QueryCache(args.resPath);
             if (info != null)
             {
                 info.UpdateTick();
@@ -171,7 +171,7 @@ namespace ASGame
                     StartCoroutine(m_networkLoader.LoadAssetAsync<T>(args.resPath, args.assetName, (obj) =>
                     {
                         //加入缓存
-                        ResourceLoaderCache.GetInstance().PushCache(args.resPath, obj);
+                        ResourceLoadCache.GetInstance().PushCache(args.resPath, obj);
 
                         listener.CallCompeleted(obj);
 
@@ -189,7 +189,7 @@ namespace ASGame
         }
 
         //异步加载
-        public ResourceLoadHandle<T> LoadFromFileAsync<T>(string path) where T : Object
+        public ResourceLoadHandler<T> LoadFromFileAsync<T>(string path) where T : Object
         {
             return LoadFromFileAsync<T>(new ResourceLoadParams(path, typeof(T)));
         }
@@ -199,7 +199,7 @@ namespace ASGame
             return LoadFromMenory<T>(new ResourceLoadParams(binary, assetName));
         }
 
-        public ResourceLoadHandle<T> LoadFromMenoryAsync<T>(byte[] binary, string assetName) where T : Object
+        public ResourceLoadHandler<T> LoadFromMenoryAsync<T>(byte[] binary, string assetName) where T : Object
         {
             return LoadFromMenoryAsync<T>(new ResourceLoadParams(binary, assetName));
         }
@@ -209,7 +209,7 @@ namespace ASGame
             return LoadFromWeb<T>(new ResourceLoadParams(url));
         }
 
-        public ResourceLoadHandle<T> LoadFromWebAsync<T>(string url) where T : Object
+        public ResourceLoadHandler<T> LoadFromWebAsync<T>(string url) where T : Object
         {
             return LoadFromWebAsync<T>(new ResourceLoadParams(url));
         }

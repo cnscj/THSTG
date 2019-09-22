@@ -267,6 +267,7 @@ namespace ASEditor
             }
 
             AssetDatabase.SaveAssets(); //保存变更,不然没得内容
+            AssetDatabase.Refresh();
             return ctrl;
         }
 
@@ -304,7 +305,7 @@ namespace ASEditor
                     AssetDatabase.SaveAssets(); //保存变更,不然没得内容
                 }
             }
-
+            AssetDatabase.Refresh();
             return ovrrideCtrl;
         }
 
@@ -356,6 +357,7 @@ namespace ASEditor
                 Object.DestroyImmediate(spriteGO);
 
                 AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
                 return outGO;
             }
 
@@ -381,6 +383,7 @@ namespace ASEditor
             {
                 AssetDatabase.CreateAsset(mat, savePath);
             }
+            AssetDatabase.Refresh();
             return mat;
         }
 
