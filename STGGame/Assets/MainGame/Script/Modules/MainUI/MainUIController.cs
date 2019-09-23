@@ -1,4 +1,5 @@
-﻿using THGame;
+﻿
+using XLibGame;
 using XLibrary.MVC;
 
 namespace STGGame

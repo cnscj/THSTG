@@ -8,5 +8,6 @@ namespace ASEditor
     {
         [SerializeField] public string key;
         [SerializeField] public string srcPath;
+        [SerializeField] public string processPath;
     }
 }

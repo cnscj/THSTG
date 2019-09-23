@@ -204,7 +204,7 @@ namespace ASEditor
                         curveBinding.type = typeof(SpriteRenderer);
                         curveBinding.path = "";
                         curveBinding.propertyName = "m_Sprite";
-                        float frameTime = 1 / SpriteConfig.GetInstance().defaultFrameRate;
+                        float frameTime = 1 / SpriteToolsConfig.GetInstance().defaultFrameRate;
                         int index = 0;
                         List<ObjectReferenceKeyframe> keyFrames = new List<ObjectReferenceKeyframe>();
                         foreach (var listPair in actionPair.Value)
@@ -217,7 +217,7 @@ namespace ASEditor
                         }
 
                         AnimationClip clip = new AnimationClip();
-                        clip.frameRate = SpriteConfig.GetInstance().defaultFrameRate;//动画帧率，30比较合适
+                        clip.frameRate = SpriteToolsConfig.GetInstance().defaultFrameRate;//动画帧率，30比较合适
 #if !UNITY_5
                         AnimationUtility.SetAnimationType(clip, ModelImporterAnimationType.Generic);
 #endif
@@ -374,7 +374,7 @@ namespace ASEditor
                 string assetRootPathName = Path.GetFileNameWithoutExtension(assetRootPath);
                 savePath = Path.Combine(assetRootPath, string.Format("{0}.mat", assetRootPathName));
             }
-            Material mat = new Material(SpriteConfig.GetInstance().defaultShader);
+            Material mat = new Material(SpriteToolsConfig.GetInstance().defaultShader);
             if (XFileTools.Exists(savePath))
             {
                 mat = AssetDatabase.LoadAssetAtPath<Material>(savePath);

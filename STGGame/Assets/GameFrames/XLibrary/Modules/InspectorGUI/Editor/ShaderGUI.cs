@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 
-namespace XLibraryEditor
+namespace XLibEditor
 {
 	public class ShaderGUI<T> : UnityEditor.ShaderGUI
     {

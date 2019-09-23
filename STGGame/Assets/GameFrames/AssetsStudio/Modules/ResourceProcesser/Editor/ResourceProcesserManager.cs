@@ -29,7 +29,7 @@ namespace ASEditor
 
         public void ProcessAll()
         {
-            string curScenePath = EditorSceneManager.GetActiveScene().path;
+            string curScenePath = UnityEngine.SceneManagement.SceneManager.GetActiveScene().path;
 
             foreach (var process in m_processers)
             {

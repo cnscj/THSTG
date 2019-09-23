@@ -1,5 +1,5 @@
 ﻿using UnityEditor;
-using XLibraryEditor;
+using XLibEditor;
 
 namespace ASEditor
 {

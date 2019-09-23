@@ -8,7 +8,7 @@ namespace ASEditor
     public class ResourceBuilderConfigWindow : EditorWindow
     {
 
-        [MenuItem("AssetsStudio/打包配置",false,2)]
+        [MenuItem("AssetsStudio/资源打包配置",false,3)]
         static void ShowWindow()
         {
             ResourceBuilderConfigWindow myWindow = (ResourceBuilderConfigWindow)EditorWindow.GetWindow(typeof(ResourceBuilderConfigWindow), false, "ResourceBuilderConfig", false);//创建窗口

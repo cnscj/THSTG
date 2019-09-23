@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 
-namespace XLibraryEditor
+namespace XLibEditor
 {
 	public class WindowGUI<T> : EditorWindow where T : EditorWindow
     {
@@ -169,6 +169,7 @@ namespace XLibraryEditor
                         ShowProperty(pair.Value, pair.Key);
                     }
                 }
+                GUILayout.Space(5);
             }
 
         }

@@ -2,7 +2,7 @@
 using UnityEngine;
 using XLibrary;
 
-namespace XLibraryEditor
+namespace XLibEditor
 {
     public static class GUIUtil
     {

@@ -1,6 +1,6 @@
 ﻿using UnityEditor;
 using UnityEngine;
-using XLibraryEditor;
+using XLibEditor;
 
 namespace ASEditor
 {
@@ -36,6 +36,7 @@ namespace ASEditor
             {
                 infos.key = EditorGUILayout.TextField("资源名", infos.key);
                 GUIUtil.ShowPathBar("源资源路径", ref infos.srcPath);
+                GUIUtil.ShowPathBar("后处理导出路径", ref infos.processPath);
 
                 if (GUILayout.Button("移除"))
                 {

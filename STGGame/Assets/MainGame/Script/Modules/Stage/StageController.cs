@@ -1,7 +1,7 @@
 ﻿
 using System.Collections.Generic;
-using THGame;
 using UnityEngine;
+using XLibGame;
 using XLibrary.MVC;
 
 namespace STGGame

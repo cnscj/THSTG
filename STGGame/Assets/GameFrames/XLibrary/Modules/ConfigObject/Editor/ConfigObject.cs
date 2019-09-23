@@ -2,7 +2,7 @@
 using UnityEditor;
 using XLibrary;
 
-namespace XLibraryEditor
+namespace XLibEditor
 {
     public class ConfigObject<T> : ScriptableObject where T : ScriptableObject, new()
     {

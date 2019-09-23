@@ -1,5 +1,5 @@
 ﻿
-using XLibraryEditor;
+using XLibEditor;
 
 namespace STGEditor
 {

@@ -1,6 +1,6 @@
 ﻿
 using UnityEngine;
-using XLibraryEditor;
+using XLibEditor;
 
 namespace ASEditor
 {
