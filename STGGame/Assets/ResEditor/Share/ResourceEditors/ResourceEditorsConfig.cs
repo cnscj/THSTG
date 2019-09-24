@@ -6,7 +6,7 @@ namespace STGEditor
 {
     public static class ResourceEditorsConfig
     {
-        public static readonly string editorFolder = "Assets/ResEditor/ShareRes/ResourceEditors";
+        public static readonly string editorFolder = "Assets/ResEditor/Share/ResourceEditors";
     }
 
 }
