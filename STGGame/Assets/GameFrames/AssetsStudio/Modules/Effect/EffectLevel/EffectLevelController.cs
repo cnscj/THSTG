@@ -7,15 +7,15 @@ using UnityEngine;
 namespace ASGame
 {
     [System.Serializable]
-    public class NodeLevelController : MonoBehaviour
+    public class EffectLevelController : MonoBehaviour
     {
-        public List<NodeLevelMetadata> metadataList;       //数据源
+        public List<EffectLevelMetadata> metadataList;       //数据源
 
         public void SetupPacks(GameObject[] packs)
         {
             for (int i = 0; i < packs.Length; i++)
             {
-                int level = NodeLevelUtil.GetEffectLevel(packs[i]);
+                int level = EffectLevelUtil.GetEffectLevel(packs[i]);
                 if (level == metadataList[i].level)
                 {
                     GameObject pack = packs[i];
@@ -68,11 +68,11 @@ namespace ASGame
 
         private void Start()
         {
-            NodeLevelManager.instance.levelChangedCallback += OnLimitLevelChanged;
+            EffectLevelManager.instance.levelChangedCallback += OnLimitLevelChanged;
         }
         private void OnDestroy()
         {
-            NodeLevelManager.instance.levelChangedCallback -= OnLimitLevelChanged;
+            EffectLevelManager.instance.levelChangedCallback -= OnLimitLevelChanged;
         }
 
         private void OnLimitLevelChanged(int val)

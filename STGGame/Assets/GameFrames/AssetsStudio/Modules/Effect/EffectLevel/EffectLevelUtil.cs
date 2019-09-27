@@ -3,7 +3,7 @@ using ASGame.Editor;
 
 namespace ASGame
 {
-    public static class NodeLevelUtil
+    public static class EffectLevelUtil
     {
         public static readonly int maxLevel = 10;
         public static readonly int defaultLv = 1;
@@ -13,10 +13,10 @@ namespace ASGame
         {
             if (GO)
             {
-                var levelEditor = GO.GetComponent<NodeLevelEditMono>();
+                var levelEditor = GO.GetComponent<EffectLevelEditMono>();
                 if (levelEditor == null)
                 {
-                    levelEditor = GO.AddComponent<NodeLevelEditMono>();
+                    levelEditor = GO.AddComponent<EffectLevelEditMono>();
                 }
                 levelEditor.level = level;
             }
@@ -26,7 +26,7 @@ namespace ASGame
         {
             int level = -1;
 
-            var levelEditor = GO.GetComponent<NodeLevelEditMono>();
+            var levelEditor = GO.GetComponent<EffectLevelEditMono>();
             if (levelEditor != null)
             {
                 return levelEditor.level;
@@ -39,7 +39,7 @@ namespace ASGame
         {
             if (GO)
             {
-                var levelEditor = GO.GetComponent<NodeLevelEditMono>();
+                var levelEditor = GO.GetComponent<EffectLevelEditMono>();
                 if (levelEditor != null)
                 {
                     Object.DestroyImmediate(levelEditor);

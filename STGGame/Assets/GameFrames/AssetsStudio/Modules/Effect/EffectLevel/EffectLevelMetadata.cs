@@ -4,7 +4,7 @@ using UnityEngine;
 namespace ASGame
 {
     [System.Serializable]
-    public class NodeLevelMetadata
+    public class EffectLevelMetadata
     {
         [SerializeField]
         public int level;                               //等级

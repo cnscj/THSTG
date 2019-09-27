@@ -7,7 +7,7 @@ using ASGame;
 
 namespace ASEditor
 {
-    public static class NodeLevelEditTools
+    public static class EffectLevelEditTools
     {
 
 
@@ -25,7 +25,7 @@ namespace ASEditor
                     Transform father = GO.transform.parent;
                     while (father != null)
                     {
-                        int fatherLv = NodeLevelUtil.GetEffectLevel(father.gameObject);
+                        int fatherLv = EffectLevelUtil.GetEffectLevel(father.gameObject);
                         fatherLv = fatherLv == -1 ? 1 : fatherLv;
                         targetNode = father;
                         if (fatherLv <= minLv)
@@ -50,7 +50,7 @@ namespace ASEditor
                         {
                             continue;
                         }
-                        int childLv = NodeLevelUtil.GetEffectLevel(child.gameObject);
+                        int childLv = EffectLevelUtil.GetEffectLevel(child.gameObject);
                         childLv = childLv == -1 ? level : childLv;
 
                         if (childLv <= minLv)
@@ -67,7 +67,7 @@ namespace ASEditor
                         return;
                     }
 
-                    NodeLevelUtil.SetEffectLevel(GO.gameObject, level);
+                    EffectLevelUtil.SetEffectLevel(GO.gameObject, level);
                     EditorUtility.SetDirty(GO);
                     AssetDatabase.SaveAssets();
                 }
@@ -88,7 +88,7 @@ namespace ASEditor
                 Transform[] GOs = Selection.transforms;
                 foreach (var GO in GOs)
                 {
-                    NodeLevelUtil.ShowEffectLevel(GO.gameObject, level);
+                    EffectLevelUtil.ShowEffectLevel(GO.gameObject, level);
                 }
             }
             else
@@ -103,13 +103,13 @@ namespace ASEditor
             GameObject outGO = null;
             if (srcGO)
             {
-                if (ridLv > 0 && ridLv <= NodeLevelUtil.maxLevel)
+                if (ridLv > 0 && ridLv <= EffectLevelUtil.maxLevel)
                 {
                     GameObject newGO = GameObject.Instantiate(srcGO);
 
                     foreach (var node in newGO.GetComponentsInChildren<Transform>(true))
                     {
-                        int nodeLv = NodeLevelUtil.GetEffectLevel(node.gameObject);
+                        int nodeLv = EffectLevelUtil.GetEffectLevel(node.gameObject);
                         if (nodeLv != -1)
                         {
                             if (nodeLv > ridLv)
@@ -118,7 +118,7 @@ namespace ASEditor
                             }
                             else
                             {
-                                NodeLevelUtil.ResetEffectLevel(node.gameObject);
+                                EffectLevelUtil.ResetEffectLevel(node.gameObject);
                             }
                         }
                     }
@@ -139,7 +139,7 @@ namespace ASEditor
                 {
                     XFolderTools.CreateDirectory(finalPath);
                 }
-                for (int i = 1; i <= NodeLevelUtil.maxLevel; i++)
+                for (int i = 1; i <= EffectLevelUtil.maxLevel; i++)
                 {
                     string saveName = Path.Combine(finalPath, string.Format("{0}_{1:D2}.prefab", effectId, i));
                     SavePrefabByLevel(srcGO, saveName, i);
@@ -147,7 +147,7 @@ namespace ASEditor
             }
 
         }
-        //补丁包的形式-配合NodeLevelController
+        //补丁包的形式-配合EffectLevelController
         public static void SaveAllLevelPrefabs2(GameObject srcGO, string savePath)
         {
             if (srcGO)
@@ -159,12 +159,12 @@ namespace ASEditor
                 foreach (var effectGO in newGO.GetComponentsInChildren<Transform>())
                 {
                     if (effectGO.gameObject == newGO) continue;     //不包括头结点
-                    int effectLv = NodeLevelUtil.GetEffectLevel(effectGO.gameObject);
+                    int effectLv = EffectLevelUtil.GetEffectLevel(effectGO.gameObject);
                     if (effectLv == -1)
                     {
-                        effectLv = NodeLevelUtil.defaultLv;
+                        effectLv = EffectLevelUtil.defaultLv;
                     }
-                    if (effectLv >= NodeLevelUtil.defaultLv && effectLv <= NodeLevelUtil.maxLevel)
+                    if (effectLv >= EffectLevelUtil.defaultLv && effectLv <= EffectLevelUtil.maxLevel)
                     {
                         List<GameObject> list = null;
                         if (nodeMap.ContainsKey(effectLv))
@@ -180,7 +180,7 @@ namespace ASEditor
                     }
                     else
                     {
-                        NodeLevelUtil.ResetEffectLevel(effectGO.gameObject);
+                        EffectLevelUtil.ResetEffectLevel(effectGO.gameObject);
                     }
 
                 }
@@ -198,14 +198,14 @@ namespace ASEditor
                 {
                     XFolderTools.CreateDirectory(finalPath);
                 }
-                var ctrl = newGO.AddComponent<NodeLevelController>();
-                ctrl.metadataList = new List<NodeLevelMetadata>();
+                var ctrl = newGO.AddComponent<EffectLevelController>();
+                ctrl.metadataList = new List<EffectLevelMetadata>();
 
-                for (int i = NodeLevelUtil.maxLevel; i >= NodeLevelUtil.defaultLv; i--)
+                for (int i = EffectLevelUtil.maxLevel; i >= EffectLevelUtil.defaultLv; i--)
                 {
                     if (nodeMap.ContainsKey(i))
                     {
-                        NodeLevelMetadata newData = new NodeLevelMetadata();
+                        EffectLevelMetadata newData = new EffectLevelMetadata();
                         newData.effectList = new List<string>();
                         newData.level = i;
                         foreach (var effect in nodeMap[i])

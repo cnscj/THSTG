@@ -5,10 +5,10 @@ using ASGame;
 
 namespace ASEditor
 {
-    [CustomEditor(typeof(NodeLevelEditMono))]
-    public class NodeLevelEditMonoInspector : Editor
+    [CustomEditor(typeof(EffectLevelEditMono))]
+    public class EffectLevelEditMonoInspector : Editor
     {
-        private NodeLevelEditMono m_editor;
+        private EffectLevelEditMono m_editor;
 
         private List<KeyValuePair<string, SerializedProperty>> m_normalProps = new List<KeyValuePair<string, SerializedProperty>>();
 
@@ -34,7 +34,7 @@ namespace ASEditor
         void OnSceneGUI()
         {
             //得到test脚本的对象
-            m_editor = (NodeLevelEditMono)target;
+            m_editor = (EffectLevelEditMono)target;
 
             //开始绘制GUI
             Handles.BeginGUI();
@@ -54,7 +54,7 @@ namespace ASEditor
 
         void OnEnable()
         {
-            m_editor = (NodeLevelEditMono)target;
+            m_editor = (EffectLevelEditMono)target;
             Clear();
             //AddPropertys(m_normalProps, "特效等级", "level");
 

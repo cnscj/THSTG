@@ -4,21 +4,21 @@ using System.IO;
 
 namespace ASGame
 {
-    public class NodeLevelManager
+    public class EffectLevelManager
     {
         private const string s_effectPath = "effects";
         public delegate void LevelChangedDelegate(int level);
         public LevelChangedDelegate levelChangedCallback;
-        private static NodeLevelManager s_instance;
+        private static EffectLevelManager s_instance;
         private int m_limitLevel = 10;
 
-        public static NodeLevelManager instance
+        public static EffectLevelManager instance
         {
             get
             {
                 if (s_instance == null)
                 {
-                    s_instance = new NodeLevelManager();
+                    s_instance = new EffectLevelManager();
                 }
                 return s_instance;
             }

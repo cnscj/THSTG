@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace ASGame
 {
-    public class EffectEditorRadialBlur : MonoBehaviour
+    public class SkillRadialBlur : MonoBehaviour
     {
         static Material s_material; 
 
@@ -19,7 +19,7 @@ namespace ASGame
 
         void Start()
         {
-            Shader shader = Shader.Find("GY/EffectRadialBlur");
+            Shader shader = Shader.Find("GY/SkillRadialBlur"); //TODO:
             s_material = new Material(shader);
         }
 

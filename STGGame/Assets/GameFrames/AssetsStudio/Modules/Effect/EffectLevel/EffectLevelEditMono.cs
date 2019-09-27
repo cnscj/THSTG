@@ -3,7 +3,7 @@ using UnityEditor;
 
 namespace ASGame
 {
-    public class NodeLevelEditMono : MonoBehaviour
+    public class EffectLevelEditMono : MonoBehaviour
     {
        public int level;
     }
