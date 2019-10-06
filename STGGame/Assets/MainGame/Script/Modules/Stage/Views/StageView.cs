@@ -4,7 +4,7 @@ using ASGame.UI;
 
 namespace STGGame.UI
 {
-    public class StageView : EView
+    public class StageView
     {
 
         private void Start()

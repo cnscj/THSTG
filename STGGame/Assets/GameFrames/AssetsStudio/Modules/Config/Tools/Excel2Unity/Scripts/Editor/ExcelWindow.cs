@@ -56,8 +56,7 @@ namespace ASEditor
         /// <summary>
         /// 显示当前窗口	
         /// </summary>
-        [MenuItem("AssetsStudio/资源工具/Excel2Unity")]
-        static void ShowExcelTools()
+        public static void ShowExcelTools()
         {
             Init();
             //加载Excel文件

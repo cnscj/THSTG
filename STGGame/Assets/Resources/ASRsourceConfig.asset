@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc7ef9c4d6ff345fdb9aa06f82f69537, type: 3}
   m_Name: ASRsourceConfig
   m_EditorClassIdentifier: 
+  resModulePath: 
   resPathList: []

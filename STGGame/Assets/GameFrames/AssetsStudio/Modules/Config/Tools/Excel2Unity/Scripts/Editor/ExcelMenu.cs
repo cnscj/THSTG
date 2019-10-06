@@ -10,8 +10,10 @@ namespace ASEditor
 {
     public class ExcelMenu
     {
-
-        
-
+        [MenuItem("AssetsStudio/资源工具/Excel2Unity")]
+        public static void ShowExcelTools()
+        {
+            ExcelWindow.ShowExcelTools();
+        }
     }
 }
