@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="usm7w161" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="ntbx0" name="MainUIView.xml" path="/"/>
+  </resources>
+  <publish name=""/>
+</packageDescription>

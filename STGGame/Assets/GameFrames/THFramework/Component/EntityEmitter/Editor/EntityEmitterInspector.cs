@@ -94,13 +94,13 @@ namespace THEditor
             AddPropertys(normalProps, "发射数量", "launchNum");
             AddPropertys(normalProps, "发射初速度", "launchSpeed");
             AddPropertys(normalProps, "自动销毁", "launchAutoDestroy");
-            AddPropertys(normalProps, "强制发射", "launchForceLaunch");
+            //AddPropertys(normalProps, "强制发射", "launchForceLaunch");
 
             m_launchOrderType = serializedObject.FindProperty("launchOrderType");
             AddPropertys(launchOrderProps, "实体序号", "launchOrderFixedIndex");
 
             m_launchType = serializedObject.FindProperty("launchType");
-            AddPropertys(lineProps, "发射角度(°)", "launchLineAngle");
+            AddPropertys(lineProps, "发射向量", "launchLineVector");
             AddPropertys(lineProps, "持续时间", "launchLineDuration");
 
             AddPropertys(surroundProps, "最小半径", "launchSurroundMinRadius");

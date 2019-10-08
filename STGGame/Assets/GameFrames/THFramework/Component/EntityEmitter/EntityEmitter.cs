@@ -12,6 +12,8 @@ namespace THGame
             Line,           //直线
             Surround,       //包围
             Random,         //随机
+            FixedPoint,     //定点
+            Trace,          //追踪
         }
         public enum ECreateOrderType
         {
@@ -25,7 +27,7 @@ namespace THGame
         public int launchTimes = -1;
         public int launchNum = 1;
         public float launchSpeed = 1;
-        public bool launchAutoDestroy = true;
+        public bool launchAutoDestroy = false;
         public bool launchForceLaunch = false;
         public EDiffusionType launchType = EDiffusionType.Surround;
         public Func<GameObject, GameObject> createFunc;               //实例化函数(有的可能是从对象池取得)
@@ -34,7 +36,7 @@ namespace THGame
         public int launchOrderFixedIndex = 0;
 
         //发射类型:直线
-        public int launchLineAngle;           //发射角度
+        public Vector3 launchLineVector;      //发射向量
         public float launchLineDuration;      //持续时间
 
         //发射类型:周围
@@ -52,6 +54,11 @@ namespace THGame
 
         void Awake()
         {
+            
+        }
+
+        void Start()
+        {
             m_isStop = false;
             m_curTimes = launchTimes;
             m_nextTime = Time.time;
@@ -62,11 +69,6 @@ namespace THGame
                     return Instantiate(prefab);
                 };
             }
-        }
-
-        void Start()
-        {
-            
         }
         void Update()
         {
@@ -105,17 +107,17 @@ namespace THGame
                     LaunchLine();
                     break;
                 case EDiffusionType.Surround:
-                    LaunchLine();
+                    LaunchSurround();
                     break;
                 case EDiffusionType.Random:
-                    LaunchLine();
+                    LaunchRandom();
                     break;
             }
         }
 
         void LaunchLine()
         {
-
+            
         }
 
         void LaunchSurround()

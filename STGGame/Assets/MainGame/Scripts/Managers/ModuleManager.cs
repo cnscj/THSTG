@@ -10,7 +10,7 @@ namespace STGGame
         {
             MVCManager.GetInstance().AddController<MainUIController>(ModuleType.MAIN_UI);
             MVCManager.GetInstance().AddController<StageController>(ModuleType.STAGE);
-
+            MVCManager.GetInstance().AddController<TestController>(ModuleType.TEST);
 
         }
 
