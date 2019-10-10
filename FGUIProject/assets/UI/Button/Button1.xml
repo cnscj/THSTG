@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="160,58" pivot="0.5,0.5" extention="Button">
+  <displayList>
+    <richtext id="n0_po2z" name="title" xy="80,28" pivot="0.5,0.5" anchor="true" size="41,25" fontSize="18" align="center" vAlign="middle" text="标题"/>
+  </displayList>
+  <Button downEffect="scale" downEffectValue="0.95"/>
+</component>

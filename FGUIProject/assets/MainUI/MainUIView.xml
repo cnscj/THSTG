@@ -1,2 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<component size="1280,720"/>
+<component size="1280,720" bgColor="#ff0000">
+  <displayList/>
+</component>
