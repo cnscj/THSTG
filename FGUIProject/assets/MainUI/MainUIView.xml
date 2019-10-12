@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <component size="1280,720" bgColor="#ff0000">
-  <displayList/>
+  <displayList>
+    <graph id="n0_mdnj" name="n0" xy="0,0" size="280,720" type="rect"/>
+    <graph id="n1_mdnj" name="n1" xy="1000,0" size="280,720" type="rect"/>
+  </displayList>
 </component>

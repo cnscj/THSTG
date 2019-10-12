@@ -20,7 +20,8 @@ ExportedObj/
 *.svd
 *.vscode
 *.vs
- 
+*.objs
+
 # Unity3D generated meta files
 *.pidb.meta
  
@@ -47,3 +48,4 @@ STGGame/Assets/MainGame/Z_Test
 STGGame/Assets/MainGame/ZCustom_Test
 /STGGame/Assets/MainGame/ZCustom_Test
 STGGame/Assets/StreamingAssets/ABRes
+
