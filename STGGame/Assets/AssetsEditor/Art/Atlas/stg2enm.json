@@ -1,0 +1,92 @@
+{
+    "SubTexture": [
+        {
+            "height": 64,
+            "name": "mystia_idle_01",
+            "width": 48,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "height": 64,
+            "name": "mystia_idle_02",
+            "width": 48,
+            "x": 48,
+            "y": 0
+        },
+        {
+            "height": 64,
+            "name": "mystia_idle_03",
+            "width": 48,
+            "x": 96,
+            "y": 0
+        },
+        {
+            "height": 64,
+            "name": "mystia_idle_04",
+            "width": 48,
+            "x": 144,
+            "y": 0
+        },
+        {
+            "height": 64,
+            "name": "mystia_move_right_01",
+            "width": 48,
+            "x": 0,
+            "y": 64
+        },
+        {
+            "height": 64,
+            "name": "mystia_move_right_02",
+            "width": 48,
+            "x": 48,
+            "y": 64
+        },
+        {
+            "height": 64,
+            "name": "mystia_move_right_03",
+            "width": 48,
+            "x": 96,
+            "y": 64
+        },
+        {
+            "height": 64,
+            "name": "mystia_move_right_04",
+            "width": 48,
+            "x": 144,
+            "y": 64
+        },
+        {
+            "height": 64,
+            "name": "mystia_attack_01",
+            "width": 48,
+            "x": 0,
+            "y": 128
+        },
+        {
+            "height": 64,
+            "name": "mystia_attack_02",
+            "width": 48,
+            "x": 48,
+            "y": 128
+        },
+        {
+            "height": 64,
+            "name": "mystia_attack_03",
+            "width": 48,
+            "x": 96,
+            "y": 128
+        },
+        {
+            "height": 64,
+            "name": "mystia_attack_04",
+            "width": 48,
+            "x": 144,
+            "y": 128
+        }
+    ],
+    "height": 256,
+    "imagePath": "stg2enm.png",
+    "name": "stg2enm",
+    "width": 256
+}

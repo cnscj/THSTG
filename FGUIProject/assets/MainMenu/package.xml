@@ -3,6 +3,12 @@
   <resources>
     <component id="po2z0" name="MainMenuSelectRoleView.xml" path="/" exported="true"/>
     <component id="po2z1" name="MainMenuView.xml" path="/" exported="true"/>
+    <image id="z7yu2" name="face_st04a_name.png" path="/_Tex/" exported="true"/>
+    <image id="z7yu3" name="face_st04b_name.png" path="/_Tex/" exported="true"/>
+    <image id="z7yu6" name="sl_pl01h.png" path="/_Tex/" exported="true"/>
+    <image id="z7yu7" name="sl_pl00h.png" path="/_Tex/" exported="true"/>
+    <image id="z7yu8" name="sl_pltxt6.png" path="/_Tex/" exported="true"/>
+    <image id="z7yu9" name="sl_pltxt4.png" path="/_Tex/" exported="true"/>
   </resources>
-  <publish name="Menu"/>
+  <publish name="MainMenu"/>
 </packageDescription>

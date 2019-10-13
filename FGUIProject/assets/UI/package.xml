@@ -2,6 +2,7 @@
 <packageDescription id="y8wff1cb" jpegQuality="80" compressPNG="true">
   <resources>
     <component id="po2z0" name="Button1.xml" path="/Button/" exported="true"/>
+    <image id="z7yu8" name="gg_th08_logo.jpg" path="/_Tex/" exported="true"/>
   </resources>
   <publish name=""/>
 </packageDescription>

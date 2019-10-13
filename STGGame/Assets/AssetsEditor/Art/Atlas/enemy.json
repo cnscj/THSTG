@@ -1,0 +1,1331 @@
+{
+    "SubTexture": [
+        {
+            "height": 32,
+            "name": "10400001_01",
+            "width": 32,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "height": 32,
+            "name": "10400001_02",
+            "width": 32,
+            "x": 32,
+            "y": 0
+        },
+        {
+            "height": 32,
+            "name": "10400001_03",
+            "width": 32,
+            "x": 64,
+            "y": 0
+        },
+        {
+            "height": 32,
+            "name": "10400001_04",
+            "width": 32,
+            "x": 96,
+            "y": 0
+        },
+        {
+            "height": 32,
+            "name": "10400001_05",
+            "width": 32,
+            "x": 128,
+            "y": 0
+        },
+        {
+            "height": 32,
+            "name": "10400001_06",
+            "width": 32,
+            "x": 160,
+            "y": 0
+        },
+        {
+            "height": 32,
+            "name": "10400001_07",
+            "width": 32,
+            "x": 192,
+            "y": 0
+        },
+        {
+            "height": 32,
+            "name": "10400001_08",
+            "width": 32,
+            "x": 224,
+            "y": 0
+        },
+        {
+            "height": 32,
+            "name": "10400002_01",
+            "width": 32,
+            "x": 256,
+            "y": 0
+        },
+        {
+            "height": 32,
+            "name": "10400002_02",
+            "width": 32,
+            "x": 288,
+            "y": 0
+        },
+        {
+            "height": 32,
+            "name": "10400002_03",
+            "width": 32,
+            "x": 320,
+            "y": 0
+        },
+        {
+            "height": 32,
+            "name": "10400002_04",
+            "width": 32,
+            "x": 352,
+            "y": 0
+        },
+        {
+            "height": 32,
+            "name": "10400002_05",
+            "width": 32,
+            "x": 384,
+            "y": 0
+        },
+        {
+            "height": 32,
+            "name": "10400002_06",
+            "width": 32,
+            "x": 416,
+            "y": 0
+        },
+        {
+            "height": 32,
+            "name": "10400002_07",
+            "width": 32,
+            "x": 448,
+            "y": 0
+        },
+        {
+            "height": 32,
+            "name": "10400002_08",
+            "width": 32,
+            "x": 480,
+            "y": 0
+        },
+        {
+            "height": 32,
+            "name": "enemy_17",
+            "width": 32,
+            "x": 0,
+            "y": 32
+        },
+        {
+            "height": 32,
+            "name": "enemy_18",
+            "width": 32,
+            "x": 32,
+            "y": 32
+        },
+        {
+            "height": 32,
+            "name": "enemy_19",
+            "width": 32,
+            "x": 64,
+            "y": 32
+        },
+        {
+            "height": 32,
+            "name": "enemy_20",
+            "width": 32,
+            "x": 96,
+            "y": 32
+        },
+        {
+            "height": 32,
+            "name": "enemy_21",
+            "width": 32,
+            "x": 128,
+            "y": 32
+        },
+        {
+            "height": 32,
+            "name": "enemy_22",
+            "width": 32,
+            "x": 160,
+            "y": 32
+        },
+        {
+            "height": 32,
+            "name": "enemy_23",
+            "width": 32,
+            "x": 192,
+            "y": 32
+        },
+        {
+            "height": 32,
+            "name": "enemy_24",
+            "width": 32,
+            "x": 224,
+            "y": 32
+        },
+        {
+            "height": 32,
+            "name": "enemy_25",
+            "width": 32,
+            "x": 256,
+            "y": 32
+        },
+        {
+            "height": 32,
+            "name": "enemy_26",
+            "width": 32,
+            "x": 288,
+            "y": 32
+        },
+        {
+            "height": 32,
+            "name": "enemy_27",
+            "width": 32,
+            "x": 320,
+            "y": 32
+        },
+        {
+            "height": 32,
+            "name": "enemy_28",
+            "width": 32,
+            "x": 352,
+            "y": 32
+        },
+        {
+            "height": 32,
+            "name": "enemy_29",
+            "width": 32,
+            "x": 384,
+            "y": 32
+        },
+        {
+            "height": 32,
+            "name": "enemy_30",
+            "width": 32,
+            "x": 416,
+            "y": 32
+        },
+        {
+            "height": 32,
+            "name": "enemy_31",
+            "width": 32,
+            "x": 448,
+            "y": 32
+        },
+        {
+            "height": 32,
+            "name": "enemy_32",
+            "width": 32,
+            "x": 480,
+            "y": 32
+        },
+        {
+            "height": 32,
+            "name": "enemy_33",
+            "width": 32,
+            "x": 0,
+            "y": 64
+        },
+        {
+            "height": 32,
+            "name": "enemy_34",
+            "width": 32,
+            "x": 32,
+            "y": 64
+        },
+        {
+            "height": 32,
+            "name": "enemy_35",
+            "width": 32,
+            "x": 64,
+            "y": 64
+        },
+        {
+            "height": 32,
+            "name": "enemy_36",
+            "width": 32,
+            "x": 96,
+            "y": 64
+        },
+        {
+            "height": 32,
+            "name": "enemy_37",
+            "width": 32,
+            "x": 128,
+            "y": 64
+        },
+        {
+            "height": 32,
+            "name": "enemy_38",
+            "width": 32,
+            "x": 160,
+            "y": 64
+        },
+        {
+            "height": 32,
+            "name": "enemy_39",
+            "width": 32,
+            "x": 192,
+            "y": 64
+        },
+        {
+            "height": 32,
+            "name": "enemy_40",
+            "width": 32,
+            "x": 224,
+            "y": 64
+        },
+        {
+            "height": 32,
+            "name": "enemy_41",
+            "width": 32,
+            "x": 256,
+            "y": 64
+        },
+        {
+            "height": 32,
+            "name": "enemy_42",
+            "width": 32,
+            "x": 288,
+            "y": 64
+        },
+        {
+            "height": 32,
+            "name": "enemy_43",
+            "width": 32,
+            "x": 320,
+            "y": 64
+        },
+        {
+            "height": 32,
+            "name": "enemy_44",
+            "width": 32,
+            "x": 352,
+            "y": 64
+        },
+        {
+            "height": 32,
+            "name": "enemy_45",
+            "width": 32,
+            "x": 384,
+            "y": 64
+        },
+        {
+            "height": 32,
+            "name": "enemy_46",
+            "width": 32,
+            "x": 416,
+            "y": 64
+        },
+        {
+            "height": 32,
+            "name": "enemy_47",
+            "width": 32,
+            "x": 448,
+            "y": 64
+        },
+        {
+            "height": 32,
+            "name": "enemy_48",
+            "width": 32,
+            "x": 480,
+            "y": 64
+        },
+        {
+            "height": 32,
+            "name": "enemy_49",
+            "width": 32,
+            "x": 0,
+            "y": 96
+        },
+        {
+            "height": 32,
+            "name": "enemy_50",
+            "width": 32,
+            "x": 32,
+            "y": 96
+        },
+        {
+            "height": 32,
+            "name": "enemy_51",
+            "width": 32,
+            "x": 64,
+            "y": 96
+        },
+        {
+            "height": 32,
+            "name": "enemy_52",
+            "width": 32,
+            "x": 96,
+            "y": 96
+        },
+        {
+            "height": 32,
+            "name": "enemy_53",
+            "width": 32,
+            "x": 128,
+            "y": 96
+        },
+        {
+            "height": 32,
+            "name": "enemy_54",
+            "width": 32,
+            "x": 160,
+            "y": 96
+        },
+        {
+            "height": 32,
+            "name": "enemy_55",
+            "width": 32,
+            "x": 192,
+            "y": 96
+        },
+        {
+            "height": 32,
+            "name": "enemy_56",
+            "width": 32,
+            "x": 224,
+            "y": 96
+        },
+        {
+            "height": 32,
+            "name": "enemy_57",
+            "width": 32,
+            "x": 256,
+            "y": 96
+        },
+        {
+            "height": 32,
+            "name": "enemy_58",
+            "width": 32,
+            "x": 288,
+            "y": 96
+        },
+        {
+            "height": 32,
+            "name": "enemy_59",
+            "width": 32,
+            "x": 320,
+            "y": 96
+        },
+        {
+            "height": 32,
+            "name": "enemy_60",
+            "width": 32,
+            "x": 352,
+            "y": 96
+        },
+        {
+            "height": 32,
+            "name": "enemy_61",
+            "width": 32,
+            "x": 384,
+            "y": 96
+        },
+        {
+            "height": 32,
+            "name": "enemy_62",
+            "width": 32,
+            "x": 416,
+            "y": 96
+        },
+        {
+            "height": 32,
+            "name": "enemy_63",
+            "width": 32,
+            "x": 448,
+            "y": 96
+        },
+        {
+            "height": 32,
+            "name": "enemy_64",
+            "width": 32,
+            "x": 480,
+            "y": 96
+        },
+        {
+            "height": 32,
+            "name": "enemy_67",
+            "width": 32,
+            "x": 64,
+            "y": 128
+        },
+        {
+            "height": 32,
+            "name": "enemy_68",
+            "width": 32,
+            "x": 96,
+            "y": 128
+        },
+        {
+            "height": 32,
+            "name": "enemy_69",
+            "width": 32,
+            "x": 128,
+            "y": 128
+        },
+        {
+            "height": 32,
+            "name": "enemy_70",
+            "width": 32,
+            "x": 160,
+            "y": 128
+        },
+        {
+            "height": 32,
+            "name": "enemy_71",
+            "width": 32,
+            "x": 192,
+            "y": 128
+        },
+        {
+            "height": 32,
+            "name": "enemy_72",
+            "width": 32,
+            "x": 224,
+            "y": 128
+        },
+        {
+            "height": 32,
+            "name": "enemy_73",
+            "width": 32,
+            "x": 256,
+            "y": 128
+        },
+        {
+            "height": 32,
+            "name": "enemy_74",
+            "width": 32,
+            "x": 288,
+            "y": 128
+        },
+        {
+            "height": 32,
+            "name": "enemy_75",
+            "width": 32,
+            "x": 320,
+            "y": 128
+        },
+        {
+            "height": 32,
+            "name": "enemy_76",
+            "width": 32,
+            "x": 352,
+            "y": 128
+        },
+        {
+            "height": 32,
+            "name": "enemy_77",
+            "width": 32,
+            "x": 384,
+            "y": 128
+        },
+        {
+            "height": 32,
+            "name": "enemy_78",
+            "width": 32,
+            "x": 416,
+            "y": 128
+        },
+        {
+            "height": 32,
+            "name": "enemy_79",
+            "width": 32,
+            "x": 448,
+            "y": 128
+        },
+        {
+            "height": 32,
+            "name": "enemy_80",
+            "width": 32,
+            "x": 480,
+            "y": 128
+        },
+        {
+            "height": 32,
+            "name": "enemy_83",
+            "width": 32,
+            "x": 64,
+            "y": 160
+        },
+        {
+            "height": 32,
+            "name": "enemy_84",
+            "width": 32,
+            "x": 96,
+            "y": 160
+        },
+        {
+            "height": 32,
+            "name": "enemy_85",
+            "width": 32,
+            "x": 128,
+            "y": 160
+        },
+        {
+            "height": 32,
+            "name": "enemy_86",
+            "width": 32,
+            "x": 160,
+            "y": 160
+        },
+        {
+            "height": 32,
+            "name": "enemy_87",
+            "width": 32,
+            "x": 192,
+            "y": 160
+        },
+        {
+            "height": 32,
+            "name": "enemy_88",
+            "width": 32,
+            "x": 224,
+            "y": 160
+        },
+        {
+            "height": 32,
+            "name": "enemy_89",
+            "width": 32,
+            "x": 256,
+            "y": 160
+        },
+        {
+            "height": 32,
+            "name": "enemy_90",
+            "width": 32,
+            "x": 288,
+            "y": 160
+        },
+        {
+            "height": 32,
+            "name": "enemy_91",
+            "width": 32,
+            "x": 320,
+            "y": 160
+        },
+        {
+            "height": 32,
+            "name": "enemy_92",
+            "width": 32,
+            "x": 352,
+            "y": 160
+        },
+        {
+            "height": 32,
+            "name": "enemy_93",
+            "width": 32,
+            "x": 384,
+            "y": 160
+        },
+        {
+            "height": 32,
+            "name": "enemy_94",
+            "width": 32,
+            "x": 416,
+            "y": 160
+        },
+        {
+            "height": 32,
+            "name": "enemy_95",
+            "width": 32,
+            "x": 448,
+            "y": 160
+        },
+        {
+            "height": 32,
+            "name": "enemy_96",
+            "width": 32,
+            "x": 480,
+            "y": 160
+        },
+        {
+            "height": 32,
+            "name": "onmyouGyoku_01",
+            "width": 32,
+            "x": 0,
+            "y": 192
+        },
+        {
+            "height": 32,
+            "name": "onmyouGyoku_02",
+            "width": 32,
+            "x": 32,
+            "y": 192
+        },
+        {
+            "height": 32,
+            "name": "onmyouGyoku_03",
+            "width": 32,
+            "x": 64,
+            "y": 192
+        },
+        {
+            "height": 32,
+            "name": "onmyouGyoku_04",
+            "width": 32,
+            "x": 96,
+            "y": 192
+        },
+        {
+            "height": 32,
+            "name": "enemy_101",
+            "width": 32,
+            "x": 128,
+            "y": 192
+        },
+        {
+            "height": 32,
+            "name": "enemy_102",
+            "width": 32,
+            "x": 160,
+            "y": 192
+        },
+        {
+            "height": 32,
+            "name": "enemy_103",
+            "width": 32,
+            "x": 192,
+            "y": 192
+        },
+        {
+            "height": 32,
+            "name": "enemy_104",
+            "width": 32,
+            "x": 224,
+            "y": 192
+        },
+        {
+            "height": 32,
+            "name": "enemy_105",
+            "width": 32,
+            "x": 256,
+            "y": 192
+        },
+        {
+            "height": 32,
+            "name": "enemy_106",
+            "width": 32,
+            "x": 288,
+            "y": 192
+        },
+        {
+            "height": 32,
+            "name": "enemy_107",
+            "width": 32,
+            "x": 320,
+            "y": 192
+        },
+        {
+            "height": 32,
+            "name": "enemy_108",
+            "width": 32,
+            "x": 352,
+            "y": 192
+        },
+        {
+            "height": 32,
+            "name": "enemy_109",
+            "width": 32,
+            "x": 384,
+            "y": 192
+        },
+        {
+            "height": 32,
+            "name": "enemy_110",
+            "width": 32,
+            "x": 416,
+            "y": 192
+        },
+        {
+            "height": 32,
+            "name": "enemy_111",
+            "width": 32,
+            "x": 448,
+            "y": 192
+        },
+        {
+            "height": 32,
+            "name": "enemy_112",
+            "width": 32,
+            "x": 480,
+            "y": 192
+        },
+        {
+            "height": 32,
+            "name": "enemy_113",
+            "width": 32,
+            "x": 0,
+            "y": 224
+        },
+        {
+            "height": 32,
+            "name": "enemy_114",
+            "width": 32,
+            "x": 32,
+            "y": 224
+        },
+        {
+            "height": 32,
+            "name": "enemy_115",
+            "width": 32,
+            "x": 64,
+            "y": 224
+        },
+        {
+            "height": 32,
+            "name": "enemy_116",
+            "width": 32,
+            "x": 96,
+            "y": 224
+        },
+        {
+            "height": 32,
+            "name": "enemy_117",
+            "width": 32,
+            "x": 128,
+            "y": 224
+        },
+        {
+            "height": 32,
+            "name": "enemy_118",
+            "width": 32,
+            "x": 160,
+            "y": 224
+        },
+        {
+            "height": 32,
+            "name": "enemy_119",
+            "width": 32,
+            "x": 192,
+            "y": 224
+        },
+        {
+            "height": 32,
+            "name": "enemy_120",
+            "width": 32,
+            "x": 224,
+            "y": 224
+        },
+        {
+            "height": 32,
+            "name": "enemy_121",
+            "width": 32,
+            "x": 256,
+            "y": 224
+        },
+        {
+            "height": 32,
+            "name": "enemy_122",
+            "width": 32,
+            "x": 288,
+            "y": 224
+        },
+        {
+            "height": 32,
+            "name": "enemy_123",
+            "width": 32,
+            "x": 320,
+            "y": 224
+        },
+        {
+            "height": 32,
+            "name": "enemy_124",
+            "width": 32,
+            "x": 352,
+            "y": 224
+        },
+        {
+            "height": 32,
+            "name": "enemy_125",
+            "width": 32,
+            "x": 384,
+            "y": 224
+        },
+        {
+            "height": 32,
+            "name": "enemy_126",
+            "width": 32,
+            "x": 416,
+            "y": 224
+        },
+        {
+            "height": 32,
+            "name": "enemy_127",
+            "width": 32,
+            "x": 448,
+            "y": 224
+        },
+        {
+            "height": 32,
+            "name": "enemy_128",
+            "width": 32,
+            "x": 480,
+            "y": 224
+        },
+        {
+            "height": 32,
+            "name": "enemy_129",
+            "width": 32,
+            "x": 0,
+            "y": 256
+        },
+        {
+            "height": 32,
+            "name": "enemy_130",
+            "width": 32,
+            "x": 32,
+            "y": 256
+        },
+        {
+            "height": 32,
+            "name": "enemy_131",
+            "width": 32,
+            "x": 64,
+            "y": 256
+        },
+        {
+            "height": 32,
+            "name": "enemy_132",
+            "width": 32,
+            "x": 96,
+            "y": 256
+        },
+        {
+            "height": 32,
+            "name": "enemy_133",
+            "width": 32,
+            "x": 128,
+            "y": 256
+        },
+        {
+            "height": 32,
+            "name": "enemy_134",
+            "width": 32,
+            "x": 160,
+            "y": 256
+        },
+        {
+            "height": 32,
+            "name": "enemy_135",
+            "width": 32,
+            "x": 192,
+            "y": 256
+        },
+        {
+            "height": 32,
+            "name": "enemy_136",
+            "width": 32,
+            "x": 224,
+            "y": 256
+        },
+        {
+            "height": 32,
+            "name": "enemy_137",
+            "width": 32,
+            "x": 256,
+            "y": 256
+        },
+        {
+            "height": 32,
+            "name": "enemy_138",
+            "width": 32,
+            "x": 288,
+            "y": 256
+        },
+        {
+            "height": 32,
+            "name": "enemy_139",
+            "width": 32,
+            "x": 320,
+            "y": 256
+        },
+        {
+            "height": 32,
+            "name": "enemy_140",
+            "width": 32,
+            "x": 352,
+            "y": 256
+        },
+        {
+            "height": 32,
+            "name": "enemy_141",
+            "width": 32,
+            "x": 384,
+            "y": 256
+        },
+        {
+            "height": 32,
+            "name": "enemy_142",
+            "width": 32,
+            "x": 416,
+            "y": 256
+        },
+        {
+            "height": 32,
+            "name": "enemy_143",
+            "width": 32,
+            "x": 448,
+            "y": 256
+        },
+        {
+            "height": 32,
+            "name": "enemy_144",
+            "width": 32,
+            "x": 480,
+            "y": 256
+        },
+        {
+            "height": 32,
+            "name": "enemy_145",
+            "width": 32,
+            "x": 0,
+            "y": 288
+        },
+        {
+            "height": 32,
+            "name": "enemy_146",
+            "width": 32,
+            "x": 32,
+            "y": 288
+        },
+        {
+            "height": 32,
+            "name": "enemy_147",
+            "width": 32,
+            "x": 64,
+            "y": 288
+        },
+        {
+            "height": 32,
+            "name": "enemy_148",
+            "width": 32,
+            "x": 96,
+            "y": 288
+        },
+        {
+            "height": 32,
+            "name": "enemy_149",
+            "width": 32,
+            "x": 128,
+            "y": 288
+        },
+        {
+            "height": 32,
+            "name": "enemy_150",
+            "width": 32,
+            "x": 160,
+            "y": 288
+        },
+        {
+            "height": 32,
+            "name": "enemy_151",
+            "width": 32,
+            "x": 192,
+            "y": 288
+        },
+        {
+            "height": 32,
+            "name": "enemy_152",
+            "width": 32,
+            "x": 224,
+            "y": 288
+        },
+        {
+            "height": 32,
+            "name": "enemy_153",
+            "width": 32,
+            "x": 256,
+            "y": 288
+        },
+        {
+            "height": 32,
+            "name": "enemy_154",
+            "width": 32,
+            "x": 288,
+            "y": 288
+        },
+        {
+            "height": 32,
+            "name": "enemy_155",
+            "width": 32,
+            "x": 320,
+            "y": 288
+        },
+        {
+            "height": 32,
+            "name": "enemy_156",
+            "width": 32,
+            "x": 352,
+            "y": 288
+        },
+        {
+            "height": 32,
+            "name": "enemy_157",
+            "width": 32,
+            "x": 384,
+            "y": 288
+        },
+        {
+            "height": 32,
+            "name": "enemy_158",
+            "width": 32,
+            "x": 416,
+            "y": 288
+        },
+        {
+            "height": 32,
+            "name": "enemy_159",
+            "width": 32,
+            "x": 448,
+            "y": 288
+        },
+        {
+            "height": 32,
+            "name": "enemy_160",
+            "width": 32,
+            "x": 480,
+            "y": 288
+        },
+        {
+            "height": 32,
+            "name": "enemy_161",
+            "width": 32,
+            "x": 0,
+            "y": 320
+        },
+        {
+            "height": 32,
+            "name": "enemy_162",
+            "width": 32,
+            "x": 32,
+            "y": 320
+        },
+        {
+            "height": 32,
+            "name": "enemy_163",
+            "width": 32,
+            "x": 64,
+            "y": 320
+        },
+        {
+            "height": 32,
+            "name": "enemy_164",
+            "width": 32,
+            "x": 96,
+            "y": 320
+        },
+        {
+            "height": 32,
+            "name": "enemy_165",
+            "width": 32,
+            "x": 128,
+            "y": 320
+        },
+        {
+            "height": 32,
+            "name": "enemy_166",
+            "width": 32,
+            "x": 160,
+            "y": 320
+        },
+        {
+            "height": 32,
+            "name": "enemy_167",
+            "width": 32,
+            "x": 192,
+            "y": 320
+        },
+        {
+            "height": 32,
+            "name": "enemy_168",
+            "width": 32,
+            "x": 224,
+            "y": 320
+        },
+        {
+            "height": 32,
+            "name": "enemy_169",
+            "width": 32,
+            "x": 256,
+            "y": 320
+        },
+        {
+            "height": 32,
+            "name": "enemy_170",
+            "width": 32,
+            "x": 288,
+            "y": 320
+        },
+        {
+            "height": 32,
+            "name": "enemy_171",
+            "width": 32,
+            "x": 320,
+            "y": 320
+        },
+        {
+            "height": 32,
+            "name": "enemy_172",
+            "width": 32,
+            "x": 352,
+            "y": 320
+        },
+        {
+            "height": 32,
+            "name": "enemy_173",
+            "width": 32,
+            "x": 384,
+            "y": 320
+        },
+        {
+            "height": 32,
+            "name": "enemy_174",
+            "width": 32,
+            "x": 416,
+            "y": 320
+        },
+        {
+            "height": 32,
+            "name": "enemy_175",
+            "width": 32,
+            "x": 448,
+            "y": 320
+        },
+        {
+            "height": 32,
+            "name": "enemy_176",
+            "width": 32,
+            "x": 480,
+            "y": 320
+        },
+        {
+            "height": 32,
+            "name": "enemy_177",
+            "width": 32,
+            "x": 0,
+            "y": 352
+        },
+        {
+            "height": 32,
+            "name": "enemy_178",
+            "width": 32,
+            "x": 32,
+            "y": 352
+        },
+        {
+            "height": 32,
+            "name": "enemy_179",
+            "width": 32,
+            "x": 64,
+            "y": 352
+        },
+        {
+            "height": 32,
+            "name": "enemy_180",
+            "width": 32,
+            "x": 96,
+            "y": 352
+        },
+        {
+            "height": 32,
+            "name": "enemy_181",
+            "width": 32,
+            "x": 128,
+            "y": 352
+        },
+        {
+            "height": 32,
+            "name": "enemy_182",
+            "width": 32,
+            "x": 160,
+            "y": 352
+        },
+        {
+            "height": 32,
+            "name": "enemy_183",
+            "width": 32,
+            "x": 192,
+            "y": 352
+        },
+        {
+            "height": 32,
+            "name": "enemy_184",
+            "width": 32,
+            "x": 224,
+            "y": 352
+        },
+        {
+            "height": 32,
+            "name": "enemy_185",
+            "width": 32,
+            "x": 256,
+            "y": 352
+        },
+        {
+            "height": 32,
+            "name": "enemy_186",
+            "width": 32,
+            "x": 288,
+            "y": 352
+        },
+        {
+            "height": 32,
+            "name": "enemy_187",
+            "width": 32,
+            "x": 320,
+            "y": 352
+        },
+        {
+            "height": 32,
+            "name": "enemy_188",
+            "width": 32,
+            "x": 352,
+            "y": 352
+        },
+        {
+            "height": 32,
+            "name": "enemy_189",
+            "width": 32,
+            "x": 384,
+            "y": 352
+        },
+        {
+            "height": 32,
+            "name": "enemy_190",
+            "width": 32,
+            "x": 416,
+            "y": 352
+        },
+        {
+            "height": 32,
+            "name": "enemy_191",
+            "width": 32,
+            "x": 448,
+            "y": 352
+        },
+        {
+            "height": 32,
+            "name": "enemy_192",
+            "width": 32,
+            "x": 480,
+            "y": 352
+        },
+        {
+            "height": 64,
+            "name": "enemy_65",
+            "width": 64,
+            "x": 0,
+            "y": 128
+        }
+    ],
+    "height": 512,
+    "imagePath": "enemy.png",
+    "name": "enemy",
+    "width": 512
+}

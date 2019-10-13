@@ -1,2 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<component size="1280,720"/>
+<component size="1024,576">
+  <controller name="role" pages="0,solo_reimu,1,solo_marisa" selected="0"/>
+  <displayList>
+    <image id="n0_z7yu" name="n0" src="z7yu7" fileName="_Tex/sl_pl00h.png" xy="0,0">
+      <gearDisplay controller="role" pages="0"/>
+    </image>
+    <image id="n1_z7yu" name="n1" src="z7yu9" fileName="_Tex/sl_pltxt4.png" xy="372,283">
+      <gearDisplay controller="role" pages="0"/>
+    </image>
+    <image id="n2_z7yu" name="n2" src="z7yu6" fileName="_Tex/sl_pl01h.png" xy="0,0">
+      <gearDisplay controller="role" pages="1"/>
+    </image>
+    <image id="n3_z7yu" name="n3" src="z7yu8" fileName="_Tex/sl_pltxt6.png" xy="371,283">
+      <gearDisplay controller="role" pages="1"/>
+    </image>
+  </displayList>
+</component>

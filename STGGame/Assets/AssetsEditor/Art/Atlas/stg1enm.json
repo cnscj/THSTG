@@ -1,0 +1,106 @@
+{
+    "SubTexture": [
+        {
+            "height": 64,
+            "name": "wriggle_idle_01",
+            "width": 48,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "height": 64,
+            "name": "wriggle_idle_02",
+            "width": 48,
+            "x": 48,
+            "y": 0
+        },
+        {
+            "height": 64,
+            "name": "wriggle_idle_03",
+            "width": 48,
+            "x": 96,
+            "y": 0
+        },
+        {
+            "height": 64,
+            "name": "wriggle_idle_04",
+            "width": 48,
+            "x": 144,
+            "y": 0
+        },
+        {
+            "height": 64,
+            "name": "wriggle_idle_05",
+            "width": 48,
+            "x": 192,
+            "y": 0
+        },
+        {
+            "height": 64,
+            "name": "wriggle_move_right_01",
+            "width": 48,
+            "x": 0,
+            "y": 64
+        },
+        {
+            "height": 64,
+            "name": "wriggle_move_right_02",
+            "width": 48,
+            "x": 48,
+            "y": 64
+        },
+        {
+            "height": 64,
+            "name": "wriggle_move_right_03",
+            "width": 48,
+            "x": 96,
+            "y": 64
+        },
+        {
+            "height": 64,
+            "name": "wriggle_move_right_04",
+            "width": 48,
+            "x": 144,
+            "y": 64
+        },
+        {
+            "height": 64,
+            "name": "wriggle_attack_01",
+            "width": 48,
+            "x": 0,
+            "y": 128
+        },
+        {
+            "height": 64,
+            "name": "wriggle_attack_02",
+            "width": 48,
+            "x": 48,
+            "y": 128
+        },
+        {
+            "height": 64,
+            "name": "wriggle_attack_03",
+            "width": 48,
+            "x": 96,
+            "y": 128
+        },
+        {
+            "height": 64,
+            "name": "wriggle_attack_04",
+            "width": 48,
+            "x": 144,
+            "y": 128
+        },
+        {
+            "height": 64,
+            "name": "wriggle_attack_05",
+            "width": 48,
+            "x": 192,
+            "y": 128
+        }
+    ],
+    "height": 256,
+    "imagePath": "stg1enm.png",
+    "name": "stg1enm",
+    "width": 256
+}
