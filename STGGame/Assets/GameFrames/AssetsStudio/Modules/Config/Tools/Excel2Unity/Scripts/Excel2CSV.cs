@@ -36,7 +36,11 @@ namespace ASGame
                     //使用","分割每一个数值
                     stringBuilder.Append(sheetData.valTable.Rows[i][j] + ",");
                 }
-                stringBuilder.Remove(stringBuilder.Length - 1, 1);
+                if (stringBuilder.Length > 0)
+                {
+                    stringBuilder.Remove(stringBuilder.Length - 1, 1);
+                }
+                
                 //使用换行符分割每一行
                 stringBuilder.Append("\r\n");
             }

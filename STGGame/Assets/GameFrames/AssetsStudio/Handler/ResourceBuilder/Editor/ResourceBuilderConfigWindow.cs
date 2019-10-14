@@ -50,15 +50,50 @@ namespace ASEditor
         {
             foreach (var infos in ResourceBuilderConfig.GetInstance().buildInfoList)
             {
-                infos.srcName = EditorGUILayout.TextField("资源名", infos.srcName);
+                infos.srcName = EditorGUILayout.TextField("资源类型", infos.srcName);
                 ShowPathBar("资源路径:", ref infos.srcResFolder);
+
+                EditorGUILayout.BeginHorizontal();
+                infos.srcBundleSuffix = EditorGUILayout.TextField("需要打包的文件后缀('|'分割)", infos.srcBundleSuffix);
+                infos.isTraversal = EditorGUILayout.Toggle("遍历所有子目录", infos.isTraversal);
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.BeginHorizontal();
                 infos.bundleName = EditorGUILayout.TextField("包名", infos.bundleName);
-                infos.isSubFolderBuildOne = EditorGUILayout.Toggle("子目录单独打", infos.isSubFolderBuildOne);
+                infos.isUsePathName = EditorGUILayout.Toggle("中间路径扁平化", infos.isUsePathName);
+                infos.isCommonPrefixion = EditorGUILayout.Toggle("只取前缀名", infos.isCommonPrefixion);
+                EditorGUILayout.EndHorizontal();
+
+                infos.shareBundleName = EditorGUILayout.TextField("共享包名({0}为资源名)", infos.shareBundleName);
+
+
+
+
+                EditorGUILayout.BeginHorizontal();
+                if (GUILayout.Button("上移"))
+                {
+                    int index = ResourceBuilderConfig.GetInstance().buildInfoList.IndexOf(infos);
+                    int newIndex = Mathf.Max(0, index - 1) ;
+                    ResourceBuilderConfig.GetInstance().buildInfoList.Remove(infos);
+                    ResourceBuilderConfig.GetInstance().buildInfoList.Insert(newIndex, infos);
+
+                    return;
+                }
+                if (GUILayout.Button("下移"))
+                {
+                    int index = ResourceBuilderConfig.GetInstance().buildInfoList.IndexOf(infos);
+                    int newIndex = Mathf.Min(ResourceBuilderConfig.GetInstance().buildInfoList.Count - 1, index + 1);
+                    ResourceBuilderConfig.GetInstance().buildInfoList.Remove(infos);
+                    ResourceBuilderConfig.GetInstance().buildInfoList.Insert(newIndex, infos);
+
+                    return;
+                }
                 if (GUILayout.Button("移除"))
                 {
                     ResourceBuilderConfig.GetInstance().buildInfoList.Remove(infos);
                     return;
                 }
+                EditorGUILayout.EndHorizontal();
                 EditorGUILayout.Space();
 
             }

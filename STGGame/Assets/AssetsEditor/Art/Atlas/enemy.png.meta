@@ -192,7 +192,7 @@ TextureImporter:
     21300374: enemy_192
     21300376: enemy_65
   externalObjects: {}
-  serializedVersion: 7
+  serializedVersion: 9
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -4053,5 +4053,5 @@ TextureImporter:
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
   userData: 
-  assetBundleName: 
+  assetBundleName: atlas/enemy.ab
   assetBundleVariant: 

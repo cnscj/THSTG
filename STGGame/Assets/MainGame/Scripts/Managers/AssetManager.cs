@@ -10,39 +10,15 @@ namespace STGGame
 {
     public class AssetManager : MonoSingleton<AssetManager>
     {
-        public static readonly string bundleRes = PathUtil.Combine(Application.streamingAssetsPath, "ABRes", PlatformUtil.GetCurPlatformName());
-        public static readonly string srcRes = PathUtil.Combine("Assets", "GameAssets" );
+        public List<string> residentABPaths = new List<string>();   //预加载的共享包
 
-        public static readonly Dictionary<EResType, string> m_resType = new Dictionary<EResType, string>()
-        {
-            [EResType.Entity] = "entities",
-            [EResType.Audio] = "audios",
-            [EResType.Level] = "levels",
-            [EResType.Model] = "models",
-            [EResType.Sprite] = "sprites",
-            [EResType.Effect] = "effects",
-
-            [EResType.UI] = "uis",
-            [EResType.Shader] = "shaders",
-            [EResType.Config] = "configs",
-        };
-
-        public static readonly string[] residentABPaths =
-        {
-            Combine2BundlePath(EResType.Shader, "share.ab", null),
-            Combine2BundlePath(EResType.Model, "share.ab", null),
-            Combine2BundlePath(EResType.Sprite, "share.ab", null),
-            Combine2BundlePath(EResType.UI, "share.ab", null),
-            Combine2BundlePath(EResType.Level, "share.ab", null),
-            Combine2BundlePath(EResType.Config, "share.ab", null),
-        };
         public static string Combine2BundlePath(EResType resType, string fileName, string assetName)
         {
-            return ResourceLoaderUtil.CombineBundlePath(PathUtil.Combine(bundleRes, m_resType[resType], fileName), assetName);
+            return ResourceLoaderUtil.CombineBundlePath(PathUtil.Combine(ResourceBookConfig.bundleRes, GameConfig.resTypeMap[resType], fileName), assetName);
         }
         public static string Combine2EditPath(EResType resType, string assetName)
         {
-            return PathUtil.Combine(srcRes, m_resType[resType], assetName);
+            return PathUtil.Combine(ResourceBookConfig.srcRes, GameConfig.resTypeMap[resType], assetName);
         }
         public static string Combine2FixPath(EResType resType, string fileName, string assetName)
         {

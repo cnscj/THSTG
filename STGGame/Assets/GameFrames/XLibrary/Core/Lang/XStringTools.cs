@@ -86,6 +86,20 @@ namespace XLibrary
         }
 
         /// <summary>
+        /// 提取字符串包含的模块名
+        /// </summary>
+        /// <param name="path">文件路径/文件名</param>
+        /// <returns></returns>
+        public static string SplitPathModule(string path)
+        {
+            string fileName = Path.GetFileNameWithoutExtension(path);
+            int indexOf_ = fileName.IndexOf('_');
+            string pathModule = (indexOf_ == -1) ? fileName : fileName.Remove(indexOf_);
+            
+            return pathModule;
+        }
+
+        /// <summary>
         /// 把内容弄到剪贴板
         /// </summary>
         /// <param name="input"></param>

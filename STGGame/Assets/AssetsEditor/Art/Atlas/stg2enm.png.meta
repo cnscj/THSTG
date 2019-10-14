@@ -15,7 +15,7 @@ TextureImporter:
     21300020: mystia_attack_03
     21300022: mystia_attack_04
   externalObjects: {}
-  serializedVersion: 7
+  serializedVersion: 9
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -336,5 +336,5 @@ TextureImporter:
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
   userData: 
-  assetBundleName: 
+  assetBundleName: atlas/stg2enm.ab
   assetBundleVariant: 

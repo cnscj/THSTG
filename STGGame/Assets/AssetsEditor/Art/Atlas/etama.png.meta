@@ -173,7 +173,7 @@ TextureImporter:
     21300336: 10601215
     21300338: 10601216
   externalObjects: {}
-  serializedVersion: 7
+  serializedVersion: 9
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -3654,5 +3654,5 @@ TextureImporter:
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
   userData: 
-  assetBundleName: 
+  assetBundleName: atlas/etama.ab
   assetBundleVariant: 

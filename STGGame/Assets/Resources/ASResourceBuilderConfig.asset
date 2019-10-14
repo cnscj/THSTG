@@ -20,4 +20,28 @@ MonoBehaviour:
   exportFolder: Assets/StreamingAssets/ABRes
   isClearAfterBuilded: 0
   bundleIsUseFullPath: 0
-  buildInfoList: []
+  buildInfoList:
+  - srcName: Atlas
+    srcResFolder: Assets/AssetsEditor/Art/Atlas
+    srcBundleSuffix: .png
+    isTraversal: 0
+    bundleName: atlas/{2}.ab
+    isUsePathName: 0
+    isCommonPrefixion: 0
+    shareBundleName: atlas/share.ab
+  - srcName: UIs_Atlas
+    srcResFolder: Assets/AssetsEditor/Program/UIs
+    srcBundleSuffix: .png
+    isTraversal: 0
+    bundleName: '{0}/{1}/{2}_atlas.ab'
+    isUsePathName: 0
+    isCommonPrefixion: 1
+    shareBundleName: share/{0}.ab
+  - srcName: UIs_Bytes
+    srcResFolder: Assets/AssetsEditor/Program/UIs
+    srcBundleSuffix: .bytes
+    isTraversal: 1
+    bundleName: '{0}/{1}/{2}_bytes.ab'
+    isUsePathName: 0
+    isCommonPrefixion: 1
+    shareBundleName: share/{0}.ab

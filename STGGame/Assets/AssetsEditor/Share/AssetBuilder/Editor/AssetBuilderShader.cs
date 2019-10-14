@@ -23,7 +23,6 @@ namespace STGEditor
 
         protected override void OnOnce(string assetPath)
         {
-            string fileNameNotEx = Path.GetFileNameWithoutExtension(assetPath);
             SetBundleName(assetPath, string.Format(AssetBuilderConfig.bundleNameShaders, "share"));
         }
     }
