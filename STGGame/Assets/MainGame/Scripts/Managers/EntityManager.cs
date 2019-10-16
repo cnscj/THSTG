@@ -137,6 +137,7 @@ namespace STGGame
                 mapRoot.transform.SetParent(stageRoot.transform, true);
 
                 heroRoot = new GameObject("HeroRoot");
+                heroRoot.layer = 10;
                 heroRoot.transform.SetParent(stageRoot.transform, true);
                 entitiesNode.Add(EEntityType.Hero, heroRoot);
 

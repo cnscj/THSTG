@@ -344,7 +344,7 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 1
-  m_Camera: {fileID: 8009041051283078405}
+  m_Camera: {fileID: 4660550220636222296}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -521,7 +521,7 @@ PrefabInstance:
         type: 3}
       propertyPath: uiCamera
       value: 
-      objectReference: {fileID: 8009041051283078405}
+      objectReference: {fileID: 0}
     - target: {fileID: 8287892596334897145, guid: fdfae3b3b90245046a9a8c450e9b8251,
         type: 3}
       propertyPath: cameras.Array.data[0]
@@ -540,9 +540,9 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 2016189189001309193}
   m_PrefabAsset: {fileID: 0}
---- !u!20 &8009041051283078405 stripped
+--- !u!20 &4660550220636222296 stripped
 Camera:
-  m_CorrespondingSourceObject: {fileID: 8421490534284546316, guid: fdfae3b3b90245046a9a8c450e9b8251,
+  m_CorrespondingSourceObject: {fileID: 6581844662657752913, guid: fdfae3b3b90245046a9a8c450e9b8251,
     type: 3}
   m_PrefabInstance: {fileID: 2016189189001309193}
   m_PrefabAsset: {fileID: 0}

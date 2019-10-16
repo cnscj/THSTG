@@ -48,7 +48,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skillFxNode: {fileID: 0}
   modelFxNode: {fileID: 0}
-  publicFxNode: {fileID: 0}
+  sceneFxNode: {fileID: 0}
+  uiFxNode: {fileID: 0}
 --- !u!1 &3397774732709496433
 GameObject:
   m_ObjectHideFlags: 0
@@ -1207,7 +1208,7 @@ GameObject:
   - component: {fileID: 4283406228153989453}
   - component: {fileID: 4644371123470495489}
   - component: {fileID: 4465102057905268296}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1244,8 +1245,8 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 1
-  m_Camera: {fileID: 7439259604393477274}
-  m_PlaneDistance: 100
+  m_Camera: {fileID: 5239308066223360711}
+  m_PlaneDistance: 1
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -1267,12 +1268,12 @@ MonoBehaviour:
   m_Script: {fileID: 1980459831, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1024, y: 576}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -1361,6 +1362,31 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6323760154096124540, guid: fdfae3b3b90245046a9a8c450e9b8251,
+        type: 3}
+      propertyPath: mainCamera
+      value: 
+      objectReference: {fileID: 6982312611599041575}
+    - target: {fileID: 6323760154096124540, guid: fdfae3b3b90245046a9a8c450e9b8251,
+        type: 3}
+      propertyPath: mapCamera
+      value: 
+      objectReference: {fileID: 6867708223793096000}
+    - target: {fileID: 6323760154096124540, guid: fdfae3b3b90245046a9a8c450e9b8251,
+        type: 3}
+      propertyPath: uiCamera
+      value: 
+      objectReference: {fileID: 5239308066223360711}
+    - target: {fileID: 8287892596334897145, guid: fdfae3b3b90245046a9a8c450e9b8251,
+        type: 3}
+      propertyPath: cameras.Array.data[0]
+      value: 
+      objectReference: {fileID: 6982312611599041568}
+    - target: {fileID: 8287892596334897145, guid: fdfae3b3b90245046a9a8c450e9b8251,
+        type: 3}
+      propertyPath: cameras.Array.data[1]
+      value: 
+      objectReference: {fileID: 1432894772639105437}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fdfae3b3b90245046a9a8c450e9b8251, type: 3}
 --- !u!4 &6982312611711833715 stripped
@@ -1369,9 +1395,33 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1432894773392381334}
   m_PrefabAsset: {fileID: 0}
---- !u!20 &7439259604393477274 stripped
+--- !u!20 &5239308066223360711 stripped
 Camera:
-  m_CorrespondingSourceObject: {fileID: 8421490534284546316, guid: fdfae3b3b90245046a9a8c450e9b8251,
+  m_CorrespondingSourceObject: {fileID: 6581844662657752913, guid: fdfae3b3b90245046a9a8c450e9b8251,
+    type: 3}
+  m_PrefabInstance: {fileID: 1432894773392381334}
+  m_PrefabAsset: {fileID: 0}
+--- !u!20 &6867708223793096000 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 5525259279065837782, guid: fdfae3b3b90245046a9a8c450e9b8251,
+    type: 3}
+  m_PrefabInstance: {fileID: 1432894773392381334}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6982312611599041568 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8287892597146800566, guid: fdfae3b3b90245046a9a8c450e9b8251,
+    type: 3}
+  m_PrefabInstance: {fileID: 1432894773392381334}
+  m_PrefabAsset: {fileID: 0}
+--- !u!20 &6982312611599041575 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 8287892597146800561, guid: fdfae3b3b90245046a9a8c450e9b8251,
+    type: 3}
+  m_PrefabInstance: {fileID: 1432894773392381334}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1432894772639105437 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1396315147, guid: fdfae3b3b90245046a9a8c450e9b8251,
     type: 3}
   m_PrefabInstance: {fileID: 1432894773392381334}
   m_PrefabAsset: {fileID: 0}

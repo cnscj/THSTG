@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.4465934, g: 0.49642956, b: 0.5748249, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -771,7 +771,7 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 1
-  m_Camera: {fileID: 1432894771860694358}
+  m_Camera: {fileID: 0}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -885,17 +885,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2012911932257309522, guid: 56966a23b22a77241b2af981811cb473,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 8.888889
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 56966a23b22a77241b2af981811cb473, type: 3}
 --- !u!4 &1432894771860694357 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1432894772382045461, guid: 56966a23b22a77241b2af981811cb473,
-    type: 3}
-  m_PrefabInstance: {fileID: 1432894771860694356}
-  m_PrefabAsset: {fileID: 0}
---- !u!20 &1432894771860694358 stripped
-Camera:
-  m_CorrespondingSourceObject: {fileID: 7439259604393477274, guid: 56966a23b22a77241b2af981811cb473,
     type: 3}
   m_PrefabInstance: {fileID: 1432894771860694356}
   m_PrefabAsset: {fileID: 0}
