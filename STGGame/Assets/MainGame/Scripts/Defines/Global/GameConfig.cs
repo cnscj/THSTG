@@ -9,16 +9,16 @@ namespace STGGame
     {
         public static readonly Dictionary<EResType, string> resTypeMap = new Dictionary<EResType, string>()
         {
-            [EResType.Entity] = "entities",
-            [EResType.Audio] = "audios",
-            [EResType.Level] = "levels",
-            [EResType.Model] = "models",
-            [EResType.Sprite] = "sprites",
-            [EResType.Effect] = "effects",
+            [EResType.Entity] = "Entities",
+            [EResType.Audio] = "Audios",
+            [EResType.Level] = "Levels",
+            [EResType.Model] = "Models",
+            [EResType.Sprite] = "Sprites",
+            [EResType.Effect] = "Effects",
 
-            [EResType.UI] = "uis",
-            [EResType.Shader] = "shaders",
-            [EResType.Config] = "configs",
+            [EResType.UI] = "UIs",
+            [EResType.Shader] = "Shaders",
+            [EResType.Config] = "Configs",
         };
     }
 

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <packageDescription id="yh76s5e0" jpegQuality="80" compressPNG="true">
-  <resources/>
+  <resources>
+    <component id="h78s0" name="RedDot.xml" path="/" exported="true"/>
+    <image id="z7yu8" name="gg_th08_logo.jpg" path="/_Tex/" exported="true"/>
+    <component id="z7yu1" name="LoadingView.xml" path="/" exported="true"/>
+  </resources>
   <publish name=""/>
 </packageDescription>

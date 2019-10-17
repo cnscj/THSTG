@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <component size="1024,576">
-  <displayList/>
+  <displayList>
+    <list id="n0_h78s" name="n0" xy="308,207" size="368,323" overflow="scroll"/>
+  </displayList>
 </component>

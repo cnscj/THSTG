@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="y8wff1cb" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="po2z0" name="Button1.xml" path="/Button/" exported="true"/>
+  </resources>
+  <publish name=""/>
+</packageDescription>

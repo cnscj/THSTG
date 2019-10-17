@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using System.IO;
 using ASGame;
@@ -14,7 +15,7 @@ namespace STGGame
 
         public static string Combine2BundlePath(EResType resType, string fileName, string assetName)
         {
-            return ResourceLoaderUtil.CombineBundlePath(PathUtil.Combine(ResourceBookConfig.bundleRes, GameConfig.resTypeMap[resType], fileName), assetName);
+            return ResourceLoaderUtil.CombineBundlePath(PathUtil.Combine(ResourceBookConfig.bundleRes, GameConfig.resTypeMap[resType].ToLower(), fileName), assetName);
         }
         public static string Combine2EditPath(EResType resType, string assetName)
         {
@@ -69,11 +70,25 @@ namespace STGGame
             return ResourceLoader.GetInstance().LoadFromFile<GameObject>(resPath);
         }
 
-        public GameObject LoadUI(string module,string view)
+        public KeyValuePair<int, System.Object> LoadUI(string module)
         {
-            string resPath = Combine2FixPath(EResType.UI, string.Format("{0}_{1}.ab", module, view), string.Format("{0}_{1}.prefab", module, view));
+            if (ResourceLoader.GetInstance().loadMode == ResourceLoadMode.AssetBundler)
+            { 
+                string descPath = Combine2FixPath(EResType.UI, string.Format("{0}_bytes.ab", module.ToLower()), string.Format(""));
+                string resPath = Combine2FixPath(EResType.UI, string.Format("{0}_atlas.ab", module.ToLower()), string.Format(""));
 
-            return ResourceLoader.GetInstance().LoadFromFile<GameObject>(resPath);
+                AssetBundle descBundle = ResourceLoader.GetInstance().LoadFromFile<AssetBundle>(descPath);
+                AssetBundle resBundle = ResourceLoader.GetInstance().LoadFromFile<AssetBundle>(resPath);
+
+                return new KeyValuePair<int, System.Object>((int)ResourceLoadMode.AssetBundler, new KeyValuePair<AssetBundle, AssetBundle>(descBundle, resBundle));
+            }
+            else// (ResourceLoader.GetInstance().loadMode == ResourceLoadMode.Editor)
+            {
+                string uiPath = Combine2FixPath(EResType.UI, string.Format(""), string.Format("{0}", module));
+                return new KeyValuePair<int, System.Object>((int)ResourceLoadMode.Editor, uiPath);
+            }
+
+            //return null;//
         }
 
         public string LoadConfig(string fileName)

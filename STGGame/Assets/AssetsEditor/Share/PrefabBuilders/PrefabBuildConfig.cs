@@ -14,7 +14,7 @@ namespace STGGame
         public static readonly string srcLevels = PathUtil.Combine(srcArtResource, "Levels");
 
         public static readonly string srcProgramResource = PathUtil.Combine(artSrcFolder, "Program");
-        public static readonly string srcUIs = PathUtil.Combine(srcProgramResource, "UIs","Modules");
+        public static readonly string srcUIs = PathUtil.Combine(srcProgramResource, "UIs");
 
         public static readonly string srcDesignResource = PathUtil.Combine(artSrcFolder, "Design");
         public static readonly string srcConfigs = PathUtil.Combine(srcDesignResource, "Configs");

@@ -8,6 +8,7 @@ namespace ASEditor
 {
     public class ResourceProcesser
     {
+        public bool isCheckFileCode = true;     //检查文件指纹
         public bool isCheckInvainFile = true;   //检查无效文件
 
 
@@ -53,6 +54,13 @@ namespace ASEditor
                 if (!XFolderTools.Exists(m_md5Folder))
                 {
                     XFolderTools.CreateDirectory(m_md5Folder);
+                }
+                else
+                {
+                    if (!isCheckFileCode)
+                    {
+                        XFolderTools.DeleteDirectory(m_md5Folder,true);
+                    }
                 }
             }
 
@@ -225,7 +233,7 @@ namespace ASEditor
                 return;
             }
             string[] checkList = m_checkList != null ? m_checkList : GetDependFiles(assetPath, new string[] { "cs" });
-            if (!fileChecker.IsCodeChanged(checkList))
+            if (!isCheckFileCode || !fileChecker.IsCodeChanged(checkList))
             {
                 //MD5没变,但是目标文件被删除
                 if (XFileTools.Exists(saveFilePath))
@@ -238,7 +246,11 @@ namespace ASEditor
             {
                 OnOnce(assetPath);
 
-                fileChecker.SaveCodeChanged();
+                if (isCheckFileCode)
+                {
+                    fileChecker.SaveCodeChanged();
+                }
+                
                 checkMaps.Add(checkName, assetPath);
             }
         }

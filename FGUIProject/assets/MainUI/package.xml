@@ -2,7 +2,6 @@
 <packageDescription id="usm7w161" jpegQuality="80" compressPNG="true">
   <resources>
     <component id="ntbx0" name="MainUIView.xml" path="/" exported="true"/>
-    <component id="z7yu1" name="MainUILoadingView.xml" path="/" exported="true"/>
     <image id="z7yu2" name="loading_snqdz.png" path="/_Tex/" exported="true"/>
     <image id="z7yu3" name="loading_nowloading.png" path="/_Tex/" exported="true"/>
     <image id="z7yu4" name="loading_icon_01.png" path="/_Tex/" exported="true"/>

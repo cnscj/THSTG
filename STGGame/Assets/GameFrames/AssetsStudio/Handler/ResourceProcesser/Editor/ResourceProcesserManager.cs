@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEditor;
 using UnityEditor.SceneManagement;
 using XLibrary;
 
@@ -40,6 +41,8 @@ namespace ASEditor
             {
                 EditorSceneManager.OpenScene(curScenePath);
             }
+
+            AssetDatabase.Refresh();//后处理文件
         }
 
         public void RemoveAllProcesser()
