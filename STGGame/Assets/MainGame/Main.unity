@@ -246,17 +246,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 2125908311}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 966b72da4ea114415845ce941ad8b1e3, type: 3}
+  m_Script: {fileID: 11500000, guid: cf1a3f064416947e2b451ae38e2ca427, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  residentTimeS: 120
   packageList:
   - packageName: UIBase
     residentTimeS: -1
     isPlayLoad: 1
   - packageName: UIPublic
     residentTimeS: -1
-    isPlayLoad: 0
+    isPlayLoad: 1
 --- !u!114 &2125908319
 MonoBehaviour:
   m_ObjectHideFlags: 0

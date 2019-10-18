@@ -8,7 +8,7 @@ namespace XLibGame
     /// </summary>
     public class Dispatcher
     {
-        public delegate void EventListener(int eventId, Dictionary<string, object> args);
+        
         private Dictionary<int, SortedList<int,EventListener>> m_listeners = new Dictionary<int, SortedList<int, EventListener>>();
 
         /// <summary>

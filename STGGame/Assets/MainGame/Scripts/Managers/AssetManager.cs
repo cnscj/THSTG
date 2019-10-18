@@ -82,13 +82,11 @@ namespace STGGame
 
                 return new KeyValuePair<int, System.Object>((int)ResourceLoadMode.AssetBundler, new KeyValuePair<AssetBundle, AssetBundle>(descBundle, resBundle));
             }
-            else// (ResourceLoader.GetInstance().loadMode == ResourceLoadMode.Editor)
+            else
             {
                 string uiPath = Combine2FixPath(EResType.UI, string.Format(""), string.Format("{0}", module));
                 return new KeyValuePair<int, System.Object>((int)ResourceLoadMode.Editor, uiPath);
             }
-
-            //return null;//
         }
 
         public string LoadConfig(string fileName)
@@ -120,39 +118,5 @@ namespace STGGame
            
             return sceneName;
         }
-
-        public string GetResPathById(string uid)
-        {
-            //取ID
-            string resultPath = "";
-            long idNum = 0;
-            if (long.TryParse(uid, out idNum))
-            {
-                int categoryNum = int.Parse(uid.Substring(1, 1));   //FIXME:超过2位就不行了
-                
-                EResType category = (EResType)categoryNum;
-                switch (category)
-                {
-                    case EResType.Entity:
-                        resultPath = Combine2FixPath(category,string.Format("{0}.ab", uid), null);
-                        break;
-                    case EResType.Level:
-                        resultPath = Combine2FixPath(category, string.Format("{0}.ab", uid), null);
-                        break;
-                    case EResType.Model:
-                        resultPath = Combine2FixPath(category, string.Format("{0}.ab", uid), null);
-                        break;
-                    case EResType.Sprite:
-                        resultPath = Combine2FixPath(category, string.Format("{0}.ab", uid), null);
-                        break;
-                }
-            }
-            
-
-            return resultPath;
-
-        }
-
-       
     }
 }

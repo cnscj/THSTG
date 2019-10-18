@@ -315,7 +315,6 @@ namespace XLibGame
         /// <summary>
         /// 添加事件及回调
         /// </summary>
-        /// <param name="type">事件枚举</param>
         /// <param name="handle">回调</param>
         /// <param name="isUseOnce"></param>
         public static void AddTypeEvent<T>(EventHandle<T> handle, bool isUseOnce = false)
@@ -326,7 +325,6 @@ namespace XLibGame
         /// <summary>
         /// 移除某类事件的一个回调
         /// </summary>
-        /// <param name="type"></param>
         /// <param name="handle"></param>
         public static void RemoveTypeEvent<T>(EventHandle<T> handle, bool isUseOnce = false)
         {
@@ -336,7 +334,7 @@ namespace XLibGame
         /// <summary>
         /// 移除某类事件
         /// </summary>
-        /// <param name="type"></param>
+        /// <param name="isUseOnce"></param>
         public static void RemoveTypeEvent<T>(bool isUseOnce = false)
         {
             GetEventDispatcher<T>(isUseOnce).m_CallBack = null;
@@ -345,7 +343,7 @@ namespace XLibGame
         /// <summary>
         /// 触发事件
         /// </summary>
-        /// <param name="type"></param>
+        /// <param name="e"></param>
         /// <param name="args"></param>
         public static void DispatchTypeEvent<T>(T e, params object[] args)
         {

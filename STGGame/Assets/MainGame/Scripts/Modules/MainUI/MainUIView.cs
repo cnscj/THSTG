@@ -1,18 +1,21 @@
-﻿using System;
+﻿using System.Collections;
+using System.Collections.Generic;
+using FairyGUI;
 using UnityEngine;
 
 namespace STGGame
 {
-    public class TestView : FView
+    public class MainUIView : FView
     {
-
-        public TestView():base("Test","TestView")
+        GGraph n1; 
+        public MainUIView() : base("MainUI", "MainUIView")
         {
-            Debug.Log("Test-ctor");
+
         }
+
         protected override void OnInitUI()
         {
-
+            n1 = GetChild("n1") as GGraph;
         }
 
         protected override void OnInitEvent()
@@ -22,7 +25,7 @@ namespace STGGame
 
         protected override void OnEnter()
         {
-            Debug.Log("Test-enter");
+            Debug.Log("MainUI-enter");
         }
 
         protected override void OnExit()
@@ -30,5 +33,6 @@ namespace STGGame
 
         }
     }
-
 }
+
+
