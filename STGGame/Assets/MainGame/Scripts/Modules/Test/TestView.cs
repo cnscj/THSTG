@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace STGGame
+namespace STGGame.UI
 {
     public class TestView : FView
     {

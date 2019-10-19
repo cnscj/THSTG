@@ -3,14 +3,15 @@ using XLibrary.Package;
 using System.Collections.Generic;
 using System;
 using FairyGUI;
-
+using STGGame.UI;
 namespace STGGame
 {
     public class ViewManager : MonoSingleton<ViewManager>
     {
         private Dictionary<Type, ViewInfo> m_viewMaps = new Dictionary<Type, ViewInfo>();
-        public void Open<T>(Dictionary<string, Object> args = null) where T : FView, new()
+        public void Open<T>(Dictionary<string, object> args = null) where T : FView, new()
         {
+            //TODO:
             ViewInfo viewInfo = null;
             if (!m_viewMaps.TryGetValue(typeof(T), out viewInfo))
             {

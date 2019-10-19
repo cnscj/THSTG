@@ -3,5 +3,6 @@
   <displayList>
     <graph id="n0_mdnj" name="n0" xy="0,0" size="64,578" type="rect"/>
     <graph id="n1_mdnj" name="n1" xy="961,0" size="64,574" type="rect"/>
+    <component id="n2_8vw8" name="avatarCom" src="8vw85" fileName="Components/MainUIAvatar.xml" xy="96,472"/>
   </displayList>
 </component>

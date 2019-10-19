@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="80,80">
+  <displayList>
+    <richtext id="n0_8vw8" name="nameText" xy="11,29" size="55,25" fontSize="18" text="12345"/>
+    <text id="n1_ubzo" name="lvLabel" xy="19,5" size="35,25" fontSize="18" text="123"/>
+  </displayList>
+</component>

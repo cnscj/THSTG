@@ -1,34 +1,39 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using FairyGUI;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
-namespace STGGame
+namespace STGGame.UI
 {
     public class MainUIView : FView
     {
-        GGraph n1; 
+        MainUIAvatar avatarCom;
+
         public MainUIView() : base("MainUI", "MainUIView")
         {
-
+            
         }
 
         protected override void OnInitUI()
         {
-            n1 = GetChild("n1") as GGraph;
+            avatarCom = GetChild<MainUIAvatar>("avatarCom");
+
+            avatarCom.SetText("@@@@");
         }
 
         protected override void OnInitEvent()
         {
-
+            AddEventListener(EventType.TEST_MAIN_UI_UPDATE, _updateLayer);
         }
 
         protected override void OnEnter()
         {
-            Debug.Log("MainUI-enter");
+
         }
 
         protected override void OnExit()
+        {
+
+        }
+
+        private void _updateLayer(int e, Dictionary<string, object> args)
         {
 
         }

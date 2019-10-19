@@ -4,29 +4,23 @@ using System.Collections.Generic;
 using FairyGUI;
 using UnityEngine;
 
-namespace STGGame
+namespace STGGame.UI
 {
-	public class FView : FComponent
+	public class FView : FWidget
     {
-        private Dictionary<string, System.Object> m_args;
-        private string m_package;
-        private string m_component;
-
+        private Dictionary<string, object> m_args;
+      
         protected bool _isAsync = false;
         protected int _layer = 0;
+    
+        public Dictionary<string, object> args { get { return m_args; } }
 
-        public string package { get { return m_package; } }
-        public string component { get { return m_component; } }
-        public Dictionary<string, System.Object> args { get { return m_args; } }
-
-        public FView(string package, string component)
+        public FView(string package, string component):base(package, component)
         {
-            m_package = package;
-            m_component = component;
 
         }
 
-        public void Create(Dictionary<string, System.Object> args = null)
+        public void Create(Dictionary<string, object> args = null)
         {
             m_args = args;
             if (_isAsync)
@@ -48,7 +42,7 @@ namespace STGGame
                 return;
             }
 
-            Init(obj);
+            InitWithObj(obj);
 
             GRoot.inst.AddChild(obj);
         }

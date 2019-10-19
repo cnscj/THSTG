@@ -1,7 +1,7 @@
 ﻿
 using System.Collections.Generic;
 using ASGame;
-using FairyGUI;
+using STGGame.UI;
 using UnityEngine;
 using XLibrary.Package;
 

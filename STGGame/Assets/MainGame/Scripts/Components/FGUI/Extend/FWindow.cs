@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace STGGame
+namespace STGGame.UI
 {
     public class FWindow : FView
     {
