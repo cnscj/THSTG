@@ -13,7 +13,7 @@ namespace STGGame.UI
         {
 
         }
-        public void SetText(string text)
+        public new void SetText(string text)
         {
             lvLabel.SetText("123");
             nameText.SetText(text);

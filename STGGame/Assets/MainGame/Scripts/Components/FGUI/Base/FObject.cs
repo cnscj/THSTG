@@ -3,21 +3,20 @@ using System.Collections;
 using FairyGUI;
 using System.Collections.Generic;
 using XLibGame;
+using STGGame;
 
 namespace STGGame.UI
 {
-
     public class FObject
     {
         protected GObject _obj;
-        public FObject()
-        {
 
-        }
+        protected FComponent _parent;
 
-        public virtual void InitWithObj(GObject obj)
+        public virtual FObject InitWithObj(GObject obj)
         {
             this._obj = obj;
+            return this;
         }
 
         public GObject GetObject()
@@ -25,14 +24,11 @@ namespace STGGame.UI
             return _obj;
         }
 
-        public GObject GetParent()
+        public FComponent GetParent()
         {
-            return _obj.parent;
-        }
-
-        public void DebugUI()
-        {
-            //TODO:
+            var obj = _obj.parent;
+            _parent = (_parent != null) ? (obj != null ? _parent : null) : new FComponent().InitWithObj(obj) as FComponent;
+            return _parent;
         }
 
         public void SetX(float x)
@@ -144,7 +140,331 @@ namespace STGGame.UI
             var size = GetSize();
             return new Vector2(_obj.x + size.x / 2, _obj.y + size.y / 2);
         }
+
+        public Vector2 GetSourceSize()
+        {
+            return new Vector2(_obj.sourceWidth, _obj.sourceHeight);
+        }
+
+        public void SetPivot(float x, float y, bool asAnchor)
+        {
+            _obj.SetPivot(x, y, asAnchor);
+        }
+
+        // 数据
+        public void SetData(object data)
+        {
+            _obj.data = data;
+        }
+        public object GetData()
+        {
+            return _obj.data;
+        }
+
+        // 设置拖拽
+        public void SetDraggable(bool able)
+        {
+            _obj.draggable = able;
+        }
+        public bool GetDraggable()
+        {
+            return _obj.draggable;
+        }
+
+        public bool IsOnStage()
+        {
+            return _obj.onStage;
+        }
+
+        // 显示
+        public void SetVisible(bool visible)
+        {
+            if (visible == IsVisible())
+            {
+                return;
+            }
+            _obj.visible = visible;
+        }
+
+        public bool IsVisible()
+        {
+            return _obj.visible;
+        }
+
+        // 是否灰显
+        public void SsetGrayed(bool grayed)
+        {
+            _obj.grayed = grayed;
+        }
+        public bool GetGrayed()
+        {
+            return _obj.grayed;
+        }
+
+        // 是否可点击
+        public void SetTouchable(bool able)
+        {
+            _obj.touchable = able;
+        }
+
+        public bool GetTouchable()
+        {
+            return _obj.touchable;
+        }
+
+        // 是否可用，变灰、不可触摸
+        public void SetEnabled(bool enable)
+        {
+            _obj.grayed = !enable;
+            _obj.touchable = enable;
+        }
+
+        public bool IsEnabled()
+        {
+            return _obj.touchable;
+        }
+        //
+        public void SetClick(EventCallback0 func)
+        {
+            _obj.onClick.Set(func);
+        }
+        public void SetClick(EventCallback1 func)
+        {
+            _obj.onClick.Set(func);
+        }
+
+        public void AddClick(EventCallback0 func)
+        {
+            _obj.onClick.Add(func);
+        }
+        public void AddClick(EventCallback1 func)
+        {
+            _obj.onClick.Add(func);
+        }
+        public void RemoveClick(EventCallback0 func)
+        {
+            _obj.onClick.Remove(func);
+        }
+        public void RemoveClick(EventCallback1 func)
+        {
+            _obj.onClick.Remove(func);
+        }
+
+        public void ClearClick()
+        {
+            _obj.onClick.Clear();
+        }
+        public void OnClickLink(EventCallback0 func)
+        {
+            _obj.onClickLink.Add(func);
+        }
+        public void OnClickLink(EventCallback1 func)
+        {
+            _obj.onClickLink.Add(func);
+        }
+        //
+        
+        //---------- 触摸 -----------
+        public void OnTouchBegin(EventCallback1 func)
+        {
+            _obj.onTouchBegin.Add(func);
+        }
+
+        public void OnTouchMove(EventCallback1 func)
+        {
+            _obj.onTouchMove.Add(func);
+        }
+
+        public void OnTouchEnd(EventCallback1 func)
+        {
+            _obj.onTouchEnd.Add(func);
+        }
+
+        //---------- 拖拽 -----------
+        public void OnDragStart(EventCallback1 func)
+        {
+            _obj.onDragStart.Set(func);
+        }
+
+        public void OnDragMove(EventCallback1 func)
+        {
+            _obj.onDragMove.Add(func);
+        }
+
+        public void OnDragEnd(EventCallback1 func)
+        {
+            _obj.onDragEnd.Add(func);
+        }
+
+        //---------- enter - exit -----------
+        public void OnAddedToStage(EventCallback1 func)
+        {
+            _obj.onAddedToStage.Add(func);
+        }
+        public void OnRemovedFromStage(EventCallback1 func)
+        {
+            _obj.onRemovedFromStage.Add(func);
+        }
+
+        //---------- 改变事件 -----------
+        public void OnSizeChanged(EventCallback1 func)
+        {
+            _obj.onSizeChanged.Add(func);
+        }
+        public void OnPositionChanged(EventCallback1 func)
+        {
+            _obj.onPositionChanged.Add(func);
+        }
+
+
+        // 关联
+        public void AddRelation(GObject target, RelationType relationType, bool usePercent)
+        {
+            _obj.AddRelation(target, relationType, usePercent);
+        }
+
+
+        //---------- 坐标转换 ----------
+        // Transforms a point from the local coordinate system to global (Stage) coordinates.
+        public Vector2 LocalToGlobal(Vector2 vector2)
+        {
+            return _obj.LocalToGlobal(vector2);
+        }
+
+        // Transforms a point from global (Stage) coordinates to the local coordinate system.
+        public Vector2 GlobalToLocal(Vector2 vector2)
+        {
+            return _obj.GlobalToLocal(vector2);
+        }
+
+        // 如果要转换任意两个UI对象间的坐标，例如需要知道A里面的坐标(10,10)在B里面的位置，可以用：
+        public Vector2 TransformPoint(Vector2 vector2,FObject comp)
+        {
+            return _obj.TransformPoint(vector2, comp.GetObject());
+        }
+
+
+        // 透明度
+        public void SetAlpha(float alpha)
+        {
+            _obj.alpha = alpha;
+        }
+
+        public float GetAlpha()
+        {
+            return _obj.alpha;
+        }
+
+        // 缩放
+        public void SetScale(float a, float b)
+        {
+            _obj.SetScale(a, b);
+        }
+        public void SetScale(float a)
+        {
+            SetScale(a, a);
+        }
+
+        //旋转
+        public void SetRotation(float rotation)
+        {
+            _obj.rotation = rotation;
+        }
+        public float GetRotation()
+        {
+            return _obj.rotation;
+        }
+
+        public void SetScaleX(float scaleX)
+        {
+            _obj.scaleX = scaleX;
+        }
+
+        public Vector2 GetScale()
+        {
+            return new Vector2 (_obj.scaleX, _obj.scaleY);
+        }
+
+        public float GetScaleX()
+        {
+            return _obj.scaleX;
+        }
+
+        public float GetScaleY()
+        {
+            return _obj.scaleY;
+        }
+
+        public string GetText()
+        {
+            return _obj.text;
+        }
+        public void SetText(string text)
+        {
+            if (!string.IsNullOrEmpty(text))
+            {
+                _obj.text = text;
+            }
+            else
+            {
+                _obj.text = "";
+            }
+        }
+        //
+        public void Center()
+        {
+            _obj.Center();
+        }
+        public void Dispose()
+        {
+            if (_obj != null)
+            {
+                _obj.Dispose();
+                _obj = null;
+            }
+        }
+        public void StartDrag()
+        {
+            _obj.StartDrag();
+        }
+        public void StartDrag(int id)
+        {
+            _obj.StartDrag(id);
+        }
+
+        public void SetHome(FObject obj)
+        {
+            _obj.SetHome(obj.GetObject());
+        }
+
+
+        // 获取parent
+        public bool HasParent()
+        {
+            return (GetParent() != null);
+        }
+
+        public bool IsDisposed()
+        {
+            if (_obj == null)
+            {
+                return true;
+            }
+            return _obj.isDisposed;
+        }
+
+        // 展开
+        public void Expand()
+        {
+            SetVisible(true);
+            SetInitHeight();
+        }
+
+        // 收缩
+        public void Shrink()
+        {
+            SetVisible(false);
+            SetHeight(0);
+        }
     }
-
-
 }

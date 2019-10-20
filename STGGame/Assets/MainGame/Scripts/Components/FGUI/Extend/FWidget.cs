@@ -9,10 +9,10 @@ namespace STGGame.UI
 
     public class FWidget : FComponent
     {
-        private string m_package;
-        private string m_component;
-        public string package { get { return m_package; } }
-        public string component { get { return m_component; } }
+        private string __package;
+        private string __component;
+        public string package { get { return __package; } }
+        public string component { get { return __component; } }
 
         protected float _interval = 0f;
         private int __scheduler = -1;
@@ -27,8 +27,8 @@ namespace STGGame.UI
 
         public FWidget(string package, string component)
         {
-            m_package = package;
-            m_component = component;
+            __package = package;
+            __component = component;
         }
 
         //
@@ -102,7 +102,7 @@ namespace STGGame.UI
         }
 
         ///
-        public override void InitWithObj(GObject obj)
+        public override FObject InitWithObj(GObject obj)
         {
             base.InitWithObj(obj);
             if (obj != null)
@@ -112,6 +112,7 @@ namespace STGGame.UI
 
                 OnInitUI();
             }
+            return this;
         }
     }
 

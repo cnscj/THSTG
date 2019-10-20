@@ -7,6 +7,10 @@ namespace STGGame
 {
     public static class FGUIUtil
     {
+        public static FObject CreateObject(GObject obj)
+        {
+            return new FObject().InitWithObj(obj);
+        }
         public static T CreateComponent<T>(GObject obj) where T : FComponent,new()
         {
             if (obj != null)
