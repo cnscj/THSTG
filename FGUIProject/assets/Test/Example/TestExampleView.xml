@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1024,576">
+  <displayList>
+    <list id="n0_jtdb" name="exampleList" xy="31,11" size="949,38" layout="row" overflow="scroll" defaultItem="ui://y59nubhfjtdb1" autoClearItems="true">
+      <item/>
+      <item/>
+      <item/>
+    </list>
+  </displayList>
+</component>

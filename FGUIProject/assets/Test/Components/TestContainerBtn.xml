@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="32,32" pivot="0.5,0.5" extention="Button">
+  <controller name="button" pages="0,up,1,down" selected="0"/>
+  <displayList>
+    <graph id="n0_jtdb" name="bgImg" xy="0,0" size="32,32" type="rect"/>
+    <richtext id="n3_jtdb" name="title" xy="0,0" size="32,32" fontSize="22" align="center" vAlign="middle" autoSize="none" text="+"/>
+  </displayList>
+  <Button downEffect="scale" downEffectValue="0.95"/>
+</component>

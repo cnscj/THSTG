@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="414,152">
+  <displayList>
+    <list id="n0_jtdb" name="btnList" xy="0,0" size="414,152" layout="flow_hz" overflow="scroll" lineGap="5" colGap="5" defaultItem="ui://y59nubhfjtdb5">
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+    </list>
+  </displayList>
+</component>

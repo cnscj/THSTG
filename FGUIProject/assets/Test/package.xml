@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<packageDescription id="y59nubhf">
-  <resources/>
+<packageDescription id="y59nubhf" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="jtdb0" name="TestExampleView.xml" path="/Example/" exported="true"/>
+    <component id="jtdb1" name="TestExampleItemTmpl.xml" path="/Example/Components/"/>
+    <component id="jtdb2" name="TestContainerBtn.xml" path="/Components/" exported="true"/>
+    <component id="jtdb3" name="TestView.xml" path="/" exported="true"/>
+    <component id="jtdb4" name="TestContainerCom.xml" path="/Components/" exported="true"/>
+    <component id="jtdb5" name="TestContainerItemTmpl.xml" path="/Components/"/>
+  </resources>
+  <publish name="Test"/>
 </packageDescription>

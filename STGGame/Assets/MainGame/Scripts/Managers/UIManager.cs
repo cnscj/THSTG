@@ -59,7 +59,7 @@ namespace STGGame
 
         private void Start()
         {
-            ViewManager.GetInstance().Open<MainUIView>();
+            ViewManager.GetInstance().Open<TestView>();
 
         }
     }

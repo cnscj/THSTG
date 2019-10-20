@@ -17,7 +17,9 @@ namespace STGGame.UI
         protected FComponent _footer;
 
         public delegate string ItemProvideFunc(object data, int index);
-        public delegate void ItemStateFunc(object data, int index, FComponent comp, GObject obj);
+        public delegate void ItemStateFunc0(int index, FComponent comp);
+        public delegate void ItemStateFunc1(int index, FComponent comp, object data);
+        
 
         // 设置虚拟列表
         public void SetVirtual()
@@ -83,7 +85,7 @@ namespace STGGame.UI
             });
         }
 
-        public void SetState(ItemStateFunc func)
+        public void SetState(ItemStateFunc0 func)
         {
             _obj.asList.itemRenderer = new ListItemRenderer((index,obj) =>
             {
@@ -92,9 +94,26 @@ namespace STGGame.UI
                 {
                     System.Reflection.Assembly asm = System.Reflection.Assembly.GetExecutingAssembly();
                     fComp = asm.CreateInstance(_class.FullName) as FComponent;
+                    fComp.InitWithObj(obj);
                     _dataTemplate[obj] = fComp;
                 }
-                func(_dataProvider[index], index, fComp, obj);
+                func( index, fComp);
+            });
+        }
+
+        public void SetState(ItemStateFunc1 func)
+        {
+            _obj.asList.itemRenderer = new ListItemRenderer((index, obj) =>
+            {
+                FComponent fComp = null;
+                if (!_dataTemplate.TryGetValue(obj, out fComp))
+                {
+                    System.Reflection.Assembly asm = System.Reflection.Assembly.GetExecutingAssembly();
+                    fComp = asm.CreateInstance(_class.FullName) as FComponent;
+                    fComp.InitWithObj(obj);
+                    _dataTemplate[obj] = fComp;
+                }
+                func(index, fComp,_dataProvider[index]);
             });
         }
 
