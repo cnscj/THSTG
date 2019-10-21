@@ -20,6 +20,8 @@ namespace STGGame.UI
             {
                 containerComp.SetVisible(!containerComp.IsVisible());
             });
+
+            containerComp.DebugUI();
         }
 
         protected override void OnInitEvent()

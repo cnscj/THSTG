@@ -1,9 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
 using FairyGUI;
-using System.Collections.Generic;
-using XLibGame;
-using STGGame;
 
 namespace STGGame.UI
 {
@@ -11,7 +7,7 @@ namespace STGGame.UI
     {
         protected GObject _obj;
 
-        protected FComponent _parent;
+        private FComponent __parent;
 
         public virtual FObject InitWithObj(GObject obj)
         {
@@ -27,8 +23,8 @@ namespace STGGame.UI
         public FComponent GetParent()
         {
             var obj = _obj.parent;
-            _parent = (_parent != null) ? (obj != null ? _parent : null) : new FComponent().InitWithObj(obj) as FComponent;
-            return _parent;
+            __parent = (__parent != null) ? (obj != null ? __parent : null) : new FComponent().InitWithObj(obj) as FComponent;
+            return __parent;
         }
 
         public void SetX(float x)

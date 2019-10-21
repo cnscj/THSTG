@@ -2,11 +2,12 @@
 <packageDescription id="y59nubhf" jpegQuality="80" compressPNG="true">
   <resources>
     <component id="jtdb0" name="TestExampleView.xml" path="/Example/" exported="true"/>
-    <component id="jtdb1" name="TestExampleItemTmpl.xml" path="/Example/Components/"/>
+    <component id="jtdb1" name="TestExampleItemTmpl.xml" path="/Example/Components/" exported="true"/>
     <component id="jtdb2" name="TestContainerBtn.xml" path="/Components/" exported="true"/>
     <component id="jtdb3" name="TestView.xml" path="/" exported="true"/>
     <component id="jtdb4" name="TestContainerCom.xml" path="/Components/" exported="true"/>
     <component id="jtdb5" name="TestContainerItemTmpl.xml" path="/Components/"/>
+    <component id="voe96" name="TestExampleTextView.xml" path="/Example/Text/" exported="true"/>
   </resources>
   <publish name="Test"/>
 </packageDescription>

@@ -1,8 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using FairyGUI;
-using System.Collections.Generic;
-using XLibGame;
+﻿using FairyGUI;
 
 namespace STGGame.UI
 {
@@ -10,8 +6,8 @@ namespace STGGame.UI
     public class FScrollPane
     {
         protected ScrollPane _obj;
-        protected FComponent _header;
-        protected FComponent _footer;
+        private FComponent __header;
+        private FComponent __footer;
 
         public FScrollPane(ScrollPane scrollPane)
         {
@@ -26,15 +22,15 @@ namespace STGGame.UI
         public FComponent GetHeader()
         {
             var obj = _obj.header;
-            _header = (_header != null) ? (obj != null ? _header : null) : new FComponent().InitWithObj(obj) as FComponent;
-            return _header;
+            __header = (__header != null) ? (obj != null ? __header : null) : new FComponent().InitWithObj(obj) as FComponent;
+            return __header;
         }
 
         public FComponent GetFooter()
         {
             var obj = _obj.footer;
-            _footer = (_footer != null) ? (obj != null ? _footer : null) : new FComponent().InitWithObj(obj) as FComponent;
-            return _footer;
+            __footer = (__footer != null) ? (obj != null ? __footer : null) : new FComponent().InitWithObj(obj) as FComponent;
+            return __footer;
         }
 
         public void LockHeader(int size)

@@ -6,16 +6,32 @@ namespace STGGame.UI
 {
     public class FWindow : FView
     {
+        public static readonly string titleName = "title";
+        protected string _title = "标题";
+        private FRichText __titleLabel;
         public FWindow(string package,string component):base(package, component)
         {
-
+            _layerOrder = 100;
         }
 
-        public void SetTitle()
+        public void SetTitle(string title)
         {
 
         }
- 
+
+        private void __InitWindowTitle()
+        {
+            __titleLabel = GetChild<FRichText>(titleName);
+            if(__titleLabel != null)
+            {
+                __titleLabel.SetText(_title);
+            }
+        }
+
+        protected override void OnInit()
+        {
+
+        }
     }
 
 }

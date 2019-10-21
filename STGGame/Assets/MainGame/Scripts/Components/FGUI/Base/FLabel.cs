@@ -1,8 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
-using FairyGUI;
 using System.Collections.Generic;
-using XLibGame;
 
 namespace STGGame.UI
 {
@@ -10,12 +7,12 @@ namespace STGGame.UI
     public class FLabel : FComponent
     {
 
-        public string GetText()
+        public new string GetText()
         {
             return _obj.asTextField.text;
         }
 
-        public string SetText(string value)
+        public new string SetText(string value)
         {
             return _obj.asTextField.text = value;
         }

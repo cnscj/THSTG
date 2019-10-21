@@ -1,8 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using FairyGUI;
-using System.Collections.Generic;
-using XLibGame;
+﻿using FairyGUI;
 
 namespace STGGame.UI
 {

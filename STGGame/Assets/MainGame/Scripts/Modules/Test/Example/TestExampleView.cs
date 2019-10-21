@@ -1,23 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace STGGame.UI
 {
-    public class TestExampleView : FView
+    public class TestExampleView : FViewTabBar
     {
-        FList exampleList;
+        List<ViewParams> layers = new List<ViewParams>()
+        {
+            new ViewParams(){cls = typeof(TestExampleTextView),title = "文本"},
+            new ViewParams(){cls = typeof(TestExampleTextView),title = "测试"},
+        };
+
+
         public TestExampleView():base("Test", "TestExampleView")
         {
-            
+            _layers = layers;
         }
+
         protected override void OnInitUI()
         {
-            exampleList = GetChild<FList>("exampleList");
-            exampleList.SetState((int index, FComponent comp) =>
-            {
 
-
-            });
         }
 
         protected override void OnInitEvent()

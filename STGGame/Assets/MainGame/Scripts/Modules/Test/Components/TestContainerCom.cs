@@ -13,7 +13,7 @@ namespace STGGame.UI
             public string btnName;
             public EventCallback0 btnFunc;
         }
-        List<object> data = new List<object>()
+        List<ItemData> data = new List<ItemData>()
         {
             new ItemData()
             {
@@ -38,7 +38,9 @@ namespace STGGame.UI
         protected override void OnInitUI()
         {
             btnList = GetChild<FList>("btnList");
-            btnList.SetState((int index, FComponent comp,object data) =>
+            btnList.SetVirtual();
+            btnList.SetClass(typeof(FButton));
+            btnList.SetState((index,comp,data) =>
             {
                 var item = data as ItemData;
                 var btn = comp as FButton;

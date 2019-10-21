@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1024,576" opaque="false" designImage="ui://y59nubhfjtdb0">
+  <displayList>
+    <richtext id="n0_voe9" name="t1" xy="94,129" size="117,25" fontSize="18" autoSize="none" text="213213"/>
+    <text id="n1_voe9" name="t2" xy="95,171" size="171,25" fontSize="18" autoSize="none" text="3123"/>
+    <text id="n2_voe9" name="t3" xy="95,211" size="95,25" input="true" fontSize="18" autoSize="none" text="输入"/>
+  </displayList>
+</component>

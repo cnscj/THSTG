@@ -5,5 +5,5 @@
     <graph id="n0_jtdb" name="n0" xy="0,0" size="111,36" type="rect"/>
     <richtext id="n1_jtdb" name="title" xy="35,5" size="41,25" fontSize="18" text="标题"/>
   </displayList>
-  <Button downEffect="scale" downEffectValue="0.95"/>
+  <Button mode="Radio" downEffect="scale" downEffectValue="0.95"/>
 </component>

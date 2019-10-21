@@ -9,7 +9,7 @@ namespace XLibGame
     public class Dispatcher
     {
         
-        private Dictionary<int, SortedList<int,EventListener>> m_listeners = new Dictionary<int, SortedList<int, EventListener>>();
+        private Dictionary<int, SortedList<int,EventListener2>> m_listeners = new Dictionary<int, SortedList<int, EventListener2>>();
 
         /// <summary>
         /// 广播指定事件。
@@ -31,7 +31,7 @@ namespace XLibGame
         /// </summary>
         /// <param name="eventId">事件编号</param>
         /// <param name="listener">回调委托</param>
-        public void AddListener(int eventId, EventListener listener, int priority = 1)
+        public void AddListener(int eventId, EventListener2 listener, int priority = 1)
         {
             var listeners = GetEventListeners(eventId);
             listeners.Add(priority,listener);
@@ -42,7 +42,7 @@ namespace XLibGame
         /// </summary>
         /// <param name="eventId">事件编号</param>
         /// <param name="listenerToBeRemoved">回调委托</param>
-        public void RemoveListener(int eventId, EventListener listenerToBeRemoved)
+        public void RemoveListener(int eventId, EventListener2 listenerToBeRemoved)
         {
             var listeners = GetEventListeners(eventId);
             for (var i = 0; i < listeners.Count; i++)
@@ -75,12 +75,12 @@ namespace XLibGame
             return listeners.Count > 0;
         }
 
-        private SortedList<int, EventListener> GetEventListeners(int eventId)
+        private SortedList<int, EventListener2> GetEventListeners(int eventId)
         {
-            SortedList<int, EventListener> ret;
+            SortedList<int, EventListener2> ret;
             if (m_listeners.TryGetValue(eventId, out ret))
                 return ret;
-            ret = new SortedList<int, EventListener>();
+            ret = new SortedList<int, EventListener2>();
             m_listeners.Add(eventId, ret);
             return ret;
         }

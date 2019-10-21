@@ -13,8 +13,8 @@ namespace STGGame.UI
         protected Type _class = typeof(FComponent);
         protected object _classArgs = null;
 
-        protected FComponent _header;
-        protected FComponent _footer;
+        private FComponent __header;
+        private FComponent __footer;
 
         public delegate string ItemProvideFunc(object data, int index);
         public delegate void ItemStateFunc0(int index, FComponent comp);
@@ -46,7 +46,7 @@ namespace STGGame.UI
         }
 
         //////////////////////////////////////////////////
-        public void OnClickItem(EventCallback1 func)
+        public void SetClickItem(EventCallback1 func)
         {
             _obj.asList.onClickItem.Set(func);
         }
@@ -70,10 +70,6 @@ namespace STGGame.UI
         {
             _class = cls;
             _classArgs = clsArgs;
-        }
-        public void SetClass<T>(object clsArgs = null) where T : FComponent, new()
-        {
-            SetClass(typeof(T), clsArgs);
         }
 
         // 设置多样式虚拟列表
@@ -113,7 +109,7 @@ namespace STGGame.UI
                     fComp.InitWithObj(obj);
                     _dataTemplate[obj] = fComp;
                 }
-                func(index, fComp,_dataProvider[index]);
+                func(index, fComp, _dataProvider[index]);
             });
         }
 
@@ -122,12 +118,12 @@ namespace STGGame.UI
             return _dataTemplate;
         }
 
-
-        public void SetDataProvider(List<object> array)
+        public void SetDataProvider<T>(List<T> array) where T : new()
         {
             if (array != null)
             {
-                _dataProvider = array;
+                List<object> list = array.ConvertAll(s => (object)s);
+                _dataProvider = list;
             }
             else
             {
@@ -322,15 +318,15 @@ namespace STGGame.UI
         public FComponent GetHeader()
         {
             var obj = _obj.asList.scrollPane.header;
-            _header = (_header != null) ? (obj != null ? _header : null) : new FComponent().InitWithObj(obj) as FComponent;
-            return _header;
+            __header = (__header != null) ? (obj != null ? __header : null) : new FComponent().InitWithObj(obj) as FComponent;
+            return __header;
         }
 
         public FComponent GetFooter()
         {
             var obj = _obj.asList.scrollPane.footer;
-            _footer = (_footer != null) ? (obj != null ? _footer : null) : new FComponent().InitWithObj(obj) as FComponent;
-            return _footer;
+            __footer = (__footer != null) ? (obj != null ? __footer : null) : new FComponent().InitWithObj(obj) as FComponent;
+            return __footer;
         }
 
         public int ItemIndexToChildIndex(int index)

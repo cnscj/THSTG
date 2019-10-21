@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<component size="1024,576">
+<component size="1024,576" opaque="false">
   <displayList>
-    <component id="n0_jtdb" name="containerBtn" src="jtdb2" fileName="Components/TestContainerCom.xml" xy="5,4"/>
-    <component id="n3_jtdb" name="containerComp" src="jtdb4" fileName="TestContainerView.xml" xy="39,4" visible="false"/>
+    <component id="n0_jtdb" name="containerBtn" src="jtdb2" fileName="Components/TestContainerBtn.xml" xy="5,4"/>
+    <component id="n3_jtdb" name="containerComp" src="jtdb4" fileName="Components/TestContainerCom.xml" xy="39,4" visible="false"/>
   </displayList>
 </component>

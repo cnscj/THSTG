@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FairyGUI;
 using UnityEngine;
 
@@ -8,45 +6,39 @@ namespace STGGame.UI
 {
 	public class FView : FWidget
     {
-        private Dictionary<string, object> m_args;
-      
-        protected bool _isAsync = false;
-        protected int _layer = 0;
-    
-        public Dictionary<string, object> args { get { return m_args; } }
+        protected object _args;                         //参数
+        protected bool _isAsync = false;                //是否异步加载
+        protected int _layerOrder = 0;                  //层
+        protected bool _isFullScreen = false;           //是否全屏
+
+        public bool isAsync { get { return _isAsync; } }
+
 
         public FView(string package, string component):base(package, component)
         {
 
         }
 
-        public void Create(Dictionary<string, object> args = null)
+        public void ToCreate()
         {
-            m_args = args;
-            if (_isAsync)
+
+        }
+
+        public void ToAdd()
+        {
+            if (HasParent())
             {
-                UIPackage.CreateObjectAsync(package, component, _OnCreateSuccess);
-            }
-            else
-            {
-                GObject obj = UIPackage.CreateObject(package, component);
-                _OnCreateSuccess(obj);
+                if (!GetParent().IsDisposed())
+                {
+                    GetParent().AddChild(this);
+                }
             }
         }
 
-        private void _OnCreateSuccess(GObject obj)
+        public virtual void Close()
         {
-            if (obj == null)
-            {
-                Debug.LogError(string.Format("{0} {1} => package not found | 没有加载到包或组件", package, component));
-                return;
-            }
 
-            InitWithObj(obj);
-
-            GRoot.inst.AddChild(obj);
         }
-
     }
 
 }

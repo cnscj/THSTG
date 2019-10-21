@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using FairyGUI;
+﻿using FairyGUI;
 using System.Collections.Generic;
 using XLibGame;
 
@@ -9,20 +7,20 @@ namespace STGGame.UI
 
     public class FWidget : FComponent
     {
-        private string __package;
-        private string __component;
+        private readonly string __package = "";
+        private readonly string __component = "";
         public string package { get { return __package; } }
         public string component { get { return __component; } }
 
         protected float _interval = 0f;
         private int __scheduler = -1;
-        private List<KeyValuePair<int, XLibGame.EventListener>> __listener;
+        private List<KeyValuePair<int, EventListener2>> __listener;
 
-        public void AddEventListener(int eventId, XLibGame.EventListener listener)
+        public void AddEventListener(int eventId, EventListener2 listener)
         {
             DispatcherManager.GetInstance().AddListener(eventId, listener);
-            __listener = (__listener != null) ? __listener : new List<KeyValuePair<int, XLibGame.EventListener>>();
-            __listener.Add(new KeyValuePair<int, XLibGame.EventListener>(eventId, listener));
+            __listener = (__listener != null) ? __listener : new List<KeyValuePair<int, EventListener2>>();
+            __listener.Add(new KeyValuePair<int, EventListener2>(eventId, listener));
         }
 
         public FWidget(string package, string component)
@@ -32,6 +30,10 @@ namespace STGGame.UI
         }
 
         //
+        protected virtual void OnInit()
+        {
+
+        }
         protected virtual void OnInitUI()
         {
           
@@ -107,10 +109,11 @@ namespace STGGame.UI
             base.InitWithObj(obj);
             if (obj != null)
             {
+                OnInit();
+                OnInitUI();
+
                 obj.onAddedToStage.Add(_OnAddedToStage);
                 obj.onRemovedFromStage.Add(_OnEemovedFromStage);
-
-                OnInitUI();
             }
             return this;
         }

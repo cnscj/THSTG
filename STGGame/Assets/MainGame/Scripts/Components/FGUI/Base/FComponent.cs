@@ -1,16 +1,14 @@
 ﻿using UnityEngine;
-using System.Collections;
 using FairyGUI;
 using System.Collections.Generic;
-using XLibGame;
 
 namespace STGGame.UI
 {
 
     public class FComponent : FObject
     {
-        protected FGraph _graph;
-        protected FScrollPane _scrollPane;
+        private FGraph __graph;
+        private FScrollPane __scrollPane;
 
         public T GetChild<T>(string name) where T : FComponent, new()
         {
@@ -34,18 +32,19 @@ namespace STGGame.UI
         public void DebugUI()
         {
             var size = GetSize();
-            if (_graph != null)
+            if (__graph != null)
             {
-                _graph.Dispose();
-                _graph = null;
+                __graph.Dispose();
+                __graph = null;
             }
-            else
-            {
-                _graph = new FGraph().InitWithObj(new GGraph()) as FGraph;
-                _graph.DrawRect(size.x, size.y, 5, new Color(0xff,0x00,0x00),new Color(0x00,0x00,0x00));
-                _graph.SetTouchable(false);
 
-                AddChild(_graph);
+            if (__graph == null)
+            {
+                __graph = new FGraph().InitWithObj(new GGraph()) as FGraph;
+                __graph.DrawRect(size.x, size.y, 5, new Color(0xff,0x00,0x00,0xff),new Color(0x00,0x00,0x00,0x00));
+                __graph.SetTouchable(false);
+
+                AddChild(__graph);
             }
         }
         //
@@ -107,8 +106,9 @@ namespace STGGame.UI
         }
         public FScrollPane GetScrollPane()
         {
-            _scrollPane = (_scrollPane != null) ? _scrollPane : new FScrollPane(_obj.asCom.scrollPane);
-            return _scrollPane;
+            var obj = _obj.asCom.scrollPane;
+            __scrollPane = (__scrollPane != null) ? (obj != null ? __scrollPane : null): new FScrollPane(obj);
+            return __scrollPane;
         }
 
         //
