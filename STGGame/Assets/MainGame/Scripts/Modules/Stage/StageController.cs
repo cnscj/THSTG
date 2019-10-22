@@ -16,7 +16,7 @@ namespace STGGame
             Debug.Log(TestConfiger.GetResSrc("reimu"));
         }
 
-        protected void Test(int eventId, Dictionary<string, object> args)
+        protected void Test(int eventId, object args)
         {
             Debug.Log(StageCache.GetInstance().testString);
         }

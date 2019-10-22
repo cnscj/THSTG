@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FairyGUI;
 
 namespace STGGame.UI
 {
@@ -85,7 +86,7 @@ namespace STGGame.UI
                     var curView = _children[index].view;
                     if (curView != null)
                     {
-                        curView.ToAdd();
+                        curView.ForAdd();
                     }
                     else
                     {
@@ -133,13 +134,13 @@ namespace STGGame.UI
             
         }
 
-
         //重写后不希望再被重写
-        protected override void OnInit()
+        public override FWrapper<GObject> InitWithObj(GObject obj)
         {
+            base.InitWithObj(obj);
             __InitBarList();
             __InitLayerStack();
-
+            return this;
         }
     }
 

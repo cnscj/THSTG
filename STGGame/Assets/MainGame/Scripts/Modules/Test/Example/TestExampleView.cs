@@ -11,7 +11,7 @@ namespace STGGame.UI
             new ViewParams(){cls = typeof(TestExampleTextView),title = "文本"},
             new ViewParams(){cls = typeof(TestExampleTextView),title = "测试"},
         };
-
+        FButton closeBtn;
 
         public TestExampleView():base("Test", "TestExampleView")
         {
@@ -20,7 +20,11 @@ namespace STGGame.UI
 
         protected override void OnInitUI()
         {
-
+            closeBtn = GetChild<FButton>("closeBtn");
+            closeBtn.SetClick((context) =>
+            {
+                Close();
+            });
         }
 
         protected override void OnInitEvent()

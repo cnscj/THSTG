@@ -3,27 +3,26 @@
 namespace STGGame.UI
 {
 
-    public class FTransition
+    public class FTransition : FWrapper<Transition>
     {
-        protected Transition _obj;
-        public FTransition(Transition trans)
-        {
-            _obj = trans;
-        }
-
-        public Transition GetObject()
-        {
-            return _obj;
-        }
-
         public void Play()
         {
-            
+            _obj.Play();
         }
 
         public void Play(PlayCompleteCallback onComplete)
         {
-           
+            _obj.Play(onComplete);
+        }
+
+        public void Stop()
+        {
+            _obj.Stop();
+        }
+
+        public bool IsPlaying()
+        {
+            return _obj.playing;
         }
     }
 

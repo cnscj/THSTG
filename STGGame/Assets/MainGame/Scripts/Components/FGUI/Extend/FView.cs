@@ -6,10 +6,10 @@ namespace STGGame.UI
 {
 	public class FView : FWidget
     {
-        protected object _args;                         //参数
-        protected bool _isAsync = false;                //是否异步加载
-        protected int _layerOrder = 0;                  //层
-        protected bool _isFullScreen = false;           //是否全屏
+        protected object _args;                 //参数
+        protected bool _isAsync;                //是否异步加载
+        protected int _layerOrder = 0;          //层
+        protected bool _isFullScreen;           //是否全屏
 
         public bool isAsync { get { return _isAsync; } }
 
@@ -19,12 +19,12 @@ namespace STGGame.UI
 
         }
 
-        public void ToCreate()
+        public void ForCreate()
         {
 
         }
 
-        public void ToAdd()
+        public void ForAdd()
         {
             if (HasParent())
             {
@@ -37,7 +37,8 @@ namespace STGGame.UI
 
         public virtual void Close()
         {
-
+            //TODO:
+            //ViewManager.GetInstance().Close(this);
         }
     }
 

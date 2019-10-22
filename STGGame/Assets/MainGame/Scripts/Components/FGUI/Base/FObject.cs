@@ -3,27 +3,14 @@ using FairyGUI;
 
 namespace STGGame.UI
 {
-    public class FObject
+    public class FObject : FWrapper<GObject>
     {
-        protected GObject _obj;
-
         private FComponent __parent;
-
-        public virtual FObject InitWithObj(GObject obj)
-        {
-            this._obj = obj;
-            return this;
-        }
-
-        public GObject GetObject()
-        {
-            return _obj;
-        }
 
         public FComponent GetParent()
         {
             var obj = _obj.parent;
-            __parent = (__parent != null) ? (obj != null ? __parent : null) : new FComponent().InitWithObj(obj) as FComponent;
+            __parent = (__parent != null) ? (obj != null ? __parent.InitWithObj(obj) as FComponent : null) : new FComponent().InitWithObj(obj) as FComponent;
             return __parent;
         }
 

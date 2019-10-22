@@ -15,6 +15,10 @@ namespace STGGame.UI
             GObject obj = this._obj.asCom.GetChild(name);
             return FGUIUtil.CreateComponent<T>(obj);
         }
+        public FComponent GetChild(string name)
+        {
+            return GetChild<FComponent>(name);
+        }
 
         public FComponent[] GetChildren()
         {
@@ -96,18 +100,18 @@ namespace STGGame.UI
         public FController GetController(string name)
         {
             Controller ctrl = _obj.asCom.GetController(name);
-            return new FController(ctrl);
+            return new FController().InitWithObj(ctrl) as FController;
         }
 
         public FTransition GetTransition(string name)
         {
             Transition trans = _obj.asCom.GetTransition(name);
-            return new FTransition(trans);
+            return new FTransition().InitWithObj(trans) as FTransition;
         }
         public FScrollPane GetScrollPane()
         {
             var obj = _obj.asCom.scrollPane;
-            __scrollPane = (__scrollPane != null) ? (obj != null ? __scrollPane : null): new FScrollPane(obj);
+            __scrollPane = (__scrollPane != null) ? (obj != null ? __scrollPane.InitWithObj(obj) as FScrollPane : null): new FScrollPane().InitWithObj(obj) as FScrollPane;
             return __scrollPane;
         }
 

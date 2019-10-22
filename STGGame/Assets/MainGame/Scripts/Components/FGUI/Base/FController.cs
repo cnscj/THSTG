@@ -3,19 +3,8 @@
 namespace STGGame.UI
 {
 
-    public class FController
+    public class FController : FWrapper<Controller>
     {
-        protected Controller _obj;
-        public FController(Controller ctrl)
-        {
-            _obj = ctrl;
-        }
-
-        public Controller GetObject()
-        {
-            return _obj;
-        }
-
         public void SetSelectedIndex(int index)
         {
             _obj.selectedIndex = index;

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="48,48" pivot="0.5,0.5" extention="Button">
+  <controller name="button" pages="0,up,1,down" selected="0"/>
+  <displayList>
+    <graph id="n2_vd2z" name="n2" xy="0,0" size="48,48" type="eclipse" lineColor="#ff999999" fillColor="#ffcccccc"/>
+    <richtext id="n3_vd2z" name="title" xy="13,7" size="22,33" fontSize="26" text="X"/>
+  </displayList>
+  <Button downEffect="scale" downEffectValue="0.95"/>
+</component>

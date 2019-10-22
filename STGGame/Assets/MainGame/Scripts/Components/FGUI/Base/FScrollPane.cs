@@ -3,33 +3,22 @@
 namespace STGGame.UI
 {
 
-    public class FScrollPane
+    public class FScrollPane : FWrapper<ScrollPane>
     {
-        protected ScrollPane _obj;
         private FComponent __header;
         private FComponent __footer;
-
-        public FScrollPane(ScrollPane scrollPane)
-        {
-            _obj = scrollPane;
-        }
-
-        public ScrollPane GetObject()
-        {
-            return _obj;
-        }
 
         public FComponent GetHeader()
         {
             var obj = _obj.header;
-            __header = (__header != null) ? (obj != null ? __header : null) : new FComponent().InitWithObj(obj) as FComponent;
+            __header = (__header != null) ? (obj != null ? __header.InitWithObj(obj) as FComponent : null) : new FComponent().InitWithObj(obj) as FComponent;
             return __header;
         }
 
         public FComponent GetFooter()
         {
             var obj = _obj.footer;
-            __footer = (__footer != null) ? (obj != null ? __footer : null) : new FComponent().InitWithObj(obj) as FComponent;
+            __footer = (__footer != null) ? (obj != null ? __footer.InitWithObj(obj) as FComponent : null) : new FComponent().InitWithObj(obj) as FComponent;
             return __footer;
         }
 

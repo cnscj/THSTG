@@ -4,7 +4,7 @@
     <graph id="n1_voe9" name="biImg" xy="0,0" size="1024,576" type="rect" lineSize="0" lineColor="#ff999999" fillColor="#ff999999">
       <relation target="" sidePair="width-width,height-height"/>
     </graph>
-    <list id="n0_jtdb" name="list" xy="37,11" size="949,74" layout="flow_hz" overflow="scroll" lineGap="5" colGap="5" defaultItem="ui://y59nubhfjtdb1" autoClearItems="true">
+    <list id="n0_jtdb" name="list" xy="37,11" size="926,80" layout="flow_hz" overflow="scroll" lineGap="5" colGap="5" defaultItem="ui://y59nubhfjtdb1" autoClearItems="true">
       <item/>
       <item/>
       <item/>
@@ -17,5 +17,6 @@
       <item/>
       <item/>
     </list>
+    <component id="n2_vd2z" name="closeBtn" src="vd2z1" fileName="Button/ButtonClose1.xml" pkg="y8wff1cb" xy="969,5"/>
   </displayList>
 </component>

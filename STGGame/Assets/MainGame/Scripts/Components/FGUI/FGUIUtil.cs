@@ -41,7 +41,7 @@ namespace STGGame
             T view = new T();
             if (view != null)
             {
-                view.ToCreate();
+                view.ForCreate();
             }
             
             return view;
@@ -53,7 +53,7 @@ namespace STGGame
             FView view = asm.CreateInstance(cls.FullName) as FView;
             if (view != null)
             {
-                view.ToCreate();
+                view.ForCreate();
             }
             
             return view;

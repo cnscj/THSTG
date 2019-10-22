@@ -33,7 +33,7 @@ namespace STGGame.UI
 
         }
 
-        private void _updateLayer(int e, Dictionary<string, object> args)
+        private void _updateLayer(int e, object args)
         {
 
         }

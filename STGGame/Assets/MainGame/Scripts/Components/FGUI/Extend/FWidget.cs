@@ -30,10 +30,6 @@ namespace STGGame.UI
         }
 
         //
-        protected virtual void OnInit()
-        {
-
-        }
         protected virtual void OnInitUI()
         {
           
@@ -104,17 +100,17 @@ namespace STGGame.UI
         }
 
         ///
-        public override FObject InitWithObj(GObject obj)
+        public override FWrapper<GObject> InitWithObj(GObject obj)
         {
-            base.InitWithObj(obj);
-            if (obj != null)
+            if (obj != null && obj != _obj)
             {
-                OnInit();
+                base.InitWithObj(obj);
                 OnInitUI();
 
                 obj.onAddedToStage.Add(_OnAddedToStage);
                 obj.onRemovedFromStage.Add(_OnEemovedFromStage);
             }
+            
             return this;
         }
     }

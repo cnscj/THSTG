@@ -13,9 +13,6 @@ namespace STGGame.UI
         protected Type _class = typeof(FComponent);
         protected object _classArgs = null;
 
-        private FComponent __header;
-        private FComponent __footer;
-
         public delegate string ItemProvideFunc(object data, int index);
         public delegate void ItemStateFunc0(int index, FComponent comp);
         public delegate void ItemStateFunc1(int index, FComponent comp, object data);
@@ -157,23 +154,23 @@ namespace STGGame.UI
         //////////////////////////////////////////////////
 
         // 移动scroll
-        public void ScrollToView(int index, bool IsAction = false)
+        public void ScrollToView(int index, bool isAction = false)
         {
             if (index < 1)
             {
                 index = 1;
             }
-            _obj.asList.ScrollToView(index - 1, IsAction);
+            _obj.asList.ScrollToView(index - 1, isAction);
         }
 
-        public void ScrollToTop(bool IsAction = false)
+        public void ScrollToTop(bool isAction = false)
         {
-            ScrollToView(1, false);
+            ScrollToView(1, isAction);
         }
 
-        public void ScrollToBottom(bool IsAction = false)
+        public void ScrollToBottom(bool isAction = false)
         {
-            ScrollToView(_dataProvider.Count, IsAction);
+            ScrollToView(_dataProvider.Count, isAction);
         }
 
 
@@ -188,11 +185,15 @@ namespace STGGame.UI
         }
 
 
-        // 获取当前选中的data
+        // 获取当前选中的data，list里面的item是单选按钮才生效
         public object GetSelectedData()
         {
             var index = GetSelectedIndex();
-            return _dataProvider[index]; 
+            if (index >= 0)
+            {
+                return _dataProvider[index];
+            }
+            return null;
         }
 
         // 获取当前选中第几个，list里面的item是单选按钮才生效
@@ -317,16 +318,12 @@ namespace STGGame.UI
 
         public FComponent GetHeader()
         {
-            var obj = _obj.asList.scrollPane.header;
-            __header = (__header != null) ? (obj != null ? __header : null) : new FComponent().InitWithObj(obj) as FComponent;
-            return __header;
+            return GetScrollPane().GetHeader();
         }
 
         public FComponent GetFooter()
         {
-            var obj = _obj.asList.scrollPane.footer;
-            __footer = (__footer != null) ? (obj != null ? __footer : null) : new FComponent().InitWithObj(obj) as FComponent;
-            return __footer;
+            return GetScrollPane().GetFooter();
         }
 
         public int ItemIndexToChildIndex(int index)
@@ -367,11 +364,12 @@ namespace STGGame.UI
         public FComponent GetCompByIndex(int index)
         {
             int childIndex = _obj.asList.ItemIndexToChildIndex(index);
-            if (childIndex >= 0 && childIndex < _obj.asList.numChildren) ;
+            if (childIndex >= 0 && childIndex < _obj.asList.numChildren)
             {
                 var obj = _obj.asList.GetChildAt(childIndex);
                 return _dataTemplate[obj];
             }
+            return null;
         }
 
         // 返回当前滚动位置是否在最下边
