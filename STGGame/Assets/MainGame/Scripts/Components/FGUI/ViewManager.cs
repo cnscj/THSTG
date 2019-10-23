@@ -6,6 +6,7 @@ using FairyGUI;
 using STGGame.UI;
 using UnityEngine;
 
+
 namespace STGGame
 {
     public class ViewManager : MonoSingleton<ViewManager>
@@ -15,7 +16,7 @@ namespace STGGame
         {
             //TODO:
             ViewInfo viewInfo = null;
-            if (!m_viewMaps.TryGetValue(typeof(T), out viewInfo))
+            if (!m_viewMaps.TryGetValue(GetViewKey<T>(), out viewInfo))
             {
                 T view = new T();
                 string packageName = view.package;
@@ -37,19 +38,25 @@ namespace STGGame
 
         }
 
-        public void Close<T>() where T : FView
+        public void Close(Type type)
         {
             ViewInfo viewInfo = null;
-            if (!m_viewMaps.TryGetValue(typeof(T), out viewInfo))
+            if (!m_viewMaps.TryGetValue(type, out viewInfo))
             {
 
             }
         }
 
+        public void Close<T>() where T : FView
+        {
+            Close(typeof(T));
+        }
+
+
         public bool IsOpened<T>() where T : FView
         {
             ViewInfo viewInfo = null;
-            if (!m_viewMaps.TryGetValue(typeof(T), out viewInfo))
+            if (!m_viewMaps.TryGetValue(GetViewKey<T>(), out viewInfo))
             {
 
             }
@@ -59,7 +66,7 @@ namespace STGGame
         public T GetView<T>() where T : FView
         {
             ViewInfo viewInfo = null;
-            if (!m_viewMaps.TryGetValue(typeof(T), out viewInfo))
+            if (!m_viewMaps.TryGetValue(GetViewKey<T>(), out viewInfo))
             {
                 return viewInfo as T;
             }
@@ -99,8 +106,13 @@ namespace STGGame
 
             view.InitWithObj(obj);
 
-            m_viewMaps.Add(typeof(T), viewInfo);
+            m_viewMaps.Add(GetViewKey<T>(), viewInfo);
             GRoot.inst.AddChild(obj);
+        }
+
+        private Type GetViewKey<T>(FView view = null)
+        {
+            return typeof(T);
         }
     }
 

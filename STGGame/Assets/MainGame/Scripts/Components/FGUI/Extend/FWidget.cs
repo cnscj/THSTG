@@ -100,7 +100,7 @@ namespace STGGame.UI
         }
 
         ///
-        public override FWrapper<GObject> InitWithObj(GObject obj)
+        public override Wrapper<GObject> InitWithObj(GObject obj)
         {
             if (obj != null && obj != _obj)
             {

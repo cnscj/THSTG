@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using FairyGUI;
-using UnityEngine;
-
+﻿
 namespace STGGame.UI
 {
 	public class FView : FWidget
@@ -37,8 +34,7 @@ namespace STGGame.UI
 
         public virtual void Close()
         {
-            //TODO:
-            //ViewManager.GetInstance().Close(this);
+            ViewManager.GetInstance().Close(this.GetType());
         }
     }
 

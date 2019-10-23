@@ -29,7 +29,7 @@ namespace STGGame.UI
             }
         }
 
-        public override FWrapper<GObject> InitWithObj(GObject obj)
+        public override Wrapper<GObject> InitWithObj(GObject obj)
         {
             return base.InitWithObj(obj);
         }

@@ -3,7 +3,7 @@
 namespace STGGame.UI
 {
 
-    public class FTweener : FWrapper<GTweener>
+    public class FTweener : Wrapper<GTweener>
     {
         public void Kill()
         {

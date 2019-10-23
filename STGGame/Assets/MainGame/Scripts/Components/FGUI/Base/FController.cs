@@ -3,7 +3,7 @@
 namespace STGGame.UI
 {
 
-    public class FController : FWrapper<Controller>
+    public class FController : Wrapper<Controller>
     {
         public void SetSelectedIndex(int index)
         {

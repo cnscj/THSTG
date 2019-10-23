@@ -135,7 +135,7 @@ namespace STGGame.UI
         }
 
         //重写后不希望再被重写
-        public override FWrapper<GObject> InitWithObj(GObject obj)
+        public override Wrapper<GObject> InitWithObj(GObject obj)
         {
             base.InitWithObj(obj);
             __InitBarList();

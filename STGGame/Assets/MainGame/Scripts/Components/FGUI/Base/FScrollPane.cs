@@ -3,7 +3,7 @@
 namespace STGGame.UI
 {
 
-    public class FScrollPane : FWrapper<ScrollPane>
+    public class FScrollPane : Wrapper<ScrollPane>
     {
         private FComponent __header;
         private FComponent __footer;

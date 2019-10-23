@@ -3,7 +3,7 @@ using FairyGUI;
 
 namespace STGGame.UI
 {
-    public class FObject : FWrapper<GObject>
+    public class FObject : Wrapper<GObject>
     {
         private FComponent __parent;
 

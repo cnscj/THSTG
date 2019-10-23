@@ -3,7 +3,7 @@
 namespace STGGame.UI
 {
 
-    public class FTransition : FWrapper<Transition>
+    public class FTransition : Wrapper<Transition>
     {
         public void Play()
         {

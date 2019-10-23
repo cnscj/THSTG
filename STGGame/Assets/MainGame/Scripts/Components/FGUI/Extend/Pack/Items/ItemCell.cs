@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace STGGame.UI
 {
-    public class ItemCell : FComponent
+    public class ItemCell : FWidget
     {
-        public ItemCell(ItemData data)
+        public ItemCell(ItemData data):base("UIPublic","ItemCell")
         {
 
         }
