@@ -102,6 +102,11 @@ namespace ASEditor
                 }
             });
 
+            if (XFolderTools.CheckNullFolder(m_md5Folder))
+            {
+                XFolderTools.DeleteDirectory(m_md5Folder);
+            }
+
             XFolderTools.TraverseFiles(m_exportFolder, (fullPath) =>
             {
                 //XXX:检测机制有误(源文件名可能与输出文件名不一致)
@@ -127,6 +132,11 @@ namespace ASEditor
                     }
                 }
             });
+
+            if (XFolderTools.CheckNullFolder(m_exportFolder))
+            {
+                XFolderTools.DeleteDirectory(m_exportFolder);
+            }
 
             AssetDatabase.Refresh();
         }
