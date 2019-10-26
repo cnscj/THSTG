@@ -11,7 +11,7 @@ namespace STGGame.UI
         public string package { get; protected set; }
         public string component { get; protected set; }
 
-        protected float _interval = 0f;
+        protected float _interval = -1.0f;
         private int __scheduler = -1;
         private List<KeyValuePair<int, EventListener2>> __listener;
 
@@ -72,7 +72,7 @@ namespace STGGame.UI
 
         private void _InitScheduler()
         {
-            if (_interval > 0f)
+            if (_interval >= 0f)
             {
                 __scheduler = SchedulerManager.GetInstance().Schedule(OnTick, _interval);
             }

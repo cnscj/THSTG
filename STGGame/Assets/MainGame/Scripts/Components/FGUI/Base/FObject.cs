@@ -5,6 +5,7 @@ namespace STGGame.UI
 {
     public class FObject : Wrapper<GObject>
     {
+       
         private FComponent __parent;
 
         public FComponent GetParent()
@@ -17,6 +18,7 @@ namespace STGGame.UI
         public void SetX(float x)
         {
             _obj.x = x;
+
         }
         public float GetX()
         {
@@ -393,6 +395,7 @@ namespace STGGame.UI
                 _obj.text = "";
             }
         }
+
         //
         public void Center()
         {

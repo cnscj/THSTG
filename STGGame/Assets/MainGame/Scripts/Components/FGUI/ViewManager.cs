@@ -42,7 +42,7 @@ namespace STGGame
                     viewInfo.view.Dispose();
                     m_viewMaps.Remove(type);
 
-                    //释放包的引用
+                    //TODO:释放包的引用
                 }
                 else
                 {

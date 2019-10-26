@@ -35,6 +35,7 @@ namespace STGGame.UI
 
         public void DebugUI()
         {
+#if DEBUG
             var size = GetSize();
             if (__graph != null)
             {
@@ -50,31 +51,32 @@ namespace STGGame.UI
 
                 AddChild(__graph);
             }
+#endif
         }
         //
-        public void AddChild(FComponent comp)
+        public virtual void AddChild(FComponent comp)
         {
             _obj.asCom.AddChild(comp.GetObject());
         }
-        public void AddChildAt(FComponent comp, int idx)
+        public virtual void AddChildAt(FComponent comp, int idx)
         {
             _obj.asCom.AddChildAt(comp.GetObject(), idx);
         }
 
-        public void RemoveChild(FComponent comp,bool isDisposed = false)
+        public virtual void RemoveChild(FComponent comp,bool isDisposed = false)
         {
             _obj.asCom.RemoveChild(comp.GetObject(), isDisposed);
         }
-        public void RemoveChildren()
+        public virtual void RemoveChildren()
         {
             _obj.asCom.RemoveChildren();
         }
 
-        public void RemoveAllChildren(bool isDisposed = false)
+        public virtual void RemoveAllChildren(bool isDisposed = false)
         {
             _obj.asCom.RemoveChildren(0, -1, isDisposed);
         }
-        public void RemoveFromParent()
+        public virtual void RemoveFromParent()
         {
             _obj.asCom.RemoveFromParent();
         }

@@ -24,9 +24,9 @@ namespace STGGame.UI
 
         protected FList _list;
         protected List<ViewParams> _layers;
-        protected List<ViewInfo> _children;
+        protected Dictionary<int, ViewInfo> _children;
 
-        private int __preIndex = -2;
+        private int __preIndex = -1;
 
 
         public FViewTabBar(string package,string component):base(package, component)
@@ -37,16 +37,18 @@ namespace STGGame.UI
         {
             if (_children != null)
             {
-                foreach(var child in _children)
+                foreach(var pair in _children)
                 {
-                    if (child.view != null)
+                    var viewInfo = pair.Value;
+                    if (viewInfo.view != null)
                     {
-                        child.view.Close();
+                        viewInfo.view.Close();
                     }
                 }
                 _children.Clear();
                 _children = null;
             }
+            base.Close();
         }
 
         private void __InitBarList()
@@ -65,10 +67,7 @@ namespace STGGame.UI
 
                 _list.AddClickItem((context) =>
                 {
-                    if (_children == null)
-                    {
-                        return;
-                    }
+                    _children = (_children != null) ? _children : new Dictionary<int, ViewInfo>();
 
                     var data = _list.GetSelectedData() as ViewParams;
                     var index = _list.GetSelectedIndex();
@@ -77,11 +76,12 @@ namespace STGGame.UI
                     {
                         return;
                     }
-                    Debug.Log("!!!!");
-                    var preView = (__preIndex >= 0 && __preIndex <= _children.Count - 1) ? _children[__preIndex].view : null;
-                    if (preView != null)
+
+                    ViewInfo preViewInfo = null;
+                    if (_children.TryGetValue(__preIndex, out preViewInfo))
                     {
-                        if (preView.HasParent())
+                        var preView = preViewInfo.view;
+                        if (preView != null)
                         {
                             preView.RemoveFromParent();
                         }
@@ -89,33 +89,36 @@ namespace STGGame.UI
 
                     var curIndex = index;
                     __preIndex = curIndex;
-  
-                    var curView = (curIndex >= 0 && curIndex <= _children.Count - 1) ? _children[curIndex].view : null;
-                    if (curView != null)
+
+                    bool isNeedCreate = true;
+                    ViewInfo curViewInfo = null;
+                    if (_children.TryGetValue(curIndex, out curViewInfo))
                     {
-                        if (curView.HasParent())
+                        var curView = curViewInfo.view;
+                        if (curView != null)
                         {
-                            if (!curView.GetParent().IsDisposed())
+                            if (!curView.IsDisposed())
                             {
-                                curView.GetParent().AddChild(curView);
+                                AddChild(curView);
+                                isNeedCreate = false;
                             }
                         }
-                        Debug.Log("####");
                     }
-                    else
+
+                    if (isNeedCreate)
                     {
-                        Debug.Log("%%%%");
                         var newData = _list.GetSelectedData() as ViewParams;
                         var newIndex = _list.GetSelectedIndex();
                         if (curIndex != newIndex)
                         {
                             return;
                         }
-                        Debug.Log("^^^");
+                        
                         var newView = FGUIUtil.CreateView(newData.cls);
                         ViewInfo newViewInfo = new ViewInfo();
-                        _children[curIndex] = newViewInfo;
                         newViewInfo.view = newView;
+
+                        _children[curIndex] = newViewInfo;
 
                         AddChild(newView);
                     }
@@ -129,9 +132,10 @@ namespace STGGame.UI
 
             if (_layers != null && _list != null)
             {
-                _children = (_children != null) ? _children : new List<ViewInfo>();
-                _children.Clear();
-
+                if (_children != null)
+                {
+                    _children.Clear();
+                }
                 _list.SetDataProvider(_layers);
                 _list.ScrollToView(_list.GetSelectedIndex());
             }
