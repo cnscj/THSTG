@@ -34,12 +34,12 @@ namespace STGGame
                 if (info.Key == PackageLoadMode.PathString)
                 {
                     string uiPath = info.Value as string;
-                    UIPackage.AddPackage(uiPath);
+                    package = UIPackage.AddPackage(uiPath);
                 }
                 else if(info.Key == PackageLoadMode.AssetBundlePair)
                 {
                     KeyValuePair<AssetBundle, AssetBundle> pair = (KeyValuePair<AssetBundle, AssetBundle>)info.Value;
-                    UIPackage.AddPackage(pair.Key, pair.Value);
+                    package = UIPackage.AddPackage(pair.Key, pair.Value);
                 }
 
                 if (package != null)

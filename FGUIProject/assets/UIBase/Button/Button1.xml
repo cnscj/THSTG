@@ -3,7 +3,7 @@
   <controller name="button" pages="0,up,1,down" selected="0"/>
   <displayList>
     <graph id="n1_jtdb" name="n1" xy="0,0" size="160,58" type="rect"/>
-    <richtext id="n0_po2z" name="title" xy="80,28" pivot="0.5,0.5" anchor="true" size="41,25" fontSize="18" align="center" vAlign="middle" text="标题"/>
+    <richtext id="n0_po2z" name="title" xy="80,28" pivot="0.5,0.5" anchor="true" size="45,27" fontSize="20" align="center" vAlign="middle" text="标题"/>
   </displayList>
   <Button downEffect="scale" downEffectValue="0.95"/>
 </component>

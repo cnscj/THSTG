@@ -14,103 +14,71 @@ namespace STGGame
         private Dictionary<Type, ViewInfo> m_viewMaps = new Dictionary<Type, ViewInfo>();
         public void Open<T>(object args = null) where T : FView, new()
         {
-            //TODO:
             ViewInfo viewInfo = null;
-            if (!m_viewMaps.TryGetValue(GetViewKey<T>(), out viewInfo))
+            if (!m_viewMaps.TryGetValue(__GetViewKey<T>(), out viewInfo))
             {
-                T view = new T();
-                string packageName = view.package;
-                string componentName = view.component;
-
-                //检查包是否有加载
-                if (PackageManager.GetInstance().GetPackageInfo(packageName) == null)
+                //加载View
+                FGUIUtil.CreateView<T>(args).OnCreated((view)=>
                 {
-                    PackageManager.GetInstance().AddPackage(packageName);
-                }
-                //
+                    viewInfo = new ViewInfo();
+                    viewInfo.view = view;
 
-                __CreateView<T>(view, args);
-            }
-            else
-            {
+                    GRoot.inst.AddChild(view.GetObject());
 
+                    m_viewMaps.Add(__GetViewKey<T>(), viewInfo);
+                });  
             }
 
+            //
         }
 
-        public void Close(Type type)
+        public void Close(Type type, bool isDisposed = true)
         {
             ViewInfo viewInfo = null;
-            if (!m_viewMaps.TryGetValue(type, out viewInfo))
+            if (m_viewMaps.TryGetValue(type, out viewInfo))
             {
+                if (isDisposed)
+                {
+                    viewInfo.view.Dispose();
+                    m_viewMaps.Remove(type);
 
+                    //释放包的引用
+                }
+                else
+                {
+                    viewInfo.view.RemoveFromParent();
+                }
             }
         }
 
-        public void Close<T>() where T : FView
+        public void Close<T>(bool isDisposed = true) where T : FView
         {
-            Close(typeof(T));
+            Close(typeof(T), isDisposed);
         }
 
 
         public bool IsOpened<T>() where T : FView
         {
             ViewInfo viewInfo = null;
-            if (!m_viewMaps.TryGetValue(GetViewKey<T>(), out viewInfo))
+            if (m_viewMaps.TryGetValue(__GetViewKey<T>(), out viewInfo))
             {
 
             }
             return false;
         }
 
-        public T GetView<T>() where T : FView
+        public ViewInfo GetView<T>() where T : FView
         {
             ViewInfo viewInfo = null;
-            if (!m_viewMaps.TryGetValue(GetViewKey<T>(), out viewInfo))
+            if (m_viewMaps.TryGetValue(__GetViewKey<T>(), out viewInfo))
             {
-                return viewInfo as T;
+                return viewInfo;
             }
             return null;
         }
 
-
-
         ////
-        public void __CreateView<T>(T view, object args = null) where T : FView
-        {
-            if (view.isAsync)
-            {
-                UIPackage.CreateObjectAsync(view.package, view.component, (obj) =>
-                {
-                    _OnCreateSuccess<T>(obj, view);
-                });
-            }
-            else
-            {
-                GObject obj = UIPackage.CreateObject(view.package, view.component);
-                _OnCreateSuccess<T>(obj, view);
-            }
-
-        }
-
-        private void _OnCreateSuccess<T>(GObject obj,T view) where T : FView
-        {
-            if (obj == null)
-            {
-                Debug.LogError(string.Format("{0} {1} => package not found | 没有加载到包或组件", view.package, view.component));
-                return;
-            }
-            //加载包
-            ViewInfo viewInfo = new ViewInfo();
-            viewInfo.view = view;
-
-            view.InitWithObj(obj);
-
-            m_viewMaps.Add(GetViewKey<T>(), viewInfo);
-            GRoot.inst.AddChild(obj);
-        }
-
-        private Type GetViewKey<T>(FView view = null)
+        private Type __GetViewKey<T>(FView view = null)
         {
             return typeof(T);
         }

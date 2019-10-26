@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FairyGUI;
+using UnityEngine;
 
 namespace STGGame.UI
 {
@@ -25,7 +26,7 @@ namespace STGGame.UI
         protected List<ViewParams> _layers;
         protected List<ViewInfo> _children;
 
-        private int __preIndex = -1;
+        private int __preIndex = -2;
 
 
         public FViewTabBar(string package,string component):base(package, component)
@@ -54,6 +55,7 @@ namespace STGGame.UI
             if (_list != null)
             {
                 _list.SetVirtual();
+
                 _list.SetState((index, comp, data) =>
                 {
                     var viewParams = data as ViewParams;
@@ -63,6 +65,11 @@ namespace STGGame.UI
 
                 _list.AddClickItem((context) =>
                 {
+                    if (_children == null)
+                    {
+                        return;
+                    }
+
                     var data = _list.GetSelectedData() as ViewParams;
                     var index = _list.GetSelectedIndex();
 
@@ -70,8 +77,8 @@ namespace STGGame.UI
                     {
                         return;
                     }
-
-                    var preView = _children[__preIndex].view;
+                    Debug.Log("!!!!");
+                    var preView = (__preIndex >= 0 && __preIndex <= _children.Count - 1) ? _children[__preIndex].view : null;
                     if (preView != null)
                     {
                         if (preView.HasParent())
@@ -81,27 +88,38 @@ namespace STGGame.UI
                     }
 
                     var curIndex = index;
-                    __preIndex = index;
-
-                    var curView = _children[index].view;
+                    __preIndex = curIndex;
+  
+                    var curView = (curIndex >= 0 && curIndex <= _children.Count - 1) ? _children[curIndex].view : null;
                     if (curView != null)
                     {
-                        curView.ForAdd();
+                        if (curView.HasParent())
+                        {
+                            if (!curView.GetParent().IsDisposed())
+                            {
+                                curView.GetParent().AddChild(curView);
+                            }
+                        }
+                        Debug.Log("####");
                     }
                     else
                     {
+                        Debug.Log("%%%%");
                         var newData = _list.GetSelectedData() as ViewParams;
                         var newIndex = _list.GetSelectedIndex();
                         if (curIndex != newIndex)
                         {
                             return;
                         }
-
+                        Debug.Log("^^^");
                         var newView = FGUIUtil.CreateView(newData.cls);
                         ViewInfo newViewInfo = new ViewInfo();
-                        _children[index] = newViewInfo;
+                        _children[curIndex] = newViewInfo;
                         newViewInfo.view = newView;
+
+                        AddChild(newView);
                     }
+
                 });
             }
         }
@@ -113,14 +131,6 @@ namespace STGGame.UI
             {
                 _children = (_children != null) ? _children : new List<ViewInfo>();
                 _children.Clear();
-
-                foreach (var layer in _layers)
-                {
-                    ViewInfo viewInfo = new ViewInfo();
-                    viewInfo.view = FGUIUtil.CreateView(layer.cls);
-
-                    _children.Add(viewInfo);
-                }
 
                 _list.SetDataProvider(_layers);
                 _list.ScrollToView(_list.GetSelectedIndex());
@@ -138,8 +148,10 @@ namespace STGGame.UI
         public override Wrapper<GObject> InitWithObj(GObject obj)
         {
             base.InitWithObj(obj);
+
             __InitBarList();
             __InitLayerStack();
+            
             return this;
         }
     }

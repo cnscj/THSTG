@@ -1,4 +1,5 @@
 ﻿using FairyGUI;
+using System;
 using System.Collections.Generic;
 using XLibGame;
 
@@ -7,10 +8,8 @@ namespace STGGame.UI
 
     public class FWidget : FComponent
     {
-        private readonly string __package = "";
-        private readonly string __component = "";
-        public string package { get { return __package; } }
-        public string component { get { return __component; } }
+        public string package { get; protected set; }
+        public string component { get; protected set; }
 
         protected float _interval = 0f;
         private int __scheduler = -1;
@@ -23,10 +22,10 @@ namespace STGGame.UI
             __listener.Add(new KeyValuePair<int, EventListener2>(eventId, listener));
         }
 
-        public FWidget(string package, string component)
+        public FWidget(string packageName, string componentName)
         {
-            __package = package;
-            __component = component;
+            package = packageName;
+            component = componentName;
         }
 
         //

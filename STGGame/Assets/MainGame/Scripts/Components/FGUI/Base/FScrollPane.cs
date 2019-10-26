@@ -11,14 +11,14 @@ namespace STGGame.UI
         public FComponent GetHeader()
         {
             var obj = _obj.header;
-            __header = (__header != null) ? (obj != null ? __header.InitWithObj(obj) as FComponent : null) : new FComponent().InitWithObj(obj) as FComponent;
+            __header = (obj != null) ? (__header != null ? __header.InitWithObj(obj) as FComponent : new FComponent().InitWithObj(obj) as FComponent) : null;
             return __header;
         }
 
         public FComponent GetFooter()
         {
             var obj = _obj.footer;
-            __footer = (__footer != null) ? (obj != null ? __footer.InitWithObj(obj) as FComponent : null) : new FComponent().InitWithObj(obj) as FComponent;
+            __footer = (obj != null) ? (__footer != null ? __footer.InitWithObj(obj) as FComponent : new FComponent().InitWithObj(obj) as FComponent) : null;
             return __footer;
         }
 

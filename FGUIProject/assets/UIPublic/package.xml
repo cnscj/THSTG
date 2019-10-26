@@ -5,5 +5,5 @@
     <image id="z7yu8" name="gg_th08_logo.jpg" path="/_Tex/" exported="true"/>
     <component id="z7yu1" name="LoadingView.xml" path="/" exported="true"/>
   </resources>
-  <publish name=""/>
+  <publish name="UIPublic"/>
 </packageDescription>

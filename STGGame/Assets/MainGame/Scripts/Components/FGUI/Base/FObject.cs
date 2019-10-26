@@ -10,7 +10,7 @@ namespace STGGame.UI
         public FComponent GetParent()
         {
             var obj = _obj.parent;
-            __parent = (__parent != null) ? (obj != null ? __parent.InitWithObj(obj) as FComponent : null) : new FComponent().InitWithObj(obj) as FComponent;
+            __parent = (obj != null) ? (__parent != null ? __parent.InitWithObj(obj) as FComponent : new FComponent().InitWithObj(obj) as FComponent) : null;
             return __parent;
         }
 

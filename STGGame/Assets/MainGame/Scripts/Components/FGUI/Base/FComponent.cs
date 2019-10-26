@@ -111,7 +111,7 @@ namespace STGGame.UI
         public FScrollPane GetScrollPane()
         {
             var obj = _obj.asCom.scrollPane;
-            __scrollPane = (__scrollPane != null) ? (obj != null ? __scrollPane.InitWithObj(obj) as FScrollPane : null): new FScrollPane().InitWithObj(obj) as FScrollPane;
+            __scrollPane = (obj != null) ? (__scrollPane != null ? __scrollPane.InitWithObj(obj) as FScrollPane : new FScrollPane().InitWithObj(obj) as FScrollPane) : null;
             return __scrollPane;
         }
 

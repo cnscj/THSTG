@@ -1,4 +1,7 @@
 ﻿
+using System;
+using FairyGUI;
+
 namespace STGGame.UI
 {
 	public class FView : FWidget
@@ -7,6 +10,7 @@ namespace STGGame.UI
         protected bool _isAsync;                //是否异步加载
         protected int _layerOrder = 0;          //层
         protected bool _isFullScreen;           //是否全屏
+        protected Action<FView> _onCreated;     //创建回调
 
         public bool isAsync { get { return _isAsync; } }
 
@@ -16,25 +20,42 @@ namespace STGGame.UI
 
         }
 
-        public void ForCreate()
+        public FView OnCreated(Action<FView> onFunc)
         {
-
-        }
-
-        public void ForAdd()
-        {
-            if (HasParent())
+            _onCreated = onFunc;
+            if(_obj != null)
             {
-                if (!GetParent().IsDisposed())
+                if (!_isAsync)
                 {
-                    GetParent().AddChild(this);
+                    DoCreated();
                 }
             }
+            return this;
         }
+
 
         public virtual void Close()
         {
             ViewManager.GetInstance().Close(this.GetType());
+        }
+
+        public override Wrapper<GObject> InitWithObj(GObject obj)
+        {
+            base.InitWithObj(obj);
+            if (_isAsync)
+            {
+                DoCreated();
+            }
+            return this;
+        }
+
+        private void DoCreated()
+        {
+            if (_onCreated != null)
+            {
+                _onCreated(this);
+                _onCreated = null;
+            }
         }
     }
 
