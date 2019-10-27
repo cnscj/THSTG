@@ -45,7 +45,7 @@ namespace STGGame.UI
                 var item = data as ItemData;
                 var btn = comp as FButton;
                 comp.SetText(item.btnName);
-                comp.SetClick(item.btnFunc);
+                comp.OnClick(item.btnFunc);
 
 
             });

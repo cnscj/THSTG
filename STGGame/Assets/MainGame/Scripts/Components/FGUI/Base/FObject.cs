@@ -5,8 +5,27 @@ namespace STGGame.UI
 {
     public class FObject : Wrapper<GObject>
     {
-       
         private FComponent __parent;
+
+        public static FObject Create(GObject obj)
+        {
+            var fObj = new FObject();
+            if (fObj != null)
+            {
+                fObj.InitWithObj(obj);
+            }
+            return fObj;
+        }
+
+        public static T1 Create<T1, T2>() where T1 : FObject, new() where T2 : GObject, new()
+        {
+            T2 gObj = new T2();
+            T1 fObj = new T1();
+
+            fObj.InitWithObj(gObj);
+
+            return fObj;
+        }
 
         public FComponent GetParent()
         {
@@ -209,11 +228,11 @@ namespace STGGame.UI
             return _obj.touchable;
         }
         //
-        public void SetClick(EventCallback0 func)
+        public void OnClick(EventCallback0 func)
         {
             _obj.onClick.Set(func);
         }
-        public void SetClick(EventCallback1 func)
+        public void OnClick(EventCallback1 func)
         {
             _obj.onClick.Set(func);
         }
@@ -303,11 +322,14 @@ namespace STGGame.UI
 
 
         // 关联
-        public void AddRelation(GObject target, RelationType relationType, bool usePercent)
+        public void AddRelation(FObject target, RelationType relationType, bool usePercent)
         {
-            _obj.AddRelation(target, relationType, usePercent);
+            _obj.AddRelation(target.GetObject(), relationType, usePercent);
         }
-
+        public void AddRelation(FObject target, RelationType relationType)
+        {
+            _obj.AddRelation(target.GetObject(), relationType);
+        }
 
         //---------- 坐标转换 ----------
         // Transforms a point from the local coordinate system to global (Stage) coordinates.
@@ -394,6 +416,16 @@ namespace STGGame.UI
             {
                 _obj.text = "";
             }
+        }
+
+        public void SetSortingOrder(int order)
+        {
+            _obj.sortingOrder = order;
+        }
+
+        public int GetSortingOrder()
+        {
+            return _obj.sortingOrder;
         }
 
         //

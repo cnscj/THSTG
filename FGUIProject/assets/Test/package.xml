@@ -8,6 +8,10 @@
     <component id="jtdb4" name="TestContainerCom.xml" path="/Components/" exported="true"/>
     <component id="jtdb5" name="TestContainerItemTmpl.xml" path="/Components/"/>
     <component id="voe96" name="TestExampleTextView.xml" path="/Example/Text/" exported="true"/>
+    <component id="logx7" name="TestExampleButtonView.xml" path="/Example/Button/" exported="true"/>
+    <component id="logx8" name="TestExampleTextLongTextComp.xml" path="/Example/Text/Components/"/>
+    <component id="logx9" name="TestExampleWindowView.xml" path="/Example/Window/" exported="true"/>
+    <component id="logxa" name="TextExampleWindowNewWnd.xml" path="/Example/Window/View/"/>
   </resources>
   <publish name="Test"/>
 </packageDescription>

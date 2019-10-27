@@ -10,7 +10,10 @@ namespace STGGame.UI
             _obj = obj;
             return this;
         }
-
+        public bool IsInited()
+        {
+            return (_obj != null);
+        }
         public T GetObject()
         {
             return _obj;

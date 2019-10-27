@@ -22,7 +22,7 @@ namespace STGGame.UI
         }
         public static readonly string barListName = "list";
 
-        protected FList _list;
+        protected FList _barList;
         protected List<ViewParams> _layers;
         protected Dictionary<int, ViewInfo> _children;
 
@@ -33,7 +33,7 @@ namespace STGGame.UI
         {
         }
 
-        public override void Close()
+        public override void Close(bool IsDisposed = true)
         {
             if (_children != null)
             {
@@ -42,35 +42,35 @@ namespace STGGame.UI
                     var viewInfo = pair.Value;
                     if (viewInfo.view != null)
                     {
-                        viewInfo.view.Close();
+                        viewInfo.view.Close(true);
                     }
                 }
                 _children.Clear();
                 _children = null;
             }
-            base.Close();
+            base.Close(IsDisposed);
         }
 
         private void __InitBarList()
         {
-            _list = GetChild<FList>(barListName);
-            if (_list != null)
+            _barList = GetChild<FList>(barListName);
+            if (_barList != null)
             {
-                _list.SetVirtual();
+                _barList.SetVirtual();
 
-                _list.SetState((index, comp, data) =>
+                _barList.SetState((index, comp, data) =>
                 {
                     var viewParams = data as ViewParams;
                     var title = comp.GetChild<FRichText>("title");
                     title.SetText(viewParams.title);
                 });
 
-                _list.AddClickItem((context) =>
+                _barList.AddClickItem((context) =>
                 {
                     _children = (_children != null) ? _children : new Dictionary<int, ViewInfo>();
 
-                    var data = _list.GetSelectedData() as ViewParams;
-                    var index = _list.GetSelectedIndex();
+                    var data = _barList.GetSelectedData() as ViewParams;
+                    var index = _barList.GetSelectedIndex();
 
                     if (index == __preIndex)
                     {
@@ -107,14 +107,14 @@ namespace STGGame.UI
 
                     if (isNeedCreate)
                     {
-                        var newData = _list.GetSelectedData() as ViewParams;
-                        var newIndex = _list.GetSelectedIndex();
+                        var newData = _barList.GetSelectedData() as ViewParams;
+                        var newIndex = _barList.GetSelectedIndex();
                         if (curIndex != newIndex)
                         {
                             return;
                         }
                         
-                        var newView = FGUIUtil.CreateView(newData.cls);
+                        var newView = FView.Create(newData.cls);
                         ViewInfo newViewInfo = new ViewInfo();
                         newViewInfo.view = newView;
 
@@ -130,14 +130,16 @@ namespace STGGame.UI
         {
             OnInitTabBar();
 
-            if (_layers != null && _list != null)
+            if (_layers != null && _barList != null)
             {
                 if (_children != null)
                 {
                     _children.Clear();
                 }
-                _list.SetDataProvider(_layers);
-                _list.ScrollToView(_list.GetSelectedIndex());
+                _barList.SetDataProvider(_layers);
+
+                _barList.SetSelectedIndex(0, true);
+                _barList.ScrollToView(_barList.GetSelectedIndex());
             }
         }
 
@@ -148,7 +150,7 @@ namespace STGGame.UI
             
         }
 
-        //重写后不希望再被重写
+
         public override Wrapper<GObject> InitWithObj(GObject obj)
         {
             base.InitWithObj(obj);

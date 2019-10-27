@@ -10,10 +10,30 @@ namespace STGGame.UI
         private FGraph __graph;
         private FScrollPane __scrollPane;
 
+        public static T Create<T>(GObject obj) where T : FComponent, new()
+        {
+            if (obj != null)
+            {
+                T com = new T();
+                if (com != null)
+                {
+                    com.InitWithObj(obj);
+                }
+
+                return com;
+            }
+            return null;
+        }
+
+        public static FComponent Create(GObject obj)
+        {
+            return Create<FComponent>(obj);
+        }
+
         public T GetChild<T>(string name) where T : FComponent, new()
         {
             GObject obj = this._obj.asCom.GetChild(name);
-            return FGUIUtil.CreateComponent<T>(obj);
+            return FComponent.Create<T>(obj);
         }
         public FComponent GetChild(string name)
         {
@@ -26,7 +46,7 @@ namespace STGGame.UI
             GObject[] children = _obj.asCom.GetChildren();
             foreach (var child in children)
             {
-                FComponent fObj = FGUIUtil.CreateComponent<FComponent>(child);
+                FComponent fObj = FComponent.Create<FComponent>(child);
                 _childList.Add(fObj);
             }
             return _childList.ToArray();

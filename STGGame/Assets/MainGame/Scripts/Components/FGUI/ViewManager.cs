@@ -12,24 +12,35 @@ namespace STGGame
     public class ViewManager : MonoSingleton<ViewManager>
     {
         private Dictionary<Type, ViewInfo> m_viewMaps = new Dictionary<Type, ViewInfo>();
+
         public void Open<T>(object args = null) where T : FView, new()
         {
+            bool isNeedCreate = true;
             ViewInfo viewInfo = null;
-            if (!m_viewMaps.TryGetValue(__GetViewKey<T>(), out viewInfo))
+            if (m_viewMaps.TryGetValue(__GetViewKey<T>(), out viewInfo))
+            {
+                FView view = viewInfo.view;
+                if (!view.IsDisposed())
+                {
+                    GRoot.inst.AddChild(view.GetObject());
+                    isNeedCreate = false;
+                }
+            }
+
+            //
+            if (isNeedCreate)
             {
                 //加载View
-                FGUIUtil.CreateView<T>(args).OnCreated((view)=>
+                FView.Create(typeof(T), args).OnCreated((view) =>
                 {
                     viewInfo = new ViewInfo();
                     viewInfo.view = view;
 
                     GRoot.inst.AddChild(view.GetObject());
 
-                    m_viewMaps.Add(__GetViewKey<T>(), viewInfo);
-                });  
+                    m_viewMaps[__GetViewKey<T>()] = viewInfo;
+                });
             }
-
-            //
         }
 
         public void Close(Type type, bool isDisposed = true)
@@ -37,16 +48,12 @@ namespace STGGame
             ViewInfo viewInfo = null;
             if (m_viewMaps.TryGetValue(type, out viewInfo))
             {
+                viewInfo.view.Close(isDisposed);
                 if (isDisposed)
                 {
-                    viewInfo.view.Dispose();
                     m_viewMaps.Remove(type);
 
                     //TODO:释放包的引用
-                }
-                else
-                {
-                    viewInfo.view.RemoveFromParent();
                 }
             }
         }
@@ -56,18 +63,17 @@ namespace STGGame
             Close(typeof(T), isDisposed);
         }
 
-
         public bool IsOpened<T>() where T : FView
         {
             ViewInfo viewInfo = null;
             if (m_viewMaps.TryGetValue(__GetViewKey<T>(), out viewInfo))
             {
-
+                return viewInfo.view.IsVisible();
             }
             return false;
         }
 
-        public ViewInfo GetView<T>() where T : FView
+        public ViewInfo GetViewInfo<T>() where T : FView
         {
             ViewInfo viewInfo = null;
             if (m_viewMaps.TryGetValue(__GetViewKey<T>(), out viewInfo))

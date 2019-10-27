@@ -16,7 +16,7 @@ namespace STGGame.UI
             containerBtn = GetChild<FButton>("containerBtn");
             containerComp = GetChild<TestContainerComp>("containerComp");
 
-            containerBtn.SetClick((context) =>
+            containerBtn.OnClick((context) =>
             {
                 containerComp.SetVisible(!containerComp.IsVisible());
             });

@@ -85,7 +85,7 @@ GameObject:
   - component: {fileID: 6581844662657752913}
   - component: {fileID: 6582723267016051430}
   m_Layer: 0
-  m_Name: UICamera
+  m_Name: Stage Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

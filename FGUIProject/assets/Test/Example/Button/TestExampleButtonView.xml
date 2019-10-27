@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1024,576" opaque="false" designImage="ui://y59nubhfjtdb0">
+  <displayList>
+    <component id="n3_logx" name="btn1" src="po2z0" fileName="Button/Button1.xml" pkg="y8wff1cb" xy="63,178">
+      <Button title="点击"/>
+    </component>
+  </displayList>
+</component>

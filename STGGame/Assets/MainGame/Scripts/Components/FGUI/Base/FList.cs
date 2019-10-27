@@ -43,7 +43,11 @@ namespace STGGame.UI
         }
 
         //////////////////////////////////////////////////
-        public void SetClickItem(EventCallback1 func)
+        public void OnClickItem(EventCallback0 func)
+        {
+            _obj.asList.onClickItem.Set(func);
+        }
+        public void OnClickItem(EventCallback1 func)
         {
             _obj.asList.onClickItem.Set(func);
         }

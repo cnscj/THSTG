@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1024,576" opaque="false" designImage="ui://y59nubhfjtdb0">
+  <displayList>
+    <component id="n8_logx" name="n8" src="logx2" fileName="Window/Window1.xml" pkg="y8wff1cb" xy="189,248" size="459,321"/>
+  </displayList>
+</component>
