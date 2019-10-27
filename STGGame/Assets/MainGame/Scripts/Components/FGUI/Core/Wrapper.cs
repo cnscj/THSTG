@@ -18,6 +18,11 @@ namespace STGGame.UI
         {
             return _obj;
         }
+
+        protected void SetObject(T obj)
+        {
+            _obj = obj;
+        }
     }
 
 }

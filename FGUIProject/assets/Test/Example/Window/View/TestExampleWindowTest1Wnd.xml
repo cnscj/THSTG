@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1024,576">
+  <displayList>
+    <component id="n0_logx" name="frame" src="logx4" fileName="Window/Window1.xml" pkg="y8wff1cb" xy="220,72" size="512,397"/>
+    <richtext id="n1_logx" name="n1" xy="287,185" size="203,25" fontSize="18" text="简单的窗口由三部分主城"/>
+    <component id="n2_logx" name="btn1" src="po2z0" fileName="Button/Button1.xml" pkg="y8wff1cb" xy="544,390">
+      <Button title="扁平极简主义"/>
+    </component>
+  </displayList>
+</component>

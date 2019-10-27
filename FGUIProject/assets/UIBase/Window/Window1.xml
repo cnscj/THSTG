@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<component size="640,480">
+<component size="640,480" extention="Label" initName="frame">
   <displayList>
-    <graph id="n0_logx" name="n0" xy="0,28" size="640,452" type="rect">
+    <graph id="n3_logx" name="contentArea" xy="0,25" size="640,452" type="rect">
       <relation target="" sidePair="width-width,height-height"/>
     </graph>
-    <graph id="n1_logx" name="n1" xy="197,3" size="246,52" type="rect">
+    <graph id="n4_logx" name="dragArea" xy="197,0" size="246,52" type="rect">
       <relation target="" sidePair="center-center,top-top"/>
       <relation target="" sidePair="width-width%"/>
     </graph>
-    <component id="n2_logx" name="closeBtn" src="vd2z1" fileName="Button/ButtonClose1.xml" xy="592,28">
+    <component id="n5_logx" name="closeButton" src="vd2z1" fileName="Button/ButtonClose1.xml" xy="592,25">
       <relation target="" sidePair="right-right,top-top"/>
     </component>
-    <richtext id="n3_logx" name="title" xy="319,28" pivot="0.5,0.5" anchor="true" size="41,25" fontSize="18" align="center" vAlign="middle" text="标题">
+    <richtext id="n6_logx" name="title" xy="319,25" pivot="0.5,0.5" anchor="true" size="41,25" touchable="false" fontSize="18" align="center" vAlign="middle" text="标题">
       <relation target="" sidePair="center-center,top-top"/>
     </richtext>
   </displayList>

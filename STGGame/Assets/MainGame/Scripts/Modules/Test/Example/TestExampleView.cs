@@ -10,6 +10,7 @@ namespace STGGame.UI
         {
             new ViewParams(){cls = typeof(TestExampleTextView),title = "文本"},
             new ViewParams(){cls = typeof(TestExampleButtonView),title = "按钮"},
+            new ViewParams(){cls = typeof(TestExampleWindowView),title = "窗口"},
         };
         FButton closeBtn;
 

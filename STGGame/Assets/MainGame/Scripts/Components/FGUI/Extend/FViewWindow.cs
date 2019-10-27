@@ -7,42 +7,46 @@ namespace STGGame.UI
 {
     public class FViewWindow : FView
     {
-        public static readonly string titleName = "title";
-        protected string _title = "标题";
-        private FRichText __titleLabel;
+        public static readonly string frameName = "frame";
+
+        protected FWindow _frame;
+
         public FViewWindow(string package, string component) : base(package, component)
         {
             _layerOrder = 100;
         }
 
-        public void SetTitle(string title)
+        private void __InitWindowUI()
         {
-            if (__titleLabel != null)
-            {
-                __titleLabel.SetText(title);
-            }
-        }
+            _frame = GetChild<FWindow>(frameName);
 
-        public string GetTitle()
-        {
-            if (__titleLabel != null)
+            if (_frame != null)
             {
-               return __titleLabel.GetText();
-            }
-            return null;
-        }
+                if (_frame.closeButton != null)
+                {
+                    _frame.closeButton.OnClick((context) =>
+                    {
+                        Close();
+                    });
+                }
 
-        private void __InitWindowTitle()
-        {
-            __titleLabel = GetChild<FRichText>(titleName);
-            SetTitle(_title);
+                if (_frame.dragArea != null)
+                {
+                    _frame.dragArea.SetDraggable(true);
+                    _frame.dragArea.OnDragStart((context) =>
+                    {
+                        context.PreventDefault();
+                        StartDrag();
+                    });
+                }
+            }
         }
 
         public override Wrapper<GObject> InitWithObj(GObject obj)
         {
+            SetObject(obj);
+            __InitWindowUI();
             base.InitWithObj(obj);
-
-            __InitWindowTitle();
 
             return this;
         }

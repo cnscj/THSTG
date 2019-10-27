@@ -3,7 +3,7 @@
   <resources>
     <component id="po2z0" name="Button1.xml" path="/Button/" exported="true"/>
     <component id="vd2z1" name="ButtonClose1.xml" path="/Button/" exported="true"/>
-    <component id="logx2" name="Window1.xml" path="/Window/" exported="true"/>
+    <component id="logx4" name="Window1.xml" path="/Window/" exported="true"/>
   </resources>
   <publish name="UIBase"/>
 </packageDescription>

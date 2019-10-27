@@ -101,13 +101,16 @@ namespace STGGame.UI
         ///
         public override Wrapper<GObject> InitWithObj(GObject obj)
         {
-            if (obj != null && obj != _obj)
+            base.InitWithObj(obj);
+            if (obj != null)
             {
-                base.InitWithObj(obj);
                 OnInitUI();
 
+                obj.onAddedToStage.Clear();
+                obj.onRemovedFromStage.Clear();
                 obj.onAddedToStage.Add(_OnAddedToStage);
                 obj.onRemovedFromStage.Add(_OnEemovedFromStage);
+                
             }
             
             return this;

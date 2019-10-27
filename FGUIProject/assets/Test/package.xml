@@ -11,7 +11,7 @@
     <component id="logx7" name="TestExampleButtonView.xml" path="/Example/Button/" exported="true"/>
     <component id="logx8" name="TestExampleTextLongTextComp.xml" path="/Example/Text/Components/"/>
     <component id="logx9" name="TestExampleWindowView.xml" path="/Example/Window/" exported="true"/>
-    <component id="logxa" name="TextExampleWindowNewWnd.xml" path="/Example/Window/View/"/>
+    <component id="logxb" name="TestExampleWindowTest1Wnd.xml" path="/Example/Window/View/" exported="true"/>
   </resources>
   <publish name="Test"/>
 </packageDescription>
