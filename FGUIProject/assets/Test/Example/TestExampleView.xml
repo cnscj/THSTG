@@ -4,7 +4,7 @@
     <graph id="n1_voe9" name="biImg" xy="0,0" size="1024,576" type="rect" lineSize="0" lineColor="#ff999999" fillColor="#ff999999">
       <relation target="" sidePair="width-width,height-height"/>
     </graph>
-    <list id="n0_jtdb" name="list" xy="62,11" size="899,80" layout="flow_hz" overflow="scroll" lineGap="5" colGap="1" defaultItem="ui://y59nubhfjtdb1" autoClearItems="true">
+    <list id="n0_jtdb" name="barList" xy="62,11" size="899,80" layout="flow_hz" overflow="scroll" lineGap="5" colGap="1" defaultItem="ui://y59nubhfjtdb1" autoClearItems="true">
       <relation target="" sidePair="center-center,top-top"/>
       <item/>
       <item/>

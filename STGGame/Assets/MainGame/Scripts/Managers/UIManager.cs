@@ -34,9 +34,17 @@ namespace STGGame
 
                 return new KeyValuePair<PackageLoadMode,System.Object>(mode, pair.Value);
             });
-            
 
-            foreach(var settingInfo in packageList)
+            PackageManager.GetInstance().OnAdded((packageInfo) =>
+            {
+                PackageSettingInfo settingInfo = null;
+                if (m_settingMap.TryGetValue(packageInfo.package.name, out settingInfo))
+                {
+                    packageInfo.residentTimeS = settingInfo.residentTimeS;
+                }
+            });
+
+            foreach (var settingInfo in packageList)
             {
                 if (!string.IsNullOrEmpty(settingInfo.packageName))
                 {
@@ -45,11 +53,7 @@ namespace STGGame
                         m_settingMap.Add(settingInfo.packageName, settingInfo);
                         if (settingInfo.isPlayLoad)
                         {
-                            var packageInfo = PackageManager.GetInstance().AddPackage(settingInfo.packageName);
-                            if (packageInfo != null)
-                            {
-                                packageInfo.residentTimeS = settingInfo.residentTimeS;
-                            }
+                            PackageManager.GetInstance().AddPackage(settingInfo.packageName);
                         }
                     }
                 }
@@ -60,7 +64,6 @@ namespace STGGame
         private void Start()
         {
             ViewManager.GetInstance().Open<TestView>();
-
         }
     }
 }

@@ -10,11 +10,16 @@ namespace STGGame
 {
     public class PackageManager : MonoSingleton<PackageManager>
     {
-        public int residentTimeS = 120;
+        public static string dependKeyName = "name";
+        public static float clearCacheDuration = 1f;        //轮询频率
+        public float residentTimeS = 120f;                  //默认包驻留时间
+        private float m_cacheTimeTemp;
 
         private Func<string,KeyValuePair<PackageLoadMode, System.Object>> m_loader;
         private Dictionary<string, PackageInfo> m_packageMap = new Dictionary<string, PackageInfo>();
-
+        private List<PackageInfo> m_invalidPackages = new List<PackageInfo>();
+        private HashSet<string> m_refPackages = new HashSet<string>();
+        private Action<PackageInfo> m_onAddedCallback;
         public PackageManager()
         {
 
@@ -25,35 +30,84 @@ namespace STGGame
             m_loader = loader;
         }
 
+        public void SetLoader(Func<string, string> loader)
+        {
+            if (loader != null)
+            {
+                SetLoader((packageName) =>
+                {
+                    string packagePath = loader(packageName);
+                    return new KeyValuePair<PackageLoadMode, System.Object>(PackageLoadMode.PathString, packagePath);
+                });
+            }
+        }
+
+        public void SetLoader(Func<string, KeyValuePair<AssetBundle, AssetBundle>> loader)
+        {
+            if (loader != null)
+            {
+                SetLoader((packageName) =>
+                {
+                    KeyValuePair<AssetBundle, AssetBundle> pair = loader(packageName);
+                    return new KeyValuePair<PackageLoadMode, System.Object>(PackageLoadMode.AssetBundlePair, pair);
+                });
+            }
+        }
+
+        public void OnAdded(Action<PackageInfo> func)
+        {
+            m_onAddedCallback = func;
+        }
+
         public PackageInfo AddPackage(string packageName)
         {
-            if (m_loader != null)
+            PackageInfo packageInfo = null;
+            if (!m_packageMap.TryGetValue(packageName, out packageInfo))
             {
-                UIPackage package = null;
-                KeyValuePair<PackageLoadMode, System.Object> info = m_loader(packageName);
-                if (info.Key == PackageLoadMode.PathString)
+                if (m_loader != null)
                 {
-                    string uiPath = info.Value as string;
-                    package = UIPackage.AddPackage(uiPath);
-                }
-                else if(info.Key == PackageLoadMode.AssetBundlePair)
-                {
-                    KeyValuePair<AssetBundle, AssetBundle> pair = (KeyValuePair<AssetBundle, AssetBundle>)info.Value;
-                    package = UIPackage.AddPackage(pair.Key, pair.Value);
-                }
+                    UIPackage package = null;
+                    KeyValuePair<PackageLoadMode, System.Object> info = m_loader(packageName);
+                    if (info.Key == PackageLoadMode.PathString)
+                    {
+                        string uiPath = info.Value as string;
+                        package = UIPackage.AddPackage(uiPath);
+                    }
+                    else if (info.Key == PackageLoadMode.AssetBundlePair)
+                    {
+                        KeyValuePair<AssetBundle, AssetBundle> pair = (KeyValuePair<AssetBundle, AssetBundle>)info.Value;
+                        package = UIPackage.AddPackage(pair.Key, pair.Value);
+                    }
 
-                if (package != null)
-                {
-                    PackageInfo packageInfo = new PackageInfo();
-                    packageInfo.package = package;
-                    packageInfo.residentTimeS = residentTimeS;
-                    packageInfo.accessTimestamp = Time.realtimeSinceStartup;
-                    m_packageMap.Add(package.name, packageInfo);
 
-                    return packageInfo;
+                    if (package != null)
+                    {
+                        foreach (var depList in package.dependencies)
+                        {
+                            foreach (var depPair in depList)
+                            {
+                                if (dependKeyName.Equals(depPair.Key))
+                                {
+                                    AddPackage(depPair.Value);
+                                }
+                            }
+                        }
+
+                        packageInfo = new PackageInfo();
+                        packageInfo.package = package;
+                        packageInfo.residentTimeS = residentTimeS;
+                        packageInfo.accessTimestamp = Time.realtimeSinceStartup;
+                        m_packageMap.Add(package.name, packageInfo);
+
+                        if (m_onAddedCallback != null)
+                        {
+                            m_onAddedCallback(packageInfo);
+                        }
+
+                    }
                 }
             }
-            return null;
+            return packageInfo;
         }
 
         public void RemovePackage(string packageName)
@@ -69,6 +123,19 @@ namespace STGGame
             m_packageMap.Remove(packageName);
         }
 
+        //包的交叉引用会有问题,这里会造成死递归,这里用Set避免之
+        public void RetainPackage(string packageName)
+        {
+            m_refPackages.Clear();
+            __RetainPackage(packageName);
+        }
+
+        public void ReleasePackage(string packageName)
+        {
+            m_refPackages.Clear();
+            __ReleasePackage(packageName);
+        }
+        
         public PackageInfo GetPackageInfo(string packageName)
         {
             if (m_packageMap.ContainsKey(packageName))
@@ -76,6 +143,104 @@ namespace STGGame
                 return m_packageMap[packageName];
             }
             return null;
+        }
+
+        private void UpdateCache()
+        {
+            //如果计数小于等于0
+            //轮询这些包是否超时,超时释放包
+            //常驻包不释放
+            foreach (var pair in m_packageMap)
+            {
+                var packageInfo = pair.Value;
+                if (packageInfo.residentTimeS > 0)  //常驻包不释放
+                {
+                    if (packageInfo.refCount <= 0)  //引用次数为0时触发倒计时(但也有可能只加载了包,没有组件)
+                    {
+                        if (packageInfo.accessTimestamp + packageInfo.residentTimeS <= Time.realtimeSinceStartup)   //倒计时就释放
+                        {
+                            m_invalidPackages.Add(pair.Value);
+                        }
+                        
+                    }
+                }
+            }
+
+            if (m_invalidPackages.Count > 0)
+            {
+                foreach (var packageInfo in m_invalidPackages)
+                {
+                    RemovePackage(packageInfo.package.name);
+                }
+                m_invalidPackages.Clear();
+            }
+        }
+
+        private void Update()
+        {
+            if (clearCacheDuration < 0) return;
+
+            m_cacheTimeTemp += Time.deltaTime;
+
+            if (m_cacheTimeTemp >= clearCacheDuration)
+            {
+                UpdateCache();
+                m_cacheTimeTemp -= clearCacheDuration;
+            }
+        }
+
+        private void __RetainPackage(string packageName)
+        {
+            PackageInfo packageInfo = null;
+            if (m_packageMap.TryGetValue(packageName, out packageInfo))
+            {
+                if (m_refPackages.Contains(packageName))
+                {
+                    return;
+                }
+                m_refPackages.Add(packageName);
+
+                var package = packageInfo.package;
+                foreach (var depList in package.dependencies)
+                {
+                    foreach (var depPair in depList)
+                    {
+                        if (dependKeyName.Equals(depPair.Key))
+                        {
+                            __RetainPackage(depPair.Value);
+
+                        }
+                    }
+                }
+                packageInfo.refCount++;
+                packageInfo.UpdateTick();
+            }
+        }
+        private void __ReleasePackage(string packageName)
+        {
+            PackageInfo packageInfo = null;
+            if (m_packageMap.TryGetValue(packageName, out packageInfo))
+            {
+                if (m_refPackages.Contains(packageName))
+                {
+                    return;
+                }
+                m_refPackages.Add(packageName);
+
+                var package = packageInfo.package;
+                foreach (var depList in package.dependencies)
+                {
+                    foreach (var depPair in depList)
+                    {
+                        if (dependKeyName.Equals(depPair.Key))
+                        {
+                            __ReleasePackage(depPair.Value);
+                        }
+                    }
+                }
+                packageInfo.refCount--;
+                packageInfo.UpdateTick();
+            }
         }
 
     }

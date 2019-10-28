@@ -45,13 +45,15 @@ namespace XLibGame
         public void RemoveListener(int eventId, EventListener2 listenerToBeRemoved)
         {
             var listeners = GetEventListeners(eventId);
-            for (var i = 0; i < listeners.Count; i++)
+            if (listeners != null)
             {
-                var listener = listeners[i];
-                if (listener == listenerToBeRemoved)
+                foreach(var listener in listeners)
                 {
-                    listeners.RemoveAt(i);
-                    break;
+                    if (listener.Value == listenerToBeRemoved)
+                    {
+                        listeners.Remove(listener.Key);
+                        break;
+                    }
                 }
             }
         }

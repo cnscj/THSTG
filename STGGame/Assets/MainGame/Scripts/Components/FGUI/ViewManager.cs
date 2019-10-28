@@ -20,18 +20,27 @@ namespace STGGame
             if (m_viewMaps.TryGetValue(__GetViewKey<T>(), out viewInfo))
             {
                 FView view = viewInfo.view;
-                if (!view.IsDisposed())
+                if (!IsOpened<T>())
                 {
-                    GRoot.inst.AddChild(view.GetObject());
+                    if (!view.IsDisposed())
+                    {
+                        view.SetArgs(args);
+                        GRoot.inst.AddChild(view.GetObject());
+                        isNeedCreate = false;
+                    }
+                }
+                else
+                {
                     isNeedCreate = false;
                 }
+
             }
 
             //
             if (isNeedCreate)
             {
                 //加载View
-                FView.Create(typeof(T), args).OnCreated((view) =>
+                FView.Create<T>(args).OnCreated((view) =>
                 {
                     viewInfo = new ViewInfo();
                     viewInfo.view = view;
@@ -52,8 +61,6 @@ namespace STGGame
                 if (isDisposed)
                 {
                     m_viewMaps.Remove(type);
-
-                    //TODO:释放包的引用
                 }
             }
         }
@@ -68,7 +75,11 @@ namespace STGGame
             ViewInfo viewInfo = null;
             if (m_viewMaps.TryGetValue(__GetViewKey<T>(), out viewInfo))
             {
-                return viewInfo.view.IsVisible();
+                FView view = viewInfo.view;
+                if (!view.IsDisposed())
+                {
+                    return view.IsVisible();
+                }
             }
             return false;
         }
@@ -84,9 +95,14 @@ namespace STGGame
         }
 
         ////
-        private Type __GetViewKey<T>(FView view = null)
+        private Type __GetViewKey<T>()
         {
             return typeof(T);
+        }
+
+        private Type __GetViewKey(FView view)
+        {
+            return view.GetType();
         }
     }
 

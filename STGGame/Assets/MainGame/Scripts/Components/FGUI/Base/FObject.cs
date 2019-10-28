@@ -433,7 +433,7 @@ namespace STGGame.UI
         {
             _obj.Center();
         }
-        public void Dispose()
+        public virtual void Dispose()
         {
             if (_obj != null)
             {

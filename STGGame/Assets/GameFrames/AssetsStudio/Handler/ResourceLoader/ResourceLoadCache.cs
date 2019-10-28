@@ -59,7 +59,7 @@ namespace ASGame
         }
 
         //清理缓冲区
-        private void updateCache()
+        private void UpdateCache()
         {
             foreach (var iter in cacheDataDic.ToList())
             {
@@ -79,7 +79,7 @@ namespace ASGame
 
             if (m_cacheTimeTemp >= clearCacheDuration)
             {
-                updateCache();
+                UpdateCache();
                 m_cacheTimeTemp -= clearCacheDuration;
             }
         }

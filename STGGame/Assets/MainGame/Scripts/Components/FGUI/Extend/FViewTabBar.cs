@@ -18,9 +18,10 @@ namespace STGGame.UI
         public class ViewInfo
         {
             public FView view;
+            public ViewParams viewParams;
 
         }
-        public static readonly string barListName = "list";
+        public static readonly string barListName = "barList";
 
         protected FList _barList;
         protected List<ViewParams> _layers;
@@ -33,7 +34,7 @@ namespace STGGame.UI
         {
         }
 
-        public override void Close(bool IsDisposed = true)
+        public override void Close(bool isDisposed = true)
         {
             if (_children != null)
             {
@@ -48,7 +49,7 @@ namespace STGGame.UI
                 _children.Clear();
                 _children = null;
             }
-            base.Close(IsDisposed);
+            base.Close(isDisposed);
         }
 
         private void __InitBarList()
@@ -114,9 +115,10 @@ namespace STGGame.UI
                             return;
                         }
                         
-                        var newView = FView.Create(newData.cls);
+                        var newView = FView.Create(newData.cls, newData.args) as FView;
                         ViewInfo newViewInfo = new ViewInfo();
                         newViewInfo.view = newView;
+                        newViewInfo.viewParams = newData;
 
                         _children[curIndex] = newViewInfo;
 
@@ -153,11 +155,11 @@ namespace STGGame.UI
 
         public override Wrapper<GObject> InitWithObj(GObject obj)
         {
-            base.InitWithObj(obj);
-
+            SetObject(obj);
             __InitBarList();
             __InitLayerStack();
-            
+            base.InitWithObj(obj);
+
             return this;
         }
     }

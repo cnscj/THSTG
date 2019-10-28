@@ -5,7 +5,6 @@ namespace STGGame.UI
     public class MainUIView : FView
     {
         MainUIAvatar avatarCom;
-
         public MainUIView() : base("MainUI", "MainUIView")
         {
             
@@ -14,7 +13,6 @@ namespace STGGame.UI
         protected override void OnInitUI()
         {
             avatarCom = GetChild<MainUIAvatar>("avatarCom");
-
             avatarCom.SetText("@@@@");
         }
 
