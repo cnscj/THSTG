@@ -242,7 +242,8 @@ namespace ASEditor
             {
                 return;
             }
-            string[] checkList = m_checkList != null ? m_checkList : GetDependFiles(assetPath, new string[] { "cs" });
+            //不同平台下取得的shader的Md5不同,尽管两个文件并无实际改动.所以排除
+            string[] checkList = m_checkList != null ? m_checkList : GetDependFiles(assetPath, new string[] { "cs", "shader" });
             if (!isCheckFileCode || !fileChecker.IsCodeChanged(checkList))
             {
                 //MD5没变,但是目标文件被删除

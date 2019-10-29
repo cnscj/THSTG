@@ -6,12 +6,14 @@ namespace STGGame.UI
 {
 	public class FView : FWidget
     {
-
-
         protected int _layerOrder = 0;          //层
         protected bool _isFullScreen;           //是否全屏
         protected Action<FView> _onCreated;     //创建回调
 
+        public static new FView Create(Type cls, object args = null)
+        {
+            return FWidget.Create(cls, args) as FView;
+        }
 
         public FView(string package, string component):base(package, component)
         {

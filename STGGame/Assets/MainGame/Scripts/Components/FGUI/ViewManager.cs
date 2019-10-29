@@ -11,16 +11,18 @@ namespace STGGame
 {
     public class ViewManager : MonoSingleton<ViewManager>
     {
+        //TODO:常驻View不应该被移除
         private Dictionary<Type, ViewInfo> m_viewMaps = new Dictionary<Type, ViewInfo>();
+        private Action<ViewInfo> m_onCreated;
 
-        public void Open<T>(object args = null) where T : FView, new()
+        public void Open(Type type, object args = null)
         {
             bool isNeedCreate = true;
             ViewInfo viewInfo = null;
-            if (m_viewMaps.TryGetValue(__GetViewKey<T>(), out viewInfo))
+            if (m_viewMaps.TryGetValue(type, out viewInfo))
             {
                 FView view = viewInfo.view;
-                if (!IsOpened<T>())
+                if (!IsOpened(type))
                 {
                     if (!view.IsDisposed())
                     {
@@ -40,17 +42,34 @@ namespace STGGame
             if (isNeedCreate)
             {
                 //加载View
-                FView.Create<T>(args).OnCreated((view) =>
+                FView.Create(type,args).OnCreated((view) =>
                 {
                     viewInfo = new ViewInfo();
                     viewInfo.view = view;
 
                     GRoot.inst.AddChild(view.GetObject());
 
-                    m_viewMaps[__GetViewKey<T>()] = viewInfo;
+                    m_viewMaps[type] = viewInfo;
+
+                    if (m_onCreated != null)
+                    {
+                        m_onCreated(viewInfo);
+                    }
                 });
             }
         }
+
+        public void Open<T>(object args = null) where T : FView, new()
+        {
+            Open(__GetViewKey<T>(), args);
+        }
+
+        public void Open(string typeName, object args = null)
+        {
+            Type type = Type.GetType(typeName);
+            Open(type, args);
+        }
+
 
         public void Close(Type type, bool isDisposed = true)
         {
@@ -70,10 +89,16 @@ namespace STGGame
             Close(typeof(T), isDisposed);
         }
 
-        public bool IsOpened<T>() where T : FView
+        public void Close(string typeName, bool isDisposed = true)
+        {
+            Type type = Type.GetType(typeName);
+            Close(type, isDisposed);
+        }
+
+        public bool IsOpened(Type type)
         {
             ViewInfo viewInfo = null;
-            if (m_viewMaps.TryGetValue(__GetViewKey<T>(), out viewInfo))
+            if (m_viewMaps.TryGetValue(type, out viewInfo))
             {
                 FView view = viewInfo.view;
                 if (!view.IsDisposed())
@@ -84,14 +109,41 @@ namespace STGGame
             return false;
         }
 
-        public ViewInfo GetViewInfo<T>() where T : FView
+        public bool IsOpened<T>() where T : FView
+        {
+            return IsOpened(__GetViewKey<T>());
+        }
+
+        public bool IsOpened(string typeName)
+        {
+            Type type = Type.GetType(typeName);
+            return IsOpened(type);
+        }
+
+        public ViewInfo GetViewInfo(Type type)
         {
             ViewInfo viewInfo = null;
-            if (m_viewMaps.TryGetValue(__GetViewKey<T>(), out viewInfo))
+            if (m_viewMaps.TryGetValue(type, out viewInfo))
             {
                 return viewInfo;
             }
             return null;
+        }
+
+        public ViewInfo GetViewInfo<T>() where T : FView
+        {
+            return GetViewInfo(__GetViewKey<T>());
+        }
+
+        public ViewInfo GetViewInfo(string typeName)
+        {
+            Type type = Type.GetType(typeName);
+            return GetViewInfo(type);
+        }
+
+        public void OnCreated(Action<ViewInfo> func)
+        {
+            m_onCreated = func;
         }
 
         ////

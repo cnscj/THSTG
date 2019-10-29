@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using XLibrary.Package;
+﻿using XLibrary.Package;
 using FairyGUI;
 using System.Collections.Generic;
-using ASGame;
 using System;
 using UnityEngine;
 
@@ -12,7 +10,7 @@ namespace STGGame
     {
         public static string dependKeyName = "name";
         public static float clearCacheDuration = 1f;        //轮询频率
-        public float residentTimeS = 120f;                  //默认包驻留时间
+        public float residentTimeS = 15f;                  //默认包驻留时间
         private float m_cacheTimeTemp;
 
         private Func<string,KeyValuePair<PackageLoadMode, System.Object>> m_loader;
@@ -88,7 +86,15 @@ namespace STGGame
                             {
                                 if (dependKeyName.Equals(depPair.Key))
                                 {
-                                    AddPackage(depPair.Value);
+                                    var depPackageInfo = AddPackage(depPair.Value);
+                                    if (depPackageInfo != null)
+                                    {
+                                        if (depPackageInfo.residentTimeS >= 0)
+                                        {
+                                            Debug.LogWarning(string.Format("包 {0} 引用了非常驻包 {1} 的资源", packageName, depPair.Key));
+                                        }
+                                    }
+                                    
                                 }
                             }
                         }
@@ -105,6 +111,9 @@ namespace STGGame
                         }
 
                     }
+                }else
+                {
+                    Debug.LogError(string.Format("没有Loader加载器函数,请先通过SetLoader设置"));
                 }
             }
             return packageInfo;
@@ -153,7 +162,7 @@ namespace STGGame
             foreach (var pair in m_packageMap)
             {
                 var packageInfo = pair.Value;
-                if (packageInfo.residentTimeS > 0)  //常驻包不释放
+                if (packageInfo.residentTimeS >= 0)  //常驻包不释放
                 {
                     if (packageInfo.refCount <= 0)  //引用次数为0时触发倒计时(但也有可能只加载了包,没有组件)
                     {
@@ -170,7 +179,9 @@ namespace STGGame
             {
                 foreach (var packageInfo in m_invalidPackages)
                 {
-                    RemovePackage(packageInfo.package.name);
+                    string packageName = packageInfo.package.name;
+                    RemovePackage(packageName);
+                    Debug.Log(string.Format("无效包 {0} 已被释放", packageName));
                 }
                 m_invalidPackages.Clear();
             }

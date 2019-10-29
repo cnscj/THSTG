@@ -14,17 +14,33 @@ namespace STGGame
         public class PackageSettingInfo
         {
             public string packageName;
-            public int residentTimeS = -1;
+            public float residentTimeS = -1;
             public bool isPlayLoad;
         }
 
-        [Header("包设置")]
-        public List<PackageSettingInfo> packageList = new List<PackageSettingInfo>();   //常驻包
-        private Dictionary<string, PackageSettingInfo> m_settingMap = new Dictionary<string, PackageSettingInfo>();
+        [System.Serializable]
+        public class ViewSettingInfo
+        {
+            public string viewName;
+           
+            public bool isPlayLoad;
+
+        }
+
+
+        [Header("Package设置")]
+        public float residentTimeS = 15;
+        public List<PackageSettingInfo> packageList = new List<PackageSettingInfo>();   
+        private Dictionary<string, PackageSettingInfo> m_packageSettingMap = new Dictionary<string, PackageSettingInfo>();
+
+        [Header("View设置")]
+        public List<ViewSettingInfo> viewList = new List<ViewSettingInfo>();
+        private Dictionary<string, ViewSettingInfo> m_viewSettingMap = new Dictionary<string, ViewSettingInfo>();
 
         private void Awake()
         {
             //设置Package的加载器
+            PackageManager.GetInstance().residentTimeS = residentTimeS;
             PackageManager.GetInstance().SetLoader((packageName) =>
             {
                 var pair = AssetManager.GetInstance().LoadUI(packageName);
@@ -38,19 +54,28 @@ namespace STGGame
             PackageManager.GetInstance().OnAdded((packageInfo) =>
             {
                 PackageSettingInfo settingInfo = null;
-                if (m_settingMap.TryGetValue(packageInfo.package.name, out settingInfo))
+                if (m_packageSettingMap.TryGetValue(packageInfo.package.name, out settingInfo))
                 {
                     packageInfo.residentTimeS = settingInfo.residentTimeS;
                 }
             });
 
-            foreach (var settingInfo in packageList)
+            ViewManager.GetInstance().OnCreated((viewInfo) =>
+            {
+                ViewSettingInfo settingInfo = null;
+                if (m_viewSettingMap.TryGetValue(viewInfo.view.GetType().ToString(), out settingInfo))
+                {
+                    
+                }
+            });
+
+            foreach (var settingInfo in  packageList)
             {
                 if (!string.IsNullOrEmpty(settingInfo.packageName))
                 {
-                    if (!m_settingMap.ContainsKey(settingInfo.packageName))
+                    if (!m_packageSettingMap.ContainsKey(settingInfo.packageName))
                     {
-                        m_settingMap.Add(settingInfo.packageName, settingInfo);
+                        m_packageSettingMap.Add(settingInfo.packageName, settingInfo);
                         if (settingInfo.isPlayLoad)
                         {
                             PackageManager.GetInstance().AddPackage(settingInfo.packageName);
@@ -59,11 +84,31 @@ namespace STGGame
                 }
             }
 
+            foreach (var settingInfo in viewList)
+            {
+                if (!string.IsNullOrEmpty(settingInfo.viewName))
+                {
+                    if (!m_viewSettingMap.ContainsKey(settingInfo.viewName))
+                    {
+                        m_viewSettingMap.Add(settingInfo.viewName, settingInfo);
+                    }
+                }
+            }
         }
 
         private void Start()
         {
-            ViewManager.GetInstance().Open<TestView>();
+            foreach (var settingInfo in viewList)
+            {
+                if (!string.IsNullOrEmpty(settingInfo.viewName))
+                {
+                    if (settingInfo.isPlayLoad)
+                    {
+                        ViewManager.GetInstance().Open(settingInfo.viewName);
+                    }
+                }
+            }
         }
+      
     }
 }

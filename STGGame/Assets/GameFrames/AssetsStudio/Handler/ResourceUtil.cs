@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using UnityEditor;
 
 namespace ASEditor
 {
@@ -34,5 +36,44 @@ namespace ASEditor
 			int iModelId;
 			return !int.TryParse(modelId, out iModelId) ? "" : modelId;
 		}
-	}
+
+        /// <summary>
+        /// 取得关联的依赖文件路径,包括自己
+        /// </summary>
+        /// <param name="filePath">资源路径</param>
+        /// <param name="excludeEx">排除文件</param>
+        /// <returns></returns>
+        public static string[] GetDependFiles(string filePath, string[] excludeEx = null)
+        {
+            Dictionary<string, bool> excludeMap = null;
+            if (excludeEx != null)
+            {
+                excludeMap = new Dictionary<string, bool>();
+                foreach (var ex in excludeEx)
+                {
+                    string exLower = ex.ToLower();
+                    if (!excludeMap.ContainsKey(exLower))
+                    {
+                        excludeMap.Add(exLower, true);
+                    }
+                }
+
+            }
+
+            List<string> filesPath = new List<string>();
+            string[] oriDepends = AssetDatabase.GetDependencies(filePath, true);
+            foreach (var path in oriDepends)
+            {
+                string extension = Path.GetExtension(path).ToLower();
+
+                if (excludeMap != null && excludeMap.ContainsKey(extension))
+                {
+                    continue;
+                }
+
+                filesPath.Add(path);
+            }
+            return filesPath.ToArray();
+        }
+    }
 }

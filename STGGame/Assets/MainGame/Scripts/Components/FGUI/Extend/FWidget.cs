@@ -20,7 +20,7 @@ namespace STGGame.UI
 
         public bool isAsync { get { return _isAsync; } }
 
-        //不受widgetManager管理
+        //不受ViewManager管理
         public static FWidget Create(Type cls, object args = null)
         {
             System.Reflection.Assembly asm = System.Reflection.Assembly.GetExecutingAssembly();
@@ -126,6 +126,10 @@ namespace STGGame.UI
             return _args;
         }
 
+        public string GetName()
+        {
+            return GetType().ToString();
+        }
         //
         protected virtual void OnInitUI()
         {

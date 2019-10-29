@@ -25,7 +25,7 @@ namespace STGGame.UI
             return null;
         }
 
-        public static FComponent Create(GObject obj)
+        public static new FComponent Create(GObject obj)
         {
             return Create<FComponent>(obj);
         }

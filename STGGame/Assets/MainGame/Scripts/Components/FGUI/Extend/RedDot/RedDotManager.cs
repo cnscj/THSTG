@@ -21,12 +21,12 @@ namespace STGGame.UI
 
         }
 
-        public void SetStatus(RedDot redDotParams,bool isShow)
+        public void SetStatus(RedDotParams redDotParams, bool isShow)
         {
 
         }
 
-        public bool GetStatus(RedDot redDotParams)
+        public bool GetStatus(RedDotParams redDotParams)
         {
 
             return false;
