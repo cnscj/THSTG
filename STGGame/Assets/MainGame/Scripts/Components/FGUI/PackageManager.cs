@@ -86,12 +86,13 @@ namespace STGGame
                             {
                                 if (dependKeyName.Equals(depPair.Key))
                                 {
+
                                     var depPackageInfo = AddPackage(depPair.Value);
                                     if (depPackageInfo != null)
                                     {
                                         if (depPackageInfo.residentTimeS >= 0)
                                         {
-                                            Debug.LogWarning(string.Format("包 {0} 引用了非常驻包 {1} 的资源", packageName, depPair.Key));
+                                            Debug.LogWarning(string.Format("[PackageManager]包 {0} 引用了非常驻包 {1} 的资源", packageName, depPair.Value));
                                         }
                                     }
                                     
@@ -109,11 +110,11 @@ namespace STGGame
                         {
                             m_onAddedCallback(packageInfo);
                         }
-
+                        Debug.Log(string.Format("[PackageManager]包 {0} 已被成功加载", packageName));
                     }
                 }else
                 {
-                    Debug.LogError(string.Format("没有Loader加载器函数,请先通过SetLoader设置"));
+                    Debug.LogError(string.Format("[PackageManager]没有Loader加载器函数,请先通过SetLoader设置"));
                 }
             }
             return packageInfo;
@@ -181,7 +182,7 @@ namespace STGGame
                 {
                     string packageName = packageInfo.package.name;
                     RemovePackage(packageName);
-                    Debug.Log(string.Format("无效包 {0} 已被释放", packageName));
+                    Debug.Log(string.Format("[PackageManager]无效包 {0} 已被释放", packageName));
                 }
                 m_invalidPackages.Clear();
             }
