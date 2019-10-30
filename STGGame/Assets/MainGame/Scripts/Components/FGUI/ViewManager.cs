@@ -15,6 +15,13 @@ namespace STGGame
         private Dictionary<Type, ViewInfo> m_viewMaps = new Dictionary<Type, ViewInfo>();
         private Action<ViewInfo> m_onCreated;
 
+        //TODO:非模态窗口
+        public ViewInfo New(Type type,object args =null)
+        {
+            return null;
+        }
+
+        //模态窗口
         public void Open(Type type, object args = null)
         {
             bool isNeedCreate = true;
@@ -108,6 +115,14 @@ namespace STGGame
             }
             return false;
         }
+
+        //TODO:
+        public void CloseAll()
+        {
+
+        }
+
+
 
         public bool IsOpened<T>() where T : FView
         {
