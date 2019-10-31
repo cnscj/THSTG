@@ -1,6 +1,8 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace XLibrary
@@ -10,6 +12,7 @@ namespace XLibrary
         public enum CodeType
         {
             Md5,
+            Sha1,
 
         }
         private string m_saveCodeFolder;
@@ -17,7 +20,7 @@ namespace XLibrary
 
         private string m_curRecPath;
         private string m_checkCode;
-        private string m_saveMd5Name = "";
+        private string m_saveCodeName = "";
 
         public FilesChecker(string codeFolder = "", CodeType codeType = CodeType.Md5)
         {
@@ -67,12 +70,12 @@ namespace XLibrary
                 }
             }
 
-            m_curRecPath = PathUtil.Combine(saveFolderPath, string.Format("{0}", (m_saveMd5Name == "" ? fileNotExName : m_saveMd5Name)));
+            m_curRecPath = PathUtil.Combine(saveFolderPath, string.Format("{0}", (m_saveCodeName == "" ? fileNotExName : m_saveCodeName)));
             m_checkCode = GetCode(paths);
 
-            string recMd5 = LoadCode(m_curRecPath);
+            string recCode = LoadCode(m_curRecPath);
 
-            if (m_checkCode != recMd5)
+            if (m_checkCode != recCode)
             {
                 return true;
             }
@@ -83,12 +86,12 @@ namespace XLibrary
 
         public void SetSvaeCodeName(string fileName)
         {
-            m_saveMd5Name = fileName;
+            m_saveCodeName = fileName;
         }
 
         public string GetSvaeCodeName()
         {
-            return m_saveMd5Name;
+            return m_saveCodeName;
         }
 
         public void SaveCodeChanged()
@@ -108,7 +111,7 @@ namespace XLibrary
                 }
                 else if (File.Exists(path))
                 {
-                    code = GetFileMd5(path);
+                    code = GetFileCode(path);
                 }
                 if (!codeList.ContainsKey(code))
                     codeList.Add(code, path);
@@ -140,14 +143,19 @@ namespace XLibrary
             File.WriteAllText(path, code);
         }
 
-        private string GetFileMd5(string filePath)
+        private string GetFileCode(string filePath)
         {
-            return XStringTools.FileToMd5(filePath);
-        }
-
-        private string GetFileHash(string filePath)
-        {
-            return XStringTools.FileToMd5(filePath);
+            string code = "";
+            switch (m_CheckCodeType)
+            {
+                case CodeType.Md5:
+                    code = GetFileMd5(filePath);
+                    break;
+                case CodeType.Sha1:
+                    code = GetFileSha1(filePath);
+                    break;
+            }
+            return code;
         }
 
         private string GetFilesCode(string[] filePaths)
@@ -155,17 +163,10 @@ namespace XLibrary
             SortedList<string, string> codeList = new SortedList<string, string>();
             foreach (var filePath in filePaths)
             {
-                string code = "";
-                switch (m_CheckCodeType)
-                {
-                    case CodeType.Md5:
-                        code = GetFileMd5(filePath);
-                        break;
-                }
-
+                string code = GetFileCode(filePath);
                 codeList.Add(code, filePath);
             }
-            //遍历文件夹,遍历所有文件Md5
+            //遍历文件夹,遍历所有文件Code
             StringBuilder stringBuilder = new StringBuilder();
             foreach (var code in codeList)
             {
@@ -186,10 +187,25 @@ namespace XLibrary
                 filePaths.Add(path);
             }, true);
 
-            string md5s = GetFilesCode(filePaths.ToArray());
-            return XStringTools.StringToMD5(md5s);
+            string codes = GetFilesCode(filePaths.ToArray());
+            return codes;
         }
 
+
+        //
+        private string GetFileMd5(string filePath)
+        {
+            return XStringTools.FileToMd5(filePath);
+        }
+
+        private string GetFileSha1(string filePath)
+        {
+            var hash = SHA1.Create();
+            var stream = new FileStream(filePath, FileMode.Open);
+            byte[] hashByte = hash.ComputeHash(stream);
+            stream.Close();
+            return BitConverter.ToString(hashByte).Replace("-", "");
+        }
     }
 
 }

@@ -42,7 +42,7 @@ namespace XLibrary
 			if (string.IsNullOrEmpty(str))
 				return "";
 
-			return ToMD5(Encoding.UTF8.GetBytes(str));
+            return ToMD5(Encoding.UTF8.GetBytes(str));
 		}
 
 		public static string FileToMd5(string filePath)
@@ -50,19 +50,19 @@ namespace XLibrary
 			if (string.IsNullOrEmpty(filePath))
 				return "";
 
-			FileStream file = new FileStream(filePath, FileMode.Open);
-			MD5 md5 = new MD5CryptoServiceProvider();
-			byte[] retVal = md5.ComputeHash(file);
-			file.Close();
-			return ToMD5(retVal);
-		}
+            FileStream file = new FileStream(filePath, FileMode.Open);
+            byte[] bytes = new byte[file.Length];
+            file.Read(bytes, 0, bytes.Length);
+            file.Close();
+            return ToMD5(bytes);
+        }
 
 		public static string ToMD5(byte[] data)
 		{
-			MD5 md5 = MD5.Create();
-			data = md5.ComputeHash(data);
+            MD5 md5 = MD5.Create();
+            data = md5.ComputeHash(data);
 
-			StringBuilder sBuilder = new StringBuilder();
+            StringBuilder sBuilder = new StringBuilder();
 			for (int i = 0; i < data.Length; ++i)
 			{
 				sBuilder.Append(data[i].ToString("x2"));
