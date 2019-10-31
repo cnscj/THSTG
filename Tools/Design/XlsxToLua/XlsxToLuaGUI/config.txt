@@ -1,0 +1,14 @@
+programPath:../XlsxToLua/XlsxToLua.exe
+excelFolderPath:../../../Stage
+exportLuaFolderPath:../../../../../thm/src/app/th08/Scripts/Configs/Generate
+clientFolderPath:-noClient
+langFilePath:-noLang
+-exportCsvParam_extension:csv
+-exportCsvParam_splitString:,
+-exportJsonParam_extension:txt
+-exportCsvParam_isExportColumnName:true
+-exportCsvParam_isExportColumnDataType:true
+-exportJsonParam_isExportJsonArrayFormat:true
+-exportJsonParam_isMapIncludeKeyColumnValue:true
+-exportJavaClassParam_isUseDate:true
+isCheckedUseRelativePath:true
