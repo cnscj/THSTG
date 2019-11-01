@@ -14,6 +14,7 @@
         UI = 101,
         Shader = 102,
         Config = 103,
+        Script = 104,
     }
 
 }

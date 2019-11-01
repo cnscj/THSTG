@@ -118,5 +118,14 @@ namespace STGGame
            
             return sceneName;
         }
+
+
+        public byte[] LoadScript(string fileName)
+        {
+            string resPath = Combine2FixPath(EResType.Script, string.Format("{0}.ab", fileName), string.Format("{0}.bytes", fileName));
+            var dllData = ResourceLoader.GetInstance().LoadFromFile<TextAsset>(resPath);
+
+            return dllData.bytes;
+        }
     }
 }

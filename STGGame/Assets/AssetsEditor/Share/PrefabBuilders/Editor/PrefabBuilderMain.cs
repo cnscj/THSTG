@@ -10,6 +10,7 @@ namespace STGEditor
             new PrefabBuilderProcessEffect(PrefabBuildConfig.tempEffectMd5s,PrefabBuildConfig.tempEffect),
             new PrefabBuilderProcessLevel(PrefabBuildConfig.tempLevelMd5s,PrefabBuildConfig.tempLevels),
             new PrefabBuilderProcessUI(PrefabBuildConfig.tempUIMd5s,PrefabBuildConfig.tempUIs),
+            new PrefabBuilderProcessScript(PrefabBuildConfig.tempScriptMd5s,PrefabBuildConfig.tempScripts),
             new PrefabBuilderProcessCfg(PrefabBuildConfig.tempConfigMd5s,PrefabBuildConfig.tempConfigs),
         });
     }

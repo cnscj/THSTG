@@ -19,6 +19,7 @@ namespace STGGame
             [EResType.UI] = "UIs",
             [EResType.Shader] = "Shaders",
             [EResType.Config] = "Configs",
+            [EResType.Script] = "Scripts",
         };
     }
 

@@ -21,6 +21,7 @@ namespace STGGame
 
         public static readonly string srcProgramResource = PathUtil.Combine(artSrcFolder, "Program");
         public static readonly string srcUIs = PathUtil.Combine(srcProgramResource, "UIs");
+        public static readonly string srcScripts = PathUtil.Combine(srcProgramResource, "Scripts");
 
         public static readonly string srcDesignResource = PathUtil.Combine(artSrcFolder, "Design");
         public static readonly string srcConfigs = PathUtil.Combine(srcDesignResource, "Configs");
@@ -33,6 +34,7 @@ namespace STGGame
         public static readonly string tempEffect = PathUtil.Combine(temResource, "Effects");
         public static readonly string tempLevels = PathUtil.Combine(temResource, "Levels");
         public static readonly string tempUIs = PathUtil.Combine(temResource, "UIs");
+        public static readonly string tempScripts = PathUtil.Combine(temResource, "Scripts");
         public static readonly string tempConfigs = PathUtil.Combine(temResource, "Configs");
 
         public static readonly string temMd5 = PathUtil.Combine(temResource, "_Md5");
@@ -41,6 +43,7 @@ namespace STGGame
         public static readonly string tempEffectMd5s = PathUtil.Combine(temMd5, "Effects");
         public static readonly string tempLevelMd5s = PathUtil.Combine(temMd5, "Levels");
         public static readonly string tempUIMd5s = PathUtil.Combine(temMd5, "UIs");
+        public static readonly string tempScriptMd5s = PathUtil.Combine(temMd5, "Scripts");
         public static readonly string tempConfigMd5s = PathUtil.Combine(temMd5, "Configs");
     }
 }
