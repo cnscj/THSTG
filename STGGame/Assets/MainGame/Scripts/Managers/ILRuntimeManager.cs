@@ -37,12 +37,13 @@ namespace STGGame
         void InitializeILRuntime()
         {
             //这里做一些ILRuntime的注册，HelloWorld示例暂时没有需要注册的
+            appdomain.RegisterCrossBindingAdaptor(new ControllerAdaptor());
         }
 
         void OnHotFixLoaded()
         {
             //HelloWorld，第一次方法调用
-            appdomain.Invoke("THHFGmae.Main", "Init", null, null);
+            appdomain.Invoke("XSTGGame.Main", "Init", null, null);
 
         }
 
