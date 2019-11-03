@@ -22,8 +22,11 @@ namespace STGGame
         public class ViewSettingInfo
         {
             public string viewName;
-           
+
+            public bool isResident;      //常驻View
+            public bool isPerpetual;     //不可Close
             public bool isPlayLoad;
+
 
         }
 
@@ -65,7 +68,8 @@ namespace STGGame
                 ViewSettingInfo settingInfo = null;
                 if (m_viewSettingMap.TryGetValue(viewInfo.view.GetType().ToString(), out settingInfo))
                 {
-                    
+                    viewInfo.isPerpetual = settingInfo.isPerpetual;
+                    viewInfo.isResident = settingInfo.isResident;
                 }
             });
 

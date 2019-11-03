@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<component size="640,480" extention="Label" initName="frame">
+<component size="640,480" opaque="false" extention="Label" initName="frame">
   <displayList>
     <graph id="n3_logx" name="contentArea" xy="0,25" size="640,452" type="rect">
       <relation target="" sidePair="width-width,height-height"/>
     </graph>
     <graph id="n4_logx" name="dragArea" xy="197,0" size="246,52" type="rect">
-      <relation target="" sidePair="center-center,top-top"/>
-      <relation target="" sidePair="width-width%"/>
+      <relation target="" sidePair="width-width%,center-center,top-top"/>
     </graph>
     <component id="n5_logx" name="closeButton" src="vd2z1" fileName="Button/ButtonClose1.xml" xy="592,25">
       <relation target="" sidePair="right-right,top-top"/>

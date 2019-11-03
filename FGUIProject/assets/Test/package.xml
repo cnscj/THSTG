@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<packageDescription id="y59nubhf" jpegQuality="80" compressPNG="true">
+<packageDescription id="y59nubhf">
   <resources>
     <component id="jtdb0" name="TestExampleView.xml" path="/Example/" exported="true"/>
     <component id="jtdb1" name="TestExampleItemTmpl.xml" path="/Example/Components/" exported="true"/>
@@ -12,6 +12,7 @@
     <component id="logx8" name="TestExampleTextLongTextComp.xml" path="/Example/Text/Components/"/>
     <component id="logx9" name="TestExampleWindowView.xml" path="/Example/Window/" exported="true"/>
     <component id="logxb" name="TestExampleWindowTest1Wnd.xml" path="/Example/Window/View/" exported="true"/>
+    <component id="tf07c" name="TestExampleWindowTest2Wnd.xml" path="/Example/Window/View/" exported="true"/>
   </resources>
   <publish name="Test"/>
 </packageDescription>

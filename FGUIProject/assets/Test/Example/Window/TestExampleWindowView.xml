@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <component size="1024,576" opaque="false" designImage="ui://y59nubhfjtdb0">
   <displayList>
-    <component id="n10_logx" name="popWnd" src="po2z0" fileName="Button/Button1.xml" pkg="y8wff1cb" xy="440,480">
-      <Button title="弹窗"/>
+    <component id="n10_logx" name="nonModelPopWnd" src="po2z0" fileName="Button/Button1.xml" pkg="y8wff1cb" xy="41,493">
+      <Button title="非模态弹窗"/>
+    </component>
+    <component id="n11_lq57" name="modelPopWnd1" src="po2z0" fileName="Button/Button1.xml" pkg="y8wff1cb" xy="719,510" size="116,40">
+      <Button title="模态弹窗1"/>
+    </component>
+    <component id="n13_tf07" name="modelPopWnd2" src="po2z0" fileName="Button/Button1.xml" pkg="y8wff1cb" xy="880,510" size="116,40">
+      <Button title="模态弹窗2"/>
+    </component>
+    <component id="n14_tf07" name="closeAllBtn" src="po2z0" fileName="Button/Button1.xml" pkg="y8wff1cb" xy="329,500" size="108,39">
+      <Button title="关掉所有"/>
+    </component>
+    <component id="n15_tf07" name="close100Btn" src="po2z0" fileName="Button/Button1.xml" pkg="y8wff1cb" xy="478,500" size="108,39">
+      <Button title="关掉100"/>
     </component>
   </displayList>
 </component>

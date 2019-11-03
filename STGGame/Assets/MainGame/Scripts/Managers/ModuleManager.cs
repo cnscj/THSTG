@@ -1,5 +1,5 @@
 ﻿
-using XLibrary.MVC;
+using STGGame.MVC;
 using XLibrary.Package;
 
 namespace STGGame

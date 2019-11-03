@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<packageDescription id="y8wff1cb" jpegQuality="80" compressPNG="true">
+<packageDescription id="y8wff1cb">
   <resources>
     <component id="po2z0" name="Button1.xml" path="/Button/" exported="true"/>
     <component id="vd2z1" name="ButtonClose1.xml" path="/Button/" exported="true"/>
     <component id="logx4" name="Window1.xml" path="/Window/" exported="true"/>
   </resources>
-  <publish name="UIBase"/>
+  <publish name="UIBase" maxAtlasSize="2048" rotation="true"/>
 </packageDescription>

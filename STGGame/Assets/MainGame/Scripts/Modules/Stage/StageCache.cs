@@ -1,4 +1,4 @@
-﻿using XLibrary.MVC;
+﻿using STGGame.MVC;
 
 namespace STGGame
 {

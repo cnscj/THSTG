@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<component size="1024,576">
+<component size="1024,576" opaque="false">
   <displayList>
-    <component id="n0_logx" name="frame" src="logx4" fileName="Window/Window1.xml" pkg="y8wff1cb" xy="220,72" size="512,397"/>
+    <component id="n0_logx" name="frame" src="logx4" fileName="Window/Window1.xml" pkg="y8wff1cb" xy="256,89" size="512,397"/>
     <richtext id="n1_logx" name="n1" xy="287,185" size="203,25" fontSize="18" text="简单的窗口由三部分主城"/>
-    <component id="n2_logx" name="btn1" src="po2z0" fileName="Button/Button1.xml" pkg="y8wff1cb" xy="544,390">
+    <component id="n2_logx" name="btn1" src="po2z0" fileName="Button/Button1.xml" pkg="y8wff1cb" xy="592,405">
       <Button title="扁平极简主义"/>
     </component>
+    <richtext id="n3_lq57" name="n3" xy="308,437" size="271,22" fontSize="16" text="FGUIEditor必须勾选&quot;可穿透空白区域&quot;"/>
   </displayList>
 </component>

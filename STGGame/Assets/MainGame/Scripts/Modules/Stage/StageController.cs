@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using XLibGame;
-using XLibrary.MVC;
+using STGGame.MVC;
 
 namespace STGGame
 {

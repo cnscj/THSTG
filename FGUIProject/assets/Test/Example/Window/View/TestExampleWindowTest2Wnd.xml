@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1024,576" opaque="false">
+  <displayList>
+    <component id="n0_logx" name="frame" src="logx4" fileName="Window/Window1.xml" pkg="y8wff1cb" xy="287,97" size="327,254"/>
+    <component id="n2_logx" name="btn1" src="po2z0" fileName="Button/Button1.xml" pkg="y8wff1cb" xy="524,316" size="80,22">
+      <Button title="close"/>
+    </component>
+  </displayList>
+</component>
