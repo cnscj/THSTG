@@ -3,6 +3,10 @@ namespace STGGame.MVC
 {
     public class Controller
     {
+        public static T Get<T>() where T : Controller, new()
+        {
+            return MVCManager.GetInstance().GetController<T>();
+        }
 
         public bool Initialize()
         {
