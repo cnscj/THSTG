@@ -3,18 +3,18 @@ using UnityEngine;
 using Unity.Entities;
 using XLibrary.Package;
 
-namespace STGGame
+namespace STGU3D
 {
     public class GameManager : MonoSingleton<GameManager>
     {
         private void Awake()
         {
             DontDestroyOnLoad(this.gameObject);
+            STGService.Main.InitAwake();
         }
         private void Start()
         {
-            EntityManager.GetInstance().CreatePlayer();
-            //SceneManager.GetInstance().LoadLevelScene("200001");
+            STGService.Main.InitStart();
         }
         private GameManager()
         {

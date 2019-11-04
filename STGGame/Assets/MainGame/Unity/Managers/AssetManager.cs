@@ -7,7 +7,7 @@ using UnityEngine;
 using XLibrary;
 using XLibrary.Package;
 
-namespace STGGame
+namespace STGService
 {
     public class AssetManager : MonoSingleton<AssetManager>
     {

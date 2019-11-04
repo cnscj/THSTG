@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using XLibGame;
-namespace STGGame
+namespace STGU3D
 {
     public static class DispatcherManager
     {
