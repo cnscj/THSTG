@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<packageDescription id="yh76s5e0" jpegQuality="80" compressPNG="true">
+<packageDescription id="yh76s5e0">
   <resources>
     <component id="h78s0" name="RedDot.xml" path="/" exported="true"/>
-    <image id="z7yu8" name="loading_th08_logo.jpg" path="/_Tex/Loading/" exported="true"/>
     <component id="z7yu1" name="LoadingView.xml" path="/" exported="true"/>
     <image id="z7yu4" name="loading_icon_01.png" path="/_Tex/Loading/" exported="true"/>
     <image id="z7yu3" name="loading_nowloading.png" path="/_Tex/Loading/" exported="true"/>

@@ -422,5 +422,35 @@ namespace STGService.UI
         {
             return _obj.asList.numChildren;
         }
+
+        //加一层遮罩,List含3d物体时用
+        public void SetStencil()
+        {
+            SetVirtual();
+            // 弄一个组件和list一样大
+            // 弄一个shape当做遮罩
+            // 把这个list放入这个组件
+            var container = FComponent.Create<FComponent, GComponent>();
+            var graph = FComponent.Create<FGraph, GGraph>();
+            var parent = this.GetParent();
+
+            //初始化
+            container.SetXY(this.GetXY());
+
+            graph.SetXY(0, 0);
+            graph.SetSize(this.GetSize());
+
+            //
+            this.RemoveFromParent();
+            this.SetXY(0, 0);
+
+            //
+            parent.AddChild(container);
+            container.AddChild(graph);
+            container.AddChild(this);
+
+            graph.AddRelation(this, FairyGUI.RelationType.Size);
+            container.GetObject().asCom.mask = graph.GetObject().displayObject;
+        }
     }
 }

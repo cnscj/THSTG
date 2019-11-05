@@ -257,8 +257,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Texture: {fileID: 0}
   m_UVRect:
     serializedVersion: 2
@@ -427,7 +425,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 647176299}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2069008616}
@@ -771,8 +769,8 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 1
-  m_Camera: {fileID: 0}
-  m_PlaneDistance: 100
+  m_Camera: {fileID: 1432894771860694358}
+  m_PlaneDistance: 10
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -895,6 +893,12 @@ PrefabInstance:
 --- !u!4 &1432894771860694357 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1432894772382045461, guid: 56966a23b22a77241b2af981811cb473,
+    type: 3}
+  m_PrefabInstance: {fileID: 1432894771860694356}
+  m_PrefabAsset: {fileID: 0}
+--- !u!20 &1432894771860694358 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 5239308066223360711, guid: 56966a23b22a77241b2af981811cb473,
     type: 3}
   m_PrefabInstance: {fileID: 1432894771860694356}
   m_PrefabAsset: {fileID: 0}

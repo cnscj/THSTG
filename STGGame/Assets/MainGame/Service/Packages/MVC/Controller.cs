@@ -10,21 +10,21 @@ namespace STGService.MVC
 
         public bool Initialize()
         {
-            OnOpen();
+            OnAdded();
             return true;
         }
 
         public void Dispose()
         {
-            OnClose();
+            OnRemoved();
         }
 
-        protected virtual void OnOpen()
+        protected virtual void OnAdded()
         {
 
         }
 
-        protected virtual void OnClose()
+        protected virtual void OnRemoved()
         {
 
         }

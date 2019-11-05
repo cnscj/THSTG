@@ -6,7 +6,7 @@ namespace STGService
 {
     public class MainUIController : Controller
     {
-        protected override void OnOpen()
+        protected override void OnAdded()
         {
             EventSystem.Dispatch(EventType.TEST_EVENT);
         }

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="0nxtd0tq">
+  <resources>
+    <image id="z7yu8" name="loading_th08_logo.jpg" path="/Image/Background/"/>
+  </resources>
+  <publish name="Assets" excluded="/"/>
+</packageDescription>

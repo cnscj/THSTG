@@ -1,15 +1,16 @@
 ﻿
+using System.Collections.Generic;
 using XLibGame;
 using STGService.MVC;
 
 namespace STGService
 {
-    public class TestController : Controller
-    {
+	public class FightController : Controller
+	{
         protected override void OnAdded()
         {
-
+           
         }
-    }
 
+    }
 }

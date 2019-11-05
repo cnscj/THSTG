@@ -55,6 +55,10 @@ namespace STGService.UI
         {
             _obj.xy = new Vector2(x, y);
         }
+        public void SetXY(Vector2 xy)
+        {
+            _obj.xy = xy;
+        }
         public Vector2 GetXY()
         {
             return _obj.xy;
@@ -138,6 +142,10 @@ namespace STGService.UI
             _obj.width = width;
             _obj.height = height;
         }
+        public void SetSize(Vector2 size)
+        {
+            SetSize(size.x, size.y);
+        }
 
         public Vector2 GetCenter()
         {
@@ -163,6 +171,10 @@ namespace STGService.UI
         public object GetData()
         {
             return _obj.data;
+        }
+        public T GetData<T>() where T : Object, new()
+        {
+            return GetData() as T;
         }
 
         // 设置拖拽
