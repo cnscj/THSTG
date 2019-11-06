@@ -6,7 +6,7 @@ namespace STGService
 {
     public static class Main 
     {
-        //所有业务逻辑的入口
+        //所有业务逻辑初始化
         public static void InitAwake()
         {
             AssetSystem.InitAwake();
