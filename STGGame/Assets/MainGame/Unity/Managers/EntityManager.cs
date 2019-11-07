@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 using XLibrary.Package;
 
-namespace STGService
+namespace STGU3D
 {
     public class EntityManager : MonoSingleton<EntityManager>
     {

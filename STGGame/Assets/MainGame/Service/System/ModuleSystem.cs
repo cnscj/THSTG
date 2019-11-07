@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using STGService.MVC;
-using STGU3D;
-using XLibGame;
+﻿using STGService.MVC;
 
 namespace STGService
 {

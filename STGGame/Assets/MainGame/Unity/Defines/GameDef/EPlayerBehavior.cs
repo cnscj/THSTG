@@ -1,4 +1,4 @@
-﻿namespace STGService
+﻿namespace STGU3D
 {
     public enum EPlayerBehavior
     {

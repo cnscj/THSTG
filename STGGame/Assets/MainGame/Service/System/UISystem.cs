@@ -1,17 +1,68 @@
 ﻿using System.Collections.Generic;
 using ASGame;
+using STGU3D;
 
 namespace STGService
 {
     public static class UISystem
     {
-        private static Dictionary<string, UIManager.PackageSettingInfo> m_packageSettingMap = new Dictionary<string, UIManager.PackageSettingInfo>();
-        private static Dictionary<string, UIManager.ViewSettingInfo> m_viewSettingMap = new Dictionary<string, UIManager.ViewSettingInfo>();
+        [System.Serializable]
+        public class PackageSettingInfo
+        {
+            public string packageName;
+            public float residentTimeS = -1;
+            public bool isPlayLoad;             //运行加载
+        }
+
+        [System.Serializable]
+        public class ViewSettingInfo
+        {
+            public string viewName;
+
+            public bool isResident;      //常驻View
+            public bool isPerpetual;     //不可Close
+            public bool isPlayLoad;      //运行加载
+        }
+
+        public static float residentTimeS = 15;
+        public static List<PackageSettingInfo> packageList = new List<PackageSettingInfo>()
+        {
+            new PackageSettingInfo()
+            {
+                packageName = "UIBase",
+                residentTimeS = -1,
+                isPlayLoad = true,
+
+            },
+            new PackageSettingInfo()
+            {
+                packageName = "UIPublic",
+                residentTimeS = -1,
+                isPlayLoad = true,
+
+            },
+
+        };
+        public static List<ViewSettingInfo> viewList = new List<ViewSettingInfo>()
+        {
+            new ViewSettingInfo()
+            {
+                viewName = "STGService.UI.TestView",
+                isResident = true,
+                isPerpetual = true,
+                isPlayLoad = true,
+            }
+        };
+
+        //////////
+        private static Dictionary<string, PackageSettingInfo> m_packageSettingMap = new Dictionary<string, PackageSettingInfo>();
+        private static Dictionary<string, ViewSettingInfo> m_viewSettingMap = new Dictionary<string, ViewSettingInfo>();
+        
 
         public static void InitAwake()
         {
             //设置Package的加载器
-            PackageManager.GetInstance().residentTimeS = UIManager.GetInstance().residentTimeS;
+            PackageManager.GetInstance().residentTimeS = residentTimeS;
             PackageManager.GetInstance().SetLoader((packageName) =>
             {
                 var pair = AssetManager.GetInstance().LoadUI(packageName);
@@ -24,7 +75,7 @@ namespace STGService
 
             PackageManager.GetInstance().OnAdded((packageInfo) =>
             {
-                UIManager.PackageSettingInfo settingInfo = null;
+                PackageSettingInfo settingInfo = null;
                 if (m_packageSettingMap.TryGetValue(packageInfo.package.name, out settingInfo))
                 {
                     packageInfo.residentTimeS = settingInfo.residentTimeS;
@@ -33,7 +84,7 @@ namespace STGService
 
             ViewManager.GetInstance().OnCreated((viewInfo) =>
             {
-                UIManager.ViewSettingInfo settingInfo = null;
+                ViewSettingInfo settingInfo = null;
                 if (m_viewSettingMap.TryGetValue(viewInfo.view.GetType().ToString(), out settingInfo))
                 {
                     viewInfo.isPerpetual = settingInfo.isPerpetual;
@@ -41,7 +92,7 @@ namespace STGService
                 }
             });
 
-            foreach (var settingInfo in UIManager.GetInstance().packageList)
+            foreach (var settingInfo in packageList)
             {
                 if (!string.IsNullOrEmpty(settingInfo.packageName))
                 {
@@ -56,7 +107,7 @@ namespace STGService
                 }
             }
 
-            foreach (var settingInfo in UIManager.GetInstance().viewList)
+            foreach (var settingInfo in viewList)
             {
                 if (!string.IsNullOrEmpty(settingInfo.viewName))
                 {
@@ -70,7 +121,7 @@ namespace STGService
 
         public static void InitStart()
         {
-            foreach (var settingInfo in UIManager.GetInstance().viewList)
+            foreach (var settingInfo in viewList)
             {
                 if (!string.IsNullOrEmpty(settingInfo.viewName))
                 {

@@ -1,6 +1,6 @@
 ﻿
 using UnityEngine;
-namespace STGService
+namespace STGU3D
 {
     public class DisplayComponent : MonoBehaviour
     {

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using THGame;
-namespace STGService
+namespace STGU3D
 {
     public class BaseBehavior
     {

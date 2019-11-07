@@ -3,11 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using ASGame;
+using STGU3D;
 using UnityEngine;
 using XLibrary;
 using XLibrary.Package;
 
-namespace STGService
+namespace STGU3D
 {
     public class AssetManager : MonoSingleton<AssetManager>
     {
@@ -117,15 +118,6 @@ namespace STGService
             }
            
             return sceneName;
-        }
-
-
-        public byte[] LoadScript(string fileName)
-        {
-            string resPath = Combine2FixPath(EResType.Script, string.Format("{0}.ab", fileName), string.Format("{0}.bytes", fileName));
-            var dllData = ResourceLoader.GetInstance().LoadFromFile<TextAsset>(resPath);
-
-            return dllData.bytes;
         }
     }
 }

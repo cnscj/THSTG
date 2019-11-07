@@ -3,7 +3,7 @@ using System.IO;
 using UnityEngine;
 using XLibrary.Package;
 
-namespace STGService
+namespace STGU3D
 {
     //场景管理器
     public class SceneManager : MonoSingleton<SceneManager>

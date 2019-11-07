@@ -7,6 +7,7 @@ namespace STGService
         {
             ResourceLoader.GetInstance().loadMode = ResourceLoadMode.Editor;      //加载模式
         }
+
     }
 
 }

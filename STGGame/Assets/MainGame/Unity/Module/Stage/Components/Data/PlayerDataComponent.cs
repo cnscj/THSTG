@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace STGService
+namespace STGU3D
 {
     public class PlayerDataComponent : EntityDataComponent
     {

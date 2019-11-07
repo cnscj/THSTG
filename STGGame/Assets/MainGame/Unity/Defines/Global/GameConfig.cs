@@ -3,7 +3,7 @@ using System.Collections;
 using THGame;
 using System.Collections.Generic;
 
-namespace STGService
+namespace STGU3D
 {
 	public static class GameConfig
     {

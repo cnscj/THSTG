@@ -2,7 +2,7 @@
 using Unity.Entities;
 using Unity.Jobs;
 using UnityEngine;
-namespace STGService
+namespace STGU3D
 {
 
     public class PlayerInputMovementSystem : ComponentSystem

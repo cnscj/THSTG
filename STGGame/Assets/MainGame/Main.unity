@@ -131,7 +131,6 @@ GameObject:
   - component: {fileID: 2125908314}
   - component: {fileID: 2125908315}
   - component: {fileID: 2125908316}
-  - component: {fileID: 2125908318}
   - component: {fileID: 2125908313}
   m_Layer: 0
   m_Name: GameManager
@@ -224,31 +223,6 @@ MonoBehaviour:
   - uis/share.ab
   - levels/share.ab
   - configs/share.ab
---- !u!114 &2125908318
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2125908311}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cf1a3f064416947e2b451ae38e2ca427, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  residentTimeS: 15
-  packageList:
-  - packageName: UIBase
-    residentTimeS: -1
-    isPlayLoad: 1
-  - packageName: UIPublic
-    residentTimeS: -1
-    isPlayLoad: 1
-  viewList:
-  - viewName: STGService.UI.TestView
-    isResident: 1
-    isPerpetual: 1
-    isPlayLoad: 1
 --- !u!114 &2125908319
 MonoBehaviour:
   m_ObjectHideFlags: 0

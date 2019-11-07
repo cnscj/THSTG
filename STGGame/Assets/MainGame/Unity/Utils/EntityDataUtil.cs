@@ -1,5 +1,5 @@
 ﻿using System;
-namespace STGService
+namespace STGU3D
 {
     public static class EntityDataUtil
     {

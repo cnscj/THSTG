@@ -3,7 +3,7 @@ using System;
 using Unity.Entities;
 using UnityEngine;
 
-namespace STGService
+namespace STGU3D
 {
     public class MovementComponent : MonoBehaviour
     {

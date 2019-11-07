@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using XLibrary;
 using STGGame;
-namespace STGService
+namespace STGU3D
 {
 	public static class ResourceBookConfig
     {
