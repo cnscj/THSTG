@@ -38,11 +38,11 @@ namespace STGService.UI
 
         public virtual void Close(bool isDisposed = true)
         {
-            //FIXME:如果有退出动画,必须等动画结束在执行
+            //XXX:如果有退出动画,必须等动画结束在执行
             ViewInfo viewInfo = ViewManager.GetInstance().GetViewInfo(GetType());
             if (viewInfo != null && viewInfo.view == this)
             {
-                ViewManager.GetInstance().Close(GetType());
+                ViewManager.GetInstance().Close(this, isDisposed);
             }
             else
             {
@@ -55,7 +55,7 @@ namespace STGService.UI
                     RemoveFromParent();
                 }
             }
-            
+
         }
 
         public override Wrapper<GObject> InitWithObj(GObject obj)

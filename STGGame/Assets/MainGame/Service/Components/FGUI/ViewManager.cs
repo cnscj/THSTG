@@ -92,6 +92,32 @@ namespace STGService
             
         }
 
+        //这里必须调用View
+        public void Close(FView view, bool isDisposed = true)
+        {
+            if (view != null)
+            {
+                Type type = view.GetType();
+                ViewInfo viewInfo = null;
+                if (m_viewsMap.TryGetValue(type, out viewInfo))
+                {
+                    if (isDisposed)
+                    {
+                        m_viewsMap.Remove(type);
+                    } 
+                }
+
+                if (isDisposed)
+                {
+                    view.Dispose();
+                }
+                else
+                {
+                    view.RemoveFromParent();
+                }
+            }
+        }
+
         public void Close(Type type, bool isDisposed = true)
         {
             ViewInfo viewInfo = null;
@@ -105,15 +131,7 @@ namespace STGService
                         isDisposed = false;
                     }
 
-                    if (isDisposed)
-                    {
-                        view.Dispose();
-                        m_viewsMap.Remove(type);
-                    }
-                    else
-                    {
-                        view.RemoveFromParent();
-                    }
+                    view.Close(isDisposed);
                 }
             }
         }
@@ -143,6 +161,7 @@ namespace STGService
             return false;
         }
 
+        //FIXME:存在内存泄漏
         public void CloseAll(bool isDisposed = true)
         {
             List<Type> closeLayers = new List<Type>();

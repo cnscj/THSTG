@@ -43,7 +43,7 @@ namespace STGService.UI
                     var viewInfo = pair.Value;
                     if (viewInfo.view != null)
                     {
-                        viewInfo.view.Close(true);
+                        viewInfo.view.Close(isDisposed);
                     }
                 }
                 _children.Clear();

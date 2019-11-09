@@ -14,11 +14,14 @@ namespace THEditor
 
         private SerializedProperty m_launchOrderType;
         private List<KeyValuePair<string, SerializedProperty>> launchOrderProps = new List<KeyValuePair<string, SerializedProperty>>();
+        private List<KeyValuePair<string, SerializedProperty>> launchOrderFixProps = new List<KeyValuePair<string, SerializedProperty>>();
 
         private SerializedProperty m_launchType;
         private List<KeyValuePair<string, SerializedProperty>> lineProps = new List<KeyValuePair<string, SerializedProperty>>();
         private List<KeyValuePair<string, SerializedProperty>> surroundProps = new List<KeyValuePair<string, SerializedProperty>>();
         private List<KeyValuePair<string, SerializedProperty>> randomProps = new List<KeyValuePair<string, SerializedProperty>>();
+        private List<KeyValuePair<string, SerializedProperty>> fixedPointProps = new List<KeyValuePair<string, SerializedProperty>>();
+        private List<KeyValuePair<string, SerializedProperty>> customProps = new List<KeyValuePair<string, SerializedProperty>>();
 
         public override void OnInspectorGUI()
         {
@@ -41,9 +44,18 @@ namespace THEditor
         void ShowLaunchOrderTypeProps()
         {
             EditorGUILayout.PropertyField(m_launchOrderType, new GUIContent("发射顺序"));
-            if (m_editor.launchOrderType == EntityEmitter.ECreateOrderType.Fixed)
+            ShowPropertys(launchOrderProps);
+            if (m_editor.launchOrderType == EntityEmitter.ECreateOrderType.Orderly)
             {
-                ShowPropertys(launchOrderProps);
+               
+            }
+            else if (m_editor.launchOrderType == EntityEmitter.ECreateOrderType.Random)
+            {
+ 
+            }
+            else if (m_editor.launchOrderType == EntityEmitter.ECreateOrderType.Fixed)
+            {
+                ShowPropertys(launchOrderFixProps);
             }
         }
 
@@ -61,6 +73,14 @@ namespace THEditor
             else if (m_editor.launchType == EntityEmitter.EDiffusionType.Random)
             {
                 ShowPropertys(randomProps);
+            }
+            else if (m_editor.launchType == EntityEmitter.EDiffusionType.FixedPoint)
+            {
+                ShowPropertys(fixedPointProps);
+            }
+            else if (m_editor.launchType == EntityEmitter.EDiffusionType.Custom)
+            {
+                ShowPropertys(customProps);
             }
         }
 
@@ -87,43 +107,59 @@ namespace THEditor
             m_editor = (EntityEmitter)target;
             Clear();
 
-
             AddPropertys(normalProps, "发射实体队列", "launchEntities");
+            AddPropertys(normalProps, "发射父节点", "launchParent");
+            AddPropertys(normalProps, "发射相对节点", "launchRelative");
             AddPropertys(normalProps, "发射频度(s)", "launchFreq");
             AddPropertys(normalProps, "发射次数", "launchTimes");
             AddPropertys(normalProps, "发射数量", "launchNum");
             AddPropertys(normalProps, "发射初速度", "launchSpeed");
-            AddPropertys(normalProps, "自动销毁", "launchAutoDestroy");
+            //AddPropertys(normalProps, "自动销毁", "launchAutoDestroy");
             //AddPropertys(normalProps, "强制发射", "launchForceLaunch");
 
             m_launchOrderType = serializedObject.FindProperty("launchOrderType");
-            AddPropertys(launchOrderProps, "实体序号", "launchOrderFixedIndex");
+
+            AddPropertys(launchOrderProps, "按次数递增", "launchOrderOrderlyByTimes");
+            AddPropertys(launchOrderFixProps, "实体序号", "launchOrderFixedIndex");
+            
 
             m_launchType = serializedObject.FindProperty("launchType");
-            AddPropertys(lineProps, "发射向量", "launchLineVector");
-            AddPropertys(lineProps, "持续时间", "launchLineDuration");
+            AddPropertys(lineProps, "发射角度", "launchLineAngle");
+            AddPropertys(lineProps, "发射角度增量", "launchLineRPT");
 
-            AddPropertys(surroundProps, "最小半径", "launchSurroundMinRadius");
-            AddPropertys(surroundProps, "最大半径", "launchSurroundMaxRadius");
+            AddPropertys(surroundProps, "轨道半径", "launchSurroundRadius");
 
             AddPropertys(randomProps, "最小半径", "launchRandomMinRadius");
             AddPropertys(randomProps, "最大半径", "launchRandomMaxRadius");
 
+            AddPropertys(fixedPointProps, "固定点列表", "launchFixedPointPoints");
+            
+            AddPropertys(customProps, "自定义类型", "launchCustomType");
+            AddPropertys(customProps, "自定义数据1", "launchCustomData1");
+            AddPropertys(customProps, "自定义数据2", "launchCustomData2");
+            AddPropertys(customProps, "自定义数据2", "launchCustomData3");
         }
         void Clear()
         {
             normalProps.Clear();
             launchOrderProps.Clear();
+            launchOrderFixProps.Clear();
 
             lineProps.Clear();
             surroundProps.Clear();
             randomProps.Clear();
+            customProps.Clear();
         }
 
         void Awake()
         {
            
 
+        }
+
+        void OnDisable()
+        {
+            m_editor.launchRelative = m_editor.launchRelative != null ? m_editor.launchRelative : m_editor.gameObject;
         }
 
     }
