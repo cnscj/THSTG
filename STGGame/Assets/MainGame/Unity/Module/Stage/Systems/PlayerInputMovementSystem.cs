@@ -9,30 +9,31 @@ namespace STGU3D
     {
         struct InputMovementGroup
         {
-            public MovementComponent movement;
-            public BehaviourMapper input;
+            public PlayerDataComponent playerDataCom;
+            public MovementComponent movementCom;
+            public BehaviourMapper inputCom;
         }
 
         protected override void OnUpdate()
         {
             foreach (var entity in GetEntities<InputMovementGroup>())
             {
-                entity.movement.moveDir = Vector3.zero;
-                if (entity.input.IsAtBehaviour((int)EPlayerBehavior.MoveLeft))
+                entity.movementCom.moveSpeed = Vector3.zero;
+                if (entity.inputCom.IsAtBehaviour((int)EPlayerBehavior.MoveLeft))
                 {
-                    entity.movement.moveDir.x = -1;
+                    entity.movementCom.moveSpeed += Vector3.left * entity.playerDataCom.moveSpeed;
                 }
-                else if (entity.input.IsAtBehaviour((int)EPlayerBehavior.MoveRight))
+                else if (entity.inputCom.IsAtBehaviour((int)EPlayerBehavior.MoveRight))
                 {
-                    entity.movement.moveDir.x = 1;
+                    entity.movementCom.moveSpeed += Vector3.right * entity.playerDataCom.moveSpeed;
                 }
-                if (entity.input.IsAtBehaviour((int)EPlayerBehavior.MoveUp))
+                if (entity.inputCom.IsAtBehaviour((int)EPlayerBehavior.MoveUp))
                 {
-                    entity.movement.moveDir.y = 1;
+                    entity.movementCom.moveSpeed += Vector3.up * entity.playerDataCom.moveSpeed;
                 }
-                else if (entity.input.IsAtBehaviour((int)EPlayerBehavior.MoveDown))
+                else if (entity.inputCom.IsAtBehaviour((int)EPlayerBehavior.MoveDown))
                 {
-                    entity.movement.moveDir.y = -1;
+                    entity.movementCom.moveSpeed += Vector3.down * entity.playerDataCom.moveSpeed;
                 }
             }
         }

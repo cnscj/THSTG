@@ -53,7 +53,7 @@ namespace THGame
             return false;
         }
 
-        private void Awake()
+        protected void Awake()
         {
             foreach (var pair in keyList)
             {
@@ -67,7 +67,7 @@ namespace THGame
             }
         }
 
-        private void Update()
+        protected void Update()
         {
             //把所有的按键记录到输入组件中
             foreach (var keyPair in keyList)

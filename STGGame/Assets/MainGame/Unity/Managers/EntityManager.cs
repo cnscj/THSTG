@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using XLibrary.Package;
+using THGame;
 
 namespace STGU3D
 {
@@ -31,7 +32,7 @@ namespace STGU3D
             playerData.heroType = EHeroType.Reimu;
 
             //赋予可视化身体
-            var displayComp = entity.GetComponent<DisplayComponent>();
+            var displayComp = entity.GetComponent<RendererComponent>();
             displayComp.spriteCode = "400001";  //TODO:应该读取配置
 
             //修改GameObject名称
@@ -149,6 +150,48 @@ namespace STGU3D
                 mobRoot.transform.SetParent(stageRoot.transform, true);
                 entitiesNode.Add(EEntityType.Mob, mobRoot);
             }
+
+            //实体发射器扩展
+            EntityEmitter.OnCreate((args) =>
+            {
+                //TODO:对象池以及根据实体类型分配父类
+                return EntityEmitter.defaultOnCreate(args);
+            });
+
+            EntityEmitter.OnCalculate((args) =>
+            {
+                if (args.emitter.launchType == EntityEmitter.LaunchType.Custom)
+                {
+                    EntityEmitter.CalculateResult result = new EntityEmitter.CalculateResult();
+
+                    
+
+                    return result;
+                }
+                else
+                {
+                    return EntityEmitter.defaultOnCalculate(args);
+                }
+
+            });
+
+            EntityEmitter.OnLaunch((args) =>
+            {
+                var entity = args.createResult.entity;
+                var transformCom = entity.GetComponent<Transform>();
+                var movementCom = entity.GetComponent<MovementComponent>();
+                
+                if(transformCom != null)
+                {
+                    transformCom.localPosition = args.calculateResult.startPosition;
+                    transformCom.localEulerAngles = args.calculateResult.startEulerAngles;
+                }
+
+                if (movementCom != null)
+                {
+                    movementCom.moveSpeed = args.calculateResult.startSpeed;
+                }
+            });
         }
 
         public GameObject GetNodeByEntity(GameObject entity)

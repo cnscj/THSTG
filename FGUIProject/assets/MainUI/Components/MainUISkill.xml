@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="280,80">
+  <displayList>
+    <richtext id="n0_8vw8" name="bombText" xy="274,23" pivot="1,0.5" anchor="true" size="86,25" fontSize="18" align="right" vAlign="middle" ubb="true" vars="true" singleLine="true" text="{val=100}:Bomb"/>
+    <richtext id="n2_m4tr" name="eraseText" xy="274,55" pivot="1,0.5" anchor="true" size="87,25" fontSize="18" align="right" vAlign="middle" ubb="true" vars="true" singleLine="true" text="{val=100}:Erase"/>
+  </displayList>
+</component>

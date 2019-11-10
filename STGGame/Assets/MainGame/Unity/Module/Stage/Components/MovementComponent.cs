@@ -7,8 +7,6 @@ namespace STGU3D
 {
     public class MovementComponent : MonoBehaviour
     {
-        public Vector3 moveDir;
-
-        public float moveSpeed;
+        public Vector3 moveSpeed = Vector3.zero;
     }
 }

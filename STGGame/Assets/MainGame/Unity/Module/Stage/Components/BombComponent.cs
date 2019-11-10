@@ -6,6 +6,9 @@ namespace STGU3D
 {
     public class BombComponent : MonoBehaviour
     {
+        public int maxTimes = 3;             //最大bomb次数
+        public int dyingBombUse = 2 ;        //决死Bomb消耗数
 
+        public int times = 3;               //剩余bomb次数
     }
 }

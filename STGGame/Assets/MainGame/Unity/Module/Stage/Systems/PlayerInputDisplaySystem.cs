@@ -9,27 +9,27 @@ namespace STGU3D
     {
         struct InputDisplayGroup
         {
-            public DisplayComponent display;
-            public BehaviourMapper input;
+            public AnimatorComponent animatorCom;
+            public BehaviourMapper inputCom;
         }
 
         protected override void OnUpdate()
         {
             foreach (var entity in GetEntities<InputDisplayGroup>())
             {
-                if (!entity.display.animator)
-                    break;
+                if (!entity.animatorCom.animator)
+                    continue;
 
-                entity.display.animator.SetInteger("moveSpeed", 0);
-                if (entity.input.IsAtBehaviour((int)EPlayerBehavior.MoveLeft))
+                entity.animatorCom.animator.SetInteger("moveSpeed", 0);
+                if (entity.inputCom.IsAtBehaviour((int)EPlayerBehavior.MoveLeft))
                 {
-                    entity.display.transform.localEulerAngles = new Vector3(0, 0, 0);
-                    entity.display.animator.SetInteger("moveSpeed", -1);
+                    entity.animatorCom.transform.localEulerAngles = new Vector3(0, 0, 0);
+                    entity.animatorCom.animator.SetInteger("moveSpeed", -1);
                 }
-                else if (entity.input.IsAtBehaviour((int)EPlayerBehavior.MoveRight))
+                else if (entity.inputCom.IsAtBehaviour((int)EPlayerBehavior.MoveRight))
                 {
-                    entity.display.transform.localEulerAngles = new Vector3(0, 180, 0);
-                    entity.display.animator.SetInteger("moveSpeed", 1);
+                    entity.animatorCom.transform.localEulerAngles = new Vector3(0, 180, 0);
+                    entity.animatorCom.animator.SetInteger("moveSpeed", 1);
                 }
                 
                 

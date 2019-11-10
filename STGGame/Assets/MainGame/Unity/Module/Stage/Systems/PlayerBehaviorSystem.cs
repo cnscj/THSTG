@@ -5,7 +5,7 @@ using UnityEngine;
 namespace STGU3D
 {
 
-    public class PlayerInputBehaviorSystem : ComponentSystem
+    public class PlayerBehaviorSystem : ComponentSystem
     {
         struct InputBehaviorGroup
         {

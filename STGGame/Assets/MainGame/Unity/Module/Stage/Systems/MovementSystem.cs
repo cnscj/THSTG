@@ -16,7 +16,7 @@ namespace STGU3D
         {
             foreach (var entity in GetEntities<MovementGroup>())
             {
-                Vector3 pos = entity.transform.position + entity.movement.moveDir * entity.movement.moveSpeed * Time.deltaTime;
+                Vector3 pos = entity.transform.position + entity.movement.moveSpeed * Time.deltaTime;
                 entity.transform.position = pos;
             }
         }

@@ -45,15 +45,15 @@ namespace THEditor
         {
             EditorGUILayout.PropertyField(m_launchOrderType, new GUIContent("发射顺序"));
             ShowPropertys(launchOrderProps);
-            if (m_editor.launchOrderType == EntityEmitter.ECreateOrderType.Orderly)
+            if (m_editor.launchOrderType == EntityEmitter.CreateOrderType.Orderly)
             {
                
             }
-            else if (m_editor.launchOrderType == EntityEmitter.ECreateOrderType.Random)
+            else if (m_editor.launchOrderType == EntityEmitter.CreateOrderType.Random)
             {
  
             }
-            else if (m_editor.launchOrderType == EntityEmitter.ECreateOrderType.Fixed)
+            else if (m_editor.launchOrderType == EntityEmitter.CreateOrderType.Fixed)
             {
                 ShowPropertys(launchOrderFixProps);
             }
@@ -62,23 +62,23 @@ namespace THEditor
         void ShowLaunchTypeProps()
         {
             EditorGUILayout.PropertyField(m_launchType, new GUIContent("发射类型"));
-            if (m_editor.launchType == EntityEmitter.EDiffusionType.Line)
+            if (m_editor.launchType == EntityEmitter.LaunchType.Line)
             {
                 ShowPropertys(lineProps);
             }
-            else if(m_editor.launchType == EntityEmitter.EDiffusionType.Surround)
+            else if(m_editor.launchType == EntityEmitter.LaunchType.Surround)
             {
                 ShowPropertys(surroundProps);
             }
-            else if (m_editor.launchType == EntityEmitter.EDiffusionType.Random)
+            else if (m_editor.launchType == EntityEmitter.LaunchType.Random)
             {
                 ShowPropertys(randomProps);
             }
-            else if (m_editor.launchType == EntityEmitter.EDiffusionType.FixedPoint)
+            else if (m_editor.launchType == EntityEmitter.LaunchType.FixedPoint)
             {
                 ShowPropertys(fixedPointProps);
             }
-            else if (m_editor.launchType == EntityEmitter.EDiffusionType.Custom)
+            else if (m_editor.launchType == EntityEmitter.LaunchType.Custom)
             {
                 ShowPropertys(customProps);
             }

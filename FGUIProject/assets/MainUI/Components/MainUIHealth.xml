@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="280,80">
+  <displayList>
+    <richtext id="n0_8vw8" name="hpText" xy="8,11" size="76,25" fontSize="18" align="center" vAlign="middle" ubb="true" vars="true" singleLine="true" text="生命:{val=100}"/>
+    <richtext id="n2_m4tr" name="apText" xy="8,43" size="76,25" fontSize="18" align="center" vAlign="middle" ubb="true" vars="true" singleLine="true" text="护甲:{val=100}"/>
+  </displayList>
+</component>

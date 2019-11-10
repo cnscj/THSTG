@@ -3,6 +3,17 @@
   <displayList>
     <graph id="n0_mdnj" name="n0" xy="0,0" size="64,578" type="rect"/>
     <graph id="n1_mdnj" name="n1" xy="961,0" size="64,574" type="rect"/>
-    <component id="n2_8vw8" name="avatarCom" src="8vw85" fileName="Components/MainUIAvatar.xml" xy="96,472"/>
+    <component id="n2_8vw8" name="healthCom" src="8vw85" fileName="Components/MainUIHealth.xml" xy="75,482">
+      <relation target="" sidePair="left-left,bottom-bottom"/>
+    </component>
+    <component id="n3_m4tr" name="skillCom" src="m4tr6" fileName="Components/MainUISkill.xml" xy="675,479">
+      <relation target="" sidePair="right-right,bottom-bottom"/>
+    </component>
+    <richtext id="n5_m4tr" name="spellCardText" xy="959,24" pivot="1,0.5" anchor="true" size="194,25" fontSize="18" align="right" ubb="true" vars="true" singleLine="true" text="冻符「Perfect Freeze」">
+      <relation target="" sidePair="right-right,top-top"/>
+    </richtext>
+    <richtext id="n6_m4tr" name="musicTest" xy="73,26" pivot="0,0.5" anchor="true" size="273,25" fontSize="18" text="おてんば恋娘 ~上海アリス幻樂団">
+      <relation target="" sidePair="left-left,top-top"/>
+    </richtext>
   </displayList>
 </component>

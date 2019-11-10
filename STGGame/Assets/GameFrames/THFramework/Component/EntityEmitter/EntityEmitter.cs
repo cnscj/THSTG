@@ -7,7 +7,7 @@ namespace THGame
 {
     public class EntityEmitter : MonoBehaviour
     {
-        public enum EDiffusionType
+        public enum LaunchType
         {
             Line,           //直线
             Surround,       //包围
@@ -15,7 +15,7 @@ namespace THGame
             FixedPoint,     //定点
             Custom,         //自定义
         }
-        public enum ECreateOrderType
+        public enum CreateOrderType
         {
             Orderly,        //有序
             Random,         //随机
@@ -24,6 +24,7 @@ namespace THGame
 
         public class CreateParams
         {
+            public int index;
             public GameObject prefab;
             public GameObject parent;
         }
@@ -53,6 +54,7 @@ namespace THGame
         }
 
         //各种回调
+        //默认实例化函数
         public static readonly Func<CreateParams, CreateResult> defaultOnCreate = (args) =>
         {
             CreateResult result = new CreateResult();
@@ -66,21 +68,21 @@ namespace THGame
             return result;
 
         };
-
-        public static readonly Func<CalculateParams, CalculateResult> defaultOnStart = (args) =>
+        //计算函数
+        public static readonly Func<CalculateParams, CalculateResult> defaultOnCalculate = (args) =>
         {
             CalculateResult result = new CalculateResult();
 
             switch (args.emitter.launchType)
             {
-                case EDiffusionType.Line:
+                case LaunchType.Line:
                     result.startPosition = args.emitter.launchRelative.transform.localPosition;
                     double lAngle = args.emitter.launchLineAngle * Math.PI / 180;
                     result.startSpeed.x = args.emitter.launchSpeed * (float)Math.Cos(lAngle);
                     result.startSpeed.y = args.emitter.launchSpeed * (float)Math.Sin(lAngle);
                     args.emitter.launchLineAngle += args.emitter.launchLineRPT;
                     break;
-                case EDiffusionType.Surround:
+                case LaunchType.Surround:
                     //以相对点为中心,360
                     int sr = args.emitter.launchSurroundRadius;
                     double srAngle = 2 * Math.PI / args.emitter.launchNum * args.index;
@@ -92,7 +94,7 @@ namespace THGame
                     result.startSpeed.x = args.emitter.launchSpeed * (float)Math.Cos(srAngle);
                     result.startSpeed.y = args.emitter.launchSpeed * (float)Math.Sin(srAngle);
                     break;
-                case EDiffusionType.Random:
+                case LaunchType.Random:
                     //随机位置
                     int minR = args.emitter.launchRandomMinRadius;
                     int maxR = args.emitter.launchRandomMaxRadius;
@@ -107,7 +109,7 @@ namespace THGame
                     result.startSpeed.x = args.emitter.launchSpeed * (float)Math.Cos(angle);
                     result.startSpeed.y = args.emitter.launchSpeed * (float)Math.Sin(angle);
                     break;
-                case EDiffusionType.FixedPoint:
+                case LaunchType.FixedPoint:
                     //固定位置
                     if (args.emitter.launchFixedPointPoints.Length > 0)
                     {
@@ -124,7 +126,7 @@ namespace THGame
 
             return result;
         };
-
+        //发射函数
         public static readonly Action<LaunchParams> defaultOnLaunch = (args) =>
         {
             Transform trans = args.createResult.entity.GetComponent<Transform>();
@@ -138,20 +140,20 @@ namespace THGame
         };
 
         private static Func<CreateParams, CreateResult> s_createFunc = defaultOnCreate;
-        private static Func<CalculateParams, CalculateResult> s_calculateFunc = defaultOnStart;
+        private static Func<CalculateParams, CalculateResult> s_calculateFunc = defaultOnCalculate;
         private static Action<LaunchParams> s_launchFunc = defaultOnLaunch;
         
         public GameObject[] launchEntities;
         public GameObject launchParent;
         public GameObject launchRelative;
-        public ECreateOrderType launchOrderType;
+        public CreateOrderType launchOrderType;
         public float launchFreq = 0.5f;
         public int launchTimes = -1;
         public int launchNum = 1;
         public float launchSpeed = 1;
         public bool launchAutoDestroy = false;
         public bool launchForceLaunch = false;
-        public EDiffusionType launchType = EDiffusionType.Surround;
+        public LaunchType launchType = LaunchType.Surround;
 
         //排序值
         public bool launchOrderOrderlyByTimes = false;
@@ -186,7 +188,7 @@ namespace THGame
 
         }
 
-        public static void OnStart(Func<CalculateParams, CalculateResult> func)
+        public static void OnCalculate(Func<CalculateParams, CalculateResult> func)
         {
             s_calculateFunc = func;
 
@@ -244,20 +246,20 @@ namespace THGame
                 {
                     switch (launchOrderType)
                     {
-                        case ECreateOrderType.Orderly:
+                        case CreateOrderType.Orderly:
                             index = launchOrderOrderlyByTimes ? Math.Abs(launchTimes % launchEntities.Length) : (i % launchEntities.Length);
                             break;
-                        case ECreateOrderType.Random:
+                        case CreateOrderType.Random:
                             if (!isNeedIndex) break;
                             if (launchOrderOrderlyByTimes) isNeedIndex = false;
                             System.Random rd = new System.Random();
                             index = rd.Next(0, launchEntities.Length);//随机函数,从中取一个
                             break;
-                        case ECreateOrderType.Fixed:
+                        case CreateOrderType.Fixed:
                             index = launchOrderFixedIndex;
                             break;
                     }
-                    
+                    createParams.index = index;
                     createParams.parent = launchParent;
                     createParams.prefab = launchEntities[index];
 
