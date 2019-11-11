@@ -181,7 +181,7 @@ namespace STGService.UI
         {
             if (_interval >= 0f)
             {
-                __scheduler = SchedulerManager.GetInstance().Schedule(OnTick, _interval);
+                __scheduler = Scheduler.Schedule(OnTick, _interval);
             }
 
         }
@@ -201,7 +201,7 @@ namespace STGService.UI
         {
             if (__scheduler != -1)
             {
-                SchedulerManager.GetInstance().Unschedule(__scheduler);
+                Scheduler.Unschedule(__scheduler);
             }
         }
 

@@ -14,6 +14,9 @@ namespace XLibrary
 {
     public class CSVTable : IEnumerable
     {
+        public static readonly CSVTable empty = new CSVTable("");   //空table
+
+
         /// <summary>
         /// 获取表中的所有属性键
         /// </summary>
@@ -24,6 +27,17 @@ namespace XLibrary
         /// 存储表中所有数据对象
         /// </summary>
         private Dictionary<string, CSVObject> _dataObjDic;
+
+        /// <summary>
+        /// 从内容中加载
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public static CSVTable Load(string content)
+        {
+            CSVTable table = new CSVTable(content);
+            return table;
+        }
 
 
         /// <summary>
@@ -251,8 +265,6 @@ namespace XLibrary
 
             return content;
         }
-
-
     }
 }
 

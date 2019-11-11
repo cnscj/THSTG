@@ -1,5 +1,4 @@
-﻿using STGU3D;
-using XLibrary;
+﻿using XLibrary;
 
 namespace STGService
 {
@@ -11,7 +10,7 @@ namespace STGService
         {
             if (s_resTb == null)
             {
-                s_resTb = CSVUtil.Decode(AssetManager.GetInstance().LoadConfig("G_Resource.csv"));
+                s_resTb = AssetSystem.LoadConfig("G_Resource.csv");
             }
             return s_resTb;
         }

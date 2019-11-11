@@ -77,6 +77,11 @@ namespace XLibrary
             return value;
         }
 
+        public bool HadKey(string key)
+        {
+            return _atrributesDic.ContainsKey(key);
+        }
+
         public override string ToString()
         {
             string content = string.Empty;

@@ -1,7 +1,7 @@
 ﻿using System;
 namespace STGU3D
 {
-    public static class EntityDataUtil
+    public static class EntityUtil
     {
         public static EEntityType GetEntityTypeByCode(int code)
         {

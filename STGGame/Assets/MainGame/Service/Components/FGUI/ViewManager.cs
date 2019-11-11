@@ -161,7 +161,6 @@ namespace STGService
             return false;
         }
 
-        //FIXME:存在内存泄漏
         public void CloseAll(bool isDisposed = true)
         {
             List<Type> closeLayers = new List<Type>();
