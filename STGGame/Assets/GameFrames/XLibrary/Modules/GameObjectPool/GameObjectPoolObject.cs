@@ -1,18 +1,19 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace XLibGame
 {
-    public class GameObjectPoolObjectInfo : MonoBehaviour
+    public class GameObjectPoolObject : MonoBehaviour
     {
         /// <summary>
         /// 对象显示的持续时间，若=0，则不隐藏
         /// </summary>
-        [HideInInspector] public float lifetime = 0;
+        public float lifetime = 0;
         /// <summary>
         /// 所属对象池的唯一id
         /// </summary>
-        [HideInInspector] public string poolName;
+        public string poolName;
 
         WaitForSeconds m_waitTime;
 
@@ -35,8 +36,15 @@ namespace XLibGame
         IEnumerator CountDown(float lifetime)
         {
             yield return m_waitTime;
+            Release();
+        }
+
+        public void Release()
+        {
             //将对象加入对象池
-            GameObjectPoolManager.GetInstance().RemoveGameObject(poolName, gameObject);
+            GameObjectPoolManager.GetInstance().ReleaseGameObject(poolName, gameObject);
         }
     }
+
+
 }
