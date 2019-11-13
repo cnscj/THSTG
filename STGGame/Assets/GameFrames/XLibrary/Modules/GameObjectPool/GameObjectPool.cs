@@ -25,6 +25,11 @@ namespace XLibGame
         public int defaultCount = 0;
 
         /// <summary>
+        /// 满池时不会生成
+        /// </summary>
+        public bool fixedSize = false;
+
+        /// <summary>
         /// 队列，存放对象池中没有用到的对象，即可分配对象
         /// </summary>
         protected Queue m_queue;
@@ -56,6 +61,7 @@ namespace XLibGame
             else
             {
                 if (prefab == null) return null;
+                if (fixedSize) return null;
                 //池中没有可分配对象了，新生成一个
                 returnObj = GameObject.Instantiate(prefab) as GameObject;
                 returnObj.transform.SetParent(gameObject.transform);
@@ -110,9 +116,12 @@ namespace XLibGame
             Destroy(gameObject);
         }
 
+        /// <summary>
+        /// 根据池原有初始化
+        /// </summary>
         public void Init()
         {
-            for (int i = 0; i < defaultCount; i++)
+            for (int i = 0; i < defaultCount && i < maxCount; i++)
             {
                 if (i < transform.childCount)
                 {
@@ -139,15 +148,11 @@ namespace XLibGame
         /// </summary>
         private void Awake()
         {
-            var isSuccess = GameObjectPoolManager.GetInstance().AddGameObjectPool(this);
-            if (isSuccess)
-            {
-                Init();
-            }
+           GameObjectPoolManager.GetInstance().AddGameObjectPool(this);
         }
 
         /// <summary>
-        //移除掉无效的自己
+        // 移除掉无效的自己
         /// </summary>
         private void Start()
         {

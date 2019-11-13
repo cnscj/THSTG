@@ -17,6 +17,30 @@ namespace XLibGame
         /// 将对象池的对象都放在了一个单独的gameobject下
         /// </summary>
         Transform m_parentTrans;//默认存放路径
+        /// <summary>
+        /// 是否初始化
+        /// </summary>
+        bool m_isInit = false;
+
+        /// <summary>
+        /// 初始化回调
+        /// </summary>
+        Action<float> m_onProgress;
+
+        /// <summary>
+        /// 初始化完成回调
+        /// </summary>
+        Action m_onFinish;
+
+        public void onProgress(Action<float> func)
+        {
+            m_onProgress = func;
+        }
+
+        public void onFinih(Action func)
+        {
+            m_onFinish = func;
+        }
 
         protected GameObjectPoolManager()
         {
@@ -26,6 +50,29 @@ namespace XLibGame
         private void Awake()
         {
             m_parentTrans = gameObject.transform;
+        }
+
+        /// <summary>
+        /// 初始化所有池
+        /// </summary>
+        private void Start()
+        {
+            //初始化所有池
+            int count = 0;
+            foreach(var pair in m_poolDic)
+            {
+                pair.Value.Init();
+                count++;
+                if (m_onProgress != null)
+                {
+                    m_onProgress(count / m_poolDic.Count);
+                }
+            }
+            if (m_onFinish != null)
+            {
+                m_onFinish();
+            }
+            m_isInit = true;
         }
 
         /// <summary>
@@ -54,7 +101,10 @@ namespace XLibGame
                 pool.prefab = prefab;
                 pool.defaultCount = defaultCount;
                 obj.transform.SetParent(m_parentTrans);
-                pool.Init();
+                if (m_isInit)
+                {
+                    pool.Init();
+                }
             }
             
             m_poolDic[poolName] = pool;
@@ -73,10 +123,17 @@ namespace XLibGame
             {
                 return false;
             }
+
             if (string.IsNullOrEmpty(pool.poolName))
             {
                 return false;
             }
+
+            if (pool.prefab == null)
+            {
+                return false;
+            }
+
             //如果已存在,创建也失败
             if (m_poolDic.ContainsKey(pool.poolName))
             {
@@ -115,7 +172,7 @@ namespace XLibGame
         /// <param name="poolName">对象池名称</param>
         /// <param name="lifeTime">对象显示时间</param>
         /// <returns>新对象</returns>
-        public GameObject CreateGameObject(string poolName, float lifeTime = 0f)
+        public GameObject GetGameObject(string poolName, float lifeTime = 0f)
         {
             if (m_poolDic.ContainsKey(poolName))
             {
