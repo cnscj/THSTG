@@ -4,19 +4,19 @@ using UnityEngine;
 namespace STGU3D
 {
 
-    public class MovementSystem : ComponentSystem
+    public class MoveSystem : ComponentSystem
     {
-        struct MovementGroup
+        struct MoveGroup
         {
-            public MovementComponent movement;
+            public MoveComponent moveCom;
             public Transform transform;
         }
 
         protected override void OnUpdate()
         {
-            foreach (var entity in GetEntities<MovementGroup>())
+            foreach (var entity in GetEntities<MoveGroup>())
             {
-                Vector3 pos = entity.transform.position + entity.movement.moveSpeed * Time.deltaTime;
+                Vector3 pos = entity.transform.position + entity.moveCom.speed * Time.deltaTime;
                 entity.transform.position = pos;
             }
         }

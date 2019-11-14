@@ -6,13 +6,9 @@ using UnityEngine;
 namespace STGU3D
 {
     //请直接使用组件BehaviourMapper
-    public class InputComponent :BehaviourMapper
+    public class InputComponent : MonoBehaviour
     {
-        //重写留空
-        private void Update()
-        {
-            
-        }
+        public int type;//类型
     }
 
 }
