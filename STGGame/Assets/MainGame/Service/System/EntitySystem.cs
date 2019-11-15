@@ -41,7 +41,7 @@ namespace STGService
             {
                 var entity = args.createResult.entity;
                 var transformCom = entity.GetComponent<Transform>();
-                var moveCom = entity.GetComponent<MoveComponent>();
+                var movementCom = entity.GetComponent<MovementComponent>();
 
                 if (transformCom != null)
                 {
@@ -49,9 +49,9 @@ namespace STGService
                     transformCom.localEulerAngles = args.calculateResult.startEulerAngles;
                 }
 
-                if (moveCom != null)
+                if (movementCom != null)
                 {
-                    moveCom.speed = args.calculateResult.startSpeed;
+                    movementCom.moveSpeed = args.calculateResult.startSpeed;
                 }
             });
         }
@@ -125,7 +125,7 @@ namespace STGService
             if (entity)
             {
                 entity.AddComponent<GameObjectEntity>();    //必要组件
-                entity.AddComponent<MoveComponent>();       //移动组件
+                entity.AddComponent<MovementComponent>();       //移动组件
                 entity.AddComponent<RendererComponent>();   //渲染组件
 
             }

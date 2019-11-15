@@ -6,10 +6,9 @@ namespace STGService
     {
         public static void InitAwake()
         {
+            MVCManager.GetInstance().AddController<TestController>();
             MVCManager.GetInstance().AddController<MainUIController>();
             MVCManager.GetInstance().AddController<StageController>();
-            MVCManager.GetInstance().AddController<TestController>();
-
         }
     }
 

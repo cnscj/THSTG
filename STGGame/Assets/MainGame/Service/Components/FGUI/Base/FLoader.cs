@@ -5,22 +5,24 @@ namespace STGService.UI
 
     public class FLoader : FComponent
     {
+        bool _isAsyncLoading = false;
+
+        public bool isAsyncLoading
+        {
+            get { return _isAsyncLoading; }
+            set { _isAsyncLoading = value; }
+        }
+
         public void SetItemUrl(string package, string component)
         {
             string url = UIPackage.GetItemURL(package, component);
             _obj.asLoader.url = url;
         }
 
-        public void SetUIUrl(string package, string component)
-        {
-            string url = UIPackage.GetItemURL(package, component);
-            _obj.asLoader.url = url;
-        }
-
         //isSync: 是否同步加载。默认是异步，值为nil，只有同步时才会设置为true。
-        public void SetUrl(string url, bool isSync)
+        public void SetUrl(string url, bool isSync = false)
         {
-           //_obj.isAsyncLoading = !isSync  //这一行要在设置url之前，因为设置url时马上就加载资源了。
+           isAsyncLoading = !isSync;  //这一行要在设置url之前，因为设置url时马上就加载资源了。
             _obj.asLoader.url = url;
         }
 

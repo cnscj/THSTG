@@ -8,49 +8,61 @@ namespace STGU3D
 {
     public class InputSystem : ComponentSystem
     {
-        struct InputMoveGroup
+        struct InputGroup
         {
-            //public InputComponent inputCom;
-            public BehaviourMapper keymapsCom;
-            public PlayerDataComponent playerDataCom;
-            public MoveComponent moveCom;
+            public InputComponent inputCom;
+            public BehaviourMapper behaviourMapperCom;
+        }
+
+        struct InputPlayerMoveGroup
+        {
+            public InputComponent inputCom;
+            public PlayerDataComponent entityDataCom;   //无法捕获
+            public MovementComponent movementCom;
         }
 
         struct InputShotGroup
         {
-            //public InputComponent inputCom;
-            public BehaviourMapper keymapsCom;
+            public InputComponent inputCom;
             public ShotComponent shotCom;
         }
 
         struct InputBombGroup
         {
-            //public InputComponent inputCom;
-            public BehaviourMapper keymapsCom;
+            public InputComponent inputCom;
             public BombComponent bombCom;
         }
 
 
         protected override void OnUpdate()
         {
-            foreach (var entity in GetEntities<InputMoveGroup>())
+            foreach (var entity in GetEntities<InputGroup>())
             {
-                entity.moveCom.speed = Vector3.zero;
-                if (entity.keymapsCom.IsAtBehaviour((int)EPlayerBehavior.MoveLeft))
+                if(entity.inputCom.keymaps == null)
                 {
-                    entity.moveCom.speed += Vector3.left * entity.playerDataCom.moveSpeed;
+                    entity.inputCom.keymaps = entity.behaviourMapperCom;
                 }
-                else if (entity.keymapsCom.IsAtBehaviour((int)EPlayerBehavior.MoveRight))
+            }
+
+            foreach (var entity in GetEntities<InputPlayerMoveGroup>())
+            {
+                entity.movementCom.moveSpeed = Vector3.zero;
+                if (entity.inputCom.keymaps.IsAtBehaviour((int)EPlayerBehavior.MoveLeft))
                 {
-                    entity.moveCom.speed += Vector3.right * entity.playerDataCom.moveSpeed;
+                    entity.movementCom.moveSpeed += Vector3.left * entity.entityDataCom.moveSpeed;
+                    
                 }
-                if (entity.keymapsCom.IsAtBehaviour((int)EPlayerBehavior.MoveUp))
+                else if (entity.inputCom.keymaps.IsAtBehaviour((int)EPlayerBehavior.MoveRight))
                 {
-                    entity.moveCom.speed += Vector3.up * entity.playerDataCom.moveSpeed;
+                    entity.movementCom.moveSpeed += Vector3.right * entity.entityDataCom.moveSpeed;
                 }
-                else if (entity.keymapsCom.IsAtBehaviour((int)EPlayerBehavior.MoveDown))
+                if (entity.inputCom.keymaps.IsAtBehaviour((int)EPlayerBehavior.MoveUp))
                 {
-                    entity.moveCom.speed += Vector3.down * entity.playerDataCom.moveSpeed;
+                    entity.movementCom.moveSpeed += Vector3.up * entity.entityDataCom.moveSpeed;
+                }
+                else if (entity.inputCom.keymaps.IsAtBehaviour((int)EPlayerBehavior.MoveDown))
+                {
+                    entity.movementCom.moveSpeed += Vector3.down * entity.entityDataCom.moveSpeed;
                 }
             }
 

@@ -9,13 +9,13 @@ namespace STGU3D
         struct RendererGroup
         {
             public RendererComponent rendererCom;
-            public Transform transform;
         }
 
         protected override void OnUpdate()
         {
             foreach (var entity in GetEntities<RendererGroup>())
             {
+                var entityTrans = entity.rendererCom.gameObject.transform;
                 if (!string.IsNullOrEmpty(entity.rendererCom.rendererCode))
                 {
                     //需要更换code
@@ -27,11 +27,11 @@ namespace STGU3D
                             entity.rendererCom.renderer = null;
                         }
 
-                        var bodyNode = entity.transform.Find(nodeNama);
+                        var bodyNode = entityTrans.Find(nodeNama);
                         if (bodyNode != null) GameObject.Destroy(bodyNode);
 
                         bodyNode = new GameObject("Body").transform;
-                        bodyNode.SetParent(entity.transform, false);
+                        bodyNode.SetParent(entityTrans, false);
 
                         //
 
@@ -58,7 +58,7 @@ namespace STGU3D
                             entity.rendererCom.renderer = null;
                         }
 
-                        var bodyNode = entity.transform.Find(nodeNama);
+                        var bodyNode = entityTrans.Find(nodeNama);
                         if (bodyNode != null) GameObject.Destroy(bodyNode);
 
                         entity.rendererCom.curRendererCode = "";

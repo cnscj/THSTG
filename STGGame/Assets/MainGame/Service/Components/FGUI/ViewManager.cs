@@ -31,7 +31,7 @@ namespace STGService
                     {
                         if (GRoot.inst.GetChildAt(GRoot.inst.numChildren - 1) != view.GetObject())
                         {
-                            Close(view.GetType(), false);
+                            Close(__GetViewKey(view), false);
                         }
                         else
                         {
@@ -97,7 +97,7 @@ namespace STGService
         {
             if (view != null)
             {
-                Type type = view.GetType();
+                Type type = __GetViewKey(view);
                 ViewInfo viewInfo = null;
                 if (m_viewsMap.TryGetValue(type, out viewInfo))
                 {
@@ -167,7 +167,7 @@ namespace STGService
             foreach (var mapPairs in m_viewsMap)
             {
                 FView view = mapPairs.Value.view;
-                closeLayers.Add(view.GetType());
+                closeLayers.Add(__GetViewKey(view));
             }
 
             foreach(var layerType in closeLayers)
@@ -184,7 +184,7 @@ namespace STGService
                 FView view = mapPairs.Value.view;
                 if (view.layerOrder >= minLayer && view.layerOrder <= maxLayer)
                 {
-                    closeLayers.Add(view.GetType());
+                    closeLayers.Add(__GetViewKey(view));
                 }
             }
 
@@ -211,7 +211,7 @@ namespace STGService
                 FView view = mapPairs.Value.view;
                 if (layersSet.Contains(view.layerOrder))
                 {
-                    closeLayers.Add(view.GetType());
+                    closeLayers.Add(__GetViewKey(view));
                 }
             }
 

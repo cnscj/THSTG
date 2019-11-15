@@ -11,11 +11,11 @@ namespace STGU3D
             public AnimatorComponent animatorCom;
             public RendererComponent rendererCom;
         }
-
+        //按键不是移动动画的起因
         struct InputAnimatorGroup
         {
             public AnimatorComponent animatorCom;
-            public BehaviourMapper keysmapCom;
+            public MovementComponent movementCom;
         }
 
         protected override void OnUpdate()
@@ -36,19 +36,23 @@ namespace STGU3D
                 if (entity.animatorCom.animator)
                 {
                    
-                    entity.animatorCom.animator.SetInteger("moveSpeed", 0);
-                    if (entity.keysmapCom.IsAtBehaviour((int)EPlayerBehavior.MoveLeft))
-                    {
-                        entity.animatorCom.transform.localEulerAngles = new Vector3(0, 0, 0);
-                        entity.animatorCom.animator.SetInteger("moveSpeed", -1);
-                    }
-                    else if (entity.keysmapCom.IsAtBehaviour((int)EPlayerBehavior.MoveRight))
+                    if (entity.movementCom.moveSpeed.x > 0f) //右
                     {
                         entity.animatorCom.transform.localEulerAngles = new Vector3(0, 180, 0);
                         entity.animatorCom.animator.SetInteger("moveSpeed", 1);
                     }
+                    else if(entity.movementCom.moveSpeed.x < 0f) //左
+                    {
+                        entity.animatorCom.transform.localEulerAngles = new Vector3(0, 0, 0);
+                        entity.animatorCom.animator.SetInteger("moveSpeed", -1);
+                    }
 
+                    if (System.Math.Abs(entity.movementCom.moveSpeed.x) < 0.000001f && System.Math.Abs(entity.movementCom.moveSpeed.y) < 0.000001f)
+                    {
+                        entity.animatorCom.animator.SetInteger("moveSpeed", 0);
+                    }
 
+ 
                 }
             }
         }

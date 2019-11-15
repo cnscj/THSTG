@@ -2,11 +2,10 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using XLibGame;
+using EventCallback1 = XLibGame.EventCallback1;
 
 namespace STGService.UI
 {
-
     public class FWidget : FComponent
     {
         public string package { get; protected set; }
@@ -16,7 +15,7 @@ namespace STGService.UI
         protected bool _isAsync;                //是否异步加载
         protected float _interval = -1.0f;
         private int __scheduler = -1;
-        private List<KeyValuePair<int, EventListener2>> __listener;
+        private List<KeyValuePair<int, EventCallback1>> __listener;
 
         public bool isAsync { get { return _isAsync; } }
 
@@ -101,11 +100,11 @@ namespace STGService.UI
             }
         }
 
-        public void AddEventListener(int eventId, EventListener2 listener)
+        public void AddEventListener(int eventId, EventCallback1 listener)
         {
             EventSystem.AddListener(eventId, listener);
-            __listener = (__listener != null) ? __listener : new List<KeyValuePair<int, EventListener2>>();
-            __listener.Add(new KeyValuePair<int, EventListener2>(eventId, listener));
+            __listener = (__listener != null) ? __listener : new List<KeyValuePair<int, EventCallback1>>();
+            __listener.Add(new KeyValuePair<int, EventCallback1>(eventId, listener));
         }
 
         public FWidget(string packageName, string componentName)
@@ -202,6 +201,7 @@ namespace STGService.UI
             if (__scheduler != -1)
             {
                 Scheduler.Unschedule(__scheduler);
+                __scheduler = -1;
             }
         }
 

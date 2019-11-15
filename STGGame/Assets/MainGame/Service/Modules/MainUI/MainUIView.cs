@@ -18,7 +18,7 @@ namespace STGService.UI
 
         protected override void OnInitEvent()
         {
-            AddEventListener(EventType.TEST_MAIN_UI_UPDATE, _updateLayer);
+            //AddEventListener(EventType.TEST_MAIN_UI_UPDATE, _updateLayer);
         }
 
         protected override void OnEnter()
@@ -31,7 +31,7 @@ namespace STGService.UI
 
         }
 
-        private void _updateLayer(int e, object args)
+        private void _updateLayer()
         {
 
         }

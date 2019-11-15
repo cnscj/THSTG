@@ -5,20 +5,22 @@ using UnityEngine;
 namespace STGU3D
 {
 
-    public class PlayerShotSystem : ComponentSystem
+    public class ShotSystem : ComponentSystem
     {
-        struct PlayerShotGroup
+        struct ShotGroup
         {
-            public PlayerDataComponent playerData;
             public ShotComponent shotCom;
-            public BehaviourMapper input;
         }
 
         protected override void OnUpdate()
         {
-            foreach (var entity in GetEntities<PlayerShotGroup>())
+            foreach (var entity in GetEntities<ShotGroup>())
             {
-                
+                //开火状态
+                if (entity.shotCom.isFire)
+                {
+
+                }
             }
         }
 

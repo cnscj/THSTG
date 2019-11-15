@@ -8,7 +8,13 @@ namespace STGService
     {
         protected override void OnAdded()
         {
-            EventSystem.Dispatch(EventType.TEST_EVENT);
+            EventSystem.AddListener(EventType.TEST_EVENT, Test);
+        }
+
+        protected void Test(EventContext context)
+        {
+            UnityEngine.Debug.Log(Cache.Get<TestCache>().testString);
+            UnityEngine.Debug.Log(context.args[0]);
         }
     }
 

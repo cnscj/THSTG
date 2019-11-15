@@ -162,5 +162,15 @@ namespace XLibGame
             }
         }
 
+        /// <summary>
+        /// 被销毁清空自己
+        /// </summary>
+        private void OnDestroy()
+        {
+            if (GameObjectPoolManager.GetInstance().GetGameObjectPool(poolName))
+            {
+                GameObjectPoolManager.GetInstance().DestroyGameObjectPool(poolName);
+            }
+        }
     }
 }

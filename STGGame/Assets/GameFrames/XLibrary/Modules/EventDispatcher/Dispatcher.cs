@@ -9,52 +9,92 @@ namespace XLibGame
     public class Dispatcher
     {
         
-        private Dictionary<int, SortedList<int,EventListener2>> m_listeners = new Dictionary<int, SortedList<int, EventListener2>>();
+        private Dictionary<int, EventListener> m_listeners = new Dictionary<int, EventListener>();
 
         /// <summary>
         /// 广播指定事件。
         /// </summary>
-        /// <param name="eventId">事件编号</param>
-        /// <param name="args">事件参数</param>
-        public void Dispatch(int eventId, Dictionary<string, object> args = null)
+        /// <param name="context">事件内容</param>
+        public void Dispatch(EventContext context)
         {
-            var listeners = GetEventListeners(eventId);
-            foreach(var pair in listeners)
+            if (context == null) return;
+            EventListener listener = null;
+            if (m_listeners.TryGetValue(context.type,out listener))
             {
-                var listener = pair.Value;
-                listener.Invoke(eventId, args);
+                listener.Call(context);
             }
+        }
+
+        /// <summary>
+        /// 广播指定事件。
+        /// </summary>
+        /// <param name="type">事件编号</param>
+        /// <param name="sender">发送者</param>
+        /// <param name="args">事件参数</param>
+        public void Dispatch(int type, object sender = null, params object[] args)
+        {
+            EventContext context = new EventContext(type, sender, args);
+            Dispatch(context);
         }
 
         /// <summary>
         /// 添加对指定事件的监听。
         /// </summary>
-        /// <param name="eventId">事件编号</param>
-        /// <param name="listener">回调委托</param>
-        public void AddListener(int eventId, EventListener2 listener, int priority = 1)
+        /// <param name="type">事件编号</param>
+        /// <param name="callback0">回调委托</param>
+        public void AddListener(int type, EventCallback0 callback0, int priority = 1)
         {
-            var listeners = GetEventListeners(eventId);
-            listeners.Add(priority,listener);
+            EventListener listener = null;
+            if (!m_listeners.TryGetValue(type, out listener))
+            {
+                listener = new EventListener();
+                m_listeners.Add(type, listener);
+            }
+            listener.Add(callback0, priority);
+        }
+
+        /// <summary>
+        /// 添加对指定事件的监听。
+        /// </summary>
+        /// <param name="type">事件编号</param>
+        /// <param name="callback1">回调委托</param>
+        public void AddListener(int type, EventCallback1 callback1, int priority = 1)
+        {
+            EventListener listener = null;
+            if (!m_listeners.TryGetValue(type, out listener))
+            {
+                listener = new EventListener();
+                m_listeners.Add(type, listener);
+            }
+            listener.Add(callback1, priority);
+        }
+
+
+        /// <summary>
+        /// 移除对指定事件的监听。
+        /// </summary>
+        /// <param name="type">事件编号</param>
+        /// <param name="callback0">回调委托</param>
+        public void RemoveListener(int type, EventCallback0 callback0)
+        {
+            EventListener listener = null;
+            if (m_listeners.TryGetValue(type, out listener))
+            {
+                listener.Remove(callback0);
+            }
         }
 
         /// <summary>
         /// 移除对指定事件的监听。
         /// </summary>
-        /// <param name="eventId">事件编号</param>
-        /// <param name="listenerToBeRemoved">回调委托</param>
-        public void RemoveListener(int eventId, EventListener2 listenerToBeRemoved)
+        /// <param name="type">事件编号</param>
+        /// <param name="callback1">回调委托</param>
+        public void RemoveListener(int type, EventCallback1 callback1)
         {
-            var listeners = GetEventListeners(eventId);
-            if (listeners != null)
+            EventListener listener = null;
+            if (m_listeners.TryGetValue(type, out listener))
             {
-                foreach(var listener in listeners)
-                {
-                    if (listener.Value == listenerToBeRemoved)
-                    {
-                        listeners.Remove(listener.Key);
-                        break;
-                    }
-                }
+                listener.Remove(callback1);
             }
         }
 
@@ -69,24 +109,17 @@ namespace XLibGame
         /// <summary>
         /// 是否有该事件的监听器
         /// </summary>
-        /// <param name="eventId"></param>
+        /// <param name="type"></param>
         /// <returns></returns>
-        public bool HasListener(int eventId)
+        public bool HasListener(int type)
         {
-            var listeners = GetEventListeners(eventId);
-            return listeners.Count > 0;
+            EventListener listener = null;
+            if (m_listeners.TryGetValue(type, out listener))
+            {
+                return true;
+            }
+            return false;
         }
 
-        private SortedList<int, EventListener2> GetEventListeners(int eventId)
-        {
-            SortedList<int, EventListener2> ret;
-            if (m_listeners.TryGetValue(eventId, out ret))
-                return ret;
-            ret = new SortedList<int, EventListener2>();
-            m_listeners.Add(eventId, ret);
-            return ret;
-        }
-
-       
     }
 }

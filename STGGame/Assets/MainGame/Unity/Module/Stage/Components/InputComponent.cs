@@ -9,6 +9,7 @@ namespace STGU3D
     public class InputComponent : MonoBehaviour
     {
         public int type;//类型
+        public BehaviourMapper keymaps;
     }
 
 }
