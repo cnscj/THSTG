@@ -16,6 +16,11 @@ namespace STGU3D
         {
             STGService.Main.InitStart();
         }
+
+        private void Update()
+        {
+            STGService.Main.Update();
+        }
         private GameManager()
         {
 

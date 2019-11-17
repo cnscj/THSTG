@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074, b: 0.35872698, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311992, g: 0.38074034, b: 0.35872713, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 2125908315}
   - component: {fileID: 2125908316}
   - component: {fileID: 2125908313}
+  - component: {fileID: 2125908317}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -182,15 +183,6 @@ MonoBehaviour:
   heroRoot: {fileID: 0}
   bossRoot: {fileID: 0}
   mobRoot: {fileID: 0}
-  PlayerPrefab: {fileID: 5417156991793457501, guid: 1952b7ec5f2724869ab62d4c79261725,
-    type: 3}
-  MobPrefab: {fileID: 4562974591140096466, guid: 621a54a9cc5a44d5e9143b6696ca858c,
-    type: 3}
-  BossPrefab: {fileID: 8101344368813376635, guid: 067c1ba890e0a4b2abd9f49e0fdbed84,
-    type: 3}
-  heros: []
-  mobs: []
-  bosses: []
 --- !u!114 &2125908315
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -222,6 +214,27 @@ MonoBehaviour:
   - uis/share.ab
   - levels/share.ab
   - configs/share.ab
+--- !u!114 &2125908317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2125908311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6067ebf9f2c1aa4699b74bb0a435129, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  keyList:
+  - behaviour: 0
+    keycodes: 77000000
+  - behaviour: 0
+    keycodes: 73000000
+  - behaviour: 0
+    keycodes: 61000000
+  - behaviour: 0
+    keycodes: 64000000
 --- !u!1001 &8287892596728945978
 PrefabInstance:
   m_ObjectHideFlags: 0

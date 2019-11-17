@@ -22,8 +22,13 @@ namespace STGService
             UISystem.InitStart();
             EntitySystem.InitStart();
 
-            EntityManager.GetInstance().CreatePlayer();
+            //EntityManager.GetInstance().CreatePlayer();
             //SceneManager.GetInstance().LoadLevelScene("200001");
+
+        }
+
+        public static void Update()
+        {
 
         }
     }

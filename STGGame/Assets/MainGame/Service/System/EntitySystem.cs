@@ -58,8 +58,7 @@ namespace STGService
 
         public static void InitStart()
         {
-            var name = CSVUtil.SafeGetValue("", EntityConfiger.GetRoleInfo("10100001"), "name");
-            Debug.Log(name);
+
         }
 
         private static STGU3D.EntityManager GetManager()
@@ -71,7 +70,7 @@ namespace STGService
         {
             GameObject entity = CreateBaseRole();
             //初始化各个组件
-            var renderer = entity.GetComponent<RendererComponent>();
+            //var renderer = entity.GetComponent<RendererComponent>();
 
 
 
@@ -124,9 +123,8 @@ namespace STGService
         {
             if (entity)
             {
-                entity.AddComponent<GameObjectEntity>();    //必要组件
-                entity.AddComponent<MovementComponent>();       //移动组件
-                entity.AddComponent<RendererComponent>();   //渲染组件
+
+ 
 
             }
         }
