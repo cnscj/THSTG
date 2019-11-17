@@ -127,7 +127,7 @@ namespace ASGame
             //倒序删,防止移动报错
             sheetData.valTable.Rows.RemoveAt(4);
             sheetData.valTable.Rows.RemoveAt(3);
-            sheetData.valTable.Rows.RemoveAt(2);
+            //sheetData.valTable.Rows.RemoveAt(2);
             sheetData.valTable.Rows.RemoveAt(0);
 
             return sheetData;
