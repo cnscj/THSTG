@@ -22,7 +22,7 @@ namespace STGService
             UISystem.InitStart();
             EntitySystem.InitStart();
 
-            //EntityManager.GetInstance().CreatePlayer();
+            EntityManager.GetInstance().CreateHero();
             //SceneManager.GetInstance().LoadLevelScene("200001");
 
         }

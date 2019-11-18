@@ -1,4 +1,5 @@
 ﻿code,name,category,type,effect,effectEx,effectStr
+int,string,int,int,int,int,string
 10800001,Power,1,1,3,0,
 10800002,Point,1,7,2,0,
 10800003,BigPower,1,1,4,0,

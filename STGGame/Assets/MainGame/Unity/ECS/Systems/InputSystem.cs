@@ -1,36 +1,55 @@
 ﻿using System.Collections.Generic;
 using Entitas;
+using UnityEngine;
+using XLibGame;
 
 namespace STGU3D
 {
-    public class InputSystem : ReactiveSystem<InputEntity>
+    public class InputSystem : IExecuteSystem
     {
-        readonly IGroup<GameEntity> _movementers;
-
-        private InputContext __inputContext;
-        public InputSystem(Contexts context) : base(context.input)
+        public InputSystem(Contexts contexts)
         {
-            __inputContext = context.input;
+
         }
 
-        protected override ICollector<InputEntity> GetTrigger(IContext<InputEntity> context)
+        public void Execute()
         {
-            return context.CreateCollector(InputMatcher.Input);
-        }
+            var moveGroup = Contexts.sharedInstance.game.GetGroup(
+                GameMatcher.AllOf(
+                     GameMatcher.EntityData,
+                     GameMatcher.PlayerData,
+                     GameMatcher.Movement
+                ));
 
-        protected override bool Filter(InputEntity entity)
-        {
-            return entity.hasInput;
-        }
-
-        protected override void Execute(List<InputEntity> entities)
-        {
-            foreach (var e in entities)
+            foreach (var entity in moveGroup.GetEntities())
             {
+                Vector3 newMoveSpeed = Vector3.zero;
+                Vector3 moveDirection = Vector3.zero;
+                if (InputMapper.GetInstance().IsAtBehaviour((int)EPlayerBehavior.MoveLeft))
+                {
+                    moveDirection += Vector3.left;
+                }
+                else if (InputMapper.GetInstance().IsAtBehaviour((int)EPlayerBehavior.MoveRight))
+                {
+                    moveDirection += Vector3.right;
+                }
 
+                if (InputMapper.GetInstance().IsAtBehaviour((int)EPlayerBehavior.MoveUp))
+                {
+                    moveDirection += Vector3.up;
+                }
+                else if (InputMapper.GetInstance().IsAtBehaviour((int)EPlayerBehavior.MoveDown))
+                {
+                    moveDirection += Vector3.down;
+                }
+
+                newMoveSpeed = moveDirection * entity.entityData.moveSpeed;
+                entity.ReplaceMovement(newMoveSpeed, entity.movement.rotationSpeed);
             }
-        }
 
+            
+
+        }
     }
 
 }

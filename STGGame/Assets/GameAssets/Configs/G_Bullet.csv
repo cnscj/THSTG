@@ -1,3 +1,4 @@
 ﻿code,name,category,type,life,harm,freq,speed,effect
+int,string,int,int,int,int,float,int,int
 10500001,,1,1,100,999,0.1,20,0
 10500002,,1,1,100,999,0.4,10,0

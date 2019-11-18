@@ -1,4 +1,5 @@
 ﻿code,name,type,life,speed
+int,string,int,int,int
 10400001,花田妖精,1,1,2
 10400002,竹林妖精,1,1,2
 10400003,旋风怪,1,1,2
