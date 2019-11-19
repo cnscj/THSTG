@@ -1,5 +1,6 @@
 ﻿
 using Entitas;
+using XLibrary;
 
 namespace STGU3D
 {
@@ -9,8 +10,7 @@ namespace STGU3D
         public string entityCode;           //实体Code
         public EEntityType entityType;      //实体类型
 
-        public int moveSpeed = 1;           //实体速度
-        public string viewCode;             //viewCode
+        public CSVObject entityData;        //实体数据
     }
 
 }

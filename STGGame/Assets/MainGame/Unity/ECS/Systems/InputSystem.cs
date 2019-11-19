@@ -16,7 +16,6 @@ namespace STGU3D
         {
             var moveGroup = Contexts.sharedInstance.game.GetGroup(
                 GameMatcher.AllOf(
-                     GameMatcher.EntityData,
                      GameMatcher.PlayerData,
                      GameMatcher.Movement
                 ));
@@ -43,7 +42,7 @@ namespace STGU3D
                     moveDirection += Vector3.down;
                 }
 
-                newMoveSpeed = moveDirection * entity.entityData.moveSpeed;
+                newMoveSpeed = moveDirection * entity.playerData.speed;
                 entity.ReplaceMovement(newMoveSpeed, entity.movement.rotationSpeed);
             }
 

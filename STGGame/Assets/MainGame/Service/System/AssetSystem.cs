@@ -1,7 +1,7 @@
 ﻿using ASGame;
 using STGU3D;
 using XLibrary;
-
+using AssetManager = STGU3D.AssetManager;
 namespace STGService
 {
     public static class AssetSystem

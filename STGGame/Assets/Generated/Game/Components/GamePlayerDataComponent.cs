@@ -11,19 +11,33 @@ public partial class GameEntity {
     public STGU3D.PlayerDataComponent playerData { get { return (STGU3D.PlayerDataComponent)GetComponent(GameComponentsLookup.PlayerData); } }
     public bool hasPlayerData { get { return HasComponent(GameComponentsLookup.PlayerData); } }
 
-    public void AddPlayerData(STGU3D.EPlayerType newPlayerType, STGU3D.EHeroType newHeroType) {
+    public void AddPlayerData(STGU3D.EPlayerType newPlayerType, STGU3D.EHeroType newHeroType, int newLife, int newArmor, float newBomb, float newSpeed, string newModelCode, string newWingmanCode, string newBulletCode) {
         var index = GameComponentsLookup.PlayerData;
         var component = (STGU3D.PlayerDataComponent)CreateComponent(index, typeof(STGU3D.PlayerDataComponent));
         component.playerType = newPlayerType;
         component.heroType = newHeroType;
+        component.life = newLife;
+        component.armor = newArmor;
+        component.bomb = newBomb;
+        component.speed = newSpeed;
+        component.modelCode = newModelCode;
+        component.wingmanCode = newWingmanCode;
+        component.bulletCode = newBulletCode;
         AddComponent(index, component);
     }
 
-    public void ReplacePlayerData(STGU3D.EPlayerType newPlayerType, STGU3D.EHeroType newHeroType) {
+    public void ReplacePlayerData(STGU3D.EPlayerType newPlayerType, STGU3D.EHeroType newHeroType, int newLife, int newArmor, float newBomb, float newSpeed, string newModelCode, string newWingmanCode, string newBulletCode) {
         var index = GameComponentsLookup.PlayerData;
         var component = (STGU3D.PlayerDataComponent)CreateComponent(index, typeof(STGU3D.PlayerDataComponent));
         component.playerType = newPlayerType;
         component.heroType = newHeroType;
+        component.life = newLife;
+        component.armor = newArmor;
+        component.bomb = newBomb;
+        component.speed = newSpeed;
+        component.modelCode = newModelCode;
+        component.wingmanCode = newWingmanCode;
+        component.bulletCode = newBulletCode;
         ReplaceComponent(index, component);
     }
 

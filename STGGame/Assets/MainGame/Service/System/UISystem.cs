@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using ASGame;
 using STGU3D;
-
+using AssetManager = STGU3D.AssetManager;
 namespace STGService
 {
     public static class UISystem

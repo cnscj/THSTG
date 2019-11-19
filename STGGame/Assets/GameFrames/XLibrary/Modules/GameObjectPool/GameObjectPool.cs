@@ -30,6 +30,11 @@ namespace XLibGame
         public bool fixedSize = false;
 
         /// <summary>
+        /// 被托管
+        /// </summary>
+        public bool isManaged = true;
+
+        /// <summary>
         /// 队列，存放对象池中没有用到的对象，即可分配对象
         /// </summary>
         protected Queue m_queue;
@@ -148,7 +153,15 @@ namespace XLibGame
         /// </summary>
         private void Awake()
         {
-           GameObjectPoolManager.GetInstance().AddGameObjectPool(this);
+            if (isManaged)
+            {
+                GameObjectPoolManager.GetInstance().AddGameObjectPool(this);
+            }
+            else
+            {
+                Init();
+            }
+
         }
 
         /// <summary>
@@ -156,7 +169,7 @@ namespace XLibGame
         /// </summary>
         private void Start()
         {
-            if (string.IsNullOrEmpty(poolName) || !GameObjectPoolManager.GetInstance().GetGameObjectPool(poolName))
+            if (string.IsNullOrEmpty(poolName) || (isManaged && !GameObjectPoolManager.GetInstance().GetGameObjectPool(poolName)))
             {
                 Destroy();
             }

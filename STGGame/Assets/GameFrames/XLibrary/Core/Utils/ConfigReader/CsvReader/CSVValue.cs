@@ -15,11 +15,13 @@ namespace XLibrary
         public CSVValue(string content) { m_content = string.Format("{0}", content); }
         public CSVValue(int content) { m_content = string.Format("{0}", content); }
         public CSVValue(bool content) { m_content = string.Format("{0}", content); }
+        public CSVValue(float content) { m_content = string.Format("{0}", content); }
         public CSVValue(double content) { m_content = string.Format("{0}", content); }
 
         public override string ToString() { return m_content; }
         public int ToInt() { return int.Parse(m_content); }
         public bool ToBool() { return bool.Parse(m_content); }
+        public float ToFloat() { return float.Parse(m_content); }
         public double ToDouble() { return double.Parse(m_content); }
 
         //隐式转换
