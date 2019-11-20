@@ -19,7 +19,7 @@ namespace STGU3D
 
         protected override bool Filter(GameEntity entity)
         {
-            return true;
+            return entity.hasMovement && entity.hasTransform;
         }
 
         protected override void Execute(List<GameEntity> entities)
@@ -27,7 +27,7 @@ namespace STGU3D
             // 满足GetTrigger和Filter的实体保存在entities列表里
             foreach (var e in entities)
             {
-                e.ReplaceTransform(e.transform.position + e.movement.moveSpeed, e.transform.rotation);
+                e.ReplaceTransform(e.transform.position + e.movement.moveSpeed * Time.deltaTime, e.transform.rotation);
             }
         }
     }

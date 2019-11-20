@@ -19,7 +19,7 @@ namespace STGU3D
 
         protected override bool Filter(GameEntity entity)
         {
-            return true;
+            return entity.hasTransform;
         }
 
         protected override void Execute(List<GameEntity> entities)

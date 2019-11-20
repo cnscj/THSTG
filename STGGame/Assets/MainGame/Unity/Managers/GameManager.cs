@@ -15,6 +15,7 @@ namespace STGU3D
         private void Start()
         {
             STGService.Main.InitStart();
+
         }
 
         private void Update()

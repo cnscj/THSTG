@@ -4,10 +4,12 @@ using UnityEngine;
 
 namespace STGU3D
 {
-    public class ViewSystem : ReactiveSystem<GameEntity>
+    public class ViewReactiveSystem : ReactiveSystem<GameEntity>
     {
-        public ViewSystem(Contexts contexts) : base(contexts.game)
+        public static readonly string viewName = "View";
+        public ViewReactiveSystem(Contexts contexts) : base(contexts.game)
         {
+
         }
 
         protected override ICollector<GameEntity> GetTrigger(IContext<GameEntity> context)
@@ -24,20 +26,9 @@ namespace STGU3D
 
         protected override void Execute(List<GameEntity> entities)
         {
-            foreach (var e in entities)
+            foreach (var entity in entities)
             {
-                //绑定GameObject
-                if (e.view.viewGO != null)
-                {
-                    GameObject.Destroy(e.view.viewGO);
-                    e.view.renderer = null;
-                    e.view.animator = null;
-                }
-                GameObject view = new GameObject("view");
-
-
-
-                e.view.viewGO = view;
+                ViewSystemHelper.TryCreateView(entity);
             }
         }
     }

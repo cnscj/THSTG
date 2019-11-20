@@ -59,28 +59,92 @@ namespace STGU3D
         private void Update()
         {
             __systems.Execute();
+            __systems.Cleanup();
         }
 
+        private void OnDestroy()
+        {
+            __systems.TearDown();
+        }
         ///////////////////////
-
-        public GameEntity CreateEntity(string code)
+        public GameEntity CreateEmptyEntity()
         {
             var entity = __contexts.game.CreateEntity();
+
+            return entity;
+        }
+
+        public GameEntity CreateGameEntity(string code)
+        {
+            var entity = CreateEmptyEntity();
             AddCommonComponent(entity);
             AddEntityDataComponent(entity, code);
             return entity;
         }
 
+        public GameEntity CreateEntity(string code)
+        {
+            var entity = CreateGameEntity(code);
+            EEntityType entityType = EntityUtil.GetEntityTypeByCode(code);
+            if (entityType == EEntityType.Hero)
+            {
+                var shotCom = entity.CreateComponent<ShotComponent>(GameComponentsLookup.Shot);
+                var bombCom = entity.CreateComponent<BombComponent>(GameComponentsLookup.Bomb);
+                var healthCom = entity.CreateComponent<HealthComponent>(GameComponentsLookup.Health);
+                var boundaryLimitationCom = entity.CreateComponent<BoundaryLimitationComponent>(GameComponentsLookup.BoundaryLimitation);
+
+                entity.AddComponent(GameComponentsLookup.Shot, shotCom);
+                entity.AddComponent(GameComponentsLookup.Bomb, bombCom);
+                entity.AddComponent(GameComponentsLookup.Health, healthCom);
+                entity.AddComponent(GameComponentsLookup.BoundaryLimitation, boundaryLimitationCom);
+
+                var playerDataCom = entity.GetComponent(GameComponentsLookup.PlayerData) as PlayerDataComponent;
+                if (playerDataCom != null)
+                {
+                    entity.view.viewCode = playerDataCom.modelCode;
+
+                    healthCom.maxHealth = playerDataCom.life;
+                    healthCom.maxArmor = playerDataCom.armor;
+                }
+            }
+            else if(entityType == EEntityType.Mob)
+            {
+                var healthCom = entity.CreateComponent<HealthComponent>(GameComponentsLookup.Health);
+
+                entity.AddComponent(GameComponentsLookup.Health, healthCom);
+
+                var mobDataCom = entity.GetComponent(GameComponentsLookup.MobData) as MobDataComponent;
+                if (mobDataCom != null)
+                {
+
+                }
+
+            }
+            return entity;
+        }
+
         public GameEntity CreateHero(EHeroType type, EPlayerType playerType = EPlayerType.Player01)
         {
-            string code = string.Format("{0}", 10100001 + (int)type * 1000) ;
+            string code = string.Format("{0}", 10000000 + 100000 * (int)EEntityType.Hero + (int)type * 1000 + 1) ;
             var entity = CreateEntity(code);
 
             var playerDataCom = entity.GetComponent(GameComponentsLookup.PlayerData) as PlayerDataComponent;
-            if (playerDataCom != null) playerDataCom.playerType = playerType;
-
+            if (playerDataCom != null)
+            {
+                playerDataCom.playerType = playerType;
+            }
             return entity;
         }
+
+        //public GameEntity CreateBullet()
+        //{
+        //    var entity = CreateGameEntity(code);
+
+        //    return entity;
+        //}
+
+
+
 
         private void AddEntityDataComponent(GameEntity entity, string code)
         {
@@ -109,6 +173,26 @@ namespace STGU3D
                         playerDataCom.wingmanCode = infos["wingmanCode"];
 
                         entity.AddComponent(GameComponentsLookup.PlayerData, playerDataCom);
+                        break;
+                    case EEntityType.Wingman:
+                        var wingmanDataCom = entity.CreateComponent<WingmanDataComponent>(GameComponentsLookup.WingmanData);
+
+                        entity.AddComponent(GameComponentsLookup.WingmanData, wingmanDataCom);
+                        break;
+                    case EEntityType.Mob:
+                        var mobDataCom = entity.CreateComponent<MobDataComponent>(GameComponentsLookup.MobData);
+
+                        entity.AddComponent(GameComponentsLookup.MobData, mobDataCom);
+                        break;
+                    case EEntityType.Boss:
+                        var bossDataCom = entity.CreateComponent<MobDataComponent>(GameComponentsLookup.BossData);
+
+                        entity.AddComponent(GameComponentsLookup.BossData, bossDataCom);
+                        break;
+                    case EEntityType.Bullet:
+                        var bulletDataCom = entity.CreateComponent<BulletDataComponent>(GameComponentsLookup.BulletData);
+
+                        entity.AddComponent(GameComponentsLookup.BulletData, bulletDataCom);
                         break;
                 }
 

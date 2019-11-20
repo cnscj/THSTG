@@ -7,6 +7,10 @@ namespace STGU3D
         public GameFeature(Contexts contexts)
         {
             Add(new MovementSystem(contexts));
+            //Add(new TransformSystem(contexts));
+            Add(new ViewInitializeSystem(contexts));
+            Add(new ViewReactiveSystem(contexts));
+            Add(new ViewExecuteSystem(contexts));
         }
     }
 }

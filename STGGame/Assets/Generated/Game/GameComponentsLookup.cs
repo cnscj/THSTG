@@ -13,21 +13,24 @@ public static class GameComponentsLookup {
     public const int Bomb = 2;
     public const int BossData = 3;
     public const int BoundaryLimitation = 4;
-    public const int Eliminate = 5;
-    public const int EntityData = 6;
-    public const int EntitySpellCard = 7;
-    public const int Health = 8;
-    public const int Invincible = 9;
-    public const int MobData = 10;
-    public const int Movement = 11;
-    public const int PlayerData = 12;
-    public const int PlayerSpellCard = 13;
-    public const int Recycle = 14;
-    public const int Shot = 15;
-    public const int Transform = 16;
-    public const int View = 17;
+    public const int BulletData = 5;
+    public const int Eliminate = 6;
+    public const int EntityData = 7;
+    public const int EntitySpellCard = 8;
+    public const int Health = 9;
+    public const int Invincible = 10;
+    public const int MobData = 11;
+    public const int Movement = 12;
+    public const int PlayerData = 13;
+    public const int PlayerSpellCard = 14;
+    public const int PropData = 15;
+    public const int Recycle = 16;
+    public const int Shot = 17;
+    public const int Transform = 18;
+    public const int View = 19;
+    public const int WingmanData = 20;
 
-    public const int TotalComponents = 18;
+    public const int TotalComponents = 21;
 
     public static readonly string[] componentNames = {
         "ArmorHeadwear",
@@ -35,6 +38,7 @@ public static class GameComponentsLookup {
         "Bomb",
         "BossData",
         "BoundaryLimitation",
+        "BulletData",
         "Eliminate",
         "EntityData",
         "EntitySpellCard",
@@ -44,10 +48,12 @@ public static class GameComponentsLookup {
         "Movement",
         "PlayerData",
         "PlayerSpellCard",
+        "PropData",
         "Recycle",
         "Shot",
         "Transform",
-        "View"
+        "View",
+        "WingmanData"
     };
 
     public static readonly System.Type[] componentTypes = {
@@ -56,6 +62,7 @@ public static class GameComponentsLookup {
         typeof(STGU3D.BombComponent),
         typeof(STGU3D.BossDataComponent),
         typeof(STGU3D.BoundaryLimitationComponent),
+        typeof(STGU3D.BulletDataComponent),
         typeof(STGU3D.EliminateComponent),
         typeof(STGU3D.EntityDataComponent),
         typeof(STGU3D.EntitySpellCardComponent),
@@ -65,9 +72,11 @@ public static class GameComponentsLookup {
         typeof(STGU3D.MovementComponent),
         typeof(STGU3D.PlayerDataComponent),
         typeof(STGU3D.PlayerSpellCardComponent),
+        typeof(STGU3D.PropDataComponent),
         typeof(STGU3D.RecycleComponent),
         typeof(STGU3D.ShotComponent),
         typeof(STGU3D.TransformComponent),
-        typeof(STGU3D.ViewComponent)
+        typeof(STGU3D.ViewComponent),
+        typeof(STGU3D.WingmanDataComponent)
     };
 }
