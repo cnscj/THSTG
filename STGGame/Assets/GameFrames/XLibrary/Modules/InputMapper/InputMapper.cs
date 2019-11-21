@@ -1,6 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using XLibrary.Package;
+using System;
+using XLibrary;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace XLibGame
 {
@@ -20,7 +26,6 @@ namespace XLibGame
             Down = 2 ^ 2,
         }
         public List<KeyPair> keyList = new List<KeyPair>();
-        public Dictionary<KeyCode, int> keyMaps = new Dictionary<KeyCode, int>();                       //按键映射
         public Dictionary<int, short> keyStatus = new Dictionary<int, short>();                         //按键状态
 
         public bool IsAtBehaviour(int behaviour)
@@ -53,18 +58,92 @@ namespace XLibGame
             return false;
         }
 
-        protected void Awake()
+
+        public bool HasBindKey(KeyCode code)
+        {
+            //是否存在按键冲突
+            foreach (var pair in keyList)
+            {
+                if (pair.keycodes.Contains(code))
+                {
+                    return true;
+
+                }
+            }
+            return false;
+        }
+
+        public bool BindKey(int behaviour, KeyCode code, bool isReplace = false)
+        {
+            //是否存在按键冲突
+            foreach (var pair in keyList)
+            {
+                if (pair.keycodes.Contains(code))
+                {
+                    if(isReplace)
+                    {
+                        pair.keycodes.Remove(code);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    
+                }
+            }
+
+            //没有按键冲突
+            foreach(var pair in keyList)
+            {
+                if (pair.behaviour == behaviour)
+                {
+                    pair.keycodes.Add(code);
+                    return true;
+                }
+            }
+
+            KeyPair keyPair = new KeyPair();
+            keyPair.behaviour = behaviour;
+            keyPair.keycodes = new List<KeyCode>();
+            keyPair.keycodes.Add(code);
+            keyList.Add(keyPair);
+
+            return true;
+        }
+
+        public void UnBindKey(int behaviour, KeyCode code)
         {
             foreach (var pair in keyList)
             {
-                foreach (var keycode in pair.keycodes)
+                if (pair.behaviour == behaviour)
                 {
-                    if (!keyMaps.ContainsKey(keycode))
+                    if (pair.keycodes.Contains(code))
                     {
-                        keyMaps.Add(keycode, pair.behaviour);
+                        pair.keycodes.Remove(code);
                     }
                 }
             }
+        }
+
+        public void UnBindKeys(int behaviour)
+        {
+            foreach (var pair in keyList)
+            {
+                if (pair.behaviour == behaviour)
+                {
+                    pair.keycodes.Clear();
+                }
+            }
+        }
+
+        public void UnBindAllKeys()
+        {
+            keyList.Clear();
+        }
+
+        protected void Awake()
+        {
+
         }
 
         protected void Update()
@@ -89,20 +168,86 @@ namespace XLibGame
 
         public void LoadFromFile(string path)
         {
+            IniParser parser = new IniParser();
+            parser.Open(path);
+
+            Dictionary<string, string> dectionary = new Dictionary<string, string>();
+            parser.ReadAllValues("KEYBOARD", out dectionary);
+            parser.Close();
+
+            Dictionary<int, List<KeyCode>> tmpMap = new Dictionary<int, List<KeyCode>>();
+            foreach (var pair in dectionary)
+            {
+                var keyCodeStr = pair.Key;
+                var keyCode = (KeyCode)Enum.Parse(typeof(KeyCode), keyCodeStr);
+                var keyValue = int.Parse(pair.Value);
+
+                List<KeyCode> codeList = null;
+                if (!tmpMap.TryGetValue(keyValue,out codeList))
+                {
+                    codeList = new List<KeyCode>();
+                    tmpMap.Add(keyValue,codeList);
+                }
+                codeList.Add(keyCode);
+            }
+
+            keyList.Clear();
+            foreach(var pair in tmpMap)
+            {
+                KeyPair keyPair = new KeyPair();
+                keyPair.behaviour = pair.Key;
+                keyPair.keycodes = pair.Value;
+
+                keyList.Add(keyPair);
+            }
 
         }
 
-        public bool SaveToFile(string path)
+        public void SaveToFile(string path)
         {
-            return false;
+            IniParser parser = new IniParser();
+            parser.Open(path);
+
+            foreach (var pair in keyList)
+            {
+                var keyValue = pair.behaviour;
+                foreach (var keycode in pair.keycodes)
+                {
+                    var keyCodeStr = Enum.GetName(typeof(KeyCode), keycode);
+                    parser.WriteValue("KEYBOARD", keyCodeStr, keyValue);
+                }
+            }
+            parser.Close();
         }
 
-#if UNITY_EDITOR 
-        private bool SaveToFileEdiotr()
+#if UNITY_EDITOR
+        [ContextMenu("LoadFromFile")]
+        private void LoadFromFileEdiotr()
         {
-            return false;
+            //顺便加载到编辑器
+            var path = EditorUtility.OpenFilePanel(
+                "Overwrite with INI",
+                "",
+                "ini");
+            if (!string.IsNullOrEmpty(path))
+            {
+                LoadFromFile(path);
+            }
         }
 
+        [ContextMenu("SaveToFile")]
+        private void SaveToFileEdiotr()
+        {
+            var path = EditorUtility.SaveFilePanel(
+            "Save file as INI",
+            "",
+            "keyboard",
+            "ini");
+            if (!string.IsNullOrEmpty(path))
+            {
+                SaveToFile(path);
+            }
+        }
 #endif
     }
 

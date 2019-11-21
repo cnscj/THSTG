@@ -6,7 +6,6 @@ namespace STGU3D
 {
     public class ViewReactiveSystem : ReactiveSystem<GameEntity>
     {
-        public static readonly string viewName = "View";
         public ViewReactiveSystem(Contexts contexts) : base(contexts.game)
         {
 
@@ -28,7 +27,12 @@ namespace STGU3D
         {
             foreach (var entity in entities)
             {
-                ViewSystemHelper.TryCreateView(entity);
+                if (entity.view.viewGO)
+                {
+                    var viewNode = entity.view.viewGO.gameObject;
+                    entity.view.animator = viewNode.GetComponentInChildren<Animator>();
+                    entity.view.renderer = viewNode.GetComponentInChildren<Renderer>();
+                }
             }
         }
     }

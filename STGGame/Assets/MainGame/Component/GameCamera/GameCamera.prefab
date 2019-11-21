@@ -659,6 +659,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eda273a8d38f7ff4dbb656d0b28e4382, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainCamera: {fileID: 8287892597146800561}
-  mapCamera: {fileID: 5525259279065837782}
-  uiCamera: {fileID: 6581844662657752913}
+  mainCamera: {fileID: 4791026945991418089}
+  entityCamera: {fileID: 6748527895001982525}
+  mapCamera: {fileID: 8976743894020398073}
+  uiCamera: {fileID: 580373401722848964}

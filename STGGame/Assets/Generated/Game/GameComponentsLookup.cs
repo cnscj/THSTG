@@ -14,23 +14,28 @@ public static class GameComponentsLookup {
     public const int BossData = 3;
     public const int BoundaryLimitation = 4;
     public const int BulletData = 5;
-    public const int Eliminate = 6;
-    public const int EntityData = 7;
-    public const int EntitySpellCard = 8;
-    public const int Health = 9;
-    public const int Invincible = 10;
-    public const int MobData = 11;
-    public const int Movement = 12;
-    public const int PlayerData = 13;
-    public const int PlayerSpellCard = 14;
-    public const int PropData = 15;
-    public const int Recycle = 16;
-    public const int Shot = 17;
-    public const int Transform = 18;
-    public const int View = 19;
-    public const int WingmanData = 20;
+    public const int Collider = 6;
+    public const int Destroyed = 7;
+    public const int Eliminate = 8;
+    public const int EntityBulletFlag = 9;
+    public const int EntityData = 10;
+    public const int EntitySpellCard = 11;
+    public const int Health = 12;
+    public const int HeroBulletFlag = 13;
+    public const int Invincible = 14;
+    public const int MobData = 15;
+    public const int Movement = 16;
+    public const int OnmyougyokuWingman = 17;
+    public const int PlayerData = 18;
+    public const int PlayerSpellCard = 19;
+    public const int PropData = 20;
+    public const int Recycle = 21;
+    public const int Shot = 22;
+    public const int Transform = 23;
+    public const int View = 24;
+    public const int WingmanData = 25;
 
-    public const int TotalComponents = 21;
+    public const int TotalComponents = 26;
 
     public static readonly string[] componentNames = {
         "ArmorHeadwear",
@@ -39,13 +44,18 @@ public static class GameComponentsLookup {
         "BossData",
         "BoundaryLimitation",
         "BulletData",
+        "Collider",
+        "Destroyed",
         "Eliminate",
+        "EntityBulletFlag",
         "EntityData",
         "EntitySpellCard",
         "Health",
+        "HeroBulletFlag",
         "Invincible",
         "MobData",
         "Movement",
+        "OnmyougyokuWingman",
         "PlayerData",
         "PlayerSpellCard",
         "PropData",
@@ -63,13 +73,18 @@ public static class GameComponentsLookup {
         typeof(STGU3D.BossDataComponent),
         typeof(STGU3D.BoundaryLimitationComponent),
         typeof(STGU3D.BulletDataComponent),
+        typeof(STGU3D.ColliderComponent),
+        typeof(STGU3D.DestroyedComponent),
         typeof(STGU3D.EliminateComponent),
+        typeof(STGU3D.EntityBulletFlagComponent),
         typeof(STGU3D.EntityDataComponent),
         typeof(STGU3D.EntitySpellCardComponent),
         typeof(STGU3D.HealthComponent),
+        typeof(STGU3D.HeroBulletFlagComponent),
         typeof(STGU3D.InvincibleComponent),
         typeof(STGU3D.MobDataComponent),
         typeof(STGU3D.MovementComponent),
+        typeof(STGU3D.OnmyougyokuWingmanComponent),
         typeof(STGU3D.PlayerDataComponent),
         typeof(STGU3D.PlayerSpellCardComponent),
         typeof(STGU3D.PropDataComponent),

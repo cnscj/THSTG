@@ -6,7 +6,6 @@ namespace STGU3D
 {
     public class ViewInitializeSystem : IInitializeSystem
     {
-        public static readonly string viewName = "View";
         public ViewInitializeSystem(Contexts contexts)
         {
 
@@ -14,12 +13,12 @@ namespace STGU3D
 
         public void Initialize()
         {
-            var moveGroup = Contexts.sharedInstance.game.GetGroup(
+            var group = Contexts.sharedInstance.game.GetGroup(
                 GameMatcher.AllOf(
                      GameMatcher.View
                 ));
 
-            foreach (var entity in moveGroup.GetEntities())
+            foreach (var entity in group.GetEntities())
             {
                 ViewSystemHelper.TryCreateView(entity);
 

@@ -46,7 +46,30 @@ namespace STGU3D
                 entity.ReplaceMovement(newMoveSpeed, entity.movement.rotationSpeed);
             }
 
-            
+            //开火
+            var fireGroup = Contexts.sharedInstance.game.GetGroup(
+                GameMatcher.AllOf(
+                     GameMatcher.PlayerData,
+                     GameMatcher.Shot
+                ));
+
+            foreach (var entity in fireGroup.GetEntities())
+            {
+                bool isFire = false;
+                if (InputMapper.GetInstance().IsAtBehaviour((int)EPlayerBehavior.Attack))
+                {
+                    isFire = true;
+                }
+
+                if (entity.shot.isFire != isFire)
+                {
+                    var shotCom = entity.GetComponent(GameComponentsLookup.Shot) as ShotComponent;
+                    shotCom.isFire = isFire;
+
+                    entity.ReplaceComponent(GameComponentsLookup.Shot, shotCom);
+                }
+            }
+
 
         }
     }

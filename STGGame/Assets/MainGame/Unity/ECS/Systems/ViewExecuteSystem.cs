@@ -25,6 +25,7 @@ namespace STGU3D
                 if (entity.view.viewGO)
                 {
                     entity.view.viewGO.transform.localPosition = entity.transform.position;
+                    entity.view.viewGO.transform.localEulerAngles = entity.transform.rotation;
                 }
             }
 

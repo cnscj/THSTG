@@ -11,18 +11,20 @@ public partial class GameEntity {
     public STGU3D.RecycleComponent recycle { get { return (STGU3D.RecycleComponent)GetComponent(GameComponentsLookup.Recycle); } }
     public bool hasRecycle { get { return HasComponent(GameComponentsLookup.Recycle); } }
 
-    public void AddRecycle(UnityEngine.Vector2 newBoundary, float newStayTime) {
+    public void AddRecycle(UnityEngine.Rect newBoundary, float newMaxStayTime, float newStayTime) {
         var index = GameComponentsLookup.Recycle;
         var component = (STGU3D.RecycleComponent)CreateComponent(index, typeof(STGU3D.RecycleComponent));
         component.boundary = newBoundary;
+        component.maxStayTime = newMaxStayTime;
         component.stayTime = newStayTime;
         AddComponent(index, component);
     }
 
-    public void ReplaceRecycle(UnityEngine.Vector2 newBoundary, float newStayTime) {
+    public void ReplaceRecycle(UnityEngine.Rect newBoundary, float newMaxStayTime, float newStayTime) {
         var index = GameComponentsLookup.Recycle;
         var component = (STGU3D.RecycleComponent)CreateComponent(index, typeof(STGU3D.RecycleComponent));
         component.boundary = newBoundary;
+        component.maxStayTime = newMaxStayTime;
         component.stayTime = newStayTime;
         ReplaceComponent(index, component);
     }

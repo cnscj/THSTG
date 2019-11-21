@@ -11,14 +11,14 @@ public partial class GameEntity {
     public STGU3D.BoundaryLimitationComponent boundaryLimitation { get { return (STGU3D.BoundaryLimitationComponent)GetComponent(GameComponentsLookup.BoundaryLimitation); } }
     public bool hasBoundaryLimitation { get { return HasComponent(GameComponentsLookup.BoundaryLimitation); } }
 
-    public void AddBoundaryLimitation(UnityEngine.Vector2 newMovableArea) {
+    public void AddBoundaryLimitation(UnityEngine.Rect newMovableArea) {
         var index = GameComponentsLookup.BoundaryLimitation;
         var component = (STGU3D.BoundaryLimitationComponent)CreateComponent(index, typeof(STGU3D.BoundaryLimitationComponent));
         component.movableArea = newMovableArea;
         AddComponent(index, component);
     }
 
-    public void ReplaceBoundaryLimitation(UnityEngine.Vector2 newMovableArea) {
+    public void ReplaceBoundaryLimitation(UnityEngine.Rect newMovableArea) {
         var index = GameComponentsLookup.BoundaryLimitation;
         var component = (STGU3D.BoundaryLimitationComponent)CreateComponent(index, typeof(STGU3D.BoundaryLimitationComponent));
         component.movableArea = newMovableArea;
