@@ -12,6 +12,7 @@ namespace XLibGame
 {
     public class InputMapper : MonoSingleton<InputMapper>
     {
+        public static readonly string SECTION_KEY = "KEYBOARD";
         //记录按键状态
         [System.Serializable]
         public class KeyPair
@@ -171,36 +172,38 @@ namespace XLibGame
             IniParser parser = new IniParser();
             parser.Open(path);
 
-            Dictionary<string, string> dectionary = new Dictionary<string, string>();
-            parser.ReadAllValues("KEYBOARD", out dectionary);
+            Dictionary<string, string> dectionary = null;
+            parser.ReadAllValues(SECTION_KEY, out dectionary);
             parser.Close();
 
-            Dictionary<int, List<KeyCode>> tmpMap = new Dictionary<int, List<KeyCode>>();
-            foreach (var pair in dectionary)
+            if (dectionary != null)
             {
-                var keyCodeStr = pair.Key;
-                var keyCode = (KeyCode)Enum.Parse(typeof(KeyCode), keyCodeStr);
-                var keyValue = int.Parse(pair.Value);
-
-                List<KeyCode> codeList = null;
-                if (!tmpMap.TryGetValue(keyValue,out codeList))
+                Dictionary<int, List<KeyCode>> tmpMap = new Dictionary<int, List<KeyCode>>();
+                foreach (var pair in dectionary)
                 {
-                    codeList = new List<KeyCode>();
-                    tmpMap.Add(keyValue,codeList);
+                    var keyCodeStr = pair.Key;
+                    var keyCode = (KeyCode)Enum.Parse(typeof(KeyCode), keyCodeStr);
+                    var keyValue = int.Parse(pair.Value);
+
+                    List<KeyCode> codeList = null;
+                    if (!tmpMap.TryGetValue(keyValue, out codeList))
+                    {
+                        codeList = new List<KeyCode>();
+                        tmpMap.Add(keyValue, codeList);
+                    }
+                    codeList.Add(keyCode);
                 }
-                codeList.Add(keyCode);
+
+                keyList.Clear();
+                foreach (var pair in tmpMap)
+                {
+                    KeyPair keyPair = new KeyPair();
+                    keyPair.behaviour = pair.Key;
+                    keyPair.keycodes = pair.Value;
+
+                    keyList.Add(keyPair);
+                }
             }
-
-            keyList.Clear();
-            foreach(var pair in tmpMap)
-            {
-                KeyPair keyPair = new KeyPair();
-                keyPair.behaviour = pair.Key;
-                keyPair.keycodes = pair.Value;
-
-                keyList.Add(keyPair);
-            }
-
         }
 
         public void SaveToFile(string path)
@@ -214,7 +217,7 @@ namespace XLibGame
                 foreach (var keycode in pair.keycodes)
                 {
                     var keyCodeStr = Enum.GetName(typeof(KeyCode), keycode);
-                    parser.WriteValue("KEYBOARD", keyCodeStr, keyValue);
+                    parser.WriteValue(SECTION_KEY, keyCodeStr, keyValue);
                 }
             }
             parser.Close();

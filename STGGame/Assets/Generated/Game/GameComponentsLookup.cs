@@ -31,11 +31,12 @@ public static class GameComponentsLookup {
     public const int PropData = 20;
     public const int Recycle = 21;
     public const int Shot = 22;
-    public const int Transform = 23;
-    public const int View = 24;
-    public const int WingmanData = 25;
+    public const int TraceBullet = 23;
+    public const int Transform = 24;
+    public const int View = 25;
+    public const int WingmanData = 26;
 
-    public const int TotalComponents = 26;
+    public const int TotalComponents = 27;
 
     public static readonly string[] componentNames = {
         "ArmorHeadwear",
@@ -61,6 +62,7 @@ public static class GameComponentsLookup {
         "PropData",
         "Recycle",
         "Shot",
+        "TraceBullet",
         "Transform",
         "View",
         "WingmanData"
@@ -90,6 +92,7 @@ public static class GameComponentsLookup {
         typeof(STGU3D.PropDataComponent),
         typeof(STGU3D.RecycleComponent),
         typeof(STGU3D.ShotComponent),
+        typeof(STGU3D.TraceBulletComponent),
         typeof(STGU3D.TransformComponent),
         typeof(STGU3D.ViewComponent),
         typeof(STGU3D.WingmanDataComponent)

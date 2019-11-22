@@ -11,21 +11,31 @@ public partial class GameEntity {
     public STGU3D.EliminateComponent eliminate { get { return (STGU3D.EliminateComponent)GetComponent(GameComponentsLookup.Eliminate); } }
     public bool hasEliminate { get { return HasComponent(GameComponentsLookup.Eliminate); } }
 
-    public void AddEliminate(float newRadius, float newMaxHoldTime, float newHoldTime) {
+    public void AddEliminate(float newRadius, float newMaxHoldTime, float newConsumeRate, float newChargeRate, float newHoldTime, float newCdTime, float newNextChargeTime, bool newIsEliminating) {
         var index = GameComponentsLookup.Eliminate;
         var component = (STGU3D.EliminateComponent)CreateComponent(index, typeof(STGU3D.EliminateComponent));
         component.radius = newRadius;
         component.maxHoldTime = newMaxHoldTime;
+        component.consumeRate = newConsumeRate;
+        component.chargeRate = newChargeRate;
         component.holdTime = newHoldTime;
+        component.cdTime = newCdTime;
+        component.nextChargeTime = newNextChargeTime;
+        component.isEliminating = newIsEliminating;
         AddComponent(index, component);
     }
 
-    public void ReplaceEliminate(float newRadius, float newMaxHoldTime, float newHoldTime) {
+    public void ReplaceEliminate(float newRadius, float newMaxHoldTime, float newConsumeRate, float newChargeRate, float newHoldTime, float newCdTime, float newNextChargeTime, bool newIsEliminating) {
         var index = GameComponentsLookup.Eliminate;
         var component = (STGU3D.EliminateComponent)CreateComponent(index, typeof(STGU3D.EliminateComponent));
         component.radius = newRadius;
         component.maxHoldTime = newMaxHoldTime;
+        component.consumeRate = newConsumeRate;
+        component.chargeRate = newChargeRate;
         component.holdTime = newHoldTime;
+        component.cdTime = newCdTime;
+        component.nextChargeTime = newNextChargeTime;
+        component.isEliminating = newIsEliminating;
         ReplaceComponent(index, component);
     }
 

@@ -11,23 +11,23 @@ public partial class GameEntity {
     public STGU3D.ShotComponent shot { get { return (STGU3D.ShotComponent)GetComponent(GameComponentsLookup.Shot); } }
     public bool hasShot { get { return HasComponent(GameComponentsLookup.Shot); } }
 
-    public void AddShot(UnityEngine.GameObject newBullet, float newInterval, float newNextFireTime, bool newIsFire) {
+    public void AddShot(UnityEngine.GameObject newBullet, float newInterval, float newNextFireTime, bool newIsFiring) {
         var index = GameComponentsLookup.Shot;
         var component = (STGU3D.ShotComponent)CreateComponent(index, typeof(STGU3D.ShotComponent));
         component.bullet = newBullet;
         component.interval = newInterval;
         component.nextFireTime = newNextFireTime;
-        component.isFire = newIsFire;
+        component.isFiring = newIsFiring;
         AddComponent(index, component);
     }
 
-    public void ReplaceShot(UnityEngine.GameObject newBullet, float newInterval, float newNextFireTime, bool newIsFire) {
+    public void ReplaceShot(UnityEngine.GameObject newBullet, float newInterval, float newNextFireTime, bool newIsFiring) {
         var index = GameComponentsLookup.Shot;
         var component = (STGU3D.ShotComponent)CreateComponent(index, typeof(STGU3D.ShotComponent));
         component.bullet = newBullet;
         component.interval = newInterval;
         component.nextFireTime = newNextFireTime;
-        component.isFire = newIsFire;
+        component.isFiring = newIsFiring;
         ReplaceComponent(index, component);
     }
 

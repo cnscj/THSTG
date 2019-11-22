@@ -90,11 +90,13 @@ namespace STGU3D
             {
                 var shotCom = entity.CreateComponent<ShotComponent>(GameComponentsLookup.Shot);
                 var bombCom = entity.CreateComponent<BombComponent>(GameComponentsLookup.Bomb);
+                var eliminateCom = entity.CreateComponent<EliminateComponent>(GameComponentsLookup.Eliminate);
                 var healthCom = entity.CreateComponent<HealthComponent>(GameComponentsLookup.Health);
                 var boundaryLimitationCom = entity.CreateComponent<BoundaryLimitationComponent>(GameComponentsLookup.BoundaryLimitation);
 
                 entity.AddComponent(GameComponentsLookup.Shot, shotCom);
                 entity.AddComponent(GameComponentsLookup.Bomb, bombCom);
+                entity.AddComponent(GameComponentsLookup.Eliminate, eliminateCom);
                 entity.AddComponent(GameComponentsLookup.Health, healthCom);
                 entity.AddComponent(GameComponentsLookup.BoundaryLimitation, boundaryLimitationCom);
 

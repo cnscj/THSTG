@@ -33,6 +33,7 @@ namespace STGU3D
             var moveAnimGroup = Contexts.sharedInstance.game.GetGroup(
                 GameMatcher.AllOf(
                      GameMatcher.View,
+                     GameMatcher.Transform,
                      GameMatcher.Movement
                 ));
             foreach (var entity in moveAnimGroup.GetEntities())
@@ -42,16 +43,17 @@ namespace STGU3D
 
                     if (entity.movement.moveSpeed.x > 0f) //右
                     {
-                        entity.view.viewGO.transform.localEulerAngles = new Vector3(0, 180, 0);
                         entity.view.animator.SetInteger("moveSpeed", 1);
+                        entity.transform.rotation.y = 180;
+
+
                     }
                     else if (entity.movement.moveSpeed.x < 0f) //左
                     {
-                        entity.view.viewGO.transform.localEulerAngles = new Vector3(0, 0, 0);
                         entity.view.animator.SetInteger("moveSpeed", -1);
+                        entity.transform.rotation.y = 0;
                     }
-
-                    if (System.Math.Abs(entity.movement.moveSpeed.x) < 0.000001f && System.Math.Abs(entity.movement.moveSpeed.y) < 0.000001f)
+                    else
                     {
                         entity.view.animator.SetInteger("moveSpeed", 0);
                     }

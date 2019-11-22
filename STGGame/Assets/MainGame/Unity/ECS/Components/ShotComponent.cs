@@ -11,6 +11,6 @@ namespace STGU3D
 
         public float nextFireTime;          //下次开火时间
 
-        public bool isFire = false;         //开火状态
+        public bool isFiring = false;         //开火状态
     }
 }

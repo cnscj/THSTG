@@ -8,15 +8,15 @@
 //------------------------------------------------------------------------------
 public static class UIComponentsLookup {
 
+    public const int Destroyed = 0;
 
-
-    public const int TotalComponents = 0;
+    public const int TotalComponents = 1;
 
     public static readonly string[] componentNames = {
-
+        "Destroyed"
     };
 
     public static readonly System.Type[] componentTypes = {
-
+        typeof(STGU3D.DestroyedComponent)
     };
 }

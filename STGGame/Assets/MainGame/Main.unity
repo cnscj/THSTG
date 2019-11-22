@@ -237,6 +237,10 @@ MonoBehaviour:
     keycodes: 6400000013010000
   - behaviour: 5
     keycodes: 680000007a000000
+  - behaviour: 8
+    keycodes: 620000006b000000
+  - behaviour: 10
+    keycodes: 630000006a000000
 --- !u!1001 &8287892596728945978
 PrefabInstance:
   m_ObjectHideFlags: 0

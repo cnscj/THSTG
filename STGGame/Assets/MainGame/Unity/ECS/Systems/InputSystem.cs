@@ -7,6 +7,8 @@ namespace STGU3D
 {
     public class InputSystem : IExecuteSystem
     {
+
+
         public InputSystem(Contexts contexts)
         {
 
@@ -61,15 +63,55 @@ namespace STGU3D
                     isFire = true;
                 }
 
-                if (entity.shot.isFire != isFire)
+                if (entity.shot.isFiring != isFire)
                 {
                     var shotCom = entity.GetComponent(GameComponentsLookup.Shot) as ShotComponent;
-                    shotCom.isFire = isFire;
+                    shotCom.isFiring = isFire;
 
                     entity.ReplaceComponent(GameComponentsLookup.Shot, shotCom);
                 }
             }
 
+
+            //丢B
+            var bombGroup = Contexts.sharedInstance.game.GetGroup(
+                GameMatcher.AllOf(
+                     GameMatcher.PlayerData,
+                     GameMatcher.Bomb
+                ));
+
+            foreach (var entity in bombGroup.GetEntities())
+            {
+                if (InputMapper.GetInstance().IsAtBehaviour((int)EPlayerBehavior.Bomb))
+                {
+                    var bombCom = entity.GetComponent(GameComponentsLookup.Bomb) as BombComponent;
+                    bombCom.isBombing = true;
+
+                    entity.ReplaceComponent(GameComponentsLookup.Bomb, bombCom);
+                }
+            }
+
+            //丢B
+            var eliminateGroup = Contexts.sharedInstance.game.GetGroup(
+                GameMatcher.AllOf(
+                     GameMatcher.PlayerData,
+                     GameMatcher.Eliminate
+                ));
+
+            foreach (var entity in eliminateGroup.GetEntities())
+            {
+                bool isEliminate = false;
+                if (InputMapper.GetInstance().IsAtBehaviour((int)EPlayerBehavior.Eliminate))
+                {
+                    isEliminate = true;
+                }
+
+                var eliminateCom = entity.GetComponent(GameComponentsLookup.Eliminate) as EliminateComponent;
+                eliminateCom.isEliminating = isEliminate;
+
+                entity.ReplaceComponent(GameComponentsLookup.Eliminate, eliminateCom);
+                
+            }
 
         }
     }

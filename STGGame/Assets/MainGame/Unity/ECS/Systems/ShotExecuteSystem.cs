@@ -27,7 +27,7 @@ namespace STGU3D
 
             foreach (var entity in shotGroup.GetEntities())
             {
-                if (entity.shot.isFire)
+                if (entity.shot.isFiring)
                 {
                     if (entity.shot.nextFireTime <= Time.fixedTime)
                     {

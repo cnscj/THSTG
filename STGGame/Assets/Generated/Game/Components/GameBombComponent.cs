@@ -11,27 +11,23 @@ public partial class GameEntity {
     public STGU3D.BombComponent bomb { get { return (STGU3D.BombComponent)GetComponent(GameComponentsLookup.Bomb); } }
     public bool hasBomb { get { return HasComponent(GameComponentsLookup.Bomb); } }
 
-    public void AddBomb(int newMaxTimes, float newMaxCdTime, int newDyingBombUse, int newTimes, float newCdTime, bool newIsBomb) {
+    public void AddBomb(float newCdTime, int newTimes, float newNextBombTime, bool newIsBombing) {
         var index = GameComponentsLookup.Bomb;
         var component = (STGU3D.BombComponent)CreateComponent(index, typeof(STGU3D.BombComponent));
-        component.maxTimes = newMaxTimes;
-        component.maxCdTime = newMaxCdTime;
-        component.dyingBombUse = newDyingBombUse;
-        component.times = newTimes;
         component.cdTime = newCdTime;
-        component.isBomb = newIsBomb;
+        component.times = newTimes;
+        component.nextBombTime = newNextBombTime;
+        component.isBombing = newIsBombing;
         AddComponent(index, component);
     }
 
-    public void ReplaceBomb(int newMaxTimes, float newMaxCdTime, int newDyingBombUse, int newTimes, float newCdTime, bool newIsBomb) {
+    public void ReplaceBomb(float newCdTime, int newTimes, float newNextBombTime, bool newIsBombing) {
         var index = GameComponentsLookup.Bomb;
         var component = (STGU3D.BombComponent)CreateComponent(index, typeof(STGU3D.BombComponent));
-        component.maxTimes = newMaxTimes;
-        component.maxCdTime = newMaxCdTime;
-        component.dyingBombUse = newDyingBombUse;
-        component.times = newTimes;
         component.cdTime = newCdTime;
-        component.isBomb = newIsBomb;
+        component.times = newTimes;
+        component.nextBombTime = newNextBombTime;
+        component.isBombing = newIsBombing;
         ReplaceComponent(index, component);
     }
 

@@ -8,15 +8,18 @@
 //------------------------------------------------------------------------------
 public static class InputComponentsLookup {
 
-    public const int Input = 0;
+    public const int Destroyed = 0;
+    public const int Input = 1;
 
-    public const int TotalComponents = 1;
+    public const int TotalComponents = 2;
 
     public static readonly string[] componentNames = {
+        "Destroyed",
         "Input"
     };
 
     public static readonly System.Type[] componentTypes = {
+        typeof(STGU3D.DestroyedComponent),
         typeof(STGU3D.InputComponent)
     };
 }

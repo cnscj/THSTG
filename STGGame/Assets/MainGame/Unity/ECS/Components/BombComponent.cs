@@ -5,13 +5,10 @@ namespace STGU3D
     [Game]
     public class BombComponent : IComponent
     {
-        public int maxTimes = 3;                //最大bomb次数
-        public float maxCdTime = 5.0f;          //冷却时间
-        public int dyingBombUse = 2;            //决死Bomb消耗数
+        public float cdTime = 5.0f;             //冷却时间
+        public int times = 3;                   //拥有bomb次数
+        public float nextBombTime = 0f;         //下次可bomb时间
 
-        public int times = 3;                   //剩余bomb次数
-        public float cdTime = 0f;               //剩余冷却时间
-
-        public bool isBomb = false;             //触发
+        public bool isBombing = false;             //触发
     }
 }

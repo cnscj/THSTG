@@ -13,6 +13,8 @@ namespace STGU3D
             Add(new ViewExecuteSystem(contexts));
 
             Add(new ShotExecuteSystem(contexts));
+            Add(new BombReactiveSystem(contexts));
+            Add(new EliminateExecuteSystem(contexts));
 
             Add(new DestroyedSystem(contexts));
         }
