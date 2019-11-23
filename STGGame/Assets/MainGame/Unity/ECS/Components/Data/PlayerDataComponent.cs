@@ -11,6 +11,7 @@ namespace STGU3D
         public EHeroType heroType;
 
         public int life;
+        public int blood;
         public int armor;
         public float bomb;
         public float speed;

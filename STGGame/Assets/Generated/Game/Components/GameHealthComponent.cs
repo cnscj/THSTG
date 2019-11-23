@@ -11,23 +11,29 @@ public partial class GameEntity {
     public STGU3D.HealthComponent health { get { return (STGU3D.HealthComponent)GetComponent(GameComponentsLookup.Health); } }
     public bool hasHealth { get { return HasComponent(GameComponentsLookup.Health); } }
 
-    public void AddHealth(int newMaxHealth, int newMaxArmor, int newHealth, int newArmor) {
+    public void AddHealth(float newMaxNearDeathTime, int newMaxLife, int newMaxBlood, int newLife, int newBlood, float newTrueDeathTime, bool newIsTrueDied) {
         var index = GameComponentsLookup.Health;
         var component = (STGU3D.HealthComponent)CreateComponent(index, typeof(STGU3D.HealthComponent));
-        component.maxHealth = newMaxHealth;
-        component.maxArmor = newMaxArmor;
-        component.health = newHealth;
-        component.armor = newArmor;
+        component.maxNearDeathTime = newMaxNearDeathTime;
+        component.maxLife = newMaxLife;
+        component.maxBlood = newMaxBlood;
+        component.life = newLife;
+        component.blood = newBlood;
+        component.trueDeathTime = newTrueDeathTime;
+        component.isTrueDied = newIsTrueDied;
         AddComponent(index, component);
     }
 
-    public void ReplaceHealth(int newMaxHealth, int newMaxArmor, int newHealth, int newArmor) {
+    public void ReplaceHealth(float newMaxNearDeathTime, int newMaxLife, int newMaxBlood, int newLife, int newBlood, float newTrueDeathTime, bool newIsTrueDied) {
         var index = GameComponentsLookup.Health;
         var component = (STGU3D.HealthComponent)CreateComponent(index, typeof(STGU3D.HealthComponent));
-        component.maxHealth = newMaxHealth;
-        component.maxArmor = newMaxArmor;
-        component.health = newHealth;
-        component.armor = newArmor;
+        component.maxNearDeathTime = newMaxNearDeathTime;
+        component.maxLife = newMaxLife;
+        component.maxBlood = newMaxBlood;
+        component.life = newLife;
+        component.blood = newBlood;
+        component.trueDeathTime = newTrueDeathTime;
+        component.isTrueDied = newIsTrueDied;
         ReplaceComponent(index, component);
     }
 

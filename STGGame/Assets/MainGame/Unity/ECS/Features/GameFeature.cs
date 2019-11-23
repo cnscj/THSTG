@@ -16,6 +16,9 @@ namespace STGU3D
             Add(new BombReactiveSystem(contexts));
             Add(new EliminateExecuteSystem(contexts));
 
+            Add(new HealthReactiveSystem(contexts));
+            Add(new HealthExecuteSystem(contexts));
+
             Add(new DestroyedSystem(contexts));
         }
     }

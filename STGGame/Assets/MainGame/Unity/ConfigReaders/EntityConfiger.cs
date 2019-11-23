@@ -66,6 +66,13 @@ namespace STGU3D
 
         }
 
+        public static CSVObject GetBulletInfo(string key)
+        {
+            var tb = GetBulletTable();
+            return tb[key];
+
+        }
+
 
         public static CSVObject GetEntityInfo(string code)
         {
@@ -79,6 +86,9 @@ namespace STGU3D
                     break;
                 case EEntityType.Wingman:
                     obj = GetWingmanInfo(code);
+                    break;
+                case EEntityType.Bullet:
+                    obj = GetBulletInfo(code);
                     break;
 
             }

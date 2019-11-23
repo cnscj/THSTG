@@ -6,9 +6,13 @@ namespace STGU3D
 {
     public class EliminateExecuteSystem : IExecuteSystem
     {
+        private IGroup<GameEntity> __eliminateGroup;
         public EliminateExecuteSystem(Contexts contexts)
         {
-
+            __eliminateGroup = Contexts.sharedInstance.game.GetGroup(
+               GameMatcher.AllOf(
+                    GameMatcher.Eliminate
+               ));
         }
 
         public void StartElinate()
@@ -23,13 +27,7 @@ namespace STGU3D
 
         public void Execute()
         {
-            //移动
-            var eliminateGroup = Contexts.sharedInstance.game.GetGroup(
-                GameMatcher.AllOf(
-                     GameMatcher.Eliminate
-                ));
-
-            foreach (var entity in eliminateGroup.GetEntities())
+            foreach (var entity in __eliminateGroup.GetEntities())
             {
                 if (entity.eliminate.isEliminating)
                 {

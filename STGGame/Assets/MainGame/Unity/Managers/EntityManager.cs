@@ -82,6 +82,7 @@ namespace STGU3D
             return entity;
         }
 
+        //单独处理独特组件
         public GameEntity CreateEntity(string code)
         {
             var entity = CreateGameEntity(code);
@@ -105,8 +106,8 @@ namespace STGU3D
                 {
                     entity.view.viewCode = playerDataCom.modelCode;
 
-                    healthCom.maxHealth = playerDataCom.life;
-                    healthCom.maxArmor = playerDataCom.armor;
+                    healthCom.maxBlood = playerDataCom.life;
+                    //healthCom.maxArmor = playerDataCom.armor;
                 }
             }
             else if(entityType == EEntityType.Mob)
@@ -122,12 +123,31 @@ namespace STGU3D
                 }
 
             }
+            else if (entityType == EEntityType.Bullet)
+            {
+                var healthCom = entity.CreateComponent<HealthComponent>(GameComponentsLookup.Health);
+                entity.AddComponent(GameComponentsLookup.Health, healthCom);
+
+                if(entity.hasEntityData)
+                { 
+                    //TODO:
+                    entity.view.viewCode = entity.entityData.entityData["viewCode"].ToString();
+                    entity.movement.moveSpeed.y = 10f;
+                    ViewSystemHelper.TryCreateView(entity);
+                }
+
+            }
             return entity;
+        }
+
+        private void Entity_OnComponentAdded(IEntity entity, int index, IComponent component)
+        {
+            throw new NotImplementedException();
         }
 
         public GameEntity CreateHero(EHeroType type, EPlayerType playerType = EPlayerType.Player01)
         {
-            string code = string.Format("{0}", 10000000 + 100000 * (int)EEntityType.Hero + (int)type * 1000 + 1) ;
+            string code = string.Format("{0}", 10000000 + 100000 * (int)EEntityType.Hero + 1000 * (int)type + 1);
             var entity = CreateEntity(code);
 
             var playerDataCom = entity.GetComponent(GameComponentsLookup.PlayerData) as PlayerDataComponent;
@@ -138,16 +158,26 @@ namespace STGU3D
             return entity;
         }
 
-        //public GameEntity CreateBullet()
-        //{
-        //    var entity = CreateGameEntity(code);
+        public GameEntity CreateBullet(ECampType campType, EBulletType bulletType, EColorType colorType = EColorType.Unknow)
+        {
+            string code = string.Format("{0}", 10000000 + 100000 * (int)EEntityType.Bullet + 100 * (int)bulletType + (int)colorType);
+            var entity = CreateEntity(code);
 
-        //    return entity;
-        //}
+            if (campType == ECampType.Hero)
+            {
+                var heroBulletFlagCom = entity.CreateComponent<HeroBulletFlagComponent>(GameComponentsLookup.HeroBulletFlag);
+                entity.AddComponent(GameComponentsLookup.HeroBulletFlag, heroBulletFlagCom);
+            }
+            else if (campType == ECampType.Entity)
+            {
+                var entityBulletFlagCom = entity.CreateComponent<EntityBulletFlagComponent>(GameComponentsLookup.EntityBulletFlag);
+                entity.AddComponent(GameComponentsLookup.EntityBulletFlag, entityBulletFlagCom);
+            }
 
+            return entity;
+        }
 
-
-
+        //Data处理
         private void AddEntityDataComponent(GameEntity entity, string code)
         {
             EEntityType type = EntityUtil.GetEntityTypeByCode(code);
@@ -166,11 +196,12 @@ namespace STGU3D
                         var heroType = EntityUtil.GetHeroTypeByCode(code);
                         playerDataCom.heroType = heroType;
                         playerDataCom.life = infos["life"].ToInt();
+                        playerDataCom.blood = infos["blood"].ToInt();
                         playerDataCom.armor = infos["armor"].ToInt();
                         playerDataCom.bomb = infos["bomb"].ToInt();
                         playerDataCom.speed = infos["speed"].ToFloat();
 
-                        playerDataCom.modelCode = infos["modelCode"];
+                        playerDataCom.modelCode = infos["viewCode"];
                         playerDataCom.bulletCode = infos["bulletCode"];
                         playerDataCom.wingmanCode = infos["wingmanCode"];
 

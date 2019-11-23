@@ -6,21 +6,28 @@ namespace STGU3D
 {
     public class ViewExecuteSystem : IExecuteSystem
     {
+        private IGroup<GameEntity> __moveGroup;
+        private IGroup<GameEntity> __moveAnimGroup;
         public ViewExecuteSystem(Contexts contexts)
         {
+            __moveGroup = Contexts.sharedInstance.game.GetGroup(
+               GameMatcher.AllOf(
+                    GameMatcher.View,
+                    GameMatcher.Transform
+               ));
 
+            __moveAnimGroup = Contexts.sharedInstance.game.GetGroup(
+                GameMatcher.AllOf(
+                     GameMatcher.View,
+                     GameMatcher.Transform,
+                     GameMatcher.Movement
+                ));
         }
 
         public void Execute()
         {
             //移动
-            var moveGroup = Contexts.sharedInstance.game.GetGroup(
-                GameMatcher.AllOf(
-                     GameMatcher.View,
-                     GameMatcher.Transform
-                ));
-
-            foreach (var entity in moveGroup.GetEntities())
+            foreach (var entity in __moveGroup.GetEntities())
             {
                 if (entity.view.viewGO)
                 {
@@ -30,13 +37,8 @@ namespace STGU3D
             }
 
             //移动动画
-            var moveAnimGroup = Contexts.sharedInstance.game.GetGroup(
-                GameMatcher.AllOf(
-                     GameMatcher.View,
-                     GameMatcher.Transform,
-                     GameMatcher.Movement
-                ));
-            foreach (var entity in moveAnimGroup.GetEntities())
+
+            foreach (var entity in __moveAnimGroup.GetEntities())
             {
                 if (entity.view.animator)
                 {

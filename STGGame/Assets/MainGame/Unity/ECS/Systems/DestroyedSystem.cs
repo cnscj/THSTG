@@ -6,57 +6,65 @@ namespace STGU3D
 {
     public class DestroyedSystem : ICleanupSystem
     {
+        private IGroup<GameEntity> __destroyedGroup;
+        private IGroup<GameEntity> __viewGroup;
+        private IGroup<GameEntity> __heroBulletGroup;
+        private IGroup<GameEntity> __entityBulletGroup;
         public DestroyedSystem(Contexts contexts)
         {
+            __destroyedGroup = Contexts.sharedInstance.game.GetGroup(
+                GameMatcher.AllOf(
+                     GameMatcher.Destroyed
+             ));
+
+            __viewGroup = Contexts.sharedInstance.game.GetGroup(
+                GameMatcher.AllOf(
+                     GameMatcher.Destroyed,
+                     GameMatcher.View
+             ));
+
+            __heroBulletGroup = Contexts.sharedInstance.game.GetGroup(
+                GameMatcher.AllOf(
+                     GameMatcher.Destroyed,
+                     GameMatcher.HeroBulletFlag
+            ));
+
+            __entityBulletGroup = Contexts.sharedInstance.game.GetGroup(
+                GameMatcher.AllOf(
+                     GameMatcher.Destroyed,
+                     GameMatcher.EntityBulletFlag
+            ));
 
         }
 
         public void Cleanup()
         {
 
-            var viewGroup = Contexts.sharedInstance.game.GetGroup(
-                GameMatcher.AllOf(
-                     GameMatcher.Destroyed,
-                     GameMatcher.View
-                ));
 
-            foreach (var entity in viewGroup.GetEntities())
+
+            foreach (var entity in __viewGroup.GetEntities())
             {
                 //移除View
                 GameObject.Destroy(entity.view.viewGO);
             }
 
-            var heroBulletGroup = Contexts.sharedInstance.game.GetGroup(
-                GameMatcher.AllOf(
-                     GameMatcher.Destroyed,
-                     GameMatcher.HeroBulletFlag
-                ));
 
-            foreach (var entity in heroBulletGroup.GetEntities())
+
+            foreach (var entity in __heroBulletGroup.GetEntities())
             {
 
 
             }
 
-            var entityBulletGroup = Contexts.sharedInstance.game.GetGroup(
-                GameMatcher.AllOf(
-                     GameMatcher.Destroyed,
-                     GameMatcher.EntityBulletFlag
-                ));
 
-            foreach (var entity in entityBulletGroup.GetEntities())
+            foreach (var entity in __entityBulletGroup.GetEntities())
             {
 
 
             }
 
             //处理完,移除所有消耗组件
-            var destroyGroup = Contexts.sharedInstance.game.GetGroup(
-                GameMatcher.AllOf(
-                     GameMatcher.Destroyed
-                ));
-
-            foreach (var entity in viewGroup.GetEntities())
+            foreach (var entity in __destroyedGroup.GetEntities())
             {
                 entity.RemoveComponent(GameComponentsLookup.Destroyed);
             }

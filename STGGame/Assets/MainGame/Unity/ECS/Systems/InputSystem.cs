@@ -7,39 +7,60 @@ namespace STGU3D
 {
     public class InputSystem : IExecuteSystem
     {
-
+        private IGroup<GameEntity> __moveGroup;
+        private IGroup<GameEntity> __fireGroup;
+        private IGroup<GameEntity> __bombGroup;
+        private IGroup<GameEntity> __eliminateGroup;
 
         public InputSystem(Contexts contexts)
         {
-
-        }
-
-        public void Execute()
-        {
-            var moveGroup = Contexts.sharedInstance.game.GetGroup(
+            __moveGroup = Contexts.sharedInstance.game.GetGroup(
                 GameMatcher.AllOf(
                      GameMatcher.PlayerData,
                      GameMatcher.Movement
                 ));
 
-            foreach (var entity in moveGroup.GetEntities())
+            __fireGroup = Contexts.sharedInstance.game.GetGroup(
+                GameMatcher.AllOf(
+                     GameMatcher.PlayerData,
+                     GameMatcher.Shot
+                ));
+
+            __bombGroup = Contexts.sharedInstance.game.GetGroup(
+                GameMatcher.AllOf(
+                     GameMatcher.PlayerData,
+                     GameMatcher.Bomb
+                ));
+
+            __eliminateGroup = Contexts.sharedInstance.game.GetGroup(
+                GameMatcher.AllOf(
+                     GameMatcher.PlayerData,
+                     GameMatcher.Eliminate
+                ));
+
+        }
+
+        public void Execute()
+        {
+            //移动
+            foreach (var entity in __moveGroup.GetEntities())
             {
                 Vector3 newMoveSpeed = Vector3.zero;
                 Vector3 moveDirection = Vector3.zero;
-                if (InputMapper.GetInstance().IsAtBehaviour((int)EPlayerBehavior.MoveLeft))
+                if (InputMapper.GetInstance().IsAtBehaviour((int)EBehaviorType.MoveLeft))
                 {
                     moveDirection += Vector3.left;
                 }
-                else if (InputMapper.GetInstance().IsAtBehaviour((int)EPlayerBehavior.MoveRight))
+                else if (InputMapper.GetInstance().IsAtBehaviour((int)EBehaviorType.MoveRight))
                 {
                     moveDirection += Vector3.right;
                 }
 
-                if (InputMapper.GetInstance().IsAtBehaviour((int)EPlayerBehavior.MoveUp))
+                if (InputMapper.GetInstance().IsAtBehaviour((int)EBehaviorType.MoveUp))
                 {
                     moveDirection += Vector3.up;
                 }
-                else if (InputMapper.GetInstance().IsAtBehaviour((int)EPlayerBehavior.MoveDown))
+                else if (InputMapper.GetInstance().IsAtBehaviour((int)EBehaviorType.MoveDown))
                 {
                     moveDirection += Vector3.down;
                 }
@@ -49,16 +70,10 @@ namespace STGU3D
             }
 
             //开火
-            var fireGroup = Contexts.sharedInstance.game.GetGroup(
-                GameMatcher.AllOf(
-                     GameMatcher.PlayerData,
-                     GameMatcher.Shot
-                ));
-
-            foreach (var entity in fireGroup.GetEntities())
+            foreach (var entity in __fireGroup.GetEntities())
             {
                 bool isFire = false;
-                if (InputMapper.GetInstance().IsAtBehaviour((int)EPlayerBehavior.Attack))
+                if (InputMapper.GetInstance().IsAtBehaviour((int)EBehaviorType.Attack))
                 {
                     isFire = true;
                 }
@@ -72,17 +87,10 @@ namespace STGU3D
                 }
             }
 
-
-            //丢B
-            var bombGroup = Contexts.sharedInstance.game.GetGroup(
-                GameMatcher.AllOf(
-                     GameMatcher.PlayerData,
-                     GameMatcher.Bomb
-                ));
-
-            foreach (var entity in bombGroup.GetEntities())
+            //Bomb
+            foreach (var entity in __bombGroup.GetEntities())
             {
-                if (InputMapper.GetInstance().IsAtBehaviour((int)EPlayerBehavior.Bomb))
+                if (InputMapper.GetInstance().IsAtBehaviour((int)EBehaviorType.Bomb))
                 {
                     var bombCom = entity.GetComponent(GameComponentsLookup.Bomb) as BombComponent;
                     bombCom.isBombing = true;
@@ -91,17 +99,11 @@ namespace STGU3D
                 }
             }
 
-            //丢B
-            var eliminateGroup = Contexts.sharedInstance.game.GetGroup(
-                GameMatcher.AllOf(
-                     GameMatcher.PlayerData,
-                     GameMatcher.Eliminate
-                ));
-
-            foreach (var entity in eliminateGroup.GetEntities())
+            //消弹
+            foreach (var entity in __eliminateGroup.GetEntities())
             {
                 bool isEliminate = false;
-                if (InputMapper.GetInstance().IsAtBehaviour((int)EPlayerBehavior.Eliminate))
+                if (InputMapper.GetInstance().IsAtBehaviour((int)EBehaviorType.Eliminate))
                 {
                     isEliminate = true;
                 }
