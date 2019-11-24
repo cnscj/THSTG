@@ -27,7 +27,10 @@ namespace STGU3D
             // 满足GetTrigger和Filter的实体保存在entities列表里
             foreach (var e in entities)
             {
-                e.ReplaceTransform(e.transform.position + e.movement.moveSpeed * Time.deltaTime, e.transform.rotation + e.movement.rotationSpeed * Time.deltaTime);
+                e.transform.position = e.transform.position + e.movement.moveSpeed * Time.deltaTime;
+                e.transform.rotation = e.transform.rotation + e.movement.rotationSpeed * Time.deltaTime;
+
+                e.ReplaceComponent(GameComponentsLookup.Transform,e.transform);
             }
         }
     }

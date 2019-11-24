@@ -81,7 +81,7 @@ namespace XLibGame
         /// <typeparam name="T">对象池类型</typeparam>
         /// <param name="poolName">对象池名称，唯一id</param>
         /// <returns>对象池对象</returns>
-        public GameObjectPool NewGameObjectPool(string poolName, GameObject prefab , int defaultCount = 0)
+        public GameObjectPool NewGameObjectPool(string poolName, GameObject prefab, int maxCount = 20,int defaultCount = 0)
         {
             if (string.IsNullOrEmpty(poolName))
             {
@@ -99,6 +99,7 @@ namespace XLibGame
             {
                 pool.poolName = poolName;
                 pool.prefab = prefab;
+                pool.maxCount = maxCount;
                 pool.defaultCount = defaultCount;
                 obj.transform.SetParent(m_parentTrans);
                 if (m_isInit)
@@ -167,6 +168,16 @@ namespace XLibGame
         }
 
         /// <summary>
+        /// 是否存在对象池
+        /// </summary>
+        /// <param name="poolName"></param>
+        /// <returns></returns>
+        public bool HasGameObjectPool(string poolName)
+        {
+            return m_poolDic.ContainsKey(poolName);
+        }
+
+        /// <summary>
         /// 从对象池中取出新的对象
         /// </summary>
         /// <param name="poolName">对象池名称</param>
@@ -186,11 +197,32 @@ namespace XLibGame
         /// </summary>
         /// <param name="poolName">对象池名称</param>
         /// <param name="go">对象</param>
-        public void ReleaseGameObject(string poolName, GameObject go)
+        public void ReleaseGameObject(GameObjectPoolObject poolObj)
         {
+            if (!poolObj)
+                return;
+
+            string poolName = poolObj.poolName;
             if (m_poolDic.ContainsKey(poolName))
             {
-                m_poolDic[poolName].Release(go);
+                m_poolDic[poolName].Release(poolObj.gameObject);
+            }
+        }
+
+        /// <summary>
+        /// 将对象存入对象池中
+        /// </summary>
+        /// <param name="poolName">对象池名称</param>
+        /// <param name="go">对象</param>
+        public void ReleaseGameObject(GameObject go)
+        {
+            if (go == null)
+                return;
+
+            var gameObjectPoolObjectCom = go.GetComponent<GameObjectPoolObject>();
+            if (gameObjectPoolObjectCom)
+            {
+                ReleaseGameObject(gameObjectPoolObjectCom);
             }
             else
             {

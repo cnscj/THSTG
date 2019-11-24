@@ -29,6 +29,7 @@ namespace STGU3D
             //移动
             foreach (var entity in __moveGroup.GetEntities())
             {
+                //存在1帧的延误
                 if (entity.view.viewGO)
                 {
                     entity.view.viewGO.transform.localPosition = entity.transform.position;

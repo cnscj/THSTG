@@ -65,7 +65,7 @@ namespace STGU3D
                     moveDirection += Vector3.down;
                 }
 
-                newMoveSpeed = moveDirection * entity.playerData.speed;
+                newMoveSpeed = moveDirection * entity.playerData.moveSpeed;
                 entity.ReplaceMovement(newMoveSpeed, entity.movement.rotationSpeed);
             }
 

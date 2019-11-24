@@ -42,7 +42,7 @@ namespace XLibGame
         public void Release()
         {
             //将对象加入对象池
-            GameObjectPoolManager.GetInstance().ReleaseGameObject(poolName, gameObject);
+            GameObjectPoolManager.GetInstance().ReleaseGameObject(this);
         }
     }
 

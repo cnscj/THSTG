@@ -12,13 +12,16 @@ namespace STGU3D
             __healthGroup = Contexts.sharedInstance.game.GetGroup(
                 GameMatcher.AllOf(
                      GameMatcher.Health
-                ));
+            ));
         }
 
         public void Die(GameEntity entity)
         {
+            Debug.Log("死了");
             entity.health.isTrueDied = true;
             //发送死亡消息
+            //死亡特效啥的
+            //TODO:不同类型死亡效果不一
         }
 
         public void Execute()

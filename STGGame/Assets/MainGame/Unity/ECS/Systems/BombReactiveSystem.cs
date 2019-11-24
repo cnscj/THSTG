@@ -23,25 +23,39 @@ namespace STGU3D
             return entity.hasBomb;
         }
 
+        public void Bome(GameEntity entity)
+        {
+            Debug.Log("Bomb");
+            //决死Time消耗2颗Bomb,不够则无效Bomb
+            if (entity.hasHealth)
+            {
+                if (entity.health.blood <=0 && !entity.health.isTrueDied)
+                {
+                    //决死复活
+                    entity.health.blood = entity.health.maxBlood;
+                    entity.ReplaceComponent(GameComponentsLookup.Health, entity.health);
+                }
+            }
+            entity.bomb.times--;
+        }
+
         protected override void Execute(List<GameEntity> entities)
         {
             foreach (var entity in entities)
             {
-                if (entity.bomb.isBombing)
+                if (entity.bomb.times > 0)
                 {
-                    if (entity.bomb.nextBombTime <= Time.fixedTime)
+                    if (entity.bomb.isBombing)
                     {
-                        Bome(entity);
-                        entity.bomb.nextBombTime = Time.fixedTime + entity.bomb.cdTime;
+                        if (entity.bomb.nextBombTime <= Time.fixedTime)
+                        {
+                            Bome(entity);
+                            entity.bomb.nextBombTime = Time.fixedTime + entity.bomb.cdTime;
+                        }
                     }
-                    entity.bomb.isBombing = false;
                 }
+                entity.bomb.isBombing = false;
             }
-        }
-
-        public void Bome(GameEntity entity)
-        {
-            Debug.Log("Bomb");
         }
     }
 }

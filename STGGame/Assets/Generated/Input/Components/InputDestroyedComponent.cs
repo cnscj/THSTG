@@ -11,17 +11,19 @@ public partial class InputEntity {
     public STGU3D.DestroyedComponent destroyed { get { return (STGU3D.DestroyedComponent)GetComponent(InputComponentsLookup.Destroyed); } }
     public bool hasDestroyed { get { return HasComponent(InputComponentsLookup.Destroyed); } }
 
-    public void AddDestroyed(int newCode) {
+    public void AddDestroyed(int newCode, bool newIsDestroyed) {
         var index = InputComponentsLookup.Destroyed;
         var component = (STGU3D.DestroyedComponent)CreateComponent(index, typeof(STGU3D.DestroyedComponent));
         component.code = newCode;
+        component.isDestroyed = newIsDestroyed;
         AddComponent(index, component);
     }
 
-    public void ReplaceDestroyed(int newCode) {
+    public void ReplaceDestroyed(int newCode, bool newIsDestroyed) {
         var index = InputComponentsLookup.Destroyed;
         var component = (STGU3D.DestroyedComponent)CreateComponent(index, typeof(STGU3D.DestroyedComponent));
         component.code = newCode;
+        component.isDestroyed = newIsDestroyed;
         ReplaceComponent(index, component);
     }
 

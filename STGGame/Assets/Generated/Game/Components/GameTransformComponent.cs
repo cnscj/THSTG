@@ -11,17 +11,19 @@ public partial class GameEntity {
     public STGU3D.TransformComponent transform { get { return (STGU3D.TransformComponent)GetComponent(GameComponentsLookup.Transform); } }
     public bool hasTransform { get { return HasComponent(GameComponentsLookup.Transform); } }
 
-    public void AddTransform(UnityEngine.Vector3 newPosition, UnityEngine.Vector3 newRotation) {
+    public void AddTransform(STGU3D.TransformComponent newParent, UnityEngine.Vector3 newPosition, UnityEngine.Vector3 newRotation) {
         var index = GameComponentsLookup.Transform;
         var component = (STGU3D.TransformComponent)CreateComponent(index, typeof(STGU3D.TransformComponent));
+        component.parent = newParent;
         component.position = newPosition;
         component.rotation = newRotation;
         AddComponent(index, component);
     }
 
-    public void ReplaceTransform(UnityEngine.Vector3 newPosition, UnityEngine.Vector3 newRotation) {
+    public void ReplaceTransform(STGU3D.TransformComponent newParent, UnityEngine.Vector3 newPosition, UnityEngine.Vector3 newRotation) {
         var index = GameComponentsLookup.Transform;
         var component = (STGU3D.TransformComponent)CreateComponent(index, typeof(STGU3D.TransformComponent));
+        component.parent = newParent;
         component.position = newPosition;
         component.rotation = newRotation;
         ReplaceComponent(index, component);

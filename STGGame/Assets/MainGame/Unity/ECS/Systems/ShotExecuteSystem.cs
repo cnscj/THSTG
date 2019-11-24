@@ -18,10 +18,10 @@ namespace STGU3D
 
         private void Shot(GameEntity entity)
         {
-            Debug.Log("fire!!!");
-            //生成子弹实体
-            EntityManager.GetInstance().CreateBullet(ECampType.Hero, EBulletType.AmuletRed);
-
+            //应该根据
+            var bulletEntity = entity.shot.action?.Invoke(entity);
+            
+           
         }
 
         public void Execute()

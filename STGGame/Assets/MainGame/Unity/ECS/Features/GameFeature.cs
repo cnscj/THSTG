@@ -7,8 +7,8 @@ namespace STGU3D
         public GameFeature(Contexts contexts)
         {
             Add(new MovementSystem(contexts));
-            //Add(new TransformSystem(contexts));
-            Add(new ViewInitializeSystem(contexts));
+            Add(new TransformSystem(contexts));
+
             Add(new ViewReactiveSystem(contexts));
             Add(new ViewExecuteSystem(contexts));
 
@@ -18,6 +18,8 @@ namespace STGU3D
 
             Add(new HealthReactiveSystem(contexts));
             Add(new HealthExecuteSystem(contexts));
+
+            Add(new RecycleSystem(contexts));
 
             Add(new DestroyedSystem(contexts));
         }

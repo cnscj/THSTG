@@ -1,4 +1,5 @@
-﻿using Entitas;
+﻿using System;
+using Entitas;
 using UnityEngine;
 
 namespace STGU3D
@@ -6,11 +7,11 @@ namespace STGU3D
     [Game]
     public class ShotComponent : IComponent
     {
-        public GameObject bullet;           //子弹实体
-        public float interval = 0.3f;       //射击间隔
+        public Func<GameEntity, GameEntity> action;             //实体创建函数
+        public float interval = 0.3f;               //射击间隔
 
-        public float nextFireTime;          //下次开火时间
+        public float nextFireTime;                  //下次开火时间
 
-        public bool isFiring = false;         //开火状态
+        public bool isFiring = false;               //开火状态
     }
 }

@@ -18,7 +18,7 @@ namespace XLibGame
         /// <summary>
         /// 对象池中存放最大数量
         /// </summary>
-        public int maxCount = 50;
+        public int maxCount = 20;
         /// <summary>
         /// 默认初始容量
         /// </summary>
@@ -180,9 +180,12 @@ namespace XLibGame
         /// </summary>
         private void OnDestroy()
         {
-            if (GameObjectPoolManager.GetInstance().GetGameObjectPool(poolName))
+            if (GameObjectPoolManager.GetInstance())
             {
-                GameObjectPoolManager.GetInstance().DestroyGameObjectPool(poolName);
+                if (GameObjectPoolManager.GetInstance().GetGameObjectPool(poolName))
+                {
+                    GameObjectPoolManager.GetInstance().DestroyGameObjectPool(poolName);
+                }
             }
         }
     }

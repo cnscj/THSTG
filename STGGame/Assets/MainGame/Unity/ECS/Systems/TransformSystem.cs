@@ -26,7 +26,11 @@ namespace STGU3D
         {
             foreach (var e in entities)
             {
-                
+                if (e.transform.parent != null)
+                {
+                    e.transform.position = e.transform.parent.position + e.transform.position;
+                    e.transform.rotation = e.transform.parent.rotation + e.transform.rotation;
+                }
             }
         }
     }

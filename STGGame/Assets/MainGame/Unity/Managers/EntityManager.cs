@@ -6,6 +6,7 @@ using XLibrary.Package;
 using THGame;
 using Entitas;
 using XLibrary;
+using XLibGame;
 
 namespace STGU3D
 {
@@ -67,6 +68,62 @@ namespace STGU3D
             __systems.TearDown();
         }
         ///////////////////////
+        public GameObject NewViewNode(bool usePool, string viewCode, Vector3 position,Vector3 rotation)
+        {
+            string viewName = null;
+            GameObject viewGO = null;
+            GameObject prefabInstance = null;
+            if (usePool)
+            {
+                if (!GameObjectPoolManager.GetInstance().HasGameObjectPool(viewCode))
+                {
+                    var prefab = AssetManager.GetInstance().LoadSprite(viewCode);
+                    if (prefab)
+                    {
+                        GameObjectPoolManager.GetInstance().NewGameObjectPool(viewCode, prefab);
+                    }
+                }
+                prefabInstance = GameObjectPoolManager.GetInstance().GetGameObject(viewCode);
+            }
+            else
+            {
+                var prefab = AssetManager.GetInstance().LoadSprite(viewCode);
+                if (prefab)
+                {
+                    prefabInstance = GameObject.Instantiate(prefab);
+                }
+            }
+          
+            
+            if (!string.IsNullOrEmpty(viewName))
+            {
+                viewGO = new GameObject(viewName);
+                prefabInstance.transform.SetParent(viewGO.transform);
+            }
+            else
+            {
+                viewGO = prefabInstance;
+            }
+
+            viewGO.transform.localPosition = position;
+            viewGO.transform.localEulerAngles = rotation;
+
+            return viewGO;
+        }
+
+        ///////////////////////
+        public void DestroyEntity(GameEntity entity)
+        {
+            if (entity.hasDestroyed)
+            {
+                entity.destroyed.isDestroyed = true;
+            }
+            else
+            {
+                entity.Destroy();
+            }
+        }
+
         public GameEntity CreateEmptyEntity()
         {
             var entity = __contexts.game.CreateEntity();
@@ -101,13 +158,26 @@ namespace STGU3D
                 entity.AddComponent(GameComponentsLookup.Health, healthCom);
                 entity.AddComponent(GameComponentsLookup.BoundaryLimitation, boundaryLimitationCom);
 
-                var playerDataCom = entity.GetComponent(GameComponentsLookup.PlayerData) as PlayerDataComponent;
-                if (playerDataCom != null)
+                if (entity.hasEntityData)
                 {
-                    entity.view.viewCode = playerDataCom.modelCode;
+                    //根据
+                    shotCom.action = (shotEntity) =>
+                    {
+                        //TODO:这里应该根据情况选择子弹
+                        var bulletEntity = EntityManager.GetInstance().CreateBullet(ECampType.Hero, EBulletType.AmuletRed);
+                        bulletEntity.transform.position = shotEntity.transform.position;            //在自机处生成
+                        bulletEntity.view.viewGO.transform.position = shotEntity.transform.position;//覆盖第一帧刷新
 
-                    healthCom.maxBlood = playerDataCom.life;
-                    //healthCom.maxArmor = playerDataCom.armor;
+
+                        return bulletEntity;
+                    };
+                   
+                    entity.view.viewGO = NewViewNode(false, entity.entityData.entityData["viewCode"],entity.transform.position, entity.transform.rotation);
+                    entity.view.renderer = entity.view.viewGO.GetComponentInChildren<Renderer>();
+                    entity.view.animator = entity.view.viewGO.GetComponentInChildren<Animator>();
+
+                    entity.playerData.moveSpeed = entity.entityData.entityData["speed"].ToFloat();
+                    healthCom.maxBlood = entity.entityData.entityData["blood"].ToInt();
                 }
             }
             else if(entityType == EEntityType.Mob)
@@ -126,17 +196,34 @@ namespace STGU3D
             else if (entityType == EEntityType.Bullet)
             {
                 var healthCom = entity.CreateComponent<HealthComponent>(GameComponentsLookup.Health);
-                entity.AddComponent(GameComponentsLookup.Health, healthCom);
+                var recycleCom = entity.CreateComponent<RecycleComponent>(GameComponentsLookup.Recycle);
 
-                if(entity.hasEntityData)
-                { 
+                {
+                    Vector3 v3 = Camera.main.ScreenToWorldPoint(Vector3.zero);
+                    var winSize = new Vector2(Mathf.Abs(v3.x) * 2, Mathf.Abs(v3.y) * 2);
+                    var pixelPerPot = winSize.x / Screen.width;
+
+                    recycleCom.stayTime = 0f;
+                    recycleCom.isRecycled = false;
+                    //用的是左下角为起点
+                    recycleCom.boundary = new Rect(-pixelPerPot * Screen.width * 0.5f,- pixelPerPot * Screen.height * 0.5f, pixelPerPot * Screen.width, pixelPerPot * Screen.height);
+                }
+
+                entity.AddComponent(GameComponentsLookup.Health, healthCom);
+                entity.AddComponent(GameComponentsLookup.Recycle, recycleCom);
+
+                if (entity.hasEntityData)
+                {
                     //TODO:
-                    entity.view.viewCode = entity.entityData.entityData["viewCode"].ToString();
-                    entity.movement.moveSpeed.y = 10f;
-                    ViewSystemHelper.TryCreateView(entity);
+                    entity.transform.rotation.z = 90;
+                    entity.movement.moveSpeed.y = 8f;
+                    entity.view.viewGO = NewViewNode(true, entity.entityData.entityData["viewCode"], entity.transform.position, entity.transform.rotation);
+                    entity.view.renderer = entity.view.viewGO.GetComponentInChildren<Renderer>();
+                    entity.view.animator = entity.view.viewGO.GetComponentInChildren<Animator>();
                 }
 
             }
+
             return entity;
         }
 
@@ -158,9 +245,8 @@ namespace STGU3D
             return entity;
         }
 
-        public GameEntity CreateBullet(ECampType campType, EBulletType bulletType, EColorType colorType = EColorType.Unknow)
+        public GameEntity CreateBullet(ECampType campType, string code)
         {
-            string code = string.Format("{0}", 10000000 + 100000 * (int)EEntityType.Bullet + 100 * (int)bulletType + (int)colorType);
             var entity = CreateEntity(code);
 
             if (campType == ECampType.Hero)
@@ -176,6 +262,13 @@ namespace STGU3D
 
             return entity;
         }
+
+        public GameEntity CreateBullet(ECampType campType, EBulletType bulletType, EColorType colorType = EColorType.Unknow)
+        {
+            string code = string.Format("{0}", 10000000 + 100000 * (int)EEntityType.Bullet + 100 * (int)bulletType + (int)colorType);
+            return CreateBullet(campType, code);
+        }
+
 
         //Data处理
         private void AddEntityDataComponent(GameEntity entity, string code)
@@ -195,15 +288,6 @@ namespace STGU3D
                         var playerDataCom = entity.CreateComponent<PlayerDataComponent>(GameComponentsLookup.PlayerData);
                         var heroType = EntityUtil.GetHeroTypeByCode(code);
                         playerDataCom.heroType = heroType;
-                        playerDataCom.life = infos["life"].ToInt();
-                        playerDataCom.blood = infos["blood"].ToInt();
-                        playerDataCom.armor = infos["armor"].ToInt();
-                        playerDataCom.bomb = infos["bomb"].ToInt();
-                        playerDataCom.speed = infos["speed"].ToFloat();
-
-                        playerDataCom.modelCode = infos["viewCode"];
-                        playerDataCom.bulletCode = infos["bulletCode"];
-                        playerDataCom.wingmanCode = infos["wingmanCode"];
 
                         entity.AddComponent(GameComponentsLookup.PlayerData, playerDataCom);
                         break;
@@ -237,13 +321,27 @@ namespace STGU3D
 
         private void AddCommonComponent(GameEntity entity)
         {
+            //XXX:用这个法子创建的组件是复用原有的,因此必须手动初始化下
+            var transCom = entity.CreateComponent<TransformComponent>(GameComponentsLookup.Transform);
             var movementCom = entity.CreateComponent<MovementComponent>(GameComponentsLookup.Movement);
             var viewCom = entity.CreateComponent<ViewComponent>(GameComponentsLookup.View);
-            var transCom = entity.CreateComponent<TransformComponent>(GameComponentsLookup.Transform);
+            var destroyCom = entity.CreateComponent<DestroyedComponent>(GameComponentsLookup.Destroyed);
 
+            ////
+            transCom.position = Vector3.zero;
+            transCom.rotation = Vector3.zero;
+
+            movementCom.moveSpeed = Vector3.zero;
+            movementCom.rotationSpeed = Vector3.zero;
+
+            viewCom.animator = null;
+            viewCom.renderer = null;
+            viewCom.viewGO = null;
+            ////
             entity.AddComponent(GameComponentsLookup.Transform, transCom);
             entity.AddComponent(GameComponentsLookup.Movement, movementCom);
             entity.AddComponent(GameComponentsLookup.View, viewCom);
+            entity.AddComponent(GameComponentsLookup.Destroyed, destroyCom);
         }
 
 

@@ -11,17 +11,19 @@ public partial class UIEntity {
     public STGU3D.DestroyedComponent destroyed { get { return (STGU3D.DestroyedComponent)GetComponent(UIComponentsLookup.Destroyed); } }
     public bool hasDestroyed { get { return HasComponent(UIComponentsLookup.Destroyed); } }
 
-    public void AddDestroyed(int newCode) {
+    public void AddDestroyed(int newCode, bool newIsDestroyed) {
         var index = UIComponentsLookup.Destroyed;
         var component = (STGU3D.DestroyedComponent)CreateComponent(index, typeof(STGU3D.DestroyedComponent));
         component.code = newCode;
+        component.isDestroyed = newIsDestroyed;
         AddComponent(index, component);
     }
 
-    public void ReplaceDestroyed(int newCode) {
+    public void ReplaceDestroyed(int newCode, bool newIsDestroyed) {
         var index = UIComponentsLookup.Destroyed;
         var component = (STGU3D.DestroyedComponent)CreateComponent(index, typeof(STGU3D.DestroyedComponent));
         component.code = newCode;
+        component.isDestroyed = newIsDestroyed;
         ReplaceComponent(index, component);
     }
 

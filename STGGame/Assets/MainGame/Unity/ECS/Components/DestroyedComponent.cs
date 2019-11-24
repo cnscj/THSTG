@@ -6,5 +6,6 @@ namespace STGU3D
     public class DestroyedComponent : IComponent
     {
         public int code;
+        public bool isDestroyed;
     }
 }

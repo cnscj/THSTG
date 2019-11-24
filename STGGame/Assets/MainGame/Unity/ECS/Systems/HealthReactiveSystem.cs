@@ -25,6 +25,7 @@ namespace STGU3D
         
         public void DyingRevive(GameEntity entity)
         {
+            Debug.Log("决死复活-不会消耗生命值?");
             entity.health.isTrueDied = false;
             entity.health.trueDeathTime = -1f;
         }
@@ -32,6 +33,7 @@ namespace STGU3D
         public void Revive(GameEntity entity)
         {
             //复活
+            Debug.Log("复活");
             DyingRevive(entity);
             entity.health.life--;
         }
@@ -39,6 +41,7 @@ namespace STGU3D
         public void Dying(GameEntity entity)
         {
             //将死
+            Debug.Log("快要死了");
             entity.health.blood = 0;
             entity.health.trueDeathTime = Time.fixedTime + entity.health.maxNearDeathTime;
         }

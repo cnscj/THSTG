@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Entitas;
 using UnityEngine;
+using XLibGame;
 
 namespace STGU3D
 {
@@ -40,33 +41,40 @@ namespace STGU3D
         public void Cleanup()
         {
 
-
-
             foreach (var entity in __viewGroup.GetEntities())
             {
                 //移除View
-                GameObject.Destroy(entity.view.viewGO);
+                if (!entity.destroyed.isDestroyed)
+                    continue;
+
+                GameObjectPoolManager.GetInstance().ReleaseGameObject(entity.view.viewGO);
             }
 
 
 
             foreach (var entity in __heroBulletGroup.GetEntities())
             {
-
+                if (!entity.destroyed.isDestroyed)
+                    continue;
 
             }
 
 
             foreach (var entity in __entityBulletGroup.GetEntities())
             {
-
+                if (!entity.destroyed.isDestroyed)
+                    continue;
 
             }
 
             //处理完,移除所有消耗组件
             foreach (var entity in __destroyedGroup.GetEntities())
             {
-                entity.RemoveComponent(GameComponentsLookup.Destroyed);
+                if (!entity.destroyed.isDestroyed)
+                    continue;
+
+                entity.destroyed.isDestroyed = false;
+                entity.Destroy();
             }
         }
     }
