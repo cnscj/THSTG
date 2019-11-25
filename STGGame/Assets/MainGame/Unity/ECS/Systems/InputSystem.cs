@@ -11,6 +11,7 @@ namespace STGU3D
         private IGroup<GameEntity> __fireGroup;
         private IGroup<GameEntity> __bombGroup;
         private IGroup<GameEntity> __eliminateGroup;
+        private IGroup<GameEntity> __decelerateGroup;
 
         public InputSystem(Contexts contexts)
         {
@@ -38,10 +39,31 @@ namespace STGU3D
                      GameMatcher.Eliminate
                 ));
 
+            __decelerateGroup = Contexts.sharedInstance.game.GetGroup(
+                GameMatcher.AllOf(
+                     GameMatcher.PlayerData,
+                     GameMatcher.Decelerate
+                ));
+
         }
 
         public void Execute()
         {
+            //减速
+            foreach (var entity in __decelerateGroup.GetEntities())
+            {
+                bool isDecelerate = false;
+                if (InputMapper.GetInstance().IsAtBehaviour((int)EBehaviorType.Shift))
+                {
+                    isDecelerate = true;
+                }
+
+                var decelerateCom = entity.GetComponent(GameComponentsLookup.Decelerate) as DecelerateComponent;
+                decelerateCom.isDecelerating = isDecelerate;
+
+                entity.ReplaceComponent(GameComponentsLookup.Decelerate, decelerateCom);
+            }
+
             //移动
             foreach (var entity in __moveGroup.GetEntities())
             {
@@ -64,8 +86,15 @@ namespace STGU3D
                 {
                     moveDirection += Vector3.down;
                 }
-
-                newMoveSpeed = moveDirection * entity.playerData.moveSpeed;
+                if (entity.hasDecelerate && entity.decelerate.isDecelerating)
+                {
+                    newMoveSpeed = moveDirection * entity.playerData.moveSpeed * entity.decelerate.speedRate;
+                }
+                else
+                {
+                    newMoveSpeed = moveDirection * entity.playerData.moveSpeed;
+                }
+                
                 entity.ReplaceMovement(newMoveSpeed, entity.movement.rotationSpeed);
             }
 

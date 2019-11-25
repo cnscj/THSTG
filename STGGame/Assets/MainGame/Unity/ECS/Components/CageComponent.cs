@@ -4,7 +4,7 @@ using UnityEngine;
 namespace STGU3D
 {
     [Game]
-    public class BoundaryLimitationComponent : IComponent
+    public class CageComponent : IComponent
     {
         public Rect movableArea;
     }

@@ -9,6 +9,7 @@ namespace STGU3D
         public GameObject viewGO;
         public Renderer renderer;
         public Animator animator;
+        public Collider collider;
     }
 
 }

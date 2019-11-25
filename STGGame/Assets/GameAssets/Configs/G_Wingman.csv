@@ -1,4 +1,4 @@
-﻿code,name,type,life
-int,string,int,int
-10200101,阴阳玉,1,10000
-10200201,八云蓝,1,11000
+﻿code,name,type,viewCode,bulletCode
+int,string,int,int,int
+10200101,阴阳玉,1,,
+10200201,八云蓝,1,,

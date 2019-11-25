@@ -12,40 +12,44 @@ public static class GameComponentsLookup {
     public const int BloodHeadwear = 1;
     public const int Bomb = 2;
     public const int BossData = 3;
-    public const int BoundaryLimitation = 4;
+    public const int Buff = 4;
     public const int BulletData = 5;
-    public const int Collider = 6;
-    public const int Destroyed = 7;
-    public const int Eliminate = 8;
-    public const int EntityBulletFlag = 9;
-    public const int EntityData = 10;
-    public const int EntitySpellCard = 11;
-    public const int Health = 12;
-    public const int HeroBulletFlag = 13;
-    public const int Invincible = 14;
-    public const int MobData = 15;
-    public const int Movement = 16;
-    public const int OnmyougyokuWingman = 17;
-    public const int PlayerData = 18;
-    public const int PlayerSpellCard = 19;
-    public const int PropData = 20;
-    public const int Recycle = 21;
-    public const int Shot = 22;
-    public const int TraceBullet = 23;
-    public const int Transform = 24;
-    public const int View = 25;
-    public const int WingmanData = 26;
+    public const int Cage = 6;
+    public const int Collider = 7;
+    public const int Decelerate = 8;
+    public const int Destroyed = 9;
+    public const int Eliminate = 10;
+    public const int EntityBulletFlag = 11;
+    public const int EntityData = 12;
+    public const int EntitySpellCard = 13;
+    public const int Health = 14;
+    public const int HeroBulletFlag = 15;
+    public const int Invincible = 16;
+    public const int MobData = 17;
+    public const int Movement = 18;
+    public const int OnmyougyokuWingman = 19;
+    public const int PlayerData = 20;
+    public const int PlayerSpellCard = 21;
+    public const int PropData = 22;
+    public const int Recycle = 23;
+    public const int Shot = 24;
+    public const int TraceBullet = 25;
+    public const int Transform = 26;
+    public const int View = 27;
+    public const int WingmanData = 28;
 
-    public const int TotalComponents = 27;
+    public const int TotalComponents = 29;
 
     public static readonly string[] componentNames = {
         "ArmorHeadwear",
         "BloodHeadwear",
         "Bomb",
         "BossData",
-        "BoundaryLimitation",
+        "Buff",
         "BulletData",
+        "Cage",
         "Collider",
+        "Decelerate",
         "Destroyed",
         "Eliminate",
         "EntityBulletFlag",
@@ -73,9 +77,11 @@ public static class GameComponentsLookup {
         typeof(STGU3D.BloodHeadwearComponent),
         typeof(STGU3D.BombComponent),
         typeof(STGU3D.BossDataComponent),
-        typeof(STGU3D.BoundaryLimitationComponent),
+        typeof(STGU3D.BuffComponent),
         typeof(STGU3D.BulletDataComponent),
+        typeof(STGU3D.CageComponent),
         typeof(STGU3D.ColliderComponent),
+        typeof(STGU3D.DecelerateComponent),
         typeof(STGU3D.DestroyedComponent),
         typeof(STGU3D.EliminateComponent),
         typeof(STGU3D.EntityBulletFlagComponent),

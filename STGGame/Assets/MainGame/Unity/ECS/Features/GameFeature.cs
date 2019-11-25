@@ -15,11 +15,13 @@ namespace STGU3D
             Add(new ShotExecuteSystem(contexts));
             Add(new BombReactiveSystem(contexts));
             Add(new EliminateExecuteSystem(contexts));
+            //Add(new DecelerateSystem(contexts));
 
             Add(new HealthReactiveSystem(contexts));
             Add(new HealthExecuteSystem(contexts));
 
             Add(new RecycleSystem(contexts));
+            Add(new CageSystem(contexts));
 
             Add(new DestroyedSystem(contexts));
         }

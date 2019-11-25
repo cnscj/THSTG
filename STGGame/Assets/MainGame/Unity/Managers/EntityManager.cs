@@ -26,6 +26,11 @@ namespace STGU3D
             // 获取Entitas的上下文对象，类似一个单例管理器
             __contexts = Contexts.sharedInstance;
 
+            // 获取所需的System组
+            __systems = new Feature("Systems")
+            .Add(new GameFeature(__contexts))
+            .Add(new InputFeature(__contexts));
+
             stageRoot = new GameObject("StageRoot");
             stageRoot.transform.SetParent(gameObject.transform, true);
             {
@@ -47,14 +52,8 @@ namespace STGU3D
 
         private void Start()
         {
-            // 获取所需的System组
-            __systems = new Feature("Systems")
-            .Add(new GameFeature(__contexts))
-            .Add(new InputFeature(__contexts));
-
             // 初始化System
             __systems.Initialize();
-
         }
 
         private void Update()
@@ -68,7 +67,7 @@ namespace STGU3D
             __systems.TearDown();
         }
         ///////////////////////
-        public GameObject NewViewNode(bool usePool, string viewCode, Vector3 position,Vector3 rotation)
+        public GameObject NewViewNode(bool usePool, string viewCode, Vector3 position, Vector3 rotation)
         {
             string viewName = null;
             GameObject viewGO = null;
@@ -144,27 +143,29 @@ namespace STGU3D
         {
             var entity = CreateGameEntity(code);
             EEntityType entityType = EntityUtil.GetEntityTypeByCode(code);
+
             if (entityType == EEntityType.Hero)
             {
                 var shotCom = entity.CreateComponent<ShotComponent>(GameComponentsLookup.Shot);
                 var bombCom = entity.CreateComponent<BombComponent>(GameComponentsLookup.Bomb);
+                var decelerateCom = entity.CreateComponent<DecelerateComponent>(GameComponentsLookup.Decelerate);
                 var eliminateCom = entity.CreateComponent<EliminateComponent>(GameComponentsLookup.Eliminate);
                 var healthCom = entity.CreateComponent<HealthComponent>(GameComponentsLookup.Health);
-                var boundaryLimitationCom = entity.CreateComponent<BoundaryLimitationComponent>(GameComponentsLookup.BoundaryLimitation);
+                var cageCom = entity.CreateComponent<CageComponent>(GameComponentsLookup.Cage);
 
                 entity.AddComponent(GameComponentsLookup.Shot, shotCom);
                 entity.AddComponent(GameComponentsLookup.Bomb, bombCom);
+                entity.AddComponent(GameComponentsLookup.Decelerate, decelerateCom);
                 entity.AddComponent(GameComponentsLookup.Eliminate, eliminateCom);
                 entity.AddComponent(GameComponentsLookup.Health, healthCom);
-                entity.AddComponent(GameComponentsLookup.BoundaryLimitation, boundaryLimitationCom);
+                entity.AddComponent(GameComponentsLookup.Cage, cageCom);
 
                 if (entity.hasEntityData)
                 {
                     //根据
                     shotCom.action = (shotEntity) =>
                     {
-                        //TODO:这里应该根据情况选择子弹
-                        var bulletEntity = EntityManager.GetInstance().CreateBullet(ECampType.Hero, EBulletType.AmuletRed);
+                        var bulletEntity = EntityManager.GetInstance().CreateBullet(ECampType.Hero, shotEntity.entityData.entityData["bulletCode"]);
                         bulletEntity.transform.position = shotEntity.transform.position;            //在自机处生成
                         bulletEntity.view.viewGO.transform.position = shotEntity.transform.position;//覆盖第一帧刷新
 
@@ -173,8 +174,8 @@ namespace STGU3D
                     };
                    
                     entity.view.viewGO = NewViewNode(false, entity.entityData.entityData["viewCode"],entity.transform.position, entity.transform.rotation);
-                    entity.view.renderer = entity.view.viewGO.GetComponentInChildren<Renderer>();
-                    entity.view.animator = entity.view.viewGO.GetComponentInChildren<Animator>();
+                    entity.ReplaceComponent(GameComponentsLookup.View, entity.view);
+
 
                     entity.playerData.moveSpeed = entity.entityData.entityData["speed"].ToFloat();
                     healthCom.maxBlood = entity.entityData.entityData["blood"].ToInt();
@@ -218,18 +219,13 @@ namespace STGU3D
                     entity.transform.rotation.z = 90;
                     entity.movement.moveSpeed.y = 8f;
                     entity.view.viewGO = NewViewNode(true, entity.entityData.entityData["viewCode"], entity.transform.position, entity.transform.rotation);
-                    entity.view.renderer = entity.view.viewGO.GetComponentInChildren<Renderer>();
-                    entity.view.animator = entity.view.viewGO.GetComponentInChildren<Animator>();
+                    entity.ReplaceComponent(GameComponentsLookup.View, entity.view);
+
                 }
 
             }
 
             return entity;
-        }
-
-        private void Entity_OnComponentAdded(IEntity entity, int index, IComponent component)
-        {
-            throw new NotImplementedException();
         }
 
         public GameEntity CreateHero(EHeroType type, EPlayerType playerType = EPlayerType.Player01)
@@ -268,6 +264,19 @@ namespace STGU3D
             string code = string.Format("{0}", 10000000 + 100000 * (int)EEntityType.Bullet + 100 * (int)bulletType + (int)colorType);
             return CreateBullet(campType, code);
         }
+
+        //public GameEntity CreateWingman()
+        //{
+        //    string code = string.Format("{0}", 10000000 + 100000 * (int)EEntityType.Hero + 1000 * (int)type + 1);
+        //    var entity = CreateEntity(code);
+
+        //    var wingmanDataCom = entity.GetComponent(GameComponentsLookup.WingmanData) as WingmanDataComponent;
+        //    if (wingmanDataCom != null)
+        //    {
+                
+        //    }
+        //    return entity;
+        //}
 
 
         //Data处理
@@ -334,9 +343,11 @@ namespace STGU3D
             movementCom.moveSpeed = Vector3.zero;
             movementCom.rotationSpeed = Vector3.zero;
 
+            viewCom.collider = null;
             viewCom.animator = null;
             viewCom.renderer = null;
             viewCom.viewGO = null;
+
             ////
             entity.AddComponent(GameComponentsLookup.Transform, transCom);
             entity.AddComponent(GameComponentsLookup.Movement, movementCom);

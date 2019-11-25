@@ -32,6 +32,8 @@ namespace STGU3D
                     var viewNode = entity.view.viewGO.gameObject;
                     entity.view.animator = viewNode.GetComponentInChildren<Animator>();
                     entity.view.renderer = viewNode.GetComponentInChildren<Renderer>();
+                    entity.view.collider = viewNode.GetComponentInChildren<Collider>();
+
                 }
             }
         }
