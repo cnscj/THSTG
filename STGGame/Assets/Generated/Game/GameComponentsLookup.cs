@@ -22,23 +22,25 @@ public static class GameComponentsLookup {
     public const int EntityBulletFlag = 11;
     public const int EntityData = 12;
     public const int EntitySpellCard = 13;
-    public const int Health = 14;
-    public const int HeroBulletFlag = 15;
-    public const int Invincible = 16;
-    public const int MobData = 17;
-    public const int Movement = 18;
-    public const int OnmyougyokuWingman = 19;
-    public const int PlayerData = 20;
-    public const int PlayerSpellCard = 21;
-    public const int PropData = 22;
-    public const int Recycle = 23;
-    public const int Shot = 24;
-    public const int TraceBullet = 25;
-    public const int Transform = 26;
-    public const int View = 27;
-    public const int WingmanData = 28;
+    public const int Follow = 14;
+    public const int Health = 15;
+    public const int HeroBulletFlag = 16;
+    public const int Invincible = 17;
+    public const int MobData = 18;
+    public const int Movement = 19;
+    public const int OnmyougyokuWingman = 20;
+    public const int PlayerData = 21;
+    public const int PlayerSpellCard = 22;
+    public const int PropData = 23;
+    public const int Recycle = 24;
+    public const int Shift = 25;
+    public const int Shot = 26;
+    public const int TraceBullet = 27;
+    public const int Transform = 28;
+    public const int View = 29;
+    public const int WingmanData = 30;
 
-    public const int TotalComponents = 29;
+    public const int TotalComponents = 31;
 
     public static readonly string[] componentNames = {
         "ArmorHeadwear",
@@ -55,6 +57,7 @@ public static class GameComponentsLookup {
         "EntityBulletFlag",
         "EntityData",
         "EntitySpellCard",
+        "Follow",
         "Health",
         "HeroBulletFlag",
         "Invincible",
@@ -65,6 +68,7 @@ public static class GameComponentsLookup {
         "PlayerSpellCard",
         "PropData",
         "Recycle",
+        "Shift",
         "Shot",
         "TraceBullet",
         "Transform",
@@ -87,6 +91,7 @@ public static class GameComponentsLookup {
         typeof(STGU3D.EntityBulletFlagComponent),
         typeof(STGU3D.EntityDataComponent),
         typeof(STGU3D.EntitySpellCardComponent),
+        typeof(STGU3D.FollowComponent),
         typeof(STGU3D.HealthComponent),
         typeof(STGU3D.HeroBulletFlagComponent),
         typeof(STGU3D.InvincibleComponent),
@@ -97,6 +102,7 @@ public static class GameComponentsLookup {
         typeof(STGU3D.PlayerSpellCardComponent),
         typeof(STGU3D.PropDataComponent),
         typeof(STGU3D.RecycleComponent),
+        typeof(STGU3D.ShiftComponent),
         typeof(STGU3D.ShotComponent),
         typeof(STGU3D.TraceBulletComponent),
         typeof(STGU3D.TransformComponent),

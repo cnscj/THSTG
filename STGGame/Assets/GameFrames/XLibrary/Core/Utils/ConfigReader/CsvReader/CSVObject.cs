@@ -61,6 +61,12 @@ namespace XLibrary
             set { SetKey(key,value); }
         }
 
+        public CSVValue this[int key]
+        {
+            get { return GetValue(key.ToString()); }
+            set { SetKey(key.ToString(), value); }
+        }
+
         private void SetKey(string key, CSVValue value)
         {
             if (_atrributesDic.ContainsKey(key))

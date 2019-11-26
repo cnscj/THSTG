@@ -11,7 +11,7 @@ namespace STGU3D
         private IGroup<GameEntity> __fireGroup;
         private IGroup<GameEntity> __bombGroup;
         private IGroup<GameEntity> __eliminateGroup;
-        private IGroup<GameEntity> __decelerateGroup;
+        private IGroup<GameEntity> __shiftGroup;
 
         public InputSystem(Contexts contexts)
         {
@@ -39,10 +39,10 @@ namespace STGU3D
                      GameMatcher.Eliminate
                 ));
 
-            __decelerateGroup = Contexts.sharedInstance.game.GetGroup(
+            __shiftGroup = Contexts.sharedInstance.game.GetGroup(
                 GameMatcher.AllOf(
                      GameMatcher.PlayerData,
-                     GameMatcher.Decelerate
+                     GameMatcher.Shift
                 ));
 
         }
@@ -50,18 +50,18 @@ namespace STGU3D
         public void Execute()
         {
             //减速
-            foreach (var entity in __decelerateGroup.GetEntities())
+            foreach (var entity in __shiftGroup.GetEntities())
             {
-                bool isDecelerate = false;
+                bool isShifting = false;
                 if (InputMapper.GetInstance().IsAtBehaviour((int)EBehaviorType.Shift))
                 {
-                    isDecelerate = true;
+                    isShifting = true;
                 }
 
-                var decelerateCom = entity.GetComponent(GameComponentsLookup.Decelerate) as DecelerateComponent;
-                decelerateCom.isDecelerating = isDecelerate;
+                var shiftCom = entity.GetComponent(GameComponentsLookup.Shift) as ShiftComponent;
+                shiftCom.isShifting = isShifting;
 
-                entity.ReplaceComponent(GameComponentsLookup.Decelerate, decelerateCom);
+                entity.ReplaceComponent(GameComponentsLookup.Shift, shiftCom);
             }
 
             //移动
