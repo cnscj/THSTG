@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace STGU3D
 {
-    public class CageSystem : IExecuteSystem
+    public class CageSystem : ICleanupSystem
     {
         private IGroup<GameEntity> __cageGroup;
         public CageSystem(Contexts contexts)
@@ -16,13 +16,13 @@ namespace STGU3D
                ));
         }
 
-        public void Execute()
+        public void Cleanup()
         {
             //移动
             foreach (var entity in __cageGroup.GetEntities())
             {
                 //边界判断,不能出边界
-                
+
             }
         }
     }

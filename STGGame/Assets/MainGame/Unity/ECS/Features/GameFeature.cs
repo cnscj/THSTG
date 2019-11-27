@@ -17,8 +17,11 @@ namespace STGU3D
             Add(new EliminateExecuteSystem(contexts));
             //Add(new DecelerateSystem(contexts));
 
+            Add(new InvincibleExecuteSystem(contexts));
+
             Add(new HealthReactiveSystem(contexts));
             Add(new HealthExecuteSystem(contexts));
+            Add(new LifeReactiveSystem(contexts));
 
             Add(new RecycleSystem(contexts));
             Add(new CageSystem(contexts));

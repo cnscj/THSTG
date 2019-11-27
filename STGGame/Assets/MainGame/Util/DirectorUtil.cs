@@ -1,13 +1,12 @@
-﻿using System.Drawing;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace STGGame
 {
     public static class DirectorUtil
     {
-        public static Size GetViewportSize()
+        public static Vector2 GetViewportSize()
         {
-            return new Size(Screen.width, Screen.height);
+            return new Vector2(Screen.width, Screen.height);
         }
 
         public static float GetPixelPerPot()
@@ -25,7 +24,7 @@ namespace STGGame
             if (!isPixel)
             {
                 var pixelPerPot = GetPixelPerPot();
-                return new Rect(-pixelPerPot * size.Width * 0.5f, -pixelPerPot * size.Height * 0.5f, pixelPerPot * size.Width, pixelPerPot * size.Height);
+                return new Rect(-pixelPerPot * size.x * 0.5f, -pixelPerPot * size.y * 0.5f, pixelPerPot * size.x, pixelPerPot * size.y);
             }
             else
             {

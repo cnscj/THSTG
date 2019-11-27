@@ -14,7 +14,9 @@ namespace STGU3D
         protected override ICollector<GameEntity> GetTrigger(IContext<GameEntity> context)
         {
             return context.CreateCollector(
-                GameMatcher.AllOf(GameMatcher.Health)
+                GameMatcher.AllOf(
+                    GameMatcher.Health
+                 )
             );
         }
 
@@ -35,7 +37,13 @@ namespace STGU3D
             //复活
             Debug.Log("复活");
             DyingRevive(entity);
-            entity.health.life--;
+            if (entity.hasLife)
+            {
+                var lifeCom = entity.life;
+                lifeCom.life--;
+                entity.ReplaceComponent(GameComponentsLookup.Life, lifeCom);
+            }
+            
         }
 
         public void Dying(GameEntity entity)
@@ -54,10 +62,18 @@ namespace STGU3D
                 {
                     if (entity.health.blood > 0f)
                     {
-                        if (entity.health.life != 0)
+                        if (entity.hasLife)
+                        {
+                            if (entity.life.life > 0)
+                            {
+                                Revive(entity);
+                            }
+                        }
+                        else
                         {
                             Revive(entity);
                         }
+
                     }
                 }
                 else

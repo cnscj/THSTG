@@ -7,5 +7,7 @@ namespace STGU3D
     public class CageComponent : IComponent
     {
         public Rect movableArea;
+        public Vector2 bodySize;
+
     }
 }

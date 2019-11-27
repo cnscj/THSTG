@@ -11,26 +11,22 @@ public partial class GameEntity {
     public STGU3D.HealthComponent health { get { return (STGU3D.HealthComponent)GetComponent(GameComponentsLookup.Health); } }
     public bool hasHealth { get { return HasComponent(GameComponentsLookup.Health); } }
 
-    public void AddHealth(float newMaxNearDeathTime, int newMaxLife, int newMaxBlood, int newLife, int newBlood, float newTrueDeathTime, bool newIsTrueDied) {
+    public void AddHealth(float newMaxNearDeathTime, int newMaxBlood, int newBlood, float newTrueDeathTime, bool newIsTrueDied) {
         var index = GameComponentsLookup.Health;
         var component = (STGU3D.HealthComponent)CreateComponent(index, typeof(STGU3D.HealthComponent));
         component.maxNearDeathTime = newMaxNearDeathTime;
-        component.maxLife = newMaxLife;
         component.maxBlood = newMaxBlood;
-        component.life = newLife;
         component.blood = newBlood;
         component.trueDeathTime = newTrueDeathTime;
         component.isTrueDied = newIsTrueDied;
         AddComponent(index, component);
     }
 
-    public void ReplaceHealth(float newMaxNearDeathTime, int newMaxLife, int newMaxBlood, int newLife, int newBlood, float newTrueDeathTime, bool newIsTrueDied) {
+    public void ReplaceHealth(float newMaxNearDeathTime, int newMaxBlood, int newBlood, float newTrueDeathTime, bool newIsTrueDied) {
         var index = GameComponentsLookup.Health;
         var component = (STGU3D.HealthComponent)CreateComponent(index, typeof(STGU3D.HealthComponent));
         component.maxNearDeathTime = newMaxNearDeathTime;
-        component.maxLife = newMaxLife;
         component.maxBlood = newMaxBlood;
-        component.life = newLife;
         component.blood = newBlood;
         component.trueDeathTime = newTrueDeathTime;
         component.isTrueDied = newIsTrueDied;

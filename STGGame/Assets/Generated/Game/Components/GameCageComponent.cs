@@ -11,17 +11,19 @@ public partial class GameEntity {
     public STGU3D.CageComponent cage { get { return (STGU3D.CageComponent)GetComponent(GameComponentsLookup.Cage); } }
     public bool hasCage { get { return HasComponent(GameComponentsLookup.Cage); } }
 
-    public void AddCage(UnityEngine.Rect newMovableArea) {
+    public void AddCage(UnityEngine.Rect newMovableArea, UnityEngine.Vector2 newBodySize) {
         var index = GameComponentsLookup.Cage;
         var component = (STGU3D.CageComponent)CreateComponent(index, typeof(STGU3D.CageComponent));
         component.movableArea = newMovableArea;
+        component.bodySize = newBodySize;
         AddComponent(index, component);
     }
 
-    public void ReplaceCage(UnityEngine.Rect newMovableArea) {
+    public void ReplaceCage(UnityEngine.Rect newMovableArea, UnityEngine.Vector2 newBodySize) {
         var index = GameComponentsLookup.Cage;
         var component = (STGU3D.CageComponent)CreateComponent(index, typeof(STGU3D.CageComponent));
         component.movableArea = newMovableArea;
+        component.bodySize = newBodySize;
         ReplaceComponent(index, component);
     }
 

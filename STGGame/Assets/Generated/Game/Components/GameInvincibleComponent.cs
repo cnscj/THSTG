@@ -11,19 +11,19 @@ public partial class GameEntity {
     public STGU3D.InvincibleComponent invincible { get { return (STGU3D.InvincibleComponent)GetComponent(GameComponentsLookup.Invincible); } }
     public bool hasInvincible { get { return HasComponent(GameComponentsLookup.Invincible); } }
 
-    public void AddInvincible(float newMaxTime, float newTime) {
+    public void AddInvincible(float newTime, bool newIsInvincible) {
         var index = GameComponentsLookup.Invincible;
         var component = (STGU3D.InvincibleComponent)CreateComponent(index, typeof(STGU3D.InvincibleComponent));
-        component.maxTime = newMaxTime;
         component.time = newTime;
+        component.isInvincible = newIsInvincible;
         AddComponent(index, component);
     }
 
-    public void ReplaceInvincible(float newMaxTime, float newTime) {
+    public void ReplaceInvincible(float newTime, bool newIsInvincible) {
         var index = GameComponentsLookup.Invincible;
         var component = (STGU3D.InvincibleComponent)CreateComponent(index, typeof(STGU3D.InvincibleComponent));
-        component.maxTime = newMaxTime;
         component.time = newTime;
+        component.isInvincible = newIsInvincible;
         ReplaceComponent(index, component);
     }
 
