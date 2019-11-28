@@ -4,7 +4,7 @@ namespace STGGame
 {
     public static class DirectorUtil
     {
-        public static Vector2 GetViewportSize()
+        public static Vector2 GetScreenSize()
         {
             return new Vector2(Screen.width, Screen.height);
         }
@@ -18,19 +18,35 @@ namespace STGGame
             return pixelPerPot;
         }
 
-        public static Rect GetViewportRect(bool isPixel = false)
+        public static Rect GetScreenRect()
         {
-            var size = GetViewportSize();
-            if (!isPixel)
-            {
-                var pixelPerPot = GetPixelPerPot();
-                return new Rect(-pixelPerPot * size.x * 0.5f, -pixelPerPot * size.y * 0.5f, pixelPerPot * size.x, pixelPerPot * size.y);
-            }
-            else
-            {
-                return new Rect(-Screen.width * 0.5f, -Screen.height * 0.5f, Screen.width, Screen.height);
-            }
-
+            return new Rect(-Screen.width * 0.5f, -Screen.height * 0.5f, Screen.width, Screen.height);
         }
+
+        //世界转屏幕矩形
+        public static Rect WorldToScreenRect(Rect worldRect)
+        {
+            var pixelPerPot = GetPixelPerPot();
+            return new Rect(worldRect.x / pixelPerPot, worldRect.y / pixelPerPot, worldRect.width / pixelPerPot, worldRect.height / pixelPerPot);
+        }
+        //屏幕转世界矩形
+        public static Rect ScreenToWorldRect(Rect screenRect)
+        {
+            var pixelPerPot = GetPixelPerPot();
+            return new Rect(screenRect.x * pixelPerPot, screenRect.y * pixelPerPot, screenRect.width * pixelPerPot, screenRect.height * pixelPerPot);
+        }
+
+        //世界转屏幕坐标
+        public static Vector3 WorldToScreenPoint(Vector3 worldPosition)
+        {
+            return Camera.main.WorldToScreenPoint(worldPosition);
+        }
+        //屏幕转世界坐标
+        public static Vector3 ScreenToWorldPoint(Vector3 screenPosition)
+        {
+            return Camera.main.ScreenToWorldPoint(screenPosition);
+        }
+
+
     }
 }

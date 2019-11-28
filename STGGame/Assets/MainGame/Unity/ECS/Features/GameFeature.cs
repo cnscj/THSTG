@@ -18,6 +18,7 @@ namespace STGU3D
             //Add(new DecelerateSystem(contexts));
 
             Add(new InvincibleExecuteSystem(contexts));
+            Add(new FollowSystem(contexts));
 
             Add(new HealthReactiveSystem(contexts));
             Add(new HealthExecuteSystem(contexts));
