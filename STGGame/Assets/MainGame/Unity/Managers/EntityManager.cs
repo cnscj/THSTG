@@ -150,14 +150,18 @@ namespace STGU3D
                 var bombCom = entity.CreateComponent<BombComponent>(GameComponentsLookup.Bomb);
                 var decelerateCom = entity.CreateComponent<DecelerateComponent>(GameComponentsLookup.Decelerate);
                 var eliminateCom = entity.CreateComponent<EliminateComponent>(GameComponentsLookup.Eliminate);
+                var lifeCom = entity.CreateComponent<LifeComponent>(GameComponentsLookup.Life);
                 var healthCom = entity.CreateComponent<HealthComponent>(GameComponentsLookup.Health);
                 var cageCom = entity.CreateComponent<CageComponent>(GameComponentsLookup.Cage);
+                var invincibleCom = entity.CreateComponent<InvincibleComponent>(GameComponentsLookup.Invincible);
 
                 entity.AddComponent(GameComponentsLookup.Shot, shotCom);
                 entity.AddComponent(GameComponentsLookup.Bomb, bombCom);
                 entity.AddComponent(GameComponentsLookup.Decelerate, decelerateCom);
                 entity.AddComponent(GameComponentsLookup.Eliminate, eliminateCom);
+                entity.AddComponent(GameComponentsLookup.Life, lifeCom);
                 entity.AddComponent(GameComponentsLookup.Health, healthCom);
+                entity.AddComponent(GameComponentsLookup.Invincible, invincibleCom);
                 entity.AddComponent(GameComponentsLookup.Cage, cageCom);
 
                 if (entity.hasEntityData)

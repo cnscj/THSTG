@@ -8,7 +8,7 @@ namespace STGU3D
     {
         public int maxLife = 3;                         //最大生命次数
 
-        public int life = 3;                            //当前生命次数
-        public int lastLife = 3;                        //上次生命值
+        public int life = 1;                            //当前生命次数
+        public int lastLife = 1;                        //上次生命值
     }
 }

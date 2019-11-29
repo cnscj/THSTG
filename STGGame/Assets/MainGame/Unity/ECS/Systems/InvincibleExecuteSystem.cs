@@ -31,7 +31,7 @@ namespace STGU3D
             {
                 if (entity.invincible.time > 0)
                 {
-                    entity.invincible.time -= Time.fixedTime;
+                    entity.invincible.time -= Time.fixedDeltaTime;
                     if (entity.invincible.isInvincible)
                     {
                         if (entity.invincible.time <= 0)
