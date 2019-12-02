@@ -18,6 +18,8 @@ namespace STGU3D
         public GameObject bossRoot;
         public GameObject mobRoot;
 
+        public Dictionary<EPlayerType,GameEntity> heroMap;
+
         private Contexts __contexts;
         private Systems __systems;
 
@@ -48,6 +50,8 @@ namespace STGU3D
                 mobRoot = new GameObject("MobRoot");
                 mobRoot.transform.SetParent(stageRoot.transform, true);
             }
+
+            heroMap = new Dictionary<EPlayerType, GameEntity>();
         }
 
         private void Start()
@@ -113,6 +117,13 @@ namespace STGU3D
         ///////////////////////
         public void DestroyEntity(GameEntity entity)
         {
+            //主角引用清空
+            if (entity.hasPlayerData)
+            {
+                EPlayerType playerType = entity.playerData.playerType;
+                heroMap.Remove(playerType);
+            }
+            //
             if (entity.hasDestroyed)
             {
                 entity.destroyed.isDestroyed = true;
@@ -184,6 +195,20 @@ namespace STGU3D
                     entity.playerData.moveSpeed = entity.entityData.entityData["speed"].ToFloat();
                     healthCom.maxBlood = entity.entityData.entityData["blood"].ToInt();
                 }
+
+            }
+            else if (entityType == EEntityType.Wingman)
+            {
+                var followCom = entity.CreateComponent<FollowComponent>(GameComponentsLookup.Follow);
+
+                entity.AddComponent(GameComponentsLookup.Follow, followCom);
+
+                var wingmanDataCom = entity.GetComponent(GameComponentsLookup.WingmanData) as WingmanDataComponent;
+                if (wingmanDataCom != null)
+                {
+
+                }
+
             }
             else if(entityType == EEntityType.Mob)
             {
@@ -232,9 +257,9 @@ namespace STGU3D
             return entity;
         }
 
-        public GameEntity CreateHero(EHeroType type, EPlayerType playerType = EPlayerType.Player01)
+        public GameEntity CreateHero(EHeroType heroType, EPlayerType playerType = EPlayerType.Player01)
         {
-            string code = string.Format("{0}", 10000000 + 100000 * (int)EEntityType.Hero + 1000 * (int)type + 1);
+            string code = string.Format("{0}", 10000000 + 100000 * (int)EEntityType.Hero + 1000 * (int)heroType + 1);
             var entity = CreateEntity(code);
 
             var playerDataCom = entity.GetComponent(GameComponentsLookup.PlayerData) as PlayerDataComponent;
@@ -242,6 +267,17 @@ namespace STGU3D
             {
                 playerDataCom.playerType = playerType;
             }
+
+            //不同主角特有的
+            if (heroType == EHeroType.Reimu)
+            {
+                //Reimu持有僚机1台:onmyougyoku
+                //var onmyougyokuWingman = CreateWingman()
+            }
+
+            //缓存引用
+            heroMap[playerType] = entity;
+
             return entity;
         }
 
@@ -269,18 +305,22 @@ namespace STGU3D
             return CreateBullet(campType, code);
         }
 
-        //public GameEntity CreateWingman()
-        //{
-        //    string code = string.Format("{0}", 10000000 + 100000 * (int)EEntityType.Hero + 1000 * (int)type + 1);
-        //    var entity = CreateEntity(code);
+        public GameEntity CreateWingman(EWingmanType wingmanType)
+        {
+            string code = string.Format("{0}", 10000000 + 100000 * (int)EEntityType.Wingman + 100 * (int)wingmanType + (int)1);
+            var entity = CreateEntity(code);
 
-        //    var wingmanDataCom = entity.GetComponent(GameComponentsLookup.WingmanData) as WingmanDataComponent;
-        //    if (wingmanDataCom != null)
-        //    {
-                
-        //    }
-        //    return entity;
-        //}
+            var wingmanDataCom = entity.GetComponent(GameComponentsLookup.WingmanData) as WingmanDataComponent;
+            if (wingmanDataCom != null)
+            {
+                if (wingmanType == EWingmanType.Onmyougyoku)
+                {
+                    var onmyougyokuCom = entity.CreateComponent<OnmyougyokuWingmanComponent>(GameComponentsLookup.OnmyougyokuWingman);
+                    entity.AddComponent(GameComponentsLookup.OnmyougyokuWingman, onmyougyokuCom);
+                }
+            }
+            return entity;
+        }
 
 
         //Data处理
