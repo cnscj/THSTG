@@ -4,33 +4,27 @@ using UnityEngine;
 
 namespace STGU3D
 {
-    public class MovementSystem : ReactiveSystem<GameEntity>
+    public class MovementSystem : IExecuteSystem
     {
-        public MovementSystem(Contexts contexts) : base(contexts.game)
+        private IGroup<GameEntity> __moveGroup;
+        public MovementSystem(Contexts contexts)
         {
+            //移动
+            __moveGroup = Contexts.sharedInstance.game.GetGroup(
+                GameMatcher.AllOf(
+                     GameMatcher.Movement
+                ));
         }
 
-        protected override ICollector<GameEntity> GetTrigger(IContext<GameEntity> context)
-        {
-            return context.CreateCollector(
-                GameMatcher.AllOf(GameMatcher.Movement, GameMatcher.Transform)
-            );
-        }
-
-        protected override bool Filter(GameEntity entity)
-        {
-            return entity.hasMovement && entity.hasTransform;
-        }
-
-        protected override void Execute(List<GameEntity> entities)
+        public void Execute()
         {
             // 满足GetTrigger和Filter的实体保存在entities列表里
-            foreach (var e in entities)
+            foreach (var entity in __moveGroup.GetEntities())
             {
-                e.transform.position = e.transform.position + e.movement.moveSpeed * Time.deltaTime;
-                e.transform.rotation = e.transform.rotation + e.movement.rotationSpeed * Time.deltaTime;
+                entity.transform.localPosition = entity.transform.localPosition + entity.movement.moveSpeed * Time.deltaTime;
+                entity.transform.localRotation = entity.transform.localRotation + entity.movement.rotationSpeed * Time.deltaTime;
 
-                e.ReplaceComponent(GameComponentsLookup.Transform,e.transform);
+                entity.ReplaceComponent(GameComponentsLookup.Transform, entity.transform);
             }
         }
     }

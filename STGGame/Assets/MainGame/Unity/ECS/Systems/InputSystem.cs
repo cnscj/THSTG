@@ -94,8 +94,8 @@ namespace STGU3D
                 {
                     newMoveSpeed = moveDirection * entity.playerData.moveSpeed;
                 }
-                
-                entity.ReplaceMovement(newMoveSpeed, entity.movement.rotationSpeed);
+                entity.movement.moveSpeed = newMoveSpeed;
+                entity.ReplaceComponent(GameComponentsLookup.Movement, entity.movement);
             }
 
             //开火

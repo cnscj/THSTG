@@ -20,7 +20,7 @@ namespace STGGame
 
         public static Rect GetScreenRect()
         {
-            return new Rect(-Screen.width * 0.5f, -Screen.height * 0.5f, Screen.width, Screen.height);
+            return new Rect(-Screen.width * 0.5f, -Screen.height * 0.5f, Screen.width * 0.5f, Screen.height * 0.5f);
         }
 
         //世界转屏幕矩形

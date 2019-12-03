@@ -26,10 +26,17 @@ namespace STGU3D
         {
             foreach (var e in entities)
             {
+                //子变化,rotation会被父影响
+                //应该取矩阵取运算
                 if (e.transform.parent != null)
                 {
-                    e.transform.position = e.transform.parent.position + e.transform.position;
-                    e.transform.rotation = e.transform.parent.rotation + e.transform.rotation;
+                    e.transform.position = e.transform.parent.position + e.transform.localPosition;
+                    e.transform.rotation = e.transform.parent.rotation + e.transform.localRotation;
+                }
+                else
+                {
+                    e.transform.position = e.transform.localPosition;
+                    e.transform.rotation = e.transform.localRotation;
                 }
             }
         }
