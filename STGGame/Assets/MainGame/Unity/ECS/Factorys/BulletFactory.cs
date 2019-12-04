@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using STGGame;
 using UnityEngine;
 
 namespace STGU3D
@@ -27,14 +28,10 @@ namespace STGU3D
                 entity.ReplaceComponent(GameComponentsLookup.View, entity.view);
 
                 {
-                    Vector3 v3 = Camera.main.ScreenToWorldPoint(Vector3.zero);
-                    var winSize = new Vector2(Mathf.Abs(v3.x) * 2, Mathf.Abs(v3.y) * 2);
-                    var pixelPerPot = winSize.x / Screen.width;
-
                     recycleCom.stayTime = 0f;
                     recycleCom.isRecycled = false;
                     //用的是左下角为起点
-                    recycleCom.boundary = new Rect(-pixelPerPot * Screen.width * 0.5f, -pixelPerPot * Screen.height * 0.5f, pixelPerPot * Screen.width * 0.5f, pixelPerPot * Screen.height * 0.5f);
+                    recycleCom.boundary = DirectorUtil.ScreenToWorldRect(DirectorUtil.GetScreenRect());
                 }
 
             }

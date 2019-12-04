@@ -20,7 +20,7 @@ namespace STGGame
 
         public static Rect GetScreenRect()
         {
-            return new Rect(-Screen.width * 0.5f, -Screen.height * 0.5f, Screen.width * 0.5f, Screen.height * 0.5f);
+            return new Rect(0, 0, Screen.width, Screen.height);
         }
 
         //世界转屏幕矩形
@@ -33,7 +33,7 @@ namespace STGGame
         public static Rect ScreenToWorldRect(Rect screenRect)
         {
             var pixelPerPot = GetPixelPerPot();
-            return new Rect(screenRect.x * pixelPerPot, screenRect.y * pixelPerPot, screenRect.width * pixelPerPot, screenRect.height * pixelPerPot);
+            return new Rect(-0.5f * screenRect.width * pixelPerPot, 0.5f * screenRect.height * pixelPerPot, screenRect.width * pixelPerPot, screenRect.height * pixelPerPot);
         }
 
         //世界转屏幕坐标
@@ -44,7 +44,9 @@ namespace STGGame
         //屏幕转世界坐标
         public static Vector3 ScreenToWorldPoint(Vector3 screenPosition)
         {
-            return Camera.main.ScreenToWorldPoint(screenPosition);
+            //return Camera.main.ScreenToWorldPoint(screenPosition);
+            var pixelPerPot = GetPixelPerPot();
+            return screenPosition * pixelPerPot;
         }
 
 

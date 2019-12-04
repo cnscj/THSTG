@@ -34,6 +34,7 @@ namespace STGU3D
             var wingmanDataCom = entity.GetComponent(GameComponentsLookup.WingmanData) as WingmanDataComponent;
             if (wingmanDataCom != null)
             {
+                wingmanDataCom.wingmanType = wingmanType;
                 if (wingmanType == EWingmanType.Onmyougyoku)
                 {
                     var onmyougyokuCom = entity.CreateComponent<OnmyougyokuWingmanComponent>(GameComponentsLookup.OnmyougyokuWingman);

@@ -15,16 +15,12 @@ namespace STGGame
             {
                 case RuntimePlatform.WindowsEditor:
                     return "PC";
-                    break;
                 case RuntimePlatform.OSXEditor:
                     return "PC";
-                    break;
                 case RuntimePlatform.Android:
                     return "Android";
-                    break;
                 case RuntimePlatform.IPhonePlayer:
                     return "IOS";
-                    break;
             }
             return "";     
         }

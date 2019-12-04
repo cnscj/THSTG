@@ -8,25 +8,25 @@
 //------------------------------------------------------------------------------
 public partial class GameEntity {
 
-    static readonly STGU3D.WingmanDataComponent wingmanDataComponent = new STGU3D.WingmanDataComponent();
+    public STGU3D.WingmanDataComponent wingmanData { get { return (STGU3D.WingmanDataComponent)GetComponent(GameComponentsLookup.WingmanData); } }
+    public bool hasWingmanData { get { return HasComponent(GameComponentsLookup.WingmanData); } }
 
-    public bool isWingmanData {
-        get { return HasComponent(GameComponentsLookup.WingmanData); }
-        set {
-            if (value != isWingmanData) {
-                var index = GameComponentsLookup.WingmanData;
-                if (value) {
-                    var componentPool = GetComponentPool(index);
-                    var component = componentPool.Count > 0
-                            ? componentPool.Pop()
-                            : wingmanDataComponent;
+    public void AddWingmanData(STGU3D.EWingmanType newWingmanType) {
+        var index = GameComponentsLookup.WingmanData;
+        var component = (STGU3D.WingmanDataComponent)CreateComponent(index, typeof(STGU3D.WingmanDataComponent));
+        component.wingmanType = newWingmanType;
+        AddComponent(index, component);
+    }
 
-                    AddComponent(index, component);
-                } else {
-                    RemoveComponent(index);
-                }
-            }
-        }
+    public void ReplaceWingmanData(STGU3D.EWingmanType newWingmanType) {
+        var index = GameComponentsLookup.WingmanData;
+        var component = (STGU3D.WingmanDataComponent)CreateComponent(index, typeof(STGU3D.WingmanDataComponent));
+        component.wingmanType = newWingmanType;
+        ReplaceComponent(index, component);
+    }
+
+    public void RemoveWingmanData() {
+        RemoveComponent(GameComponentsLookup.WingmanData);
     }
 }
 

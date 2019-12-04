@@ -29,14 +29,23 @@ namespace STGU3D
             //决死Time消耗2颗Bomb,不够则无效Bomb
             if (entity.hasHealth)
             {
-                if (entity.health.blood <=0 && !entity.health.isTrueDied)
+                if (entity.health.blood <= 0 && !entity.health.isTrueDied)
                 {
-                    //决死复活
-                    entity.health.blood = entity.health.maxBlood;
-                    entity.ReplaceComponent(GameComponentsLookup.Health, entity.health);
+                    if (entity.bomb.times - 2 >= 0)   //资源是否充足
+                    {
+                        //决死复活
+                        entity.health.blood = entity.health.maxBlood;
+                        entity.ReplaceComponent(GameComponentsLookup.Health, entity.health);
+
+                        entity.bomb.times = entity.bomb.times - 2;
+                    }
+
                 }
             }
-            entity.bomb.times--;
+            else
+            {
+                entity.bomb.times--;
+            }
         }
 
         protected override void Execute(List<GameEntity> entities)

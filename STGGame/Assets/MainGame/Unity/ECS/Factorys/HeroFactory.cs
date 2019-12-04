@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using STGGame;
 using UnityEngine;
 
 namespace STGU3D
@@ -63,12 +64,8 @@ namespace STGU3D
                 }
 
                 {
-                    Vector3 v3 = Camera.main.ScreenToWorldPoint(Vector3.zero);
-                    var winSize = new Vector2(Mathf.Abs(v3.x) * 2, Mathf.Abs(v3.y) * 2);
-                    var pixelPerPot = winSize.x / Screen.width;
-
-                    cageCom.movableArea = new Rect(-pixelPerPot * Screen.width * 0.5f, -pixelPerPot * Screen.height * 0.5f, pixelPerPot * Screen.width * 0.5f, pixelPerPot * Screen.height * 0.5f);
-                    cageCom.bodySize = new Vector2(32 * pixelPerPot, 48 * pixelPerPot); //TODO:
+                    cageCom.movableArea = DirectorUtil.ScreenToWorldRect(DirectorUtil.GetScreenRect());
+                    cageCom.bodySize = DirectorUtil.ScreenToWorldPoint(new Vector2(32, 48)); //TODO:
                 }
 
                 entity.playerData.moveSpeed = entity.entityData.entityData["speed"].ToFloat();

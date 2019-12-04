@@ -37,7 +37,7 @@ public static class GameComponentsLookup {
     public const int Recycle = 26;
     public const int Shift = 27;
     public const int Shot = 28;
-    public const int TraceBullet = 29;
+    public const int Trace = 29;
     public const int Transform = 30;
     public const int View = 31;
     public const int WingmanData = 32;
@@ -74,7 +74,7 @@ public static class GameComponentsLookup {
         "Recycle",
         "Shift",
         "Shot",
-        "TraceBullet",
+        "Trace",
         "Transform",
         "View",
         "WingmanData"
@@ -110,7 +110,7 @@ public static class GameComponentsLookup {
         typeof(STGU3D.RecycleComponent),
         typeof(STGU3D.ShiftComponent),
         typeof(STGU3D.ShotComponent),
-        typeof(STGU3D.TraceBulletComponent),
+        typeof(STGU3D.TraceComponent),
         typeof(STGU3D.TransformComponent),
         typeof(STGU3D.ViewComponent),
         typeof(STGU3D.WingmanDataComponent)

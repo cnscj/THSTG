@@ -8,7 +8,5 @@ namespace STGU3D
     {
         public Rect movableArea;
         public Vector2 bodySize;
-
-        public Vector2 lastPosition;
     }
 }
