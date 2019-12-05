@@ -11,17 +11,19 @@ public partial class InputEntity {
     public STGU3D.DestroyedComponent destroyed { get { return (STGU3D.DestroyedComponent)GetComponent(InputComponentsLookup.Destroyed); } }
     public bool hasDestroyed { get { return HasComponent(InputComponentsLookup.Destroyed); } }
 
-    public void AddDestroyed(int newWhat, bool newIsDestroyed) {
+    public void AddDestroyed(System.Action<GameEntity> newAction, int newWhat, bool newIsDestroyed) {
         var index = InputComponentsLookup.Destroyed;
         var component = (STGU3D.DestroyedComponent)CreateComponent(index, typeof(STGU3D.DestroyedComponent));
+        component.action = newAction;
         component.what = newWhat;
         component.isDestroyed = newIsDestroyed;
         AddComponent(index, component);
     }
 
-    public void ReplaceDestroyed(int newWhat, bool newIsDestroyed) {
+    public void ReplaceDestroyed(System.Action<GameEntity> newAction, int newWhat, bool newIsDestroyed) {
         var index = InputComponentsLookup.Destroyed;
         var component = (STGU3D.DestroyedComponent)CreateComponent(index, typeof(STGU3D.DestroyedComponent));
+        component.action = newAction;
         component.what = newWhat;
         component.isDestroyed = newIsDestroyed;
         ReplaceComponent(index, component);

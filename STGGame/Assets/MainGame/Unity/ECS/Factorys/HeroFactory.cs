@@ -7,17 +7,12 @@ namespace STGU3D
 {
     public class HeroFactory : BaseEntityFactory
     {
-        public Dictionary<EPlayerType, GameEntity> heroMap;
-
-        public HeroFactory()
-        {
-            heroMap = new Dictionary<EPlayerType, GameEntity>();
-        }
-
+        
         public override GameEntity CreateEntity(string code)
         {
             var entity = CreateGameEntity(code);
 
+            var commandCom = entity.CreateComponent<CommandComponent>(GameComponentsLookup.Command);
             var playerDataCom = entity.CreateComponent<PlayerDataComponent>(GameComponentsLookup.PlayerData);
             var shotCom = entity.CreateComponent<ShotComponent>(GameComponentsLookup.Shot);
             var bombCom = entity.CreateComponent<BombComponent>(GameComponentsLookup.Bomb);
@@ -28,6 +23,7 @@ namespace STGU3D
             var cageCom = entity.CreateComponent<CageComponent>(GameComponentsLookup.Cage);
             var invincibleCom = entity.CreateComponent<InvincibleComponent>(GameComponentsLookup.Invincible);
 
+            entity.AddComponent(GameComponentsLookup.Command, commandCom);
             entity.AddComponent(GameComponentsLookup.PlayerData, playerDataCom);
             entity.AddComponent(GameComponentsLookup.Shot, shotCom);
             entity.AddComponent(GameComponentsLookup.Bomb, bombCom);
@@ -47,15 +43,15 @@ namespace STGU3D
                 shotCom.action = (shotEntity) =>
                 {
                     var bulletEntity = EntityManager.GetInstance().GetOrNewEntityFactory(EEntityType.Bullet).AsBullet().CreateBullet(ECampType.Hero, shotEntity.entityData.entityData["bulletCode"]);
-                    bulletEntity.transform.position = shotEntity.transform.position;            //在自机处生成
-                    bulletEntity.view.viewGO.transform.position = shotEntity.transform.position;//覆盖第一帧刷新
+                    bulletEntity.transform.localPosition = shotEntity.transform.localPosition;                          //在自机处生成
+                    bulletEntity.view.viewGO.transform.localPosition = shotEntity.transform.localPosition;              //覆盖第一帧刷新
 
 
                     return bulletEntity;
                 };
 
                 {
-                    entity.view.viewGO = NewViewNode(false, entity.entityData.entityData["viewCode"], entity.transform.position, entity.transform.rotation);
+                    entity.view.viewGO = NewViewNode(false, entity.entityData.entityData["viewCode"], entity.transform.localPosition, entity.transform.localRotation);
                     entity.view.animator = entity.view.viewGO.GetComponentInChildren<Animator>();
                     entity.view.renderer = entity.view.viewGO.GetComponentInChildren<Renderer>();
                     entity.view.collider = entity.view.viewGO.GetComponentInChildren<Collider>();
@@ -93,7 +89,7 @@ namespace STGU3D
             if (entity.hasPlayerData)
             {
                 EPlayerType playerType = entity.playerData.playerType;
-                heroMap.Remove(playerType);
+                EntityCache.GetInstance().SetHero(playerType, null);
             }
             base.DestroyEntity(entity);
         }
@@ -107,10 +103,8 @@ namespace STGU3D
             if (playerDataCom != null)
             {
                 playerDataCom.playerType = playerType;
+                EntityCache.GetInstance().SetHero(playerType, entity);
             }
-
-            //缓存引用
-            heroMap[playerType] = entity;
 
             return entity;
         }

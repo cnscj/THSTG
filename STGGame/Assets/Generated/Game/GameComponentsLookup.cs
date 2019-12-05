@@ -16,33 +16,34 @@ public static class GameComponentsLookup {
     public const int BulletData = 5;
     public const int Cage = 6;
     public const int Collider = 7;
-    public const int Damage = 8;
-    public const int Decelerate = 9;
-    public const int Destroyed = 10;
-    public const int Eliminate = 11;
-    public const int EntityBulletFlag = 12;
-    public const int EntityData = 13;
-    public const int EntitySpellCard = 14;
-    public const int Follow = 15;
-    public const int Health = 16;
-    public const int HeroBulletFlag = 17;
-    public const int Invincible = 18;
-    public const int Life = 19;
-    public const int MobData = 20;
-    public const int Movement = 21;
-    public const int OnmyougyokuWingman = 22;
-    public const int PlayerData = 23;
-    public const int PlayerSpellCard = 24;
-    public const int PropData = 25;
-    public const int Recycle = 26;
-    public const int Shift = 27;
-    public const int Shot = 28;
-    public const int Trace = 29;
-    public const int Transform = 30;
-    public const int View = 31;
-    public const int WingmanData = 32;
+    public const int Command = 8;
+    public const int Damage = 9;
+    public const int Decelerate = 10;
+    public const int Destroyed = 11;
+    public const int Eliminate = 12;
+    public const int EntityBulletFlag = 13;
+    public const int EntityData = 14;
+    public const int EntitySpellCard = 15;
+    public const int Follow = 16;
+    public const int Health = 17;
+    public const int HeroBulletFlag = 18;
+    public const int Invincible = 19;
+    public const int Life = 20;
+    public const int MobData = 21;
+    public const int Movement = 22;
+    public const int OnmyougyokuWingman = 23;
+    public const int PlayerData = 24;
+    public const int PlayerSpellCard = 25;
+    public const int PropData = 26;
+    public const int Recycle = 27;
+    public const int Shift = 28;
+    public const int Shot = 29;
+    public const int Trace = 30;
+    public const int Transform = 31;
+    public const int View = 32;
+    public const int WingmanData = 33;
 
-    public const int TotalComponents = 33;
+    public const int TotalComponents = 34;
 
     public static readonly string[] componentNames = {
         "ArmorHeadwear",
@@ -53,6 +54,7 @@ public static class GameComponentsLookup {
         "BulletData",
         "Cage",
         "Collider",
+        "Command",
         "Damage",
         "Decelerate",
         "Destroyed",
@@ -89,6 +91,7 @@ public static class GameComponentsLookup {
         typeof(STGU3D.BulletDataComponent),
         typeof(STGU3D.CageComponent),
         typeof(STGU3D.ColliderComponent),
+        typeof(STGU3D.CommandComponent),
         typeof(STGU3D.DamageComponent),
         typeof(STGU3D.DecelerateComponent),
         typeof(STGU3D.DestroyedComponent),

@@ -126,6 +126,8 @@ namespace STGU3D
             viewCom.renderer = null;
             viewCom.viewGO = null;
 
+            destroyCom.isDestroyed = false;
+
             ////
             entity.AddComponent(GameComponentsLookup.Transform, transCom);
             entity.AddComponent(GameComponentsLookup.Movement, movementCom);

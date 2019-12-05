@@ -74,6 +74,7 @@ namespace STGU3D
                     continue;
 
                 entity.destroyed.isDestroyed = false;
+                entity.destroyed.action?.Invoke(entity);
                 entity.Destroy();
             }
         }

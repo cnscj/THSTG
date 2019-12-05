@@ -33,7 +33,7 @@ namespace STGGame
         public static Rect ScreenToWorldRect(Rect screenRect)
         {
             var pixelPerPot = GetPixelPerPot();
-            return new Rect(-0.5f * screenRect.width * pixelPerPot, 0.5f * screenRect.height * pixelPerPot, screenRect.width * pixelPerPot, screenRect.height * pixelPerPot);
+            return new Rect(-0.5f * screenRect.width * pixelPerPot, -0.5f * screenRect.height * pixelPerPot, screenRect.width * pixelPerPot, screenRect.height * pixelPerPot);
         }
 
         //世界转屏幕坐标

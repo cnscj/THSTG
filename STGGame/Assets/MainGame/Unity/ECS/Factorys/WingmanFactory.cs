@@ -19,7 +19,7 @@ namespace STGU3D
 
             if (entity.hasEntityData)
             {
-                entity.view.viewGO = NewViewNode(false, entity.entityData.entityData["viewCode"], entity.transform.position, entity.transform.rotation);
+                entity.view.viewGO = NewViewNode(false, entity.entityData.entityData["viewCode"], entity.transform.localPosition, entity.transform.localRotation);
                 entity.ReplaceComponent(GameComponentsLookup.View, entity.view);
             }
 

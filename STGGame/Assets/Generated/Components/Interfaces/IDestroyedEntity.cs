@@ -11,7 +11,7 @@ public partial interface IDestroyedEntity {
     STGU3D.DestroyedComponent destroyed { get; }
     bool hasDestroyed { get; }
 
-    void AddDestroyed(int newWhat, bool newIsDestroyed);
-    void ReplaceDestroyed(int newWhat, bool newIsDestroyed);
+    void AddDestroyed(System.Action<GameEntity> newAction, int newWhat, bool newIsDestroyed);
+    void ReplaceDestroyed(System.Action<GameEntity> newAction, int newWhat, bool newIsDestroyed);
     void RemoveDestroyed();
 }

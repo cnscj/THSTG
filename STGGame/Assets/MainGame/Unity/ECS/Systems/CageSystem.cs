@@ -34,14 +34,14 @@ namespace STGU3D
                     entity.ReplaceComponent(GameComponentsLookup.Transform, entity.transform);
                 }
 
-                if (entity.transform.localPosition.y + entity.cage.bodySize.y / 2 >  entity.cage.movableArea.y)
+                if (entity.transform.localPosition.y + entity.cage.bodySize.y / 2 >  -entity.cage.movableArea.y)
                 {
-                    entity.transform.localPosition.y = entity.cage.movableArea.y - entity.cage.bodySize.y / 2;
+                    entity.transform.localPosition.y = -entity.cage.movableArea.y - entity.cage.bodySize.y / 2;
                     entity.ReplaceComponent(GameComponentsLookup.Transform, entity.transform);
                 }
-                else if (entity.transform.localPosition.y - entity.cage.bodySize.y / 2 < -(entity.cage.movableArea.height - entity.cage.movableArea.y))
+                else if (entity.transform.localPosition.y - entity.cage.bodySize.y / 2 < entity.cage.movableArea.y)
                 {
-                    entity.transform.localPosition.y = -(entity.cage.movableArea.height - entity.cage.movableArea.y) + entity.cage.bodySize.y / 2;
+                    entity.transform.localPosition.y = entity.cage.movableArea.y + entity.cage.bodySize.y / 2;
                     entity.ReplaceComponent(GameComponentsLookup.Transform, entity.transform);
                 }
             }
