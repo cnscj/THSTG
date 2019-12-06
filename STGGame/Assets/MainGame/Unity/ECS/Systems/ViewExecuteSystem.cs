@@ -47,14 +47,14 @@ namespace STGU3D
                     if (entity.movement.moveSpeed.x > 0f) //右
                     {
                         entity.view.animator.SetInteger("moveSpeed", 1);
-                        entity.transform.localRotation.y = 180;
+                        (entity.view.renderer as SpriteRenderer).flipX = true;
 
                         entity.ReplaceComponent(GameComponentsLookup.Transform, entity.transform);
                     }
                     else if (entity.movement.moveSpeed.x < 0f) //左
                     {
                         entity.view.animator.SetInteger("moveSpeed", -1);
-                        entity.transform.localRotation.y = 0;
+                        (entity.view.renderer as SpriteRenderer).flipX = false;
 
                         entity.ReplaceComponent(GameComponentsLookup.Transform, entity.transform);
                     }
