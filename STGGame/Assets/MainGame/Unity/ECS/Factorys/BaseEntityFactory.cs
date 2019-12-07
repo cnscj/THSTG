@@ -42,52 +42,7 @@ namespace STGU3D
         public WingmanFactory AsWingman() { return (WingmanFactory)this; }
 
         //通用方法
-        protected GameObject NewViewNode(bool usePool, string viewCode, Vector3 position, Vector3 rotation)
-        {
-            string viewName = null;
-            GameObject viewGO = null;
-            GameObject prefabInstance = null;
-            if (usePool)
-            {
-                if (!GameObjectPoolManager.GetInstance().HasGameObjectPool(viewCode))
-                {
-                    var prefab = AssetManager.GetInstance().LoadSprite(viewCode);
-                    if (prefab)
-                    {
-                        GameObjectPoolManager.GetInstance().NewGameObjectPool(viewCode, prefab);
-                    }
-                }
-                prefabInstance = GameObjectPoolManager.GetInstance().GetGameObject(viewCode);
-            }
-            else
-            {
-                var prefab = AssetManager.GetInstance().LoadSprite(viewCode);
-                if (prefab)
-                {
-                    prefabInstance = GameObject.Instantiate(prefab);
-                }
-            }
-
-
-            if (!string.IsNullOrEmpty(viewName))
-            {
-                viewGO = new GameObject(viewName);
-                prefabInstance.transform.SetParent(viewGO.transform);
-            }
-            else
-            {
-                viewGO = prefabInstance;
-            }
-
-            //初始化
-            viewGO.transform.localPosition = position;
-            viewGO.transform.localEulerAngles = rotation;
-
-            //EEntityType entityType = EntityUtil.GetEntityTypeByCode(viewCode);
-            
-
-            return viewGO;
-        }
+       
 
         protected void AddEntityDataComponent(GameEntity entity, string code)
         {
@@ -108,25 +63,17 @@ namespace STGU3D
 
         protected void AddCommonComponent(GameEntity entity)
         {
-            //XXX:用这个法子创建的组件是复用原有的,因此必须手动初始化下
+            //用这个法子创建的组件是复用原有的,因此必须手动初始化下
             var transCom = entity.CreateComponent<TransformComponent>(GameComponentsLookup.Transform);
             var movementCom = entity.CreateComponent<MovementComponent>(GameComponentsLookup.Movement);
             var viewCom = entity.CreateComponent<ViewComponent>(GameComponentsLookup.View);
             var destroyCom = entity.CreateComponent<DestroyedComponent>(GameComponentsLookup.Destroyed);
 
             ////
-            transCom.position = Vector3.zero;
-            transCom.rotation = Vector3.zero;
-
-            movementCom.moveSpeed = Vector3.zero;
-            movementCom.rotationSpeed = Vector3.zero;
-
-            viewCom.collider = null;
-            viewCom.animator = null;
-            viewCom.renderer = null;
-            viewCom.viewGO = null;
-
-            destroyCom.isDestroyed = false;
+            ComponentUtil.ClearTransform(transCom);
+            ComponentUtil.ClearMovement(movementCom);
+            ComponentUtil.ClearView(viewCom);
+            ComponentUtil.ClearDestroyed(destroyCom);
 
             ////
             entity.AddComponent(GameComponentsLookup.Transform, transCom);

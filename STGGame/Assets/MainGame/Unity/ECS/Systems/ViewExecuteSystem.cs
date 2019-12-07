@@ -32,8 +32,8 @@ namespace STGU3D
                 //存在1帧的延误
                 if (entity.view.viewGO)
                 {
-                    entity.view.viewGO.transform.localPosition = entity.transform.position;
-                    entity.view.viewGO.transform.localEulerAngles = entity.transform.rotation;
+                    entity.view.viewGO.transform.position = entity.transform.position;
+                    entity.view.viewGO.transform.eulerAngles = entity.transform.rotation;
                 }
             }
 

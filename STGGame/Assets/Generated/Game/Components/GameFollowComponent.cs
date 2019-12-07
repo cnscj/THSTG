@@ -11,22 +11,22 @@ public partial class GameEntity {
     public STGU3D.FollowComponent follow { get { return (STGU3D.FollowComponent)GetComponent(GameComponentsLookup.Follow); } }
     public bool hasFollow { get { return HasComponent(GameComponentsLookup.Follow); } }
 
-    public void AddFollow(UnityEngine.Vector3 newDestination, float newFollowRadius, float newFollowSpeed, bool newIsFollowing) {
+    public void AddFollow(UnityEngine.Vector3 newDestination, float newFollowRadius, float newFollowStep, bool newIsFollowing) {
         var index = GameComponentsLookup.Follow;
         var component = (STGU3D.FollowComponent)CreateComponent(index, typeof(STGU3D.FollowComponent));
         component.destination = newDestination;
         component.followRadius = newFollowRadius;
-        component.followSpeed = newFollowSpeed;
+        component.followStep = newFollowStep;
         component.isFollowing = newIsFollowing;
         AddComponent(index, component);
     }
 
-    public void ReplaceFollow(UnityEngine.Vector3 newDestination, float newFollowRadius, float newFollowSpeed, bool newIsFollowing) {
+    public void ReplaceFollow(UnityEngine.Vector3 newDestination, float newFollowRadius, float newFollowStep, bool newIsFollowing) {
         var index = GameComponentsLookup.Follow;
         var component = (STGU3D.FollowComponent)CreateComponent(index, typeof(STGU3D.FollowComponent));
         component.destination = newDestination;
         component.followRadius = newFollowRadius;
-        component.followSpeed = newFollowSpeed;
+        component.followStep = newFollowStep;
         component.isFollowing = newIsFollowing;
         ReplaceComponent(index, component);
     }

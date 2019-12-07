@@ -51,7 +51,7 @@ namespace STGU3D
                 };
 
                 {
-                    entity.view.viewGO = NewViewNode(false, entity.entityData.entityData["viewCode"], entity.transform.localPosition, entity.transform.localRotation);
+                    entity.view.viewGO = ComponentUtil.NewViewNode(false, entity.entityData.entityData["viewCode"], entity.transform.localPosition, entity.transform.localRotation);
                     entity.view.animator = entity.view.viewGO.GetComponentInChildren<Animator>();
                     entity.view.renderer = entity.view.viewGO.GetComponentInChildren<Renderer>();
                     entity.view.collider = entity.view.viewGO.GetComponentInChildren<Collider>();
@@ -75,8 +75,9 @@ namespace STGU3D
                     if (onmyougyokuWingman.hasEntityData)
                     {
                         //TODO:
-                        onmyougyokuWingman.movement.rotationSpeed.z = 100f;       //自旋
+                        onmyougyokuWingman.movement.rotationSpeed.z = 100f;                         //自旋
                         onmyougyokuWingman.transform.parent = entity.transform;
+                        onmyougyokuWingman.transform.localPosition = new Vector3(0, 0.5f, 0);       //偏移一点
                     }
                 }
 

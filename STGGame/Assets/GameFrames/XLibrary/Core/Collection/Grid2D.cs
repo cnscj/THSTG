@@ -6,8 +6,10 @@ namespace XLibrary.Collection
     public class Grid2D<T>
     {
         private static readonly List<T> s_empty = new List<T>();
-        private List<List<T>> m_grids;
-        private Dictionary<T, List<T>> m_enumerator;
+        private List<Dictionary<T,int>> m_gridsList;
+        private Dictionary<T, Dictionary<T, int>> m_gridEnumerator;
+        private Dictionary<int, bool> m_gridDirty;
+        private Dictionary<int, List<T>> m_listCache;
         private int m_gridWidth;
         private int m_gridHeight;
         private int m_row;
@@ -33,10 +35,12 @@ namespace XLibrary.Collection
                 m_gridHeight = height / m_row;
                 if (m_gridWidth > 0 && m_gridHeight > 0)
                 {
-                    m_grids = new List<List<T>>(m_row * m_col);
-                    for (int i = 0; i < m_grids.Capacity; i++) m_grids.Add(null);
+                    m_gridsList = new List<Dictionary<T, int>>(m_row * m_col);
+                    for (int i = 0; i < m_gridsList.Capacity; i++) m_gridsList.Add(null);
 
-                    m_enumerator = new Dictionary<T, List<T>>();
+                    m_gridDirty = new Dictionary<int, bool>();
+                    m_listCache = new Dictionary<int, List<T>>();
+                    m_gridEnumerator = new Dictionary<T, Dictionary<T, int>>();
                     return true;
                 }
 
@@ -46,33 +50,37 @@ namespace XLibrary.Collection
 
         public void Update(T obj, int x, int y)
         {
-            if (m_grids == null) return;
+            if (m_gridsList == null) return;
 
             int index = ConvertGridIndex(x, y);
-            if (index >= 0 && index < m_grids.Capacity)
+            if (index >= 0 && index < m_gridsList.Capacity)
             {
-                var nearbyList = m_grids[index];
-                if (nearbyList == null)
+                var curMap = m_gridsList[index];
+                if (curMap == null)
                 {
-                    nearbyList = new List<T>();
-                    m_grids[index] = nearbyList;
+                    curMap = new Dictionary<T, int>();
+                    m_gridsList[index] = curMap;
                 }
 
                 //更新位置
-                if (m_enumerator.ContainsKey(obj))
+                if (m_gridEnumerator.ContainsKey(obj))
                 {
-                    var inList = m_enumerator[obj];
-                    if (inList == nearbyList) return;
-                        
-                    inList.Remove(obj);
-                    m_enumerator.Remove(obj);
+                    var lastMap = m_gridEnumerator[obj];
+                    if (lastMap == curMap) return;
+
+                    m_gridDirty[lastMap[obj]] = true;
+                    lastMap.Remove(obj);
+                    m_gridEnumerator.Remove(obj);
                 }
-                nearbyList.Add(obj);
-                m_enumerator.Add(obj, nearbyList);
+
+                m_gridDirty[index] = true;
+                curMap.Add(obj, index);
+                m_gridEnumerator.Add(obj, curMap);
+                
             }
             else
             {
-                if (m_enumerator.ContainsKey(obj))
+                if (m_gridEnumerator.ContainsKey(obj))
                 {
                     Remove(obj);
                 }
@@ -81,34 +89,70 @@ namespace XLibrary.Collection
 
         public void Remove(T obj)
         {
-            if (m_grids == null) return;
-            if (m_enumerator.ContainsKey(obj))
+            if (m_gridsList == null) return;
+            if (m_gridEnumerator.ContainsKey(obj))
             {
-                var inList = m_enumerator[obj];
+                var lastMap = m_gridEnumerator[obj];
 
-                inList.Remove(obj);
-                m_enumerator.Remove(obj);
+                m_gridDirty.Remove(lastMap[obj]);
+                lastMap.Remove(obj);
+                m_gridEnumerator.Remove(obj);
             }
             
         }
+
         public List<T> Get(int index)
         {
-            if (m_grids == null) return s_empty;
-            if (index >= 0 && index < m_grids.Capacity)
+            if (m_gridsList == null) return s_empty;
+            List<T> retList = s_empty;
+            if (index >= 0 && index < m_gridsList.Capacity)
             {
-                var nearbyList = m_grids[index] != null ? m_grids[index] : s_empty;
-                return nearbyList;
+                bool isNeedUpdate = true;
+                if (m_listCache.TryGetValue(index, out retList))    //直接从Cache里取
+                {
+                    bool isDirty = false;
+                    m_gridDirty.TryGetValue(index, out isDirty);
+                    isNeedUpdate = isDirty;
+                }
+               
+                if (isNeedUpdate)
+                {
+                    var gridMap = m_gridsList[index];
+                    if (gridMap != null)
+                    {
+                        if (gridMap.Count > 0)
+                        {
+                            retList = new List<T>(gridMap.Keys);                 //大量高速移动的话,还是会很频繁
+                            m_listCache[index] = retList;
+                        }
+                    }
+                }
+            }
+
+            m_gridDirty[index] = false;
+            return retList;
+        }
+        public List<T> Local(T obj)
+        {
+            if (obj != null)
+            {
+                if (m_gridEnumerator.ContainsKey(obj))
+                {
+                    var lastMap = m_gridEnumerator[obj];
+                    var index = lastMap[obj];
+                    return Get(index);
+                }
             }
             return s_empty;
         }
 
-        public List<T> Gride(int row, int col)
-        {
+        public List<T> GetByGrid(int row, int col)
+        { 
             int index = GetGridIndex(row, col);
             return Get(index);
         }
 
-        public List<T> Local(int x, int y)
+        public List<T> GetByPosition(int x, int y)
         {
             int index = ConvertGridIndex(x, y);
             return Get(index);
@@ -116,18 +160,18 @@ namespace XLibrary.Collection
 
         public void Clear()
         {
-            if (m_grids == null) return;
+            if (m_gridsList == null) return;
 
-            m_grids = new List<List<T>>(m_row * m_col);
-            foreach(var list in m_grids)
+            foreach(var list in m_gridsList)
             {
                 if (list != null)
                 {
                     list.Clear();
                 }
             }
-
-            m_enumerator = new Dictionary<T, List<T>>();
+            m_gridDirty.Clear();
+            m_listCache.Clear();
+            m_gridEnumerator.Clear();
         }
 
         //
