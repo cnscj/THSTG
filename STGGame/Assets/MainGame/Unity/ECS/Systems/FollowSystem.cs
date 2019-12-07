@@ -72,12 +72,9 @@ namespace STGU3D
                         float lambda = Angle180(Vector3.forward, direction) * Mathf.PI / 180f;  //与平面XOY的夹角
 
                         //球的参数方程
-                        float newX = NormalZero(newMoveSpeed * Mathf.Cos(theta) * Mathf.Sin(lambda));
-                        float newY = NormalZero(newMoveSpeed * Mathf.Sin(theta) * Mathf.Sin(lambda));
-                        float newZ = NormalZero(newMoveSpeed * Mathf.Cos(lambda));
-
-                        Vector3 newSpeed = new Vector3(newX, newY, newZ);
-                        entity.movement.moveSpeed = newSpeed;
+                        entity.movement.moveSpeed.x = NormalZero(newMoveSpeed * Mathf.Cos(theta) * Mathf.Sin(lambda));
+                        entity.movement.moveSpeed.y = NormalZero(newMoveSpeed * Mathf.Sin(theta) * Mathf.Sin(lambda));
+                        entity.movement.moveSpeed.z = NormalZero(newMoveSpeed * Mathf.Cos(lambda));
                     }
                 }
             }
