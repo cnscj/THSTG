@@ -51,7 +51,7 @@ namespace STGU3D
                 };
 
                 {
-                    entity.view.viewGO = ComponentUtil.NewViewNode(false, entity.entityData.entityData["viewCode"], entity.transform.localPosition, entity.transform.localRotation);
+                    entity.view.viewGO = ViewUtil.NewRendererNode(false, entity.entityData.entityData["viewCode"], entity.transform.localPosition, entity.transform.localRotation);
                     entity.view.animator = entity.view.viewGO.GetComponentInChildren<Animator>();
                     entity.view.renderer = entity.view.viewGO.GetComponentInChildren<Renderer>();
                     entity.view.collider = entity.view.viewGO.GetComponentInChildren<Collider>();

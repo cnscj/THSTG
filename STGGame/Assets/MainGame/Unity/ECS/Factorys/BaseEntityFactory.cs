@@ -40,9 +40,9 @@ namespace STGU3D
         public HeroFactory AsHero(){ return (HeroFactory)this; }
         public BulletFactory AsBullet() { return (BulletFactory)this; }
         public WingmanFactory AsWingman() { return (WingmanFactory)this; }
-
+        public MobFactory AsMob() { return (MobFactory)this; }
         //通用方法
-       
+
 
         protected void AddEntityDataComponent(GameEntity entity, string code)
         {

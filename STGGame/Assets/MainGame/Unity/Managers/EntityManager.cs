@@ -12,6 +12,15 @@ namespace STGU3D
 {
     public class EntityManager : MonoSingleton<EntityManager>
     {
+        //实体工厂
+        public static readonly Dictionary<EEntityType, Type> s_factoryType = new Dictionary<EEntityType, Type>()
+        {
+            [EEntityType.Hero] = typeof(HeroFactory),
+            [EEntityType.Wingman] = typeof(WingmanFactory),
+            [EEntityType.Mob] = typeof(MobFactory),
+            [EEntityType.Bullet] = typeof(BulletFactory),
+            [EEntityType.Prop] = typeof(PropFactory),
+        };
         public GameObject stageRoot;
         public GameObject mapRoot;
         public GameObject heroRoot;
@@ -78,17 +87,10 @@ namespace STGU3D
             BaseEntityFactory factory = null;
             if (!entityFactoryMap.TryGetValue(entityType, out factory))
             {
-                switch (entityType)
+                Type clsType = null;
+                if (s_factoryType.TryGetValue(entityType,out clsType))
                 {
-                    case EEntityType.Hero:
-                        factory = new HeroFactory();
-                        break;
-                    case EEntityType.Wingman:
-                        factory = new WingmanFactory();
-                        break;
-                    case EEntityType.Bullet:
-                        factory = new BulletFactory();
-                        break;
+                    factory = (BaseEntityFactory)Activator.CreateInstance(clsType);
                 }
 
                 if (factory != null)

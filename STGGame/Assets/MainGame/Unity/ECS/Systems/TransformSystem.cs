@@ -38,7 +38,6 @@ namespace STGU3D
                     e.transform.position = e.transform.localPosition;
                     e.transform.rotation = e.transform.localRotation;
                 }
-                EntityCache.GetInstance().UpdateGrid(e);
             }
         }
     }

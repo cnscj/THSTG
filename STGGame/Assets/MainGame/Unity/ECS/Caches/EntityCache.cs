@@ -36,13 +36,13 @@ namespace STGU3D
             return heroMap[ePlayerType];
         }
 
-        public void UpdateGrid(GameEntity entity)
-        {
-            if (entity.hasTransform)
-            {
-                var sceenPoint = DirectorUtil.WorldToScreenPoint(entity.transform.position);
-                m_grid.Update(entity,(int) (sceenPoint.x), (int)(sceenPoint.y));
-            }
-        }
+        //public void UpdateGrid(GameEntity entity)
+        //{
+        //    if (entity.hasTransform)
+        //    {
+        //        var sceenPoint = DirectorUtil.WorldToScreenPoint(entity.transform.position);
+        //        m_grid.Update(entity,(int) (sceenPoint.x), (int)(sceenPoint.y));
+        //    }
+        //}
     }
 }

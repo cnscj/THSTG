@@ -132,6 +132,7 @@ namespace XLibrary.Collection
             m_gridDirty[index] = false;
             return retList;
         }
+
         public List<T> Local(T obj)
         {
             if (obj != null)

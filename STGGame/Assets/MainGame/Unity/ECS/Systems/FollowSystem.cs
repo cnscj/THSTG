@@ -1,4 +1,5 @@
 ﻿using Entitas;
+using STGGame;
 using UnityEngine;
 
 namespace STGU3D
@@ -18,28 +19,18 @@ namespace STGU3D
                 ));
         }
 
-        public float Angle360(Vector3 from, Vector3 to)
-        {
-            Vector3 v3 = Vector3.Cross(from, to);
-            if (v3.z >= 0f)
-            {
-                return Vector3.Angle(from, to);
-            }
-            else
-            {
-                return 360 - Vector3.Angle(from, to);
-            }
-        }
-
-        public float Angle180(Vector3 from, Vector3 to)
-        {
-            return Vector3.Angle(from, to); 
-        }
-
         //精度化
-        public float NormalZero(float val)
+        public float NormalizeZero(float val)
         {
             return Mathf.Abs(val) < PRECISION ? 0f : val;
+        }
+
+        public Vector3 NormalizeZero(in Vector3 inVec, out Vector3 outVec)
+        {
+            outVec.x = NormalizeZero(inVec.x);
+            outVec.y = NormalizeZero(inVec.y);
+            outVec.z = NormalizeZero(inVec.z);
+            return outVec;
         }
 
         public void Execute()
@@ -67,14 +58,13 @@ namespace STGU3D
                             newMoveSpeed = dStep;
                         }
 
-                        Vector3 direction = abVec.normalized;
-                        float theta = Angle360(Vector3.right, direction) * Mathf.PI / 180f;     //与X轴夹角
-                        float lambda = Angle180(Vector3.forward, direction) * Mathf.PI / 180f;  //与平面XOY的夹角
+                        //修改长度
+                        MathUtil.ChangeVectorLength(newMoveSpeed, in abVec, out abVec);
+                        NormalizeZero(in abVec, out abVec);
 
                         //球的参数方程
-                        entity.movement.moveSpeed.x = NormalZero(newMoveSpeed * Mathf.Cos(theta) * Mathf.Sin(lambda));
-                        entity.movement.moveSpeed.y = NormalZero(newMoveSpeed * Mathf.Sin(theta) * Mathf.Sin(lambda));
-                        entity.movement.moveSpeed.z = NormalZero(newMoveSpeed * Mathf.Cos(lambda));
+                        entity.movement.moveSpeed = abVec;
+
                     }
                 }
             }

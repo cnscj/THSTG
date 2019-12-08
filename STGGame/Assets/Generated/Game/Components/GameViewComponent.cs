@@ -11,9 +11,10 @@ public partial class GameEntity {
     public STGU3D.ViewComponent view { get { return (STGU3D.ViewComponent)GetComponent(GameComponentsLookup.View); } }
     public bool hasView { get { return HasComponent(GameComponentsLookup.View); } }
 
-    public void AddView(UnityEngine.GameObject newViewGO, UnityEngine.Renderer newRenderer, UnityEngine.Animator newAnimator, UnityEngine.Collider newCollider) {
+    public void AddView(STGGame.IView newView, UnityEngine.GameObject newViewGO, UnityEngine.Renderer newRenderer, UnityEngine.Animator newAnimator, UnityEngine.Collider newCollider) {
         var index = GameComponentsLookup.View;
         var component = (STGU3D.ViewComponent)CreateComponent(index, typeof(STGU3D.ViewComponent));
+        component.view = newView;
         component.viewGO = newViewGO;
         component.renderer = newRenderer;
         component.animator = newAnimator;
@@ -21,9 +22,10 @@ public partial class GameEntity {
         AddComponent(index, component);
     }
 
-    public void ReplaceView(UnityEngine.GameObject newViewGO, UnityEngine.Renderer newRenderer, UnityEngine.Animator newAnimator, UnityEngine.Collider newCollider) {
+    public void ReplaceView(STGGame.IView newView, UnityEngine.GameObject newViewGO, UnityEngine.Renderer newRenderer, UnityEngine.Animator newAnimator, UnityEngine.Collider newCollider) {
         var index = GameComponentsLookup.View;
         var component = (STGU3D.ViewComponent)CreateComponent(index, typeof(STGU3D.ViewComponent));
+        component.view = newView;
         component.viewGO = newViewGO;
         component.renderer = newRenderer;
         component.animator = newAnimator;
