@@ -1,5 +1,5 @@
-﻿code,name,type,life,speed
-int,string,int,int,int
-10400001,花田妖精,1,1,2
-10400002,竹林妖精,1,1,2
-10400003,旋风怪,1,1,2
+﻿code,name,type,life,speed,viewCode
+int,string,int,int,int,int
+10400100,花田妖精,1,1,2,40400101
+10400200,竹林妖精,2,1,2,40400201
+10400300,旋风怪,3,1,2,40400301

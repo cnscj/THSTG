@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Entitas.Unity;
+using STGGame;
 using UnityEngine;
 using XLibGame;
 
@@ -8,9 +9,11 @@ namespace STGU3D
 {
     public static class ComponentUtil
     {
-        public static void InitView(ViewComponent com)
+        public static IView CreateView(GameEntity entity)
         {
-
+            var view = new UnityView();
+            view.Init(entity);
+            return view;
         }
 
         public static void ClearTransform(TransformComponent com)
@@ -31,10 +34,14 @@ namespace STGU3D
 
         public static void ClearView(ViewComponent com)
         {
-            com.collider = null;
-            com.animator = null;
-            com.renderer = null;
-            com.viewGO = null;
+            if (com != null)
+            {
+                if (com.view != null)
+                {
+                    com.view.Clear();
+                }
+                com.view = null;
+            }
         }
 
         public static void ClearDestroyed(DestroyedComponent com)

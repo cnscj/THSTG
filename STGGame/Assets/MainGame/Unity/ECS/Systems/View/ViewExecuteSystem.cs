@@ -30,10 +30,10 @@ namespace STGU3D
             foreach (var entity in __moveGroup.GetEntities())
             {
                 //存在1帧的延误
-                if (entity.view.viewGO)
+                if (entity.view.view != null)
                 {
-                    entity.view.viewGO.transform.position = entity.transform.position;
-                    entity.view.viewGO.transform.eulerAngles = entity.transform.rotation;
+                    entity.view.view.SetPosition(entity.transform.position.x, entity.transform.position.y, entity.transform.position.z);
+                    entity.view.view.SetRotation(entity.transform.rotation.x, entity.transform.rotation.y, entity.transform.rotation.z);
                 }
             }
 
@@ -41,30 +41,30 @@ namespace STGU3D
 
             foreach (var entity in __moveAnimGroup.GetEntities())
             {
-                if (entity.view.animator)
-                {
+                //if (entity.view.animator)
+                //{
 
-                    if (entity.movement.moveSpeed.x > 0f) //右
-                    {
-                        entity.view.animator.SetInteger("moveSpeed", 1);
-                        (entity.view.renderer as SpriteRenderer).flipX = true;
+                //    if (entity.movement.moveSpeed.x > 0f) //右
+                //    {
+                //        entity.view.animator.SetInteger("moveSpeed", 1);
+                //        (entity.view.renderer as SpriteRenderer).flipX = true;
 
-                        entity.ReplaceComponent(GameComponentsLookup.Transform, entity.transform);
-                    }
-                    else if (entity.movement.moveSpeed.x < 0f) //左
-                    {
-                        entity.view.animator.SetInteger("moveSpeed", -1);
-                        (entity.view.renderer as SpriteRenderer).flipX = false;
+                //        entity.ReplaceComponent(GameComponentsLookup.Transform, entity.transform);
+                //    }
+                //    else if (entity.movement.moveSpeed.x < 0f) //左
+                //    {
+                //        entity.view.animator.SetInteger("moveSpeed", -1);
+                //        (entity.view.renderer as SpriteRenderer).flipX = false;
 
-                        entity.ReplaceComponent(GameComponentsLookup.Transform, entity.transform);
-                    }
-                    else
-                    {
-                        entity.view.animator.SetInteger("moveSpeed", 0);
-                    }
+                //        entity.ReplaceComponent(GameComponentsLookup.Transform, entity.transform);
+                //    }
+                //    else
+                //    {
+                //        entity.view.animator.SetInteger("moveSpeed", 0);
+                //    }
 
 
-                }
+                //}
             }
         }
     }

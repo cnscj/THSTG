@@ -46,11 +46,11 @@ namespace STGU3D
                 //移除View
                 if (!entity.destroyed.isDestroyed)
                     continue;
-
-                GameObjectPoolManager.GetInstance().ReleaseGameObject(entity.view.viewGO);
+                if (entity.view.view != null)
+                {
+                    entity.view.view.Clear();
+                }
             }
-
-
 
             foreach (var entity in __heroBulletGroup.GetEntities())
             {

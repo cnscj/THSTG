@@ -23,7 +23,7 @@ namespace STGU3D
             return mainGO;
         }
 
-        public static GameObject NewRendererNode(bool usePool, string viewCode, Vector3 position, Vector3 rotation)
+        public static GameObject NewRendererNode(bool usePool, string viewCode)
         {
             string viewName = null;
             GameObject viewGO = null;
@@ -59,12 +59,6 @@ namespace STGU3D
             {
                 viewGO = prefabInstance;
             }
-
-            //初始化
-            viewGO.transform.localPosition = position;
-            viewGO.transform.localEulerAngles = rotation;
-
-            //EEntityType entityType = EntityUtil.GetEntityTypeByCode(viewCode);
 
             return viewGO;
         }

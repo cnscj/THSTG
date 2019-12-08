@@ -43,19 +43,16 @@ namespace STGU3D
                 shotCom.action = (shotEntity) =>
                 {
                     var bulletEntity = EntityManager.GetInstance().GetOrNewEntityFactory(EEntityType.Bullet).AsBullet().CreateBullet(ECampType.Hero, shotEntity.entityData.entityData["bulletCode"]);
-                    bulletEntity.transform.localPosition = shotEntity.transform.localPosition;                          //在自机处生成
-                    bulletEntity.view.viewGO.transform.localPosition = shotEntity.transform.localPosition;              //覆盖第一帧刷新
+                    bulletEntity.transform.localPosition = shotEntity.transform.localPosition;                                                                                                          //在自机处生成
+                    bulletEntity.view.view.SetPosition(shotEntity.transform.localPosition.x, shotEntity.transform.localPosition.y, shotEntity.transform.localPosition.z);                               //覆盖第一帧刷新
 
 
                     return bulletEntity;
                 };
 
                 {
-                    entity.view.viewGO = ViewUtil.NewRendererNode(false, entity.entityData.entityData["viewCode"], entity.transform.localPosition, entity.transform.localRotation);
-                    entity.view.animator = entity.view.viewGO.GetComponentInChildren<Animator>();
-                    entity.view.renderer = entity.view.viewGO.GetComponentInChildren<Renderer>();
-                    entity.view.collider = entity.view.viewGO.GetComponentInChildren<Collider>();
-
+                    entity.view.view = ComponentUtil.CreateView(entity);
+                    entity.view.view.CreateBody(entity.entityData.entityData["viewCode"]);
                     entity.ReplaceComponent(GameComponentsLookup.View, entity.view);
                 }
 
