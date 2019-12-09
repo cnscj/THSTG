@@ -23,7 +23,7 @@ namespace STGU3D
             {
                 entity.movement.moveSpeed.y = entity.entityData.entityData["speed"].ToFloat();
                 entity.view.view = ComponentUtil.CreateView(entity);
-                entity.view.view.CreateBody(entity.entityData.entityData["viewCode"]);
+                entity.view.view.AddBody(entity.entityData.entityData["viewCode"]);
                 entity.ReplaceComponent(GameComponentsLookup.View, entity.view);
 
                 {

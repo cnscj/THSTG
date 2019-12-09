@@ -12,7 +12,7 @@ namespace STGU3D
         public static IView CreateView(GameEntity entity)
         {
             var view = new UnityView();
-            view.Init(entity);
+            view.Create(entity);
             return view;
         }
 

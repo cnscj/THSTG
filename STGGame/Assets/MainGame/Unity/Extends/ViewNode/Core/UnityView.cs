@@ -8,7 +8,11 @@ namespace STGU3D
     public class UnityView : IView
     {
         public GameObject viewGO;           //与Unity关联的节点
-        public BodyNode body;
+        public BodyNode body;               //身体节点
+        private void Awake()
+        {
+
+        }
         public void Clear()
         {
             if (viewGO != null)
@@ -18,11 +22,16 @@ namespace STGU3D
                 {
                     entityLink.Unlink();
                 }
+                if(body != null)
+                {
+                    body.Destroy();
+                }
+                //TODO:应该送入缓存区
                 GameObject.Destroy(viewGO);
             }
         }
 
-        public void Init(GameEntity entity)
+        public void Create(GameEntity entity)
         {
             Clear();
             viewGO = new GameObject("View");
@@ -72,7 +81,7 @@ namespace STGU3D
             return null;
         }
 
-        public void CreateBody(string code)
+        public void AddBody(string code)
         {
             if (body != null)
             {
@@ -85,5 +94,6 @@ namespace STGU3D
                 body.Create(code);
             }
         }
+
     }
 }

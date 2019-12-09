@@ -12,11 +12,11 @@ namespace STGU3D
         void SetRotation(in float x, in float y, in float z);
         void GetRotation(out float x, out float y, out float z);
 
-        void CreateBody(string code);
+        void AddBody(string code);
 
         object Command(int opear,object data = null);
 
-        void Init(GameEntity entity);
+        void Create(GameEntity entity);
         void Clear();
     }
 

@@ -9,16 +9,14 @@ namespace STGU3D
     {
         public GameObject body;
         public GameObject showGO;
-        public Animator animator;
 
-        void Start()
-        {
-            NewBody();
-        }
+        public new Renderer renderer;
+        public Animator animator;
+        public new Collider collider;
 
         public void Create(string code)
         {
-            NewBody();
+            TryNewBody();
 
             EEntityType entityType = EntityUtil.GetEntityTypeByCode(code);
             if (entityType == EEntityType.Bullet)
@@ -31,9 +29,14 @@ namespace STGU3D
             }
             showGO.transform.localPosition = body.transform.localPosition;
             showGO.transform.SetParent(body.transform);
+
+            renderer = renderer != null ? renderer : showGO.GetComponentInChildren<Renderer>();
+            animator = animator != null ? animator : showGO.GetComponentInChildren<Animator>();
+            collider = collider != null ? collider : showGO.GetComponentInChildren<Collider>();
+
         }
 
-        private void OnDestroy()
+        public void Destroy()
         {
             if (GameObjectPoolManager.GetInstance())
             {
@@ -41,7 +44,7 @@ namespace STGU3D
             }
         }
 
-        private void NewBody()
+        private void TryNewBody()
         {
             if (body == null)
             {
