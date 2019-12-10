@@ -7,7 +7,6 @@ namespace STGU3D
     [Game]
     public class MobDataComponent : IComponent
     {
-        public EMobType mobType;
     }
 
 }

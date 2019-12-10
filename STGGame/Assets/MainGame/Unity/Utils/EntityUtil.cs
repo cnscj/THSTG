@@ -15,6 +15,12 @@ namespace STGU3D
             return (EHeroType)type;
         }
 
+        public static EBossType GetBossTypeByCode(long code)
+        {
+            long type = (code / 1000) % 100;
+            return (EBossType)type;
+        }
+        ///
         public static EEntityType GetEntityTypeByCode(string code)
         {
             return (EEntityType)int.Parse(code.Substring(1, 2));    //直接取前2位,不过必须保证长度
@@ -23,6 +29,11 @@ namespace STGU3D
         public static EHeroType GetHeroTypeByCode(string code)
         {
             return GetHeroTypeByCode(long.Parse(code));
+        }
+
+        public static EBossType GetBossTypeByCode(string code)
+        {
+            return GetBossTypeByCode(long.Parse(code));
         }
     }
 

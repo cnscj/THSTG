@@ -18,6 +18,7 @@ namespace STGU3D
             [EEntityType.Hero] = typeof(HeroFactory),
             [EEntityType.Wingman] = typeof(WingmanFactory),
             [EEntityType.Mob] = typeof(MobFactory),
+            [EEntityType.Boss] = typeof(BossFactory),
             [EEntityType.Bullet] = typeof(BulletFactory),
             [EEntityType.Prop] = typeof(PropFactory),
         };

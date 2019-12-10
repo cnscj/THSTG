@@ -8,25 +8,25 @@
 //------------------------------------------------------------------------------
 public partial class GameEntity {
 
-    public STGU3D.MobDataComponent mobData { get { return (STGU3D.MobDataComponent)GetComponent(GameComponentsLookup.MobData); } }
-    public bool hasMobData { get { return HasComponent(GameComponentsLookup.MobData); } }
+    static readonly STGU3D.MobDataComponent mobDataComponent = new STGU3D.MobDataComponent();
 
-    public void AddMobData(STGU3D.EMobType newMobType) {
-        var index = GameComponentsLookup.MobData;
-        var component = (STGU3D.MobDataComponent)CreateComponent(index, typeof(STGU3D.MobDataComponent));
-        component.mobType = newMobType;
-        AddComponent(index, component);
-    }
+    public bool isMobData {
+        get { return HasComponent(GameComponentsLookup.MobData); }
+        set {
+            if (value != isMobData) {
+                var index = GameComponentsLookup.MobData;
+                if (value) {
+                    var componentPool = GetComponentPool(index);
+                    var component = componentPool.Count > 0
+                            ? componentPool.Pop()
+                            : mobDataComponent;
 
-    public void ReplaceMobData(STGU3D.EMobType newMobType) {
-        var index = GameComponentsLookup.MobData;
-        var component = (STGU3D.MobDataComponent)CreateComponent(index, typeof(STGU3D.MobDataComponent));
-        component.mobType = newMobType;
-        ReplaceComponent(index, component);
-    }
-
-    public void RemoveMobData() {
-        RemoveComponent(GameComponentsLookup.MobData);
+                    AddComponent(index, component);
+                } else {
+                    RemoveComponent(index);
+                }
+            }
+        }
     }
 }
 

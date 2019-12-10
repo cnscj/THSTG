@@ -7,7 +7,7 @@ namespace STGU3D
     [Game]
     public class ViewComponent : IComponent
     {
-        public IView view;  //
+        public IView view;  //抽象交互
     }
 
 }

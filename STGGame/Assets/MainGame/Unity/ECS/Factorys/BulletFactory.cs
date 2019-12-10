@@ -55,7 +55,7 @@ namespace STGU3D
             return entity;
         }
 
-        public GameEntity CreateBullet(ECampType campType, EBulletType bulletType, EColorType colorType = EColorType.Unknow)
+        public GameEntity CreateBullet(ECampType campType, int bulletType, EColorType colorType = EColorType.Unknow)
         {
             string code = string.Format("{0}", 10000000 + 100000 * (int)EEntityType.Bullet + 100 * (int)bulletType + (int)colorType);
             return CreateBullet(campType, code);

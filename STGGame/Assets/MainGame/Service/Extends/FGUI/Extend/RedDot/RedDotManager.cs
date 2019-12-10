@@ -21,12 +21,12 @@ namespace STGService.UI
 
         }
 
-        public void SetStatus(RedDotParams redDotParams, bool isShow)
+        public void Update(RedDotParams redDotParams, bool isShow)
         {
 
         }
 
-        public bool GetStatus(RedDotParams redDotParams)
+        public bool IsShow(RedDotParams redDotParams)
         {
 
             return false;
