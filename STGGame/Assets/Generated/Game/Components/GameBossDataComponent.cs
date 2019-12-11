@@ -8,25 +8,25 @@
 //------------------------------------------------------------------------------
 public partial class GameEntity {
 
-    static readonly STGU3D.BossDataComponent bossDataComponent = new STGU3D.BossDataComponent();
+    public STGU3D.BossDataComponent bossData { get { return (STGU3D.BossDataComponent)GetComponent(GameComponentsLookup.BossData); } }
+    public bool hasBossData { get { return HasComponent(GameComponentsLookup.BossData); } }
 
-    public bool isBossData {
-        get { return HasComponent(GameComponentsLookup.BossData); }
-        set {
-            if (value != isBossData) {
-                var index = GameComponentsLookup.BossData;
-                if (value) {
-                    var componentPool = GetComponentPool(index);
-                    var component = componentPool.Count > 0
-                            ? componentPool.Pop()
-                            : bossDataComponent;
+    public void AddBossData(STGU3D.EBossType newBossType) {
+        var index = GameComponentsLookup.BossData;
+        var component = (STGU3D.BossDataComponent)CreateComponent(index, typeof(STGU3D.BossDataComponent));
+        component.bossType = newBossType;
+        AddComponent(index, component);
+    }
 
-                    AddComponent(index, component);
-                } else {
-                    RemoveComponent(index);
-                }
-            }
-        }
+    public void ReplaceBossData(STGU3D.EBossType newBossType) {
+        var index = GameComponentsLookup.BossData;
+        var component = (STGU3D.BossDataComponent)CreateComponent(index, typeof(STGU3D.BossDataComponent));
+        component.bossType = newBossType;
+        ReplaceComponent(index, component);
+    }
+
+    public void RemoveBossData() {
+        RemoveComponent(GameComponentsLookup.BossData);
     }
 }
 

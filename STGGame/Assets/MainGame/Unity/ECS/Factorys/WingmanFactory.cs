@@ -20,7 +20,7 @@ namespace STGU3D
             if (entity.hasEntityData)
             {
                 entity.view.view = ComponentUtil.CreateView(entity);
-                entity.view.view.AddBody(entity.entityData.entityData["viewCode"]);
+                ((UnityView)entity.view.view).AddBody(entity.entityData.entityData["viewCode"]);
                 entity.ReplaceComponent(GameComponentsLookup.View, entity.view);
             }
 

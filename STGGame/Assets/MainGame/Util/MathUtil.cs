@@ -42,7 +42,7 @@ namespace STGGame
         /// <returns></returns>
         public static float Rad2Deg(float radian)
         {
-            return radian / Mathf.Deg2Rad;
+            return radian * Mathf.Rad2Deg;
         }
 
         /// <summary>

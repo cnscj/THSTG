@@ -9,13 +9,12 @@ namespace STGU3D
             Add(new MovementSystem(contexts));
             Add(new TransformSystem(contexts));
 
-            Add(new ViewReactiveSystem(contexts));
-            Add(new ViewExecuteSystem(contexts));
+            Add(new ViewAnimationSystem(contexts));
+            Add(new ViewMovementSystem(contexts));
 
             Add(new ShotExecuteSystem(contexts));
             Add(new BombReactiveSystem(contexts));
             Add(new EliminateExecuteSystem(contexts));
-            //Add(new DecelerateSystem(contexts));
 
             Add(new InvincibleExecuteSystem(contexts));
             Add(new FollowSystem(contexts));

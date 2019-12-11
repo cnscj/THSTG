@@ -11,18 +11,20 @@ public partial class GameEntity {
     public STGU3D.TraceComponent trace { get { return (STGU3D.TraceComponent)GetComponent(GameComponentsLookup.Trace); } }
     public bool hasTrace { get { return HasComponent(GameComponentsLookup.Trace); } }
 
-    public void AddTrace(GameEntity newTarget, float newSearchRadius) {
+    public void AddTrace(GameEntity newTarget, bool newIsAutoSearch, float newSearchRadius) {
         var index = GameComponentsLookup.Trace;
         var component = (STGU3D.TraceComponent)CreateComponent(index, typeof(STGU3D.TraceComponent));
         component.target = newTarget;
+        component.isAutoSearch = newIsAutoSearch;
         component.searchRadius = newSearchRadius;
         AddComponent(index, component);
     }
 
-    public void ReplaceTrace(GameEntity newTarget, float newSearchRadius) {
+    public void ReplaceTrace(GameEntity newTarget, bool newIsAutoSearch, float newSearchRadius) {
         var index = GameComponentsLookup.Trace;
         var component = (STGU3D.TraceComponent)CreateComponent(index, typeof(STGU3D.TraceComponent));
         component.target = newTarget;
+        component.isAutoSearch = newIsAutoSearch;
         component.searchRadius = newSearchRadius;
         ReplaceComponent(index, component);
     }

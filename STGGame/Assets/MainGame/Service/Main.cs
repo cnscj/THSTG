@@ -23,7 +23,7 @@ namespace STGService
             EntitySystem.InitStart();
 
             EntityManager.GetInstance().GetOrNewEntityFactory(EEntityType.Hero).AsHero().CreateHero(EHeroType.Reimu);
-            SceneManager.GetInstance().LoadLevelScene("200001");
+            //SceneManager.GetInstance().LoadLevelScene("200001");
 
         }
 

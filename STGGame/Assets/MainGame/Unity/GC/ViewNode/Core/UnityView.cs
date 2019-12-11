@@ -75,7 +75,7 @@ namespace STGU3D
 
         ///
 
-        public object Command(int opear, object data = null)
+        public object Command(int operate, object data = null)
         {
 
             return null;
@@ -95,5 +95,9 @@ namespace STGU3D
             }
         }
 
+        public object GetObject()
+        {
+            return viewGO;
+        }
     }
 }
