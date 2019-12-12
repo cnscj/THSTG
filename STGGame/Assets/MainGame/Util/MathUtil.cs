@@ -8,6 +8,26 @@ namespace STGGame
         public static readonly float FLOAT_PRECISION = 0.01f;     //浮点比较精度
 
         /// <summary>
+        /// 是否是奇数
+        /// </summary>
+        /// <param name="num"></param>
+        /// <returns></returns>
+        public bool IsOdd(int num)
+        {
+            return (num & 1) == 1;
+        }
+
+        /// <summary>
+        /// 是否是偶数
+        /// </summary>
+        /// <param name="num"></param>
+        /// <returns></returns>
+        public bool IsEven(int num)
+        {
+            return (num & 1) == 0;
+        }
+
+        /// <summary>
         /// 浮点0比较
         /// </summary>
         /// <param name="val"></param>
@@ -110,7 +130,7 @@ namespace STGGame
         /// <summary>
         /// 修改向量方向
         /// </summary>
-        /// <param name="radius"></param>
+        /// <param name="newVec">新方向</param>
         /// <param name="inVec">原向量</param>
         /// <param name="outVec">输出向量</param>
         /// <returns></returns>
@@ -118,7 +138,7 @@ namespace STGGame
         {
             float oldLength = inVec.magnitude;
 
-            return ChangeVectorLength(oldLength, in inVec, out outVec);
+            return ChangeVectorLength(oldLength, in newVec, out outVec);
         }
     }
 

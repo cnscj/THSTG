@@ -27,23 +27,24 @@ public static class GameComponentsLookup {
     public const int Follow = 16;
     public const int Health = 17;
     public const int HeroBulletFlag = 18;
-    public const int Invincible = 19;
-    public const int Life = 20;
-    public const int MobData = 21;
-    public const int Movement = 22;
-    public const int OnmyougyokuWingman = 23;
-    public const int PlayerData = 24;
-    public const int PlayerSpellCard = 25;
-    public const int PropData = 26;
-    public const int Recycle = 27;
-    public const int Shift = 28;
-    public const int Shot = 29;
-    public const int Trace = 30;
-    public const int Transform = 31;
-    public const int View = 32;
-    public const int WingmanData = 33;
+    public const int Hitbox = 19;
+    public const int Invincible = 20;
+    public const int Life = 21;
+    public const int MobData = 22;
+    public const int Movement = 23;
+    public const int OnmyougyokuWingman = 24;
+    public const int PlayerData = 25;
+    public const int PlayerSpellCard = 26;
+    public const int PropData = 27;
+    public const int Recycle = 28;
+    public const int Shift = 29;
+    public const int Shot = 30;
+    public const int Trace = 31;
+    public const int Transform = 32;
+    public const int View = 33;
+    public const int WingmanData = 34;
 
-    public const int TotalComponents = 34;
+    public const int TotalComponents = 35;
 
     public static readonly string[] componentNames = {
         "ArmorHeadwear",
@@ -65,6 +66,7 @@ public static class GameComponentsLookup {
         "Follow",
         "Health",
         "HeroBulletFlag",
+        "Hitbox",
         "Invincible",
         "Life",
         "MobData",
@@ -102,6 +104,7 @@ public static class GameComponentsLookup {
         typeof(STGU3D.FollowComponent),
         typeof(STGU3D.HealthComponent),
         typeof(STGU3D.HeroBulletFlagComponent),
+        typeof(STGU3D.HitboxComponent),
         typeof(STGU3D.InvincibleComponent),
         typeof(STGU3D.LifeComponent),
         typeof(STGU3D.MobDataComponent),

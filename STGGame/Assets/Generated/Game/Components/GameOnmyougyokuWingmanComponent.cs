@@ -11,19 +11,17 @@ public partial class GameEntity {
     public STGU3D.OnmyougyokuWingmanComponent onmyougyokuWingman { get { return (STGU3D.OnmyougyokuWingmanComponent)GetComponent(GameComponentsLookup.OnmyougyokuWingman); } }
     public bool hasOnmyougyokuWingman { get { return HasComponent(GameComponentsLookup.OnmyougyokuWingman); } }
 
-    public void AddOnmyougyokuWingman(GameEntity[] newSubWingmans, bool newIsPointFire) {
+    public void AddOnmyougyokuWingman(int newId) {
         var index = GameComponentsLookup.OnmyougyokuWingman;
         var component = (STGU3D.OnmyougyokuWingmanComponent)CreateComponent(index, typeof(STGU3D.OnmyougyokuWingmanComponent));
-        component.subWingmans = newSubWingmans;
-        component.isPointFire = newIsPointFire;
+        component.id = newId;
         AddComponent(index, component);
     }
 
-    public void ReplaceOnmyougyokuWingman(GameEntity[] newSubWingmans, bool newIsPointFire) {
+    public void ReplaceOnmyougyokuWingman(int newId) {
         var index = GameComponentsLookup.OnmyougyokuWingman;
         var component = (STGU3D.OnmyougyokuWingmanComponent)CreateComponent(index, typeof(STGU3D.OnmyougyokuWingmanComponent));
-        component.subWingmans = newSubWingmans;
-        component.isPointFire = newIsPointFire;
+        component.id = newId;
         ReplaceComponent(index, component);
     }
 

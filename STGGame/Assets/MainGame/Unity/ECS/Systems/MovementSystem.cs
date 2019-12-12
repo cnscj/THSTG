@@ -21,10 +21,22 @@ namespace STGU3D
             // 满足GetTrigger和Filter的实体保存在entities列表里
             foreach (var entity in __moveGroup.GetEntities())
             {
-                entity.transform.localPosition = entity.transform.localPosition + entity.movement.moveSpeed * Time.deltaTime;
-                entity.transform.localRotation = entity.transform.localRotation + entity.movement.rotationSpeed * Time.deltaTime;
+                bool isChanged = false;
+                if (entity.movement.moveSpeed != Vector3.zero)
+                {
+                    entity.transform.localPosition = entity.transform.localPosition + entity.movement.moveSpeed * Time.deltaTime;
+                    isChanged = true;
+                }
+                if (entity.movement.rotationSpeed != Vector3.zero)
+                {
+                    entity.transform.localRotation = entity.transform.localRotation + entity.movement.rotationSpeed * Time.deltaTime;
+                    isChanged = true;
+                }
 
-                entity.ReplaceComponent(GameComponentsLookup.Transform, entity.transform);
+                if (isChanged)
+                {
+                    entity.ReplaceComponent(GameComponentsLookup.Transform, entity.transform);
+                }
             }
         }
     }

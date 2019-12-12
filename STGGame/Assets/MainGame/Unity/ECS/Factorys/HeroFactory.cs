@@ -58,7 +58,7 @@ namespace STGU3D
 
                 {
                     cageCom.movableArea = DirectorUtil.ScreenToWorldRect(DirectorUtil.GetScreenRect());
-                    cageCom.bodySize = DirectorUtil.ScreenToWorldPoint(new Vector2(32, 48)); //TODO:
+                    cageCom.bodySize = DirectorUtil.ScreenToWorldPoint(new Vector2(32, 48)); //TODO:这里应该查找hitbox
                 }
 
                 entity.playerData.moveSpeed = entity.entityData.entityData["speed"].ToFloat();
@@ -67,15 +67,21 @@ namespace STGU3D
                 //不同主角特有的
                 if (heroType == EHeroType.Reimu)
                 {
-                    //Reimu持有僚机1台:onmyougyoku
-                    var onmyougyokuWingman = EntityManager.GetInstance().GetOrNewEntityFactory(EEntityType.Wingman).AsWingman().CreateWingman(EWingmanType.Onmyougyoku);
-                    if (onmyougyokuWingman.hasEntityData)
+                    //Reimu持有僚机total台:onmyougyoku
+                    float[] d = { -0.5f, 0.5f };
+                    int total = 2;
+                    for (int i = 0; i < total; i++)
                     {
-                        //TODO:
-                        onmyougyokuWingman.movement.rotationSpeed.z = 100f;                         //自旋
-                        onmyougyokuWingman.transform.parent = entity.transform;
-                        onmyougyokuWingman.transform.localPosition = new Vector3(0, 0.5f, 0);       //偏移一点
+                        var onmyougyokuWingman = EntityManager.GetInstance().GetOrNewEntityFactory(EEntityType.Wingman).AsWingman().CreateWingman(EWingmanType.Onmyougyoku);
+                        if (onmyougyokuWingman.hasEntityData)
+                        {
+                            onmyougyokuWingman.onmyougyokuWingman.id = i;
+                            onmyougyokuWingman.movement.rotationSpeed.z = 100f;                         //自旋
+                            onmyougyokuWingman.transform.parent = entity.transform;
+                            onmyougyokuWingman.transform.localPosition = new Vector3(d[i], 0.5f, 0);       //偏移一点
+                        }
                     }
+
                 }
 
             }
@@ -94,7 +100,7 @@ namespace STGU3D
 
         public GameEntity CreateHero(EHeroType heroType, EPlayerType playerType = EPlayerType.Player01)
         {
-            string code = string.Format("{0}", 10000000 + 100000 * (int)EEntityType.Hero + 1000 * (int)heroType + 1);
+            string code = EntityUtil.GetHeroCode(heroType);
             var entity = CreateEntity(code);
 
             var playerDataCom = entity.GetComponent(GameComponentsLookup.PlayerData) as PlayerDataComponent;

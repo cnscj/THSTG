@@ -4,22 +4,31 @@ using UnityEngine;
 
 namespace STGU3D
 {
-    public class ViewMovementSystem : IExecuteSystem
+    public class ViewMovementSystem : ReactiveSystem<GameEntity>
     {
-        private IGroup<GameEntity> __viewMovementGroup;
-        public ViewMovementSystem(Contexts contexts)
+        public ViewMovementSystem(Contexts contexts) : base(contexts.game)
         {
-            __viewMovementGroup = Contexts.sharedInstance.game.GetGroup(
-                GameMatcher.AllOf(
-                        GameMatcher.View,
-                        GameMatcher.Transform
-            ));
+
         }
 
-        public void Execute()
+        protected override ICollector<GameEntity> GetTrigger(IContext<GameEntity> context)
+        {
+            return context.CreateCollector(
+                 GameMatcher.AllOf(
+                      GameMatcher.View,
+                      GameMatcher.Transform
+                 ));
+        }
+
+        protected override bool Filter(GameEntity entity)
+        {
+            return entity.hasView && entity.hasTransform;
+        }
+
+        protected override void Execute(List<GameEntity> entities)
         {
             //移动
-            foreach (var entity in __viewMovementGroup.GetEntities())
+            foreach (var entity in entities)
             {
                 //存在1帧的延误
                 if (entity.view.view != null)

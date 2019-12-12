@@ -2,7 +2,7 @@
 {
     public enum EBossType
     {
-        Onmyougyoku = 1,
+        Wriggle = 1,
     }
 
 }

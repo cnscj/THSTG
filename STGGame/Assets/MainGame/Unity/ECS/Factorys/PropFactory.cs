@@ -11,7 +11,6 @@ namespace STGU3D
             var entity = CreateGameEntity(code);
 
             var propDataCom = entity.CreateComponent<PropDataComponent>(GameComponentsLookup.PropData);
-           
 
             entity.AddComponent(GameComponentsLookup.PropData, propDataCom);
 

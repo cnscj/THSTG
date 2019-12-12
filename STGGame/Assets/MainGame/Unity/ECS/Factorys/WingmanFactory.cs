@@ -9,6 +9,7 @@ namespace STGU3D
         public override GameEntity CreateEntity(string code)
         {
             var entity = CreateGameEntity(code);
+            var wingmanType = EntityUtil.GetWingmanTypeByCode(code);
 
             var wingmanDataCom = entity.CreateComponent<WingmanDataComponent>(GameComponentsLookup.WingmanData);
             var followCom = entity.CreateComponent<FollowComponent>(GameComponentsLookup.Follow);
@@ -22,19 +23,7 @@ namespace STGU3D
                 entity.view.view = ComponentUtil.CreateView(entity);
                 ((UnityView)entity.view.view).AddBody(entity.entityData.entityData["viewCode"]);
                 entity.ReplaceComponent(GameComponentsLookup.View, entity.view);
-            }
 
-            return entity;
-        }
-
-        public GameEntity CreateWingman(EWingmanType wingmanType)
-        {
-            string code = string.Format("{0}", 10000000 + 100000 * (int)EEntityType.Wingman + 100 * (int)wingmanType + (int)1);
-            var entity = CreateEntity(code);
-
-            var wingmanDataCom = entity.GetComponent(GameComponentsLookup.WingmanData) as WingmanDataComponent;
-            if (wingmanDataCom != null)
-            {
                 wingmanDataCom.wingmanType = wingmanType;
                 if (wingmanType == EWingmanType.Onmyougyoku)
                 {
@@ -42,6 +31,15 @@ namespace STGU3D
                     entity.AddComponent(GameComponentsLookup.OnmyougyokuWingman, onmyougyokuCom);
                 }
             }
+
+            return entity;
+        }
+
+        public GameEntity CreateWingman(EWingmanType wingmanType)
+        {
+            string code = EntityUtil.GetWingmanCode(wingmanType);
+            var entity = CreateEntity(code);
+   
             return entity;
         }
 

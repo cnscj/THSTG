@@ -7,9 +7,8 @@ namespace STGU3D
     {
         //阴阳玉组件,默认有2个,随等级提升有多个,最大4个,弧形排列
         //射击模式:集火,散火
-        //
-        public GameEntity[] subWingmans;
-        public bool isPointFire;
+
+        public int id;
 
     }
 }

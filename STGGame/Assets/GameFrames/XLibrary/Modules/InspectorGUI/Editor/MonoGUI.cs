@@ -5,10 +5,19 @@ using System.Collections.Generic;
 
 namespace XLibEditor
 {
-	public class MonoGUI<T> : Editor where T : Object
+    public class MonoGUI<T> : Editor where T : Object
     {
+        public static readonly string defauleGroup = "_default";
+        public class PropertyInfo
+        {
+            public string propertyName;
+            public SerializedProperty serializedProperty;
+            public string labelName;
+            public string groupName;
+        }
+
 		protected T m_editor;
-        protected Dictionary<string, List<KeyValuePair<string, SerializedProperty>>> m_propsMaps = new Dictionary<string, List<KeyValuePair<string, SerializedProperty>>>();
+        protected Dictionary<string, List<PropertyInfo>> m_propsMaps = new Dictionary<string, List<PropertyInfo>>();
 
 		public override void OnInspectorGUI()
 		{
@@ -45,25 +54,26 @@ namespace XLibEditor
 
         }
 
-        protected SerializedProperty FindProperty(string property)
+        protected SerializedProperty FindProperty(string propertyName)
         {
-            return serializedObject.FindProperty(property);
+            return serializedObject.FindProperty(propertyName);
         }
 
-        protected SerializedProperty GetProperty(string group, string name)
+        protected SerializedProperty GetProperty(string propertyName, string groupName = null)
         {
-            if (group != null)
+            groupName = string.IsNullOrEmpty(groupName) ? defauleGroup : groupName;
+            if (groupName != null)
             {
-                List<KeyValuePair<string, SerializedProperty>> list = null;
-                bool ret = m_propsMaps.TryGetValue(group, out list);
+                List<PropertyInfo> list = null;
+                bool ret = m_propsMaps.TryGetValue(groupName, out list);
                 if (ret)
                 {
-                    foreach (var pair in list)
+                    foreach (var info in list)
                     {
 
-                        if (pair.Key == name)
+                        if (info.propertyName == propertyName)
                         {
-                            return pair.Value;
+                            return info.serializedProperty;
                         }
                     }
                 }
@@ -71,79 +81,108 @@ namespace XLibEditor
             return null;
         }
 
-        protected SerializedProperty AddProperty(string property, string group, string name = null)
+        protected SerializedProperty AddProperty(string propertyName, string labelName = null, string groupName = null)
 		{
-            SerializedProperty prop = FindProperty(property);
+            SerializedProperty prop = FindProperty(propertyName);
             if (prop != null)
             {
-                name = name != null ? name : property;
-                KeyValuePair<string, SerializedProperty> pair = new KeyValuePair<string, SerializedProperty>(name, prop);
-                var list = GetOrCreateList(group);
-                list.Add(pair);
+                groupName = string.IsNullOrEmpty(groupName) ? defauleGroup : groupName;
+                labelName = string.IsNullOrEmpty(labelName) ? propertyName : labelName;
+                PropertyInfo info = new PropertyInfo();
+                info.propertyName = propertyName;
+                info.groupName = groupName;
+                info.serializedProperty = prop;
+                info.labelName = labelName;
+
+                var list = GetOrCreateList(groupName);
+                list.Add(info);
             }
             return prop;
         }
 
-        protected void RemoveProperty(string group, string name = null)
+        protected void RemoveProperty(string propertyName, string groupName = null)
         {
-            if (name != null)
+            groupName = string.IsNullOrEmpty(groupName) ? defauleGroup : groupName;
+            if (propertyName != null)
             {
-                List<KeyValuePair<string, SerializedProperty>> list = null;
-                bool ret = m_propsMaps.TryGetValue(group, out list);
+                List<PropertyInfo> list = null;
+                bool ret = m_propsMaps.TryGetValue(groupName, out list);
                 if (ret)
                 {
                     for(int i = list.Count - 1; i >= 0; i--)
                     {
-                        var pair = list[i];
-                        if(pair.Key == name)
+                        var info = list[i];
+                        if(info.propertyName == propertyName)
                         {
-                            list.Remove(pair);
+                            list.Remove(info);
                         }
                     }
                 }
             }
             else
             {
-                m_propsMaps.Remove(group);
+                m_propsMaps.Remove(groupName);
             }
             
         }
-        protected void ShowProperty(SerializedProperty prop, string name = null)
+        protected void ShowProperty(SerializedProperty serializedProperty, string labelName = null)
         {
-            if (prop != null)
+            if (serializedProperty != null)
             {
-                name = name == null ? prop.displayName : name;
-                EditorGUILayout.PropertyField(prop, new GUIContent(name), true);
+                labelName = labelName == null ? serializedProperty.displayName : labelName;
+                EditorGUILayout.PropertyField(serializedProperty, new GUIContent(labelName), true);
             }
             
         }
-        protected void ShowPropertys(string group = null)
-		{
-   
-            if (group != null)
+        protected void ShowProperty(string propertyName, string groupName = null)
+        {
+            groupName = string.IsNullOrEmpty(groupName) ? defauleGroup : groupName;
+            if (groupName != null)
             {
-                List<KeyValuePair<string, SerializedProperty>> list = null;
-                bool ret = m_propsMaps.TryGetValue(group, out list);
+                List<PropertyInfo> list = null;
+                bool ret = m_propsMaps.TryGetValue(groupName, out list);
                 if (ret)
                 {
-                    foreach (var pair in list)
+                    foreach (var info in list)
                     {
 
-                        ShowProperty(pair.Value, pair.Key);
+                        if (info.propertyName == propertyName)
+                        {
+                            ShowProperty(info.serializedProperty, info.labelName);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        protected void ShowPropertys(string groupName = null)
+		{
+            groupName = string.IsNullOrEmpty(groupName) ? defauleGroup : groupName;
+            if (groupName != null)
+            {
+                List<PropertyInfo> list = null;
+                bool ret = m_propsMaps.TryGetValue(groupName, out list);
+                if (ret)
+                {
+                    foreach (var info in list)
+                    {
+
+                        ShowProperty(info.serializedProperty, info.labelName);
                     }
                 }
             }
             
         }
 
-        private List<KeyValuePair<string, SerializedProperty>> GetOrCreateList(string group)
+        private List<PropertyInfo> GetOrCreateList(string groupName)
         {
-            List<KeyValuePair<string, SerializedProperty>> list = null;
-            bool ret = m_propsMaps.TryGetValue(group,out list);
+            List<PropertyInfo> list = null;
+            bool ret = m_propsMaps.TryGetValue(groupName, out list);
             if (!ret)
             {
-                list = new List<KeyValuePair<string, SerializedProperty>>();
-                m_propsMaps.Add(group, list);
+                list = new List<PropertyInfo>();
+                m_propsMaps.Add(groupName, list);
             }
             return list;
         }

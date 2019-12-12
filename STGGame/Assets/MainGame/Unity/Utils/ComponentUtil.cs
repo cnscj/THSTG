@@ -43,6 +43,10 @@ namespace STGU3D
                 com.view = null;
             }
         }
+        public static void ClearHitbox(HitboxComponent com)
+        {
+            com.box = Vector2.zero;
+        }
 
         public static void ClearDestroyed(DestroyedComponent com)
         {

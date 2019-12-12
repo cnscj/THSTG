@@ -4,12 +4,18 @@ using UnityEngine;
 
 namespace STGU3D
 {
-    public class ViewAnimationSystem : IExecuteSystem
+    //TODO:开销巨大
+    public class ViewAnimationSystem : ReactiveSystem<GameEntity>
     {
-        private IGroup<GameEntity> __moveAnimGroup;
-        public ViewAnimationSystem(Contexts contexts)
+
+        public ViewAnimationSystem(Contexts contexts) : base(contexts.game)
         {
-            __moveAnimGroup = Contexts.sharedInstance.game.GetGroup(
+
+        }
+
+        protected override ICollector<GameEntity> GetTrigger(IContext<GameEntity> context)
+        {
+            return context.CreateCollector(
                  GameMatcher.AllOf(
                       GameMatcher.View,
                       GameMatcher.Transform,
@@ -17,11 +23,16 @@ namespace STGU3D
                  ));
         }
 
-        public void Execute()
+        protected override bool Filter(GameEntity entity)
+        {
+            return entity.hasView && entity.hasTransform && entity.hasMovement;
+        }
+
+        protected override void Execute(List<GameEntity> entities)
         {
             //移动动画
 
-            foreach (var entity in __moveAnimGroup.GetEntities())
+            foreach (var entity in entities)
             {
                 if (entity.view.view != null)
                 {

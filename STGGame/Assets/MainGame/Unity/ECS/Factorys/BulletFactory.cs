@@ -27,6 +27,7 @@ namespace STGU3D
                 entity.ReplaceComponent(GameComponentsLookup.View, entity.view);
 
                 {
+                    recycleCom.maxStayTime = 1f;
                     recycleCom.stayTime = 0f;
                     recycleCom.isRecycled = false;
                     //用的是左下角为起点
@@ -57,7 +58,7 @@ namespace STGU3D
 
         public GameEntity CreateBullet(ECampType campType, int bulletType, EColorType colorType = EColorType.Unknow)
         {
-            string code = string.Format("{0}", 10000000 + 100000 * (int)EEntityType.Bullet + 100 * (int)bulletType + (int)colorType);
+            string code = EntityUtil.GetBulletCode(bulletType, colorType);
             return CreateBullet(campType, code);
         }
 

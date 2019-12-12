@@ -43,7 +43,7 @@ namespace STGU3D
                         {
                             if (entity.recycle.stayTime < entity.recycle.maxStayTime)
                             {
-                                entity.recycle.stayTime += Time.fixedDeltaTime;
+                                entity.recycle.stayTime += Time.deltaTime;
                             }
                             else
                             {
