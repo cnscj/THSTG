@@ -14,7 +14,9 @@ namespace STGU3D
         {
             if (entity.hasDestroyed)
             {
-                entity.destroyed.isDestroyed = true;
+                var destroyedCom = entity.GetComponent(GameComponentsLookup.Destroyed) as DestroyedComponent;
+                destroyedCom.isDestroyed = true;
+                entity.ReplaceComponent(GameComponentsLookup.Destroyed, destroyedCom);
             }
             else
             {

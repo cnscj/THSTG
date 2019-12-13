@@ -20,7 +20,10 @@ namespace STGU3D
                 var entityLink = viewGO.GetComponent<EntityLink>();
                 if (entityLink != null)
                 {
-                    entityLink.Unlink();
+                    if (entityLink.entity != null)
+                    {
+                        entityLink.Unlink();
+                    }
                 }
                 if(body != null)
                 {
@@ -28,6 +31,7 @@ namespace STGU3D
                 }
                 //TODO:应该送入缓存区
                 GameObject.Destroy(viewGO);
+                viewGO = null;
             }
         }
 
@@ -38,10 +42,37 @@ namespace STGU3D
 
             var entityLink = viewGO.AddComponent<EntityLink>();
             entityLink.Link(entity);
+
+            if (EntityManager.GetInstance())
+            {
+                if (entity.hasEntityData)
+                {
+                    switch (entity.entityData.entityType)
+                    {
+                        case EEntityType.Hero:
+                            viewGO.transform.SetParent(EntityManager.GetInstance().heroRoot.transform);
+                            break;
+                        case EEntityType.Mob:
+                            viewGO.transform.SetParent(EntityManager.GetInstance().mobRoot.transform);
+                            break;
+                        case EEntityType.Bullet:
+                            viewGO.transform.SetParent(EntityManager.GetInstance().bulletRoot.transform);
+                            break;
+                        case EEntityType.Prop:
+                            viewGO.transform.SetParent(EntityManager.GetInstance().propRoot.transform);
+                            break;
+                        case EEntityType.Wingman:
+                            viewGO.transform.SetParent(EntityManager.GetInstance().wingmanRoot.transform);
+                            break;
+                    }
+                }
+            }
+            
         }
 
         public void SetRotation(in float x, in float y, in float z)
         {
+            if (viewGO == null) return;
             var euler = viewGO.transform.localEulerAngles;
             euler.x = x;
             euler.y = y;
@@ -58,6 +89,7 @@ namespace STGU3D
 
         public void SetPosition(in float x, in float y, in float z)
         {
+            if (viewGO == null) return;
             var position = viewGO.transform.localPosition;
             position.x = x;
             position.y = y;
@@ -75,7 +107,7 @@ namespace STGU3D
 
         ///
 
-        public object Command(int operate, object data = null)
+        public object Execute(int operate, object data = null)
         {
 
             return null;

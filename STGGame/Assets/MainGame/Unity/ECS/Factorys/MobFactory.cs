@@ -27,7 +27,7 @@ namespace STGU3D
                     recycleCom.maxStayTime = 3f;
                     recycleCom.stayTime = 0f;
                     recycleCom.isRecycled = false;
-                    recycleCom.boundary = DirectorUtil.ScreenToWorldRect(DirectorUtil.GetScreenRect()); //TODO:BUG 
+                    recycleCom.boundary = DirectorUtil.ScreenRectInWorld(DirectorUtil.GetScreenRect());
                 }
 
             }

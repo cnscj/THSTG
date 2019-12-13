@@ -39,8 +39,10 @@ namespace STGU3D
                 {
                     if (entity.trace.isAutoSearch)
                     {
-                        //TODO:从KD树中取得最近点
-
+                        //TODO:
+                        //查看全局是否存在一个追踪目标(主要是以人作为范围
+                        //没有则从KDTree取
+                       
                     }
                 }
             }

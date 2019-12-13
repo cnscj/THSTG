@@ -57,8 +57,8 @@ namespace STGU3D
                 }
 
                 {
-                    cageCom.movableArea = DirectorUtil.ScreenToWorldRect(DirectorUtil.GetScreenRect());
-                    cageCom.bodySize = DirectorUtil.ScreenToWorldPoint(new Vector2(32, 48)); //TODO:这里应该查找hitbox
+                    cageCom.movableArea = DirectorUtil.ScreenRectInWorld(DirectorUtil.GetScreenRect());
+                    cageCom.bodySize = DirectorUtil.ScreenSizeInWorld(new Vector2(32, 48)); //TODO:这里应该查找hitbox
                 }
 
                 entity.playerData.moveSpeed = entity.entityData.entityData["speed"].ToFloat();

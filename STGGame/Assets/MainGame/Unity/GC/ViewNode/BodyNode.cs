@@ -19,13 +19,17 @@ namespace STGU3D
             TryNewBody();
 
             EEntityType entityType = EntityUtil.GetEntityTypeByCode(code);
-            if (entityType == EEntityType.Bullet)
+            if (entityType == EEntityType.Hero ||
+                entityType == EEntityType.Boss
+               )
             {
-                showGO = ViewUtil.NewRendererNode(true, code);
+                showGO = NewRendererNode(true, code);
             }
             else
             {
-                showGO = ViewUtil.NewRendererNode(false, code);
+                int maxCount = 50;
+                showGO = NewRendererNode(true, code, maxCount);
+                
             }
             showGO.transform.localPosition = body.transform.localPosition;
             showGO.transform.SetParent(body.transform);
@@ -33,7 +37,6 @@ namespace STGU3D
             renderer = renderer != null ? renderer : showGO.GetComponentInChildren<Renderer>();
             animator = animator != null ? animator : showGO.GetComponentInChildren<Animator>();
             collider = collider != null ? collider : showGO.GetComponentInChildren<Collider>();
-
         }
 
         public void Destroy()
@@ -54,6 +57,45 @@ namespace STGU3D
 
         }
 
+        private static GameObject NewRendererNode(bool usePool, string viewCode, int maxCount = 20)
+        {
+            string viewName = null;
+            GameObject viewGO = null;
+            GameObject prefabInstance = null;
+            if (usePool)
+            {
+                if (!GameObjectPoolManager.GetInstance().HasGameObjectPool(viewCode))
+                {
+                    var prefab = AssetManager.GetInstance().LoadSprite(viewCode);
+                    if (prefab)
+                    {
+                        GameObjectPoolManager.GetInstance().NewGameObjectPool(viewCode, prefab, maxCount);
+                    }
+                }
+                prefabInstance = GameObjectPoolManager.GetInstance().GetGameObject(viewCode);
+            }
+            else
+            {
+                var prefab = AssetManager.GetInstance().LoadSprite(viewCode);
+                if (prefab)
+                {
+                    prefabInstance = GameObject.Instantiate(prefab);
+                }
+            }
+
+
+            if (!string.IsNullOrEmpty(viewName))
+            {
+                viewGO = new GameObject(viewName);
+                prefabInstance.transform.SetParent(viewGO.transform);
+            }
+            else
+            {
+                viewGO = prefabInstance;
+            }
+
+            return viewGO;
+        }
     }
 
 }

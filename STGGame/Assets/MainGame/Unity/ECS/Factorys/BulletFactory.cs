@@ -31,7 +31,7 @@ namespace STGU3D
                     recycleCom.stayTime = 0f;
                     recycleCom.isRecycled = false;
                     //用的是左下角为起点
-                    recycleCom.boundary = DirectorUtil.ScreenToWorldRect(DirectorUtil.GetScreenRect());
+                    recycleCom.boundary = DirectorUtil.ScreenRectInWorld(DirectorUtil.GetScreenRect());
                 }
 
             }

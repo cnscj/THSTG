@@ -33,6 +33,7 @@ namespace STGU3D
                 //存在1帧的延误
                 if (entity.view.view != null)
                 {
+                    //这里Reactive和Cleanup没有先后执行顺序,会产生问题:View被Destroy了,然而这里却被执行到了
                     entity.view.view.SetPosition(entity.transform.position.x, entity.transform.position.y, entity.transform.position.z);
                     entity.view.view.SetRotation(entity.transform.rotation.x, entity.transform.rotation.y, entity.transform.rotation.z);
                 }

@@ -46,9 +46,11 @@ namespace STGU3D
                 //移除View
                 if (!entity.destroyed.isDestroyed)
                     continue;
+
                 if (entity.view.view != null)
                 {
                     entity.view.view.Clear();
+                    entity.view.view = null;
                 }
             }
 
@@ -71,11 +73,23 @@ namespace STGU3D
             foreach (var entity in __destroyedGroup.GetEntities())
             {
                 if (!entity.destroyed.isDestroyed)
-                    continue;
-
-                entity.destroyed.isDestroyed = false;
-                entity.destroyed.action?.Invoke(entity);
-                entity.Destroy();
+                {
+                    //if (entity.destroyed.delayTime > 0f)
+                    //{
+                    //    entity.destroyed.delayTime = entity.destroyed.delayTime - Time.deltaTime;
+                    //    if (entity.destroyed.delayTime <= 0f)
+                    //    {
+                    //        entity.destroyed.isDestroyed = true;
+                    //        entity.destroyed.delayTime = 0f;
+                    //    }
+                    //}
+                }
+                else
+                {
+                    entity.destroyed.isDestroyed = false;
+                    entity.destroyed.action?.Invoke(entity);
+                    entity.Destroy();
+                }
             }
         }
     }

@@ -27,6 +27,9 @@ namespace STGU3D
         public GameObject heroRoot;
         public GameObject bossRoot;
         public GameObject mobRoot;
+        public GameObject bulletRoot;
+        public GameObject propRoot;
+        public GameObject wingmanRoot;
 
         public Dictionary<EEntityType, BaseEntityFactory> entityFactoryMap;
 
@@ -59,6 +62,15 @@ namespace STGU3D
 
                 mobRoot = new GameObject("MobRoot");
                 mobRoot.transform.SetParent(stageRoot.transform, true);
+
+                bulletRoot = new GameObject("BulletRoot");
+                bulletRoot.transform.SetParent(stageRoot.transform, true);
+
+                propRoot = new GameObject("PropRoot");
+                propRoot.transform.SetParent(stageRoot.transform, true);
+
+                wingmanRoot = new GameObject("WingmanRoot");
+                wingmanRoot.transform.SetParent(stageRoot.transform, true);
             }
 
             entityFactoryMap = new Dictionary<EEntityType, BaseEntityFactory>();

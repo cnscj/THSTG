@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace STGU3D
 {
-    //TODO:开销巨大
     public class ViewAnimationSystem : ReactiveSystem<GameEntity>
     {
 
