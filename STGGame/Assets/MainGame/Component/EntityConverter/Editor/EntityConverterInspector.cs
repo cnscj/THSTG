@@ -13,7 +13,8 @@ namespace STGEditor
         protected override void OnProps()
         {
             serproEntityCode = AddProperty("entityCode");
-            AddProperty("entityType", "实体类型", "base");
+            AddProperty("isLink","base");
+            AddProperty("entityType", "实体类型", "entity");
 
             AddProperty("heroType", "Hero类型", "hero");
             AddProperty("bossType", "Boss类型", "boss");
@@ -37,6 +38,7 @@ namespace STGEditor
                 }
                 EditorGUILayout.EndHorizontal();
                 ShowPropertys("base");
+                ShowPropertys("entity");
                 switch (m_editor.entityType)
                 {
                     case EEntityType.Hero:
@@ -55,6 +57,7 @@ namespace STGEditor
             }else
             {
                 EditorGUILayout.PropertyField(serproEntityCode, new GUIContent("实体Code"));
+                ShowPropertys("base");
             }
             ShowPropertys("common");
         }

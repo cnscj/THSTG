@@ -74,15 +74,15 @@ namespace STGU3D
             {
                 if (!entity.destroyed.isDestroyed)
                 {
-                    //if (entity.destroyed.delayTime > 0f)
-                    //{
-                    //    entity.destroyed.delayTime = entity.destroyed.delayTime - Time.deltaTime;
-                    //    if (entity.destroyed.delayTime <= 0f)
-                    //    {
-                    //        entity.destroyed.isDestroyed = true;
-                    //        entity.destroyed.delayTime = 0f;
-                    //    }
-                    //}
+                    if (entity.destroyed.delayTime > 0f)
+                    {
+                        entity.destroyed.delayTime = entity.destroyed.delayTime - Time.deltaTime;
+                        if (entity.destroyed.delayTime <= 0f)
+                        {
+                            entity.destroyed.isDestroyed = true;
+                            entity.destroyed.delayTime = 0f;
+                        }
+                    }
                 }
                 else
                 {

@@ -35,10 +35,10 @@ namespace STGU3D
             {
                 if (entity.view.view != null)
                 {
-                    if (((UnityView)entity.view.view).body != null)
+                    if (((UnityView)entity.view.view).bodyCom != null)
                     {
-                        var renderer = ((UnityView)entity.view.view).body.renderer as SpriteRenderer;
-                        var animator = ((UnityView)entity.view.view).body.animator as Animator;
+                        var renderer = ((UnityView)entity.view.view).bodyCom.renderer as SpriteRenderer;
+                        var animator = ((UnityView)entity.view.view).bodyCom.animator as Animator;
                         if (renderer && animator)
                         {
                             if (entity.movement.moveSpeed.x > 0f) //右

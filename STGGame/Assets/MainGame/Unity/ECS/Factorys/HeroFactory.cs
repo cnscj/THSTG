@@ -7,9 +7,25 @@ namespace STGU3D
 {
     public class HeroFactory : BaseEntityFactory
     {
-        
-        public override GameEntity CreateEntity(string code)
+        public GameEntity CreateHero(EHeroType heroType, EPlayerType playerType = EPlayerType.Player01)
         {
+            string code = EntityUtil.GetHeroCode(heroType);
+            var entity = CreateEntity(code);
+
+            var playerDataCom = entity.GetComponent(GameComponentsLookup.PlayerData) as PlayerDataComponent;
+            if (playerDataCom != null)
+            {
+                playerDataCom.playerType = playerType;
+                EntityCache.GetInstance().SetHero(playerType, entity);
+            }
+
+            return entity;
+        }
+
+        //创建实体以及相应的组件
+        protected override GameEntity OnCreate(string code)
+        {
+
             var entity = CreateGameEntity(code);
 
             var commandCom = entity.CreateComponent<CommandComponent>(GameComponentsLookup.Command);
@@ -34,13 +50,19 @@ namespace STGU3D
             entity.AddComponent(GameComponentsLookup.Invincible, invincibleCom);
             entity.AddComponent(GameComponentsLookup.Cage, cageCom);
 
+            return entity;
+        }
+
+        //初始化组件
+        protected override void OnInit(GameEntity entity)
+        {
             if (entity.hasEntityData)
             {
-                var heroType = EntityUtil.GetHeroTypeByCode(code);
-                playerDataCom.heroType = heroType;
+                var heroType = EntityUtil.GetHeroTypeByCode(entity.entityData.entityCode);
+                entity.playerData.heroType = heroType;
 
                 //根据
-                shotCom.action = (shotEntity) =>
+                entity.shot.action = (shotEntity) =>
                 {
                     var bulletEntity = EntityManager.GetInstance().GetOrNewEntityFactory(EEntityType.Bullet).AsBullet().CreateBullet(ECampType.Hero, shotEntity.entityData.entityData["bulletCode"]);
                     bulletEntity.transform.localPosition = shotEntity.transform.localPosition;                                                                                                          //在自机处生成
@@ -57,12 +79,12 @@ namespace STGU3D
                 }
 
                 {
-                    cageCom.movableArea = DirectorUtil.ScreenRectInWorld(DirectorUtil.GetScreenRect());
-                    cageCom.bodySize = DirectorUtil.ScreenSizeInWorld(new Vector2(32, 48)); //TODO:这里应该查找hitbox
+                    entity.cage.movableArea = DirectorUtil.ScreenRectInWorld(DirectorUtil.GetScreenRect());
+                    entity.cage.bodySize = DirectorUtil.ScreenSizeInWorld(new Vector2(32, 48)); //TODO:这里应该查找hitbox
                 }
 
                 entity.playerData.moveSpeed = entity.entityData.entityData["speed"].ToFloat();
-                healthCom.maxBlood = entity.entityData.entityData["blood"].ToInt();
+                entity.health.maxBlood = entity.entityData.entityData["blood"].ToInt();
 
                 //不同主角特有的
                 if (heroType == EHeroType.Reimu)
@@ -86,9 +108,10 @@ namespace STGU3D
 
             }
 
-            return entity;
+
         }
-        public override void DestroyEntity(GameEntity entity)
+
+        protected override void OnDestroy(GameEntity entity)
         {
             if (entity.hasPlayerData)
             {
@@ -97,22 +120,6 @@ namespace STGU3D
             }
             base.DestroyEntity(entity);
         }
-
-        public GameEntity CreateHero(EHeroType heroType, EPlayerType playerType = EPlayerType.Player01)
-        {
-            string code = EntityUtil.GetHeroCode(heroType);
-            var entity = CreateEntity(code);
-
-            var playerDataCom = entity.GetComponent(GameComponentsLookup.PlayerData) as PlayerDataComponent;
-            if (playerDataCom != null)
-            {
-                playerDataCom.playerType = playerType;
-                EntityCache.GetInstance().SetHero(playerType, entity);
-            }
-
-            return entity;
-        }
-
         
     }
 

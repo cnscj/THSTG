@@ -73,7 +73,6 @@ namespace XLibGame
             }
 
             m_coroutines.Remove(id);
-            action = null;
         }
     }
     

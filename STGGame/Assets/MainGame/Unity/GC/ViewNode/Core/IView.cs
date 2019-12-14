@@ -7,6 +7,8 @@ namespace STGU3D
     public interface IView 
     {
         object GetObject();
+        void SetObject(object obj);
+
         void SetPosition(in float x, in float y, in float z);
         void GetPosition(out float x, out float y, out float z);
 

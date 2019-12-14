@@ -5,7 +5,7 @@ using XLibGame;
 
 namespace STGU3D
 {
-    public class BodyNode : MonoBehaviour
+    public class BodyBehaviour : MonoBehaviour
     {
         public GameObject body;
         public GameObject showGO;

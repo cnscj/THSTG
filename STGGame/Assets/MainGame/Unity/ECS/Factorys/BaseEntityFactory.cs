@@ -1,16 +1,45 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using XLibGame;
+﻿
 using XLibrary;
 
 namespace STGU3D
 {
     public abstract class BaseEntityFactory
     {
-        public abstract GameEntity CreateEntity(string code);
+        public GameEntity CreateEntity(string code)
+        {
+            var entity = OnCreate(code);
+            OnInit(entity);
+            return entity;
+        }
 
-        public virtual void DestroyEntity(GameEntity entity)
+        public void DestroyEntity(GameEntity entity)
+        {
+            OnDestroy(entity);
+        }
+
+       
+        //转换方法
+        public HeroFactory AsHero(){ return (HeroFactory)this; }
+        public BulletFactory AsBullet() { return (BulletFactory)this; }
+        public WingmanFactory AsWingman() { return (WingmanFactory)this; }
+        public MobFactory AsMob() { return (MobFactory)this; }
+        public BossFactory AsBoss() { return (BossFactory)this; }
+        public PropFactory AsProp() { return (PropFactory)this; }
+
+        //创建实体以及相应的组件
+        protected virtual GameEntity OnCreate(string code)
+        {
+
+            return null;
+        }
+
+        //初始化组件
+        protected virtual void OnInit(GameEntity entity)
+        {
+            OnInit(entity);
+        }
+        //销毁实体
+        protected virtual void OnDestroy(GameEntity entity)
         {
             if (entity.hasDestroyed)
             {
@@ -23,57 +52,25 @@ namespace STGU3D
                 entity.Destroy();
             }
         }
-        public GameEntity CreateEmptyEntity()
+
+        //通用方法
+        protected GameEntity CreateEmptyEntity()
         {
             var entity = Contexts.sharedInstance.game.CreateEntity();
 
             return entity;
         }
 
-        public GameEntity CreateGameEntity(string code)
+        protected GameEntity CreateGameEntity(string code)
         {
             var entity = CreateEmptyEntity();
-            AddCommonComponent(entity);
-            AddEntityDataComponent(entity, code);
-            InitCommonComponent(entity);
+            AddCommonComponent(entity, code);
+            InitCommonComponent(entity, code);
             return entity;
         }
 
-        //转换方法
-        public HeroFactory AsHero(){ return (HeroFactory)this; }
-        public BulletFactory AsBullet() { return (BulletFactory)this; }
-        public WingmanFactory AsWingman() { return (WingmanFactory)this; }
-        public MobFactory AsMob() { return (MobFactory)this; }
-        public BossFactory AsBoss() { return (BossFactory)this; }
-        public PropFactory AsProp() { return (PropFactory)this; }
 
-        //通用方法
-        protected void InitCommonComponent(GameEntity entity)
-        {
-            if (entity.hasEntityData)
-            {
-
-            }
-        }
-
-        protected void AddEntityDataComponent(GameEntity entity, string code)
-        {
-            EEntityType type = EntityUtil.GetEntityTypeByCode(code);
-            CSVObject infos = EntityConfiger.GetEntityInfo(code);
-
-            if (infos != null)
-            {
-                var entityDataCom = entity.CreateComponent<EntityDataComponent>(GameComponentsLookup.EntityData);
-                entityDataCom.entityCode = code;
-                entityDataCom.entityType = type;
-                entityDataCom.entityData = infos;
-               
-                entity.AddComponent(GameComponentsLookup.EntityData, entityDataCom);
-            }
-
-        }
-
-        protected void AddCommonComponent(GameEntity entity)
+        protected void AddCommonComponent(GameEntity entity, string code)
         {
             //用这个法子创建的组件是复用原有的,因此必须手动初始化下
             var transCom = entity.CreateComponent<TransformComponent>(GameComponentsLookup.Transform);
@@ -82,12 +79,16 @@ namespace STGU3D
             var viewCom = entity.CreateComponent<ViewComponent>(GameComponentsLookup.View);
             var destroyCom = entity.CreateComponent<DestroyedComponent>(GameComponentsLookup.Destroyed);
 
-            ////
-            ComponentUtil.ClearTransform(transCom);
-            ComponentUtil.ClearHitbox(hitboxCom);
-            ComponentUtil.ClearMovement(movementCom);
-            ComponentUtil.ClearView(viewCom);
-            ComponentUtil.ClearDestroyed(destroyCom);
+            EEntityType type = EntityUtil.GetEntityTypeByCode(code);
+            CSVObject infos = EntityConfiger.GetEntityInfo(code);
+            if (infos != null)
+            {
+                var entityDataCom = entity.CreateComponent<EntityDataComponent>(GameComponentsLookup.EntityData);
+                entityDataCom.entityCode = code;
+                entityDataCom.entityType = type;
+                entityDataCom.entityData = infos;
+                entity.AddComponent(GameComponentsLookup.EntityData, entityDataCom);
+            }
 
             ////
             entity.AddComponent(GameComponentsLookup.Transform, transCom);
@@ -95,6 +96,15 @@ namespace STGU3D
             entity.AddComponent(GameComponentsLookup.Movement, movementCom);
             entity.AddComponent(GameComponentsLookup.View, viewCom);
             entity.AddComponent(GameComponentsLookup.Destroyed, destroyCom);
+        }
+
+        protected void InitCommonComponent(GameEntity entity, string code)
+        {
+            ComponentUtil.ClearTransform(entity.transform);
+            ComponentUtil.ClearHitbox(entity.hitbox);
+            ComponentUtil.ClearMovement(entity.movement);
+            ComponentUtil.ClearView(entity.view);
+            ComponentUtil.ClearDestroyed(entity.destroyed);
         }
     }
 }

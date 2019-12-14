@@ -11,20 +11,22 @@ public partial class UIEntity {
     public STGU3D.DestroyedComponent destroyed { get { return (STGU3D.DestroyedComponent)GetComponent(UIComponentsLookup.Destroyed); } }
     public bool hasDestroyed { get { return HasComponent(UIComponentsLookup.Destroyed); } }
 
-    public void AddDestroyed(System.Action<GameEntity> newAction, int newWhat, bool newIsDestroyed) {
+    public void AddDestroyed(System.Action<GameEntity> newAction, int newWhat, float newDelayTime, bool newIsDestroyed) {
         var index = UIComponentsLookup.Destroyed;
         var component = (STGU3D.DestroyedComponent)CreateComponent(index, typeof(STGU3D.DestroyedComponent));
         component.action = newAction;
         component.what = newWhat;
+        component.delayTime = newDelayTime;
         component.isDestroyed = newIsDestroyed;
         AddComponent(index, component);
     }
 
-    public void ReplaceDestroyed(System.Action<GameEntity> newAction, int newWhat, bool newIsDestroyed) {
+    public void ReplaceDestroyed(System.Action<GameEntity> newAction, int newWhat, float newDelayTime, bool newIsDestroyed) {
         var index = UIComponentsLookup.Destroyed;
         var component = (STGU3D.DestroyedComponent)CreateComponent(index, typeof(STGU3D.DestroyedComponent));
         component.action = newAction;
         component.what = newWhat;
+        component.delayTime = newDelayTime;
         component.isDestroyed = newIsDestroyed;
         ReplaceComponent(index, component);
     }

@@ -16,6 +16,13 @@ namespace STGU3D
             return view;
         }
 
+        public static void ClearEntityData(EntityDataComponent com)
+        {
+            com.entityCode = null;
+            com.entityData = null;
+            com.entityType = 0;
+        }
+
         public static void ClearTransform(TransformComponent com)
         {
             com.parent = null;

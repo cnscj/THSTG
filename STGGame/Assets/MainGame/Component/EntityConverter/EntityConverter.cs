@@ -8,6 +8,7 @@ namespace STGGame
     public class EntityConverter : MonoBehaviour
     {
         public string entityCode;
+        public bool isLink;
 
         public EEntityType entityType;
         public int type;
@@ -44,9 +45,26 @@ namespace STGGame
                         }
                         entity.movement.moveSpeed = initSpeed;
                     }
+
+
+                    if (isLink)
+                    {
+                        //直接作为Node节点
+                        if (entity.hasView)
+                        {
+                            var unityView = entity.view.view as UnityView;
+                            if (unityView != null)
+                            {
+
+                            }
+                        }
+                    }
                 }
             }
-            GameObject.Destroy(gameObject);
+            if (!isLink)
+            {
+                GameObject.Destroy(gameObject);
+            }
         }
 
         public void RefreshCode()
