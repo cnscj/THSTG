@@ -25,7 +25,6 @@ namespace STGU3D
         //创建实体以及相应的组件
         protected override GameEntity OnCreate(string code)
         {
-
             var entity = CreateGameEntity(code);
 
             var commandCom = entity.CreateComponent<CommandComponent>(GameComponentsLookup.Command);
@@ -74,7 +73,6 @@ namespace STGU3D
 
                 {
                     entity.view.view = ComponentUtil.CreateView(entity);
-                    ((UnityView)entity.view.view).AddBody(entity.entityData.entityData["viewCode"]);
                     entity.ReplaceComponent(GameComponentsLookup.View, entity.view);
                 }
 
@@ -107,8 +105,6 @@ namespace STGU3D
                 }
 
             }
-
-
         }
 
         protected override void OnDestroy(GameEntity entity)

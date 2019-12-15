@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8248807262584548471}
   - component: {fileID: 8248807262584548468}
   m_Layer: 0
-  m_Name: Fairy
+  m_Name: Fairy01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44,3 +44,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   entityCode: 10400100
+  isLink: 0
+  entityType: 0
+  type: 0
+  heroType: 0
+  bossType: 0
+  wingmanType: 0
+  initSpeed: {x: 0, y: 0, z: 0}

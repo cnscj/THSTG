@@ -159,7 +159,10 @@ namespace THEditor
 
         void OnDisable()
         {
-            m_editor.launchRelative = m_editor.launchRelative != null ? m_editor.launchRelative : m_editor.gameObject;
+            if (m_editor)
+            {
+                m_editor.launchRelative = m_editor.launchRelative != null ? m_editor.launchRelative : m_editor.gameObject;
+            }
         }
 
     }

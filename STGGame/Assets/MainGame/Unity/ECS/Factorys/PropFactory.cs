@@ -6,7 +6,7 @@ namespace STGU3D
 {
     public class PropFactory : BaseEntityFactory
     {
-        public override GameEntity CreateEntity(string code)
+        protected override GameEntity OnCreate(string code)
         {
             var entity = CreateGameEntity(code);
 
@@ -20,9 +20,6 @@ namespace STGU3D
             }
             return entity;
         }
-        
-
-
     }
 
 }

@@ -7,7 +7,7 @@ namespace STGU3D
 {
     public class BulletFactory : BaseEntityFactory
     {
-        public override GameEntity CreateEntity(string code)
+        protected override GameEntity OnCreate(string code)
         {
             var entity = CreateGameEntity(code);
             var bulletDataCom = entity.CreateComponent<BulletDataComponent>(GameComponentsLookup.BulletData);
@@ -23,7 +23,6 @@ namespace STGU3D
             {
                 entity.movement.moveSpeed.y = entity.entityData.entityData["speed"].ToFloat();
                 entity.view.view = ComponentUtil.CreateView(entity);
-                ((UnityView)entity.view.view).AddBody(entity.entityData.entityData["viewCode"]);
                 entity.ReplaceComponent(GameComponentsLookup.View, entity.view);
 
                 {

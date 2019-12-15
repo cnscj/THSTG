@@ -8,7 +8,7 @@ namespace STGGame
     public class EntityConverter : MonoBehaviour
     {
         public string entityCode;
-        public bool isLink;
+        public bool isLink = true;
 
         public EEntityType entityType;
         public int type;
@@ -55,7 +55,9 @@ namespace STGGame
                             var unityView = entity.view.view as UnityView;
                             if (unityView != null)
                             {
-
+                                entity.view.isEditor = true;
+                                unityView.node = gameObject;
+                                GameObject.Destroy(this);
                             }
                         }
                     }

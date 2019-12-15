@@ -17,7 +17,6 @@ namespace STGU3D
             OnDestroy(entity);
         }
 
-       
         //转换方法
         public HeroFactory AsHero(){ return (HeroFactory)this; }
         public BulletFactory AsBullet() { return (BulletFactory)this; }
@@ -36,7 +35,7 @@ namespace STGU3D
         //初始化组件
         protected virtual void OnInit(GameEntity entity)
         {
-            OnInit(entity);
+            
         }
         //销毁实体
         protected virtual void OnDestroy(GameEntity entity)
@@ -54,14 +53,14 @@ namespace STGU3D
         }
 
         //通用方法
-        protected GameEntity CreateEmptyEntity()
+        public GameEntity CreateEmptyEntity()
         {
             var entity = Contexts.sharedInstance.game.CreateEntity();
 
             return entity;
         }
 
-        protected GameEntity CreateGameEntity(string code)
+        public GameEntity CreateGameEntity(string code)
         {
             var entity = CreateEmptyEntity();
             AddCommonComponent(entity, code);

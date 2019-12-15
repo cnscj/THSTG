@@ -6,7 +6,7 @@ namespace STGU3D
 {
     public class WingmanFactory : BaseEntityFactory
     {
-        public override GameEntity CreateEntity(string code)
+        protected override GameEntity OnCreate(string code)
         {
             var entity = CreateGameEntity(code);
             var wingmanType = EntityUtil.GetWingmanTypeByCode(code);
@@ -21,7 +21,6 @@ namespace STGU3D
             if (entity.hasEntityData)
             {
                 entity.view.view = ComponentUtil.CreateView(entity);
-                ((UnityView)entity.view.view).AddBody(entity.entityData.entityData["viewCode"]);
                 entity.ReplaceComponent(GameComponentsLookup.View, entity.view);
 
                 wingmanDataCom.wingmanType = wingmanType;

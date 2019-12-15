@@ -13,7 +13,7 @@ namespace STGEditor
         protected override void OnProps()
         {
             serproEntityCode = AddProperty("entityCode");
-            AddProperty("isLink","base");
+            AddProperty("isLink","是否链接","base");
             AddProperty("entityType", "实体类型", "entity");
 
             AddProperty("heroType", "Hero类型", "hero");
@@ -26,8 +26,6 @@ namespace STGEditor
 
         protected override void OnShow()
         {
-            
-            
             if (string.IsNullOrEmpty(m_editor.entityCode))
             {
                 EditorGUILayout.BeginHorizontal();

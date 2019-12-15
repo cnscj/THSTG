@@ -10,7 +10,8 @@ namespace STGU3D
             Add(new TransformSystem(contexts));
 
             Add(new ViewAnimationSystem(contexts));
-            Add(new ViewMovementSystem(contexts));
+            Add(new ViewRuntimeTransformSystem(contexts));
+            Add(new ViewEditorTransformSystem(contexts));
 
             Add(new ShotExecuteSystem(contexts));
             Add(new BombReactiveSystem(contexts));

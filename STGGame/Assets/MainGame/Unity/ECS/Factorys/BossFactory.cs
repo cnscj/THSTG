@@ -6,12 +6,11 @@ namespace STGU3D
 {
     public class BossFactory : BaseEntityFactory
     {
-        public override GameEntity CreateEntity(string code)
+        protected override GameEntity OnCreate(string code)
         {
             var entity = CreateGameEntity(code);
 
             var bossDataCom = entity.CreateComponent<BossDataComponent>(GameComponentsLookup.BossData);
-           
 
             entity.AddComponent(GameComponentsLookup.BossData, bossDataCom);
 
@@ -22,12 +21,9 @@ namespace STGU3D
 
 
             }
-
+            
             return entity;
         }
-        
-
-
     }
 
 }

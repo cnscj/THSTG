@@ -41,14 +41,14 @@ namespace STGU3D
 
         public static void ClearView(ViewComponent com)
         {
-            if (com != null)
+            if (com.view != null)
             {
-                if (com.view != null)
-                {
-                    com.view.Clear();
-                }
-                com.view = null;
+                //复用bug,会把正在用的清掉
+                //com.view.Clear();
             }
+            com.isEditor = false;
+            com.view = null;
+            
         }
         public static void ClearHitbox(HitboxComponent com)
         {
