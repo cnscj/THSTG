@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using STGPublic;
+using STGGame;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;

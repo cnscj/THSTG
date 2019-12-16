@@ -8,7 +8,7 @@ namespace STGU3D
 {
     public class UnityView : IView
     {
-        public GameEntity entity;            //GE
+        public GameEntity entity;           //GE
         public GameObject node;             //与Unity关联的节点
         public BodyBehaviour bodyCom;       //身体节点
 
@@ -30,21 +30,20 @@ namespace STGU3D
                 }
                 //TODO:应该送入缓存区
                 GameObject.Destroy(node);
-                node = null;
-                entity = null;
             }
+            node = null;
+            entity = null;
         }
 
         //这里需要用协程延迟一帧
         public void Create(GameEntity ent)
         {
-            entity = ent;
             Clear();
-            //TODO:延迟一帧后,初始位置有问题
-            SchedulerManager.GetInstance().ScheduleNextFrame(() =>
-            {
-                InitView();
-            });
+
+            entity = ent;
+
+            //延迟一帧后,初始位置有问题
+            SchedulerManager.GetInstance().ScheduleNextFrame(InitView);
         }
 
         public void SetRotation(float x, float y, float z)
@@ -92,18 +91,24 @@ namespace STGU3D
             return null;
         }
 
-        void LinkGOAndEntity(GameObject go, GameEntity entity)
+        bool LinkGOAndEntity(GameObject go, GameEntity ent)
         {
-            var entityLink = node.GetComponent<EntityLink>();
-            if (entityLink != null)
+            if (go != null && ent != null)
             {
-                entityLink.Unlink();
+                var entityLink = go.GetComponent<EntityLink>();
+                if (entityLink != null)
+                {
+                    entityLink.Unlink();
+                }
+                else
+                {
+                    entityLink = go.AddComponent<EntityLink>();
+                }
+                entityLink.Link(ent);
+                return true;
             }
-            else
-            {
-                entityLink = node.AddComponent<EntityLink>();
-            }
-            entityLink.Link(entity);
+            return false;
+
         }
 
         void InitView()
@@ -113,22 +118,21 @@ namespace STGU3D
                 node = new GameObject("View");
             }
            
-            LinkGOAndEntity(node, entity);
-
-            if (EntityManager.GetInstance())
+            if (LinkGOAndEntity(node, entity))
             {
-                if (entity.hasEntityData)
+                if (EntityManager.GetInstance())
                 {
-                    if (!entity.view.isEditor)
+                    if (entity.hasEntityData)
                     {
                         MoveNode(entity);
+                        AddBody(entity);
+                        InitNode(entity);
                     }
-                    AddBody(entity);
                 }
             }
         }
 
-        void AddBody(GameEntity entity)
+        void AddBody(GameEntity ent)
         {
             if (bodyCom != null)
             {
@@ -137,31 +141,56 @@ namespace STGU3D
 
             if (node != null)
             {
-                string viewCode = entity.entityData.entityData["viewCode"];
+                string viewCode = ent.entityData.entityData["viewCode"];
                 bodyCom = node.AddComponent<BodyBehaviour>();
                 bodyCom.Create(viewCode);
             }
         }
 
-        void MoveNode(GameEntity entity)
+        void MoveNode(GameEntity ent)
         {
-            switch (entity.entityData.entityType)
+            if (ent.view.isEditor)
+                return;
+  
+            var entityType = ent.entityData.entityType;
+
+            switch (entityType)
             {
                 case EEntityType.Hero:
-                    node.transform.SetParent(EntityManager.GetInstance().heroRoot.transform);
+                    node.transform.SetParent(EntityManager.GetInstance().heroRoot.transform, false);
                     break;
                 case EEntityType.Mob:
-                    node.transform.SetParent(EntityManager.GetInstance().mobRoot.transform);
+                    node.transform.SetParent(EntityManager.GetInstance().mobRoot.transform, false);
                     break;
                 case EEntityType.Bullet:
-                    node.transform.SetParent(EntityManager.GetInstance().bulletRoot.transform);
+                    node.transform.SetParent(EntityManager.GetInstance().bulletRoot.transform, false);
                     break;
                 case EEntityType.Prop:
-                    node.transform.SetParent(EntityManager.GetInstance().propRoot.transform);
+                    node.transform.SetParent(EntityManager.GetInstance().propRoot.transform, false);
                     break;
                 case EEntityType.Wingman:
-                    node.transform.SetParent(EntityManager.GetInstance().wingmanRoot.transform);
+                    node.transform.SetParent(EntityManager.GetInstance().wingmanRoot.transform, false);
                     break;
+            }
+        }
+
+        void InitNode(GameEntity ent)
+        {
+            if (ent.hasTransform)
+            {
+                if (ent.hasView)
+                {
+                    if (ent.view.isEditor)
+                    {
+                        ent.transform.localPosition = node.transform.localPosition;
+                        ent.transform.localRotation = node.transform.localEulerAngles;
+                    }
+                    else
+                    {
+                        node.transform.localPosition = ent.transform.localPosition;
+                        node.transform.localEulerAngles = ent.transform.localRotation;
+                    }
+                }
             }
         }
     }

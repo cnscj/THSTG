@@ -4,7 +4,8 @@ using UnityEngine;
 
 namespace THGame
 {
-    public class EntityController : MonoBehaviour
+    //TODO:决定发射后,单个物体一系列行为,如停留,追踪等
+    public class ObjectController : MonoBehaviour
     {
         public Vector3 speed = new Vector3(0,0,0);
 

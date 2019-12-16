@@ -2,20 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace STGPublic
+namespace STGGame
 {
     public class LevelRootInfo : MonoBehaviour
     {
-        // Start is called before the first frame update
-        void Start()
+        public Vector3 center = Vector3.zero;
+        public Vector3 size = new Vector3(1024, 576, 0);
+
+        //绘制一个安全框,确保美术K帧不超过这个区域
+        private void OnDrawGizmos()
         {
-
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-
+            //TODO:获取关卡范围大小
+            Gizmos.color = Color.red;                       //为随后绘制的gizmos设置颜色。
+            Gizmos.DrawWireCube(Vector3.zero, DirectorUtil.ScreenSizeInWorld(size));
         }
     }
 }

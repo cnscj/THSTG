@@ -1,11 +1,11 @@
 ﻿
 using UnityEngine;
-using XLibrary.Package;
 
-namespace STGPublic
+namespace STGGame
 {
+    //摄像机K帧用
     public class CameraMark : MonoBehaviour
     {
-       
+      
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using XLibrary.Package;
 
-namespace STGPublic
+namespace STGGame
 {
     public class CameraManager : MonoSingleton<CameraManager>
     {

@@ -31,8 +31,8 @@ namespace STGU3D
                 showGO = NewRendererNode(true, code, maxCount);
                 
             }
-            showGO.transform.localPosition = body.transform.localPosition;
-            showGO.transform.SetParent(body.transform);
+            showGO.transform.localPosition = Vector3.zero;
+            showGO.transform.SetParent(body.transform, false);
 
             renderer = renderer != null ? renderer : showGO.GetComponentInChildren<Renderer>();
             animator = animator != null ? animator : showGO.GetComponentInChildren<Animator>();
@@ -52,7 +52,8 @@ namespace STGU3D
             if (body == null)
             {
                 body = new GameObject("Body");
-                body.transform.SetParent(gameObject.transform);
+                body.transform.localPosition = Vector3.zero;
+                body.transform.SetParent(gameObject.transform, false);
             }
 
         }

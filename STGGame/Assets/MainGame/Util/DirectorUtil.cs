@@ -6,10 +6,14 @@ namespace STGGame
     {
         public static float GetPixelPerPot()
         {
-            Vector3 v3 = Camera.main.ScreenToWorldPoint(new Vector3(0f, 0f, -Camera.main.transform.position.z)); //最后一个Z必须,不过在正交摄像机(或2d)下意义不大
-            float winSizeX = Mathf.Abs(v3.x) * 2;
-            var pixelPerPot = winSizeX / Screen.width;
-            return pixelPerPot;
+            if (Camera.main)
+            {
+                Vector3 v3 = Camera.main.ScreenToWorldPoint(new Vector3(0f, 0f, -Camera.main.transform.position.z)); //最后一个Z必须,不过在正交摄像机(或2d)下意义不大
+                float winSizeX = Mathf.Abs(v3.x) * 2;
+                var pixelPerPot = winSizeX / Screen.width;
+                return pixelPerPot;
+            }
+            return 0f;
         }
         public static float ScreenLengthInWorld(float a)
         {
@@ -23,24 +27,24 @@ namespace STGGame
             return a / pixelPerPot;
         }
 
-        public static Vector2 GetScreenSize()
+        public static Vector3 GetScreenSize()
         {
-            return new Vector2(Screen.width, Screen.height);
+            return new Vector3(Screen.width, Screen.height, 0);
         }
 
-        public static Vector2 GetWorldSize()
+        public static Vector3 GetWorldSize()
         {
-            return new Vector2(ScreenLengthInWorld(Screen.width), ScreenLengthInWorld(Screen.height));
+            return new Vector3(ScreenLengthInWorld(Screen.width), ScreenLengthInWorld(Screen.height), 0);
         }
 
-        public static Vector2 ScreenSizeInWorld(Vector2 size)
+        public static Vector3 ScreenSizeInWorld(Vector3 size)
         {
-            return new Vector2(ScreenLengthInWorld(size.x), ScreenLengthInWorld(size.y));
+            return new Vector3(ScreenLengthInWorld(size.x), ScreenLengthInWorld(size.y), ScreenLengthInWorld(size.z));
         }
 
-        public static Vector2 WorldSizeInScreen(Vector2 size)
+        public static Vector3 WorldSizeInScreen(Vector3 size)
         {
-            return new Vector2(WorldLengthInScreen(size.x), WorldLengthInScreen(size.y));
+            return new Vector3(WorldLengthInScreen(size.x), WorldLengthInScreen(size.y), WorldLengthInScreen(size.z));
         }
 
         //世界矩形在屏幕中的坐标

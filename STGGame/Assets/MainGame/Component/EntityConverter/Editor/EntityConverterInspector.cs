@@ -13,7 +13,8 @@ namespace STGEditor
         protected override void OnProps()
         {
             serproEntityCode = AddProperty("entityCode");
-            AddProperty("isLink","是否链接","base");
+            AddProperty("isLink","是否链接到实体","base");
+
             AddProperty("entityType", "实体类型", "entity");
 
             AddProperty("heroType", "Hero类型", "hero");
@@ -21,7 +22,7 @@ namespace STGEditor
             AddProperty("wingmanType", "僚机类型", "wingman");
             AddProperty("type", "子类型", "exHBW");
 
-            AddProperty("initSpeed", "实体初速度", "common");
+            AddProperty("comsList", "组件列表", "common");
         }
 
         protected override void OnShow()

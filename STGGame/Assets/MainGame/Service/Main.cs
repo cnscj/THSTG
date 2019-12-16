@@ -13,14 +13,12 @@ namespace STGService
             AssetSystem.InitAwake();
             ModuleSystem.InitAwake();
             UISystem.InitAwake();
-            EntitySystem.InitAwake();
         }
 
         //所有业务逻辑的入口
         public static void InitStart()
         {
             UISystem.InitStart();
-            EntitySystem.InitStart();
 
             EntityManager.GetInstance().GetOrNewEntityFactory(EEntityType.Hero).AsHero().CreateHero(EHeroType.Reimu);
             //SceneManager.GetInstance().LoadLevelScene("200001");

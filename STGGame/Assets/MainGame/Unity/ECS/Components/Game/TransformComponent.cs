@@ -4,6 +4,7 @@ using UnityEngine;
 namespace STGU3D
 {
     [Game]
+    [System.Serializable]
     public class TransformComponent : IComponent
     {
         public TransformComponent parent;
@@ -12,6 +13,7 @@ namespace STGU3D
 
         public Vector3 localPosition;
         public Vector3 localRotation;
+
     }
 }
 

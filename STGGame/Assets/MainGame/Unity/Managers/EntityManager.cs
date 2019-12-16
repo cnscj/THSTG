@@ -44,7 +44,8 @@ namespace STGU3D
             // 获取所需的System组
             __systems = new Feature("Systems")
             .Add(new GameFeature(__contexts))
-            .Add(new InputFeature(__contexts));
+            .Add(new InputFeature(__contexts))
+            .Add(new UIFeature(__contexts));
 
             stageRoot = new GameObject("StageRoot");
             stageRoot.transform.SetParent(gameObject.transform, true);

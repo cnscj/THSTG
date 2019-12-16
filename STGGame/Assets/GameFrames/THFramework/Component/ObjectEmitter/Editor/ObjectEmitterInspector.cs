@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 namespace THEditor
 {
-    [CustomEditor(typeof(EntityEmitter))]
-    public class EntityEmitterInspector : Editor
+    [CustomEditor(typeof(ObjectEmitter))]
+    public class ObjectEmitterInspector : Editor
     {
-        private EntityEmitter m_editor;
+        private ObjectEmitter m_editor;
         private List<KeyValuePair<string, SerializedProperty>> normalProps = new List<KeyValuePair<string, SerializedProperty>>();
 
 
@@ -45,15 +45,15 @@ namespace THEditor
         {
             EditorGUILayout.PropertyField(m_launchOrderType, new GUIContent("发射顺序"));
             ShowPropertys(launchOrderProps);
-            if (m_editor.launchOrderType == EntityEmitter.CreateOrderType.Orderly)
+            if (m_editor.launchOrderType == ObjectEmitter.CreateOrderType.Orderly)
             {
                
             }
-            else if (m_editor.launchOrderType == EntityEmitter.CreateOrderType.Random)
+            else if (m_editor.launchOrderType == ObjectEmitter.CreateOrderType.Random)
             {
  
             }
-            else if (m_editor.launchOrderType == EntityEmitter.CreateOrderType.Fixed)
+            else if (m_editor.launchOrderType == ObjectEmitter.CreateOrderType.Fixed)
             {
                 ShowPropertys(launchOrderFixProps);
             }
@@ -62,23 +62,23 @@ namespace THEditor
         void ShowLaunchTypeProps()
         {
             EditorGUILayout.PropertyField(m_launchType, new GUIContent("发射类型"));
-            if (m_editor.launchType == EntityEmitter.LaunchType.Line)
+            if (m_editor.launchType == ObjectEmitter.LaunchType.Line)
             {
                 ShowPropertys(lineProps);
             }
-            else if(m_editor.launchType == EntityEmitter.LaunchType.Surround)
+            else if(m_editor.launchType == ObjectEmitter.LaunchType.Surround)
             {
                 ShowPropertys(surroundProps);
             }
-            else if (m_editor.launchType == EntityEmitter.LaunchType.Random)
+            else if (m_editor.launchType == ObjectEmitter.LaunchType.Random)
             {
                 ShowPropertys(randomProps);
             }
-            else if (m_editor.launchType == EntityEmitter.LaunchType.FixedPoint)
+            else if (m_editor.launchType == ObjectEmitter.LaunchType.FixedPoint)
             {
                 ShowPropertys(fixedPointProps);
             }
-            else if (m_editor.launchType == EntityEmitter.LaunchType.Custom)
+            else if (m_editor.launchType == ObjectEmitter.LaunchType.Custom)
             {
                 ShowPropertys(customProps);
             }
@@ -104,7 +104,7 @@ namespace THEditor
 
         private void OnEnable()
         {
-            m_editor = (EntityEmitter)target;
+            m_editor = (ObjectEmitter)target;
             Clear();
 
             AddPropertys(normalProps, "发射实体队列", "launchEntities");

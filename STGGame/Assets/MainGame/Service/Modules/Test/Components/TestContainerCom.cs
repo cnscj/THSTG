@@ -29,6 +29,7 @@ namespace STGService.UI
                 btnFunc = () =>
                 {
                     Debug.Log("测试");
+                    EventSystem.Dispatch(STGU3D.EventType.TEST_EVENT);
                 }
             },
 

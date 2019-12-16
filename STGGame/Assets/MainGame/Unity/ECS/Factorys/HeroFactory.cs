@@ -65,8 +65,6 @@ namespace STGU3D
                 {
                     var bulletEntity = EntityManager.GetInstance().GetOrNewEntityFactory(EEntityType.Bullet).AsBullet().CreateBullet(ECampType.Hero, shotEntity.entityData.entityData["bulletCode"]);
                     bulletEntity.transform.localPosition = shotEntity.transform.localPosition;                                                                                                          //在自机处生成
-                    bulletEntity.view.view.SetPosition(shotEntity.transform.localPosition.x, shotEntity.transform.localPosition.y, shotEntity.transform.localPosition.z);                               //覆盖第一帧刷新
-
 
                     return bulletEntity;
                 };

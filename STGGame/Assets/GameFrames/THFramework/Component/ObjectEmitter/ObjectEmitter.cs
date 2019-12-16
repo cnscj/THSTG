@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace THGame
 {
-    public class EntityEmitter : MonoBehaviour
+    public class ObjectEmitter : MonoBehaviour
     {
         public enum LaunchType
         {
@@ -37,7 +37,7 @@ namespace THGame
         public class CalculateParams
         {
             public int index;
-            public EntityEmitter emitter;
+            public ObjectEmitter emitter;
         }
 
         public class CalculateResult
@@ -130,8 +130,8 @@ namespace THGame
         public static readonly Action<LaunchParams> defaultOnLaunch = (args) =>
         {
             Transform trans = args.createResult.entity.GetComponent<Transform>();
-            EntityController ctrl = args.createResult.entity.GetComponent<EntityController>();
-            if (ctrl == null) ctrl = args.createResult.entity.AddComponent<EntityController>();
+            ObjectController ctrl = args.createResult.entity.GetComponent<ObjectController>();
+            if (ctrl == null) ctrl = args.createResult.entity.AddComponent<ObjectController>();
 
             trans.localPosition = args.calculateResult.startPosition;
             trans.localEulerAngles = args.calculateResult.startEulerAngles;
