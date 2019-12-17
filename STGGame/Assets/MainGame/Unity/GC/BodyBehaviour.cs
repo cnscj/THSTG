@@ -31,7 +31,7 @@ namespace STGU3D
                 showGO = NewRendererNode(true, code, maxCount);
                 
             }
-            showGO.transform.localPosition = Vector3.zero;
+
             showGO.transform.SetParent(body.transform, false);
 
             renderer = renderer != null ? renderer : showGO.GetComponentInChildren<Renderer>();
@@ -52,6 +52,7 @@ namespace STGU3D
             if (body == null)
             {
                 body = new GameObject("Body");
+                body.transform.localEulerAngles = Vector3.zero;
                 body.transform.localPosition = Vector3.zero;
                 body.transform.SetParent(gameObject.transform, false);
             }

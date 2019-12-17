@@ -44,10 +44,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   entityCode: 10400100
-  isLink: 0
+  isLink: 1
   entityType: 0
   type: 0
   heroType: 0
   bossType: 0
   wingmanType: 0
-  initSpeed: {x: 0, y: 0, z: 0}
+  comsList: []

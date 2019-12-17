@@ -108,7 +108,7 @@ namespace XLibGame
                 //放入对象池，入队
                 m_queue.Enqueue(obj);
                 obj.SetActive(false);
-                obj.transform.SetParent(transform);
+                obj.transform.SetParent(transform, false); //不改变Transform
             }
         }
 

@@ -39,19 +39,9 @@ namespace STGGame
                 {
                     if (entity.hasTransform)
                     {
-                        entity.transform.localPosition = gameObject.transform.position;
-                        entity.transform.localRotation = gameObject.transform.eulerAngles;
+                        entity.transform.localPosition = gameObject.transform.localPosition;
+                        entity.transform.localRotation = gameObject.transform.localEulerAngles;
 
-                    }
-
-                    if (entity.hasMovement)
-                    {
-                        //FIXME:耦合了
-                        var entityController = GetComponent<THGame.ObjectController>();
-                        if (entityController != null)
-                        {
-                            entity.movement.moveSpeed = entityController.speed;
-                        }
                     }
 
                     if (comsList != null)
@@ -131,7 +121,7 @@ namespace STGGame
                 object o = null;
 
                 if (propertyInfo != null) o = propertyInfo.GetValue(obj, null);
-                if (fieldInfo != null) o = fieldInfo.GetValue(obj);
+                if (fieldInfo != null) o = fieldInfo.GetValue(obj); //这里是值引用,修改不会起效的,要重新赋值
 
                 object value = Convert.ChangeType(o, ts);
 
@@ -148,7 +138,7 @@ namespace STGGame
             try
             {
                 string[] fieldNameArray = fieldPath.Split(new char[] {'.'});
-
+                object oriObj = obj;
                 Type ts = obj.GetType();
                 PropertyInfo propertyInfo = null;
                 FieldInfo fieldInfo = null;
@@ -163,6 +153,7 @@ namespace STGGame
                     //最后一个不用了
                     if (i < fieldNameArray.Length - 1)
                     {
+                        //TODO:不知道这里是不是和传值赋值有关系,因为不起作用
                         obj = GetModelValue(fieldName, obj);
                     }
 

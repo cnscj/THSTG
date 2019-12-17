@@ -11,6 +11,7 @@ namespace THGame
         {
             Line,           //直线
             Surround,       //包围
+            Sector,         //扇形    //TODO:
             Random,         //随机
             FixedPoint,     //定点
             Custom,         //自定义
@@ -77,38 +78,39 @@ namespace THGame
             {
                 case LaunchType.Line:
                     result.startPosition = args.emitter.launchRelative.transform.localPosition;
-                    double lAngle = args.emitter.launchLineAngle * Math.PI / 180;
-                    result.startSpeed.x = args.emitter.launchSpeed * (float)Math.Cos(lAngle);
-                    result.startSpeed.y = args.emitter.launchSpeed * (float)Math.Sin(lAngle);
+                    float lAngle = args.emitter.launchLineAngle * Mathf.Deg2Rad;
+                    result.startSpeed.x = args.emitter.launchSpeed * (float)Mathf.Cos(lAngle);
+                    result.startSpeed.y = args.emitter.launchSpeed * (float)Mathf.Sin(lAngle);
                     args.emitter.launchLineAngle += args.emitter.launchLineRPT;
                     break;
                 case LaunchType.Surround:
                     //以相对点为中心,360
-                    int sr = args.emitter.launchSurroundRadius;
-                    double srAngle = 2 * Math.PI / args.emitter.launchNum * args.index;
-                    int srX = (int)(sr * Math.Cos(srAngle));
-                    int srY = (int)(sr * Math.Sin(srAngle));
+                    float sr = args.emitter.launchSurroundRadius;
+                    float srAngle = 2 * Mathf.PI / args.emitter.launchNum * args.index;
+                    float srX = (sr * Mathf.Cos(srAngle));
+                    float srY = (sr * Mathf.Sin(srAngle));
                     result.startPosition.x = srX + args.emitter.launchRelative.transform.localPosition.x;
                     result.startPosition.y = srY + args.emitter.launchRelative.transform.localPosition.y;
 
-                    result.startSpeed.x = args.emitter.launchSpeed * (float)Math.Cos(srAngle);
-                    result.startSpeed.y = args.emitter.launchSpeed * (float)Math.Sin(srAngle);
+                    result.startSpeed.x = args.emitter.launchSpeed * (float)Mathf.Cos(srAngle);
+                    result.startSpeed.y = args.emitter.launchSpeed * (float)Mathf.Sin(srAngle);
                     break;
                 case LaunchType.Random:
                     //随机位置
-                    int minR = args.emitter.launchRandomMinRadius;
-                    int maxR = args.emitter.launchRandomMaxRadius;
+                    float minR = args.emitter.launchRandomMinRadius;
+                    float maxR = args.emitter.launchRandomMaxRadius;
                     System.Random rd = new System.Random();
-                    int r = rd.Next(minR, maxR+1);
-                    double angle = rd.Next(0, 361) * Math.PI / 180;
-                    int rX = (int)(r * Math.Cos(angle));
-                    int rY = (int)(r * Math.Sin(angle));
+                    float r = rd.Next((int)(minR*100), (int)((maxR * 100) + 1)) / 100;
+                    float angle = rd.Next(0, 361) * Mathf.Deg2Rad;
+                    float rX = r * Mathf.Cos(angle);
+                    float rY = r * Mathf.Sin(angle);
                     result.startPosition.x = rX + args.emitter.launchRelative.transform.localPosition.x;
                     result.startPosition.y = rY + args.emitter.launchRelative.transform.localPosition.y;
 
-                    result.startSpeed.x = args.emitter.launchSpeed * (float)Math.Cos(angle);
-                    result.startSpeed.y = args.emitter.launchSpeed * (float)Math.Sin(angle);
+                    result.startSpeed.x = args.emitter.launchSpeed * (float)Mathf.Cos(angle);
+                    result.startSpeed.y = args.emitter.launchSpeed * (float)Mathf.Sin(angle);
                     break;
+                    //TODO:目前只有一个位置
                 case LaunchType.FixedPoint:
                     //固定位置
                     if (args.emitter.launchFixedPointPoints.Length > 0)
@@ -116,6 +118,7 @@ namespace THGame
                         var ponit = args.emitter.launchFixedPointPoints[args.index % args.emitter.launchFixedPointPoints.Length];
                         result.startPosition.x = ponit.x;
                         result.startPosition.y = ponit.y;
+                        result.startPosition.z = ponit.z;
                     }
                     else
                     {
@@ -136,7 +139,7 @@ namespace THGame
             trans.localPosition = args.calculateResult.startPosition;
             trans.localEulerAngles = args.calculateResult.startEulerAngles;
 
-            ctrl.speed = args.calculateResult.startSpeed;
+            ctrl.moveSpeed = args.calculateResult.startSpeed;
         };
 
         private static Func<CreateParams, CreateResult> s_createFunc = defaultOnCreate;
@@ -164,21 +167,21 @@ namespace THGame
         public float launchLineRPT;           //每发射一次转动角度
 
         //发射类型:周围
-        public int launchSurroundRadius;      //轨道半径
+        public float launchSurroundRadius;           //轨道半径
 
         //发射类型:离散
-        public int launchRandomMinRadius;     //最小半径
-        public int launchRandomMaxRadius = 10;     //最大半径
+        public float launchRandomMinRadius;          //最小半径
+        public float launchRandomMaxRadius = 10;     //最大半径
 
         //发射类型:固定点
-        public Vector2[] launchFixedPointPoints;     //固定点位置 FIXME:没法K帧
+        public Vector3[] launchFixedPointPoints;     //固定点位置 FIXME:没法K帧
 
         //发射类型:自定义
-        public int launchCustomType;         //自定义类型
-        public object launchCustomData0;       //自定义数据
-        public float launchCustomData1;      //自定义数据1
-        public float launchCustomData2;      //自定义数据2
-        public int launchCustomData3;       //自定义数据3
+        public int launchCustomType;            //自定义类型
+        public object launchCustomData0;        //自定义数据
+        public int launchCustomData1;           //自定义数据1
+        public float launchCustomData2;         //自定义数据2
+        public string launchCustomData3;        //自定义数据3
         //
         private float m_nextTime;
 
@@ -273,7 +276,37 @@ namespace THGame
                 }
             }
         }
-       
+
+        private void OnDrawGizmos()
+        {
+            switch (launchType)
+            {
+                case LaunchType.Line:
+                    Gizmos.color = Color.blue;
+                    Gizmos.DrawLine(transform.localPosition, new Vector3(Mathf.Cos(launchLineAngle * Mathf.Deg2Rad) + transform.localPosition.x, Mathf.Sin(launchLineAngle * Mathf.Deg2Rad) + transform.localPosition.y));
+                    break;
+                case LaunchType.Surround:
+                    Gizmos.color = Color.blue;
+                    Gizmos.DrawWireSphere(transform.localPosition, launchSurroundRadius);
+                    break;
+                case LaunchType.Random:
+                    Gizmos.color = Color.blue;
+                    Gizmos.DrawWireSphere(transform.localPosition, launchRandomMinRadius);
+                    Gizmos.DrawWireSphere(transform.localPosition, launchRandomMaxRadius);
+                    break;
+                case LaunchType.FixedPoint:
+                    if (launchFixedPointPoints != null && launchFixedPointPoints.Length > 0)
+                    {
+                        Gizmos.color = Color.blue;
+                        foreach (var position in launchFixedPointPoints)
+                        {
+                            Gizmos.DrawWireSphere(position, .20f);
+                        }
+                    }
+                    break;
+            }
+        }
+
     }
 
 }
