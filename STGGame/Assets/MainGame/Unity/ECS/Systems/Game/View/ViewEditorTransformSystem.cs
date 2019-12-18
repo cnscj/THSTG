@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace STGU3D
 {
+    //TODO:非常消耗性能
     public class ViewEditorTransformSystem : IExecuteSystem
     {
         private IGroup<GameEntity> __editorTransformGroup;
@@ -42,7 +43,7 @@ namespace STGU3D
                         transCom.localRotation.y = rotY;
                         transCom.localRotation.z = rotZ;
 
-                        entity.ReplaceComponent(GameComponentsLookup.Transform, transCom);
+                        //entity.ReplaceComponent(GameComponentsLookup.Transform, transCom);
                     }
                 }
             }

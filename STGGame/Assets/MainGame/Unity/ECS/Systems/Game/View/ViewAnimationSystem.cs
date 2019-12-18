@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace STGU3D
 {
+    //TODO:非常消耗性能
     public class ViewAnimationSystem : ReactiveSystem<GameEntity>
     {
 

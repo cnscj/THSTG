@@ -107,14 +107,18 @@ namespace STGGame
             try
             {
                 string[] fieldNameArray = fieldPath.Split(new char[] { '.' });
+                object oriObj = obj;
                 Type ts = obj.GetType();
                 PropertyInfo propertyInfo = null;
                 FieldInfo fieldInfo = null;
-                foreach (var fieldName in fieldNameArray)
+                for (int i = 0; i < fieldNameArray.Length; i++)
                 {
-                    propertyInfo = ts.GetProperty(fieldName);
-                    fieldInfo = ts.GetField(fieldName);
+                    string fieldName = fieldNameArray[i];
+
+                    propertyInfo = ts.GetRuntimeProperty(fieldName);
+                    fieldInfo = ts.GetRuntimeField(fieldName);
                     ts = propertyInfo == null ? fieldInfo.FieldType : propertyInfo.PropertyType;
+                    if (i < fieldNameArray.Length - 1) obj = propertyInfo == null ? fieldInfo.GetValue(obj) : propertyInfo.GetValue(obj, null);
                 }
 
 
@@ -146,17 +150,24 @@ namespace STGGame
                 {
                     string fieldName = fieldNameArray[i];
                     
-                    propertyInfo = ts.GetProperty(fieldName);
-                    fieldInfo = ts.GetField(fieldName);
+                    propertyInfo = ts.GetRuntimeProperty(fieldName);
+                    fieldInfo = ts.GetRuntimeField(fieldName);
                     ts = propertyInfo == null ? fieldInfo.FieldType : propertyInfo.PropertyType;
 
-                    //最后一个不用了
                     if (i < fieldNameArray.Length - 1)
                     {
-                        //TODO:不知道这里是不是和传值赋值有关系,因为不起作用
-                        obj = GetModelValue(fieldName, obj);
+                        
+                        if (propertyInfo == null)
+                        {
+                            //TODO:在这里就改失败了,因为执行obj = newObj是传值赋值,不在是修改原来的了
+                            //obj = fieldInfo.GetValueDirect(__makeref(obj));                   //TODO:传值完蛋,这里就不行了
+                            obj = fieldInfo.GetValue(obj);
+                        }
+                        else
+                        {
+                            obj = propertyInfo.GetValue(obj, null);
+                        }
                     }
-
                 }
 
                 object v = Convert.ChangeType(value, ts);
