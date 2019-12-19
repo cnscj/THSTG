@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   entityCode: 10400100
-  isLink: 1
+  isLink: 0
   entityType: 0
   type: 0
   heroType: 0

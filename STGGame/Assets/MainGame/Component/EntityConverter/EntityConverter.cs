@@ -8,6 +8,7 @@ namespace STGGame
 {
     public class EntityConverter : MonoBehaviour
     {
+        public delegate void Callback(GameEntity entity);
         [System.Serializable]
         public class ComponentData
         {
@@ -22,6 +23,7 @@ namespace STGGame
         public EHeroType heroType;
         public EBossType bossType;
         public EWingmanType wingmanType;
+        public Callback callback;
 
         public ComponentData[] comsList;
 
@@ -32,7 +34,7 @@ namespace STGGame
             {
                 RefreshCode();
             }
-            if(!string.IsNullOrEmpty(entityCode))
+            if( !string.IsNullOrEmpty(entityCode) )
             {
                 var entity = EntityManager.GetInstance().CreateEntity(entityCode);
                 if (entity != null)
@@ -52,7 +54,6 @@ namespace STGGame
                         }
                     }
 
-
                     if (isLink)
                     {
                         //直接作为Node节点
@@ -63,15 +64,26 @@ namespace STGGame
                             {
                                 entity.view.isEditor = true;
                                 unityView.node = gameObject;
-                                GameObject.Destroy(this);
                             }
                         }
                     }
+
+                    if (callback != null)
+                    {
+                        callback.Invoke(entity);
+                        callback = null;
+                    }
                 }
+
+                
             }
             if (!isLink)
             {
                 GameObject.Destroy(gameObject);
+            }
+            else
+            {
+                GameObject.Destroy(this);
             }
         }
 
@@ -200,6 +212,8 @@ namespace STGGame
 
         private void OnDrawGizmos()
         {
+            if (!enabled) return;
+
             Gizmos.color = Color.red;                       //为随后绘制的gizmos设置颜色。
             Gizmos.DrawWireSphere(transform.position, .20f);//使用center和radius参数，绘制一个线框球体
         }

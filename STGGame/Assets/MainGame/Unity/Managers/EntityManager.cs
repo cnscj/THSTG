@@ -75,7 +75,8 @@ namespace STGU3D
             }
 
             entityFactoryMap = new Dictionary<EEntityType, BaseEntityFactory>();
-            
+
+            ObjectEmitter.ReplaceListener(new EntityEmitListener());
         }
 
         private void Start()
