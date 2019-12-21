@@ -154,19 +154,19 @@ namespace THGame
             {
                 case EObjectEmitLaunchType.Line:
                     Gizmos.color = Color.blue;
-                    Gizmos.DrawLine(transform.localPosition, new Vector3(Mathf.Cos(launchLineAngle * Mathf.Deg2Rad) + transform.localPosition.x, Mathf.Sin(launchLineAngle * Mathf.Deg2Rad) + transform.localPosition.y));
+                    Gizmos.DrawLine(transform.position, new Vector3(Mathf.Cos(launchLineAngle * Mathf.Deg2Rad) + transform.position.x, Mathf.Sin(launchLineAngle * Mathf.Deg2Rad) + transform.position.y));
                     break;
                 case EObjectEmitLaunchType.Sector:
                     Gizmos.color = Color.blue;
-                    Gizmos.DrawWireSphere(transform.localPosition, launchSectorRadius);
+                    Gizmos.DrawWireSphere(transform.position, launchSectorRadius);
                     var sectorRadius = Mathf.Max(0.1f, launchSectorRadius);
-                    Gizmos.DrawLine(transform.localPosition, new Vector3(sectorRadius * Mathf.Cos(launchSectorStartAngle * Mathf.Deg2Rad) + transform.localPosition.x, sectorRadius * Mathf.Sin(launchSectorStartAngle * Mathf.Deg2Rad) + transform.localPosition.y));
-                    Gizmos.DrawLine(transform.localPosition, new Vector3(sectorRadius * Mathf.Cos((launchSectorStartAngle + launchSectorSpreadAngle) * Mathf.Deg2Rad) + transform.localPosition.x, sectorRadius * Mathf.Sin((launchSectorStartAngle + launchSectorSpreadAngle) * Mathf.Deg2Rad) + transform.localPosition.y));
+                    Gizmos.DrawLine(transform.position, new Vector3(sectorRadius * Mathf.Cos(launchSectorStartAngle * Mathf.Deg2Rad) + transform.position.x, sectorRadius * Mathf.Sin(launchSectorStartAngle * Mathf.Deg2Rad) + transform.position.y));
+                    Gizmos.DrawLine(transform.position, new Vector3(sectorRadius * Mathf.Cos((launchSectorStartAngle + launchSectorSpreadAngle) * Mathf.Deg2Rad) + transform.position.x, sectorRadius * Mathf.Sin((launchSectorStartAngle + launchSectorSpreadAngle) * Mathf.Deg2Rad) + transform.position.y));
                     break;
                 case EObjectEmitLaunchType.Random:
                     Gizmos.color = Color.blue;
-                    Gizmos.DrawWireSphere(transform.localPosition, launchRandomMinRadius);
-                    Gizmos.DrawWireSphere(transform.localPosition, launchRandomMaxRadius);
+                    Gizmos.DrawWireSphere(transform.position, launchRandomMinRadius);
+                    Gizmos.DrawWireSphere(transform.position, launchRandomMaxRadius);
                     break;
                 case EObjectEmitLaunchType.FixedPoint:
                     if (launchFixedPointPoints != null && launchFixedPointPoints.Length > 0)

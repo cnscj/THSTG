@@ -3,25 +3,30 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Playables;
 
 namespace THEditor
 {
-    public class STGTimelineEditorWindow : EditorWindow
+    public class DSTimelineEditorWindow : EditorWindow
     {
-        [MenuItem("THFramework/STGTimeline/STGTimeline辅助")]
+        [MenuItem("THFramework/DanmakuStorm/Timeline辅助")]
         public static void ShowWindow()
         {
-            STGTimelineEditorWindow myWindow = (STGTimelineEditorWindow)EditorWindow.GetWindow(typeof(STGTimelineEditorWindow), false, "STGTimeline", false);//创建窗口
+            DSTimelineEditorWindow myWindow = (DSTimelineEditorWindow)EditorWindow.GetWindow(typeof(DSTimelineEditorWindow), false, "STGTimeline", false);//创建窗口
             myWindow.Show();//展示
 
         }
+
+        public PlayableDirector playableDirector;
         public float embattleSurroundRadius;
 
+        private SerializedProperty playableDirectorProperty;
 
         void OnGUI()
         {
             GUILayout.BeginVertical();
 
+            playableDirector = (PlayableDirector)EditorGUILayout.ObjectField("时间轴", playableDirector, typeof(PlayableDirector));
             embattleSurroundRadius = EditorGUILayout.FloatField("包围半径", embattleSurroundRadius);
             if (GUILayout.Button("排序"))
             {
