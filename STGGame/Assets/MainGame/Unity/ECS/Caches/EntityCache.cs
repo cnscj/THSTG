@@ -11,9 +11,9 @@ namespace STGU3D
         public Dictionary<EPlayerType, GameEntity> heroMap;
         private EntityCache()
         {
-            var sceenSize = DirectorUtil.GetScreenSize();
+            var sceenRect = DirectorUtil.GetScreenRect();
             m_grid = new Grid2D<GameEntity>();
-            m_grid.Init(6, 6, (int)sceenSize.x, (int)sceenSize.y);
+            m_grid.Init(6, 6, (int)sceenRect.width, (int)sceenRect.height);
 
             heroMap = new Dictionary<EPlayerType, GameEntity>();
         }

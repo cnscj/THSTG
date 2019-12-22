@@ -4,88 +4,118 @@ namespace STGGame
 {
     public static class DirectorUtil
     {
-        public static float GetPixelPerPot()
+        public static Rect GetWorldRect()
         {
-            if (Camera.main)
+            Rect worldRect = new Rect();
+            var theCamera = Camera.main;
+            if (theCamera != null)
             {
-                Vector3 v3 = Camera.main.ScreenToWorldPoint(new Vector3(0f, 0f, -Camera.main.transform.position.z)); //最后一个Z必须,不过在正交摄像机(或2d)下意义不大
-                float winSizeX = Mathf.Abs(v3.x) * 2;
-                var pixelPerPot = winSizeX / Screen.width;
-                return pixelPerPot;
+                var tx = theCamera.transform;
+                Vector3 leftButtonPos = theCamera.ViewportToWorldPoint(new Vector3(0f, 0f, -tx.position.z));
+                Vector3 rightTopPos = theCamera.ViewportToWorldPoint(new Vector3(1f, 1f, -tx.position.z));
+                worldRect.x = leftButtonPos.x;
+                worldRect.y = leftButtonPos.y;
+                worldRect.width = 2 * leftButtonPos.x;
+                worldRect.height = 2 * leftButtonPos.y;
             }
-            return 0f;
-        }
-        public static float ScreenLengthInWorld(float a)
-        {
-            var pixelPerPot = GetPixelPerPot();
-            return a * pixelPerPot;
+            return worldRect;
         }
 
-        public static float WorldLengthInScreen(float a)
+        public static Rect GetScreenRect()
         {
-            var pixelPerPot = GetPixelPerPot();
-            return a / pixelPerPot;
-        }
-
-        public static Vector3 GetScreenSize()
-        {
-            return new Vector3(Screen.width, Screen.height, 0);
-        }
-
-        public static Vector3 GetWorldSize()
-        {
-            return new Vector3(ScreenLengthInWorld(Screen.width), ScreenLengthInWorld(Screen.height), 0);
+            Rect screenRect = new Rect();
+            var theCamera = Camera.main;
+            if (theCamera != null)
+            {
+                screenRect.x = 0;
+                screenRect.y = 0;
+                screenRect.width = theCamera.pixelWidth;
+                screenRect.height = theCamera.pixelHeight;
+            }
+            return screenRect;
         }
 
         public static Vector3 ScreenSizeInWorld(Vector3 size)
         {
-            return new Vector3(ScreenLengthInWorld(size.x), ScreenLengthInWorld(size.y), ScreenLengthInWorld(size.z));
+            Vector3 ret = new Vector3();
+            var theCamera = Camera.main;
+            if (theCamera != null)
+            {
+                var tx = theCamera.transform;
+                Vector3 startPos = theCamera.ViewportToScreenPoint(new Vector3(0.5f, 0.5f, -tx.position.z));
+                Vector3 worldSize = theCamera.ScreenToWorldPoint(new Vector3(startPos.x + size.x, startPos.y + size.y, -tx.position.z));
+                ret.x = worldSize.x;
+                ret.y = worldSize.y;
+                ret.z = worldSize.z;
+            }
+            return ret;
         }
 
         public static Vector3 WorldSizeInScreen(Vector3 size)
         {
-            return new Vector3(WorldLengthInScreen(size.x), WorldLengthInScreen(size.y), WorldLengthInScreen(size.z));
+            Vector3 ret = new Vector3();
+            var theCamera = Camera.main;
+            if (theCamera != null)
+            {
+                var tx = theCamera.transform;
+                Vector3 startPos = theCamera.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, -tx.position.z));
+                Vector3 screenSize = theCamera.WorldToScreenPoint(new Vector3(startPos.x + size.x, startPos.y + size.y, -tx.position.z));
+                ret.x = screenSize.x;
+                ret.y = screenSize.y;
+                ret.z = screenSize.z;
+            }
+            return ret;
         }
+
 
         //世界矩形在屏幕中的坐标
         public static Rect WorldRectInScreen(Rect worldRect)
         {
-            var pixelPerPot = GetPixelPerPot();
-            return new Rect(worldRect.x / pixelPerPot, worldRect.y / pixelPerPot, worldRect.width / pixelPerPot, worldRect.height / pixelPerPot);
+            Rect ret = new Rect();
+            var theCamera = Camera.main;
+            if (theCamera != null)
+            {
+                var tx = theCamera.transform;
+                Vector3 pos = theCamera.WorldToScreenPoint(new Vector3(worldRect.x, worldRect.y, -tx.position.z));
+                Vector3 size = theCamera.WorldToScreenPoint(new Vector3(worldRect.width, worldRect.height, -tx.position.z));
+                ret.x = pos.x;
+                ret.y = pos.y;
+                ret.width = size.x;
+                ret.height = size.y;
+            }
+            return ret;
         }
+
         //屏幕矩形在世界里的坐标
         public static Rect ScreenRectInWorld(Rect screenRect)
         {
-            var pixelPerPot = GetPixelPerPot();
-            return new Rect(-0.5f * screenRect.width * pixelPerPot, -0.5f * screenRect.height * pixelPerPot, screenRect.width * pixelPerPot, screenRect.height * pixelPerPot);
-        }
-        ///
-        /*
-         *  关于Rect的定义
-         *  左下角为起点,右上角为(w,h)
-         *  屏幕左下角永远为(0,0)
-         */
-
-        public static Rect GetScreenRect()
-        {
-            return Camera.main.pixelRect;
-        }
-
-        public static Rect GetWorldRect()
-        {
-            Vector3 v3 = Camera.main.ViewportToWorldPoint(new Vector3(1f, 1f, -Camera.main.transform.position.z));
-            return new Rect(0,0, 2 * v3.x, 2 * v3.y);
+            Rect ret = new Rect();
+            var theCamera = Camera.main;
+            if (theCamera != null)
+            {
+                var tx = theCamera.transform;
+                Vector3 startPos = theCamera.ViewportToScreenPoint(new Vector3(0.5f, 0.5f, -tx.position.z));
+                Vector3 pos = theCamera.ScreenToWorldPoint(new Vector3(screenRect.x, screenRect.y, -tx.position.z));
+                Vector3 size = theCamera.ScreenToWorldPoint(new Vector3(startPos.x + screenRect.width, startPos.y + screenRect.height, -tx.position.z));
+                ret.x = pos.x;
+                ret.y = pos.y;
+                ret.width = size.x;
+                ret.height = size.y;
+            }
+            return ret;
         }
 
-        //世界转屏幕坐标
-        public static Vector3 WorldToScreenPoint(Vector3 worldPosition)
+
+        public static Rect WorldRectInScreen()
         {
-            return Camera.main.WorldToScreenPoint(worldPosition);
+            Rect worldRect = GetWorldRect();
+            return WorldRectInScreen(worldRect);
         }
-        //屏幕转世界坐标
-        public static Vector3 ScreenToWorldPoint(Vector3 screenPosition)
+        public static Rect ScreenRectInWorld()
         {
-            return Camera.main.ScreenToWorldPoint(screenPosition);
+            Rect screenRect = new Rect();
+            return ScreenRectInWorld(screenRect);
         }
+
     }
 }
