@@ -6,15 +6,26 @@ namespace STGGame
 {
     public class LevelRootInfo : MonoBehaviour
     {
-        public Vector3 center = Vector3.zero;
-        public Vector3 size = new Vector3(1024, 576, 0);
+        public Rect region;
 
         //绘制一个安全框,确保美术K帧不超过这个区域
         private void OnDrawGizmos()
         {
-            //TODO:获取关卡范围大小
-            Gizmos.color = Color.red;                       //为随后绘制的gizmos设置颜色。
-            Gizmos.DrawWireCube(Vector3.zero, DirectorUtil.ScreenSizeInWorld(size));
+            //获取关卡范围大小
+            Camera theCamera = Camera.main;
+            if (theCamera != null)
+            {
+                Transform tx = theCamera.transform;
+                Vector3 startPos = theCamera.ViewportToScreenPoint(new Vector3(0.5f, 0.5f, -tx.position.z));
+
+                Vector3 size = theCamera.ScreenToWorldPoint(new Vector3(startPos.x + region.width, startPos.y + region.height, -tx.position.z));
+                Vector3 center = theCamera.ScreenToWorldPoint(new Vector3(region.x  + region.width / 2f, region.y + region.height / 2f, -tx.position.z));
+                
+                Gizmos.color = Color.red;//为随后绘制的gizmos设置颜色。
+                Gizmos.DrawSphere(center, 0.1f);
+                Gizmos.DrawWireCube(center,size);
+
+            }
         }
     }
 }
