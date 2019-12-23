@@ -6,7 +6,6 @@ namespace STGGame
 {
     public class LevelRootInfo : MonoBehaviour
     {
-        public string levelName;
         public Rect region;
 
         //绘制一个安全框,确保美术K帧不超过这个区域

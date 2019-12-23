@@ -52,7 +52,7 @@ namespace STGU3D
         }
         public static void ClearHitbox(HitboxComponent com)
         {
-            com.box = Vector2.zero;
+            com.radius = 0f;
         }
 
         public static void ClearDestroyed(DestroyedComponent com)

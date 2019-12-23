@@ -32,11 +32,16 @@ namespace STGU3D
                 
             }
 
-            showGO.transform.SetParent(body.transform, false);
 
-            renderer = renderer != null ? renderer : showGO.GetComponentInChildren<Renderer>();
-            animator = animator != null ? animator : showGO.GetComponentInChildren<Animator>();
-            collider = collider != null ? collider : showGO.GetComponentInChildren<Collider>();
+            {
+                showGO.transform.SetParent(body.transform, false);
+
+                renderer = renderer != null ? renderer : showGO.GetComponentInChildren<Renderer>();
+                animator = animator != null ? animator : showGO.GetComponentInChildren<Animator>();
+                collider = collider != null ? collider : showGO.GetComponentInChildren<Collider>();
+            }
+
+            TryAddEffect(showGO);
         }
 
         public void Destroy()
@@ -59,7 +64,20 @@ namespace STGU3D
 
         }
 
-        private static GameObject NewRendererNode(bool usePool, string viewCode, int maxCount = 20)
+        private void TryAddEffect(GameObject go)
+        {
+            if (go != null)
+            {
+                var shaderEffectCom = go.GetComponent<ViewShaderEffect>();
+                if (shaderEffectCom == null)
+                {
+                    shaderEffectCom = go.AddComponent<ViewShaderEffect>();
+                }
+                shaderEffectCom.target = go;
+            }
+        }
+
+        private GameObject NewRendererNode(bool usePool, string viewCode, int maxCount = 20)
         {
             string viewName = null;
             GameObject viewGO = null;

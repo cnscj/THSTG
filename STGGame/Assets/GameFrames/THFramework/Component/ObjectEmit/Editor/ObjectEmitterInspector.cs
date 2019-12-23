@@ -130,6 +130,7 @@ namespace THEditor
             
 
             m_launchType = serializedObject.FindProperty("launchType");
+            AddPropertys(lineProps, "发射长度", "launchLineDistance");
             AddPropertys(lineProps, "发射角度", "launchLineAngle");
             AddPropertys(lineProps, "发射角度增量", "launchLineRPT");
 

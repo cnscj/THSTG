@@ -29,8 +29,9 @@ namespace THGame
         public int launchOrderFixedIndex = 0;
 
         //发射类型:直线
-        public float launchLineAngle;               //发射角度(水平
-        public float launchLineRPT;                 //每发射一次转动角度
+        public float launchLineDistance = 0f;               //发射角度(水平
+        public float launchLineAngle;                       //发射角度(水平
+        public float launchLineRPT;                         //每发射一次转动角度
 
         //扇形
         public float launchSectorRadius;                    //轨道半径
@@ -38,11 +39,11 @@ namespace THGame
         public float launchSectorSpreadAngle = 360;         //张角
 
         //发射类型:离散
-        public float launchRandomMinRadius;          //最小半径
-        public float launchRandomMaxRadius = 10;     //最大半径
+        public float launchRandomMinRadius;                 //最小半径
+        public float launchRandomMaxRadius = 10;            //最大半径
 
         //发射类型:固定点
-        public Vector3[] launchFixedPointPoints;     //固定点位置
+        public Vector3[] launchFixedPointPoints;            //固定点位置
 
 
         //发射类型:自定义
@@ -125,7 +126,7 @@ namespace THGame
                     objectEmitCalculateParams.times = Mathf.Abs(launchTimes);
 
                     objectEmitLaunchParams.createResult = launchListener.OnCreate(objectEmitCreateParams);
-                    objectEmitLaunchParams.calculateResult = launchListener.OnCalculate(objectEmitCalculateParams);
+                    objectEmitLaunchParams.calculateResult = OnCalculate(objectEmitCalculateParams);
 
                     //发射前的校验
                     if (launchRelative != null)
@@ -146,6 +147,83 @@ namespace THGame
             }
         }
 
+        private ObjectEmitCalculateResult OnCalculate(ObjectEmitCalculateParams args)
+        {
+            ObjectEmitCalculateResult result = new ObjectEmitCalculateResult();
+
+            switch (args.emitter.launchType)
+            {
+                //存在一次发射不同方向的可能
+                case EObjectEmitLaunchType.Line:
+                    float lAngle = args.emitter.launchLineAngle * Mathf.Deg2Rad;
+                    result.startMoveSpeed.x = args.emitter.launchMoveSpeed * Mathf.Cos(lAngle);
+                    result.startMoveSpeed.y = args.emitter.launchMoveSpeed * Mathf.Sin(lAngle);
+                    args.emitter.launchLineAngle += args.emitter.launchLineRPT;
+
+                    result.startPosition.x = args.emitter.launchLineDistance * Mathf.Cos(lAngle);
+                    result.startPosition.y = args.emitter.launchLineDistance * Mathf.Sin(lAngle);
+
+                    result.startEulerAngles.z = (lAngle * Mathf.Rad2Deg) - 90;
+                    result.startAngleSpeed.z = args.emitter.launchAngleSpeed;
+
+                    break;
+                case EObjectEmitLaunchType.Sector:
+                    float sectorAnglePerTimes = args.emitter.launchSectorSpreadAngle / args.emitter.launchNum;
+                    float sectorAngle = (sectorAnglePerTimes * args.index + args.emitter.launchSectorStartAngle) * Mathf.Deg2Rad;
+                    float sectorX = (args.emitter.launchSectorRadius * Mathf.Cos(sectorAngle));
+                    float sectorY = (args.emitter.launchSectorRadius * Mathf.Sin(sectorAngle));
+                    result.startPosition.x = sectorX;
+                    result.startPosition.y = sectorY;
+
+                    result.startMoveSpeed.x = args.emitter.launchMoveSpeed * (float)Mathf.Cos(sectorAngle);
+                    result.startMoveSpeed.y = args.emitter.launchMoveSpeed * (float)Mathf.Sin(sectorAngle);
+
+                    result.startAngleSpeed.z = args.emitter.launchAngleSpeed;
+                    result.startEulerAngles.z = (sectorAngle * Mathf.Rad2Deg) - 90;
+
+                    break;
+                case EObjectEmitLaunchType.Random:
+                    //随机位置
+                    float minR = args.emitter.launchRandomMinRadius;
+                    float maxR = args.emitter.launchRandomMaxRadius;
+                    System.Random rd = new System.Random();
+                    float r = rd.Next((int)(minR * 100), (int)((maxR * 100) + 1)) / 100f;
+                    float angle = rd.Next(0, 361) * Mathf.Deg2Rad;
+                    float rX = r * Mathf.Cos(angle);
+                    float rY = r * Mathf.Sin(angle);
+                    result.startPosition.x = rX;
+                    result.startPosition.y = rY;
+
+                    result.startMoveSpeed.x = args.emitter.launchMoveSpeed * (float)Mathf.Cos(angle);
+                    result.startMoveSpeed.y = args.emitter.launchMoveSpeed * (float)Mathf.Sin(angle);
+
+                    result.startAngleSpeed.z = args.emitter.launchAngleSpeed;
+                    result.startEulerAngles.z = (angle * Mathf.Rad2Deg) - 90;
+
+                    break;
+                case EObjectEmitLaunchType.FixedPoint:
+                    //固定位置
+                    if (args.emitter.launchFixedPointPoints.Length > 0)
+                    {
+                        var ponit = args.emitter.launchFixedPointPoints[(args.index + args.times) % args.emitter.launchFixedPointPoints.Length];
+                        result.startPosition.x = ponit.x;
+                        result.startPosition.y = ponit.y;
+                        result.startPosition.z = ponit.z;
+
+                    }
+
+                    break;
+                case EObjectEmitLaunchType.Custom:
+                    if (args.emitter.launchCustomCallback != null)
+                    {
+                        result = args.emitter.launchCustomCallback.Calculate(args);
+                    }
+                    break;
+            }
+
+            return result;
+        }
+
         private void OnDrawGizmos()
         {
             if (!enabled) return;
@@ -154,7 +232,7 @@ namespace THGame
             {
                 case EObjectEmitLaunchType.Line:
                     Gizmos.color = Color.blue;
-                    Gizmos.DrawLine(transform.position, new Vector3(Mathf.Cos(launchLineAngle * Mathf.Deg2Rad) + transform.position.x, Mathf.Sin(launchLineAngle * Mathf.Deg2Rad) + transform.position.y));
+                    Gizmos.DrawLine(transform.position, new Vector3(launchLineDistance * Mathf.Cos(launchLineAngle * Mathf.Deg2Rad) + transform.position.x, launchLineDistance * Mathf.Sin(launchLineAngle * Mathf.Deg2Rad) + transform.position.y));
                     break;
                 case EObjectEmitLaunchType.Sector:
                     Gizmos.color = Color.blue;

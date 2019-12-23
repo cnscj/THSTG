@@ -12,6 +12,7 @@ namespace STGU3D
         public GameObject node;             //与Unity关联的节点
         public BodyBehaviour bodyCom;       //身体节点
 
+
         public void Clear()
         {
             if (node != null)
@@ -146,6 +147,7 @@ namespace STGU3D
                 bodyCom.Create(viewCode);
             }
         }
+
 
         void MoveNode(GameEntity ent)
         {

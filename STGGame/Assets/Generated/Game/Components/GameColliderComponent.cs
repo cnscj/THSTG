@@ -8,25 +8,25 @@
 //------------------------------------------------------------------------------
 public partial class GameEntity {
 
-    static readonly STGU3D.ColliderComponent colliderComponent = new STGU3D.ColliderComponent();
+    public STGU3D.ColliderComponent collider { get { return (STGU3D.ColliderComponent)GetComponent(GameComponentsLookup.Collider); } }
+    public bool hasCollider { get { return HasComponent(GameComponentsLookup.Collider); } }
 
-    public bool isCollider {
-        get { return HasComponent(GameComponentsLookup.Collider); }
-        set {
-            if (value != isCollider) {
-                var index = GameComponentsLookup.Collider;
-                if (value) {
-                    var componentPool = GetComponentPool(index);
-                    var component = componentPool.Count > 0
-                            ? componentPool.Pop()
-                            : colliderComponent;
+    public void AddCollider(UnityEngine.Vector3 newBox) {
+        var index = GameComponentsLookup.Collider;
+        var component = (STGU3D.ColliderComponent)CreateComponent(index, typeof(STGU3D.ColliderComponent));
+        component.box = newBox;
+        AddComponent(index, component);
+    }
 
-                    AddComponent(index, component);
-                } else {
-                    RemoveComponent(index);
-                }
-            }
-        }
+    public void ReplaceCollider(UnityEngine.Vector3 newBox) {
+        var index = GameComponentsLookup.Collider;
+        var component = (STGU3D.ColliderComponent)CreateComponent(index, typeof(STGU3D.ColliderComponent));
+        component.box = newBox;
+        ReplaceComponent(index, component);
+    }
+
+    public void RemoveCollider() {
+        RemoveComponent(GameComponentsLookup.Collider);
     }
 }
 

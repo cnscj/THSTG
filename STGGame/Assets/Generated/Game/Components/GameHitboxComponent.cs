@@ -11,19 +11,17 @@ public partial class GameEntity {
     public STGU3D.HitboxComponent hitbox { get { return (STGU3D.HitboxComponent)GetComponent(GameComponentsLookup.Hitbox); } }
     public bool hasHitbox { get { return HasComponent(GameComponentsLookup.Hitbox); } }
 
-    public void AddHitbox(UnityEngine.Vector2 newBox, bool newIsUseRect) {
+    public void AddHitbox(float newRadius) {
         var index = GameComponentsLookup.Hitbox;
         var component = (STGU3D.HitboxComponent)CreateComponent(index, typeof(STGU3D.HitboxComponent));
-        component.box = newBox;
-        component.isUseRect = newIsUseRect;
+        component.radius = newRadius;
         AddComponent(index, component);
     }
 
-    public void ReplaceHitbox(UnityEngine.Vector2 newBox, bool newIsUseRect) {
+    public void ReplaceHitbox(float newRadius) {
         var index = GameComponentsLookup.Hitbox;
         var component = (STGU3D.HitboxComponent)CreateComponent(index, typeof(STGU3D.HitboxComponent));
-        component.box = newBox;
-        component.isUseRect = newIsUseRect;
+        component.radius = newRadius;
         ReplaceComponent(index, component);
     }
 
