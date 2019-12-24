@@ -99,11 +99,9 @@ namespace STGU3D
 
         public BaseEntityFactory GetOrNewEntityFactory(EEntityType entityType)
         {
-            BaseEntityFactory factory = null;
-            if (!entityFactoryMap.TryGetValue(entityType, out factory))
+            if (!entityFactoryMap.TryGetValue(entityType, out BaseEntityFactory factory))
             {
-                Type clsType = null;
-                if (s_factoryType.TryGetValue(entityType,out clsType))
+                if (s_factoryType.TryGetValue(entityType, out Type clsType))
                 {
                     factory = (BaseEntityFactory)Activator.CreateInstance(clsType);
                 }

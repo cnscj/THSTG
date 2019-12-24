@@ -29,9 +29,7 @@ namespace STGU3D
             {
                 int maxCount = 50;
                 showGO = NewRendererNode(true, code, maxCount);
-                
             }
-
 
             {
                 showGO.transform.SetParent(body.transform, false);

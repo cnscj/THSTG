@@ -7,6 +7,8 @@ namespace STGU3D
     //TODO:非常消耗性能
     public class ViewEditorTransformSystem : IExecuteSystem
     {
+        private float posX = 0f, posY = 0f, posZ = 0f;
+        private float rotX = 0f, rotY = 0f, rotZ = 0f;
         private IGroup<GameEntity> __editorTransformGroup;
         public ViewEditorTransformSystem(Contexts contexts)
         {
@@ -20,6 +22,7 @@ namespace STGU3D
 
         public void Execute()
         {
+
             foreach (var entity in __editorTransformGroup.GetEntities())
             {
                 //存在1帧的延误
@@ -27,23 +30,23 @@ namespace STGU3D
                 {
                     if (entity.view.isEditor)
                     {
+                        //因为是使用position做越界判断的,因此,entity的position也要一起变动
                         //影响entity的Trans
-                        float posX = 0f, posY = 0f, posZ = 0f;
-                        float rotX = 0f, rotY = 0f, rotZ = 0f;
+
                         entity.view.view.GetPosition(ref posX, ref posY, ref posZ);
                         entity.view.view.GetRotation(ref rotX, ref rotY, ref rotZ);
 
                         var transCom = entity.GetComponent(GameComponentsLookup.Transform) as TransformComponent;
 
-                        transCom.localPosition.x = posX;
-                        transCom.localPosition.y = posY;
-                        transCom.localPosition.z = posZ;
+                        transCom.position.x = posX;
+                        transCom.position.y = posY;
+                        transCom.position.z = posZ;
 
-                        transCom.localRotation.x = rotX;
-                        transCom.localRotation.y = rotY;
-                        transCom.localRotation.z = rotZ;
+                        transCom.rotation.x = rotX;
+                        transCom.rotation.y = rotY;
+                        transCom.rotation.z = rotZ;
 
-                        //entity.ReplaceComponent(GameComponentsLookup.Transform, transCom);
+                        entity.ReplaceComponent(GameComponentsLookup.Transform, transCom);
                     }
                 }
             }

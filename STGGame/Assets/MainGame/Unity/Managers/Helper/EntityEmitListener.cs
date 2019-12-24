@@ -14,8 +14,8 @@ namespace STGU3D
             ObjectEmitController ctrl = gobj.GetComponent<ObjectEmitController>();
             if (ctrl == null) ctrl = gobj.AddComponent<ObjectEmitController>();
 
-            trans.localPosition = args.calculateResult.startPosition;
-            trans.localEulerAngles = args.calculateResult.startEulerAngles;
+            trans.position = args.calculateResult.startPosition;
+            trans.eulerAngles = args.calculateResult.startEulerAngles;
 
             ctrl.moveSpeed = args.calculateResult.startMoveSpeed;
             ctrl.rotationSpeed = args.calculateResult.startAngleSpeed;
@@ -30,7 +30,6 @@ namespace STGU3D
                     {
                         if (entity.hasView)
                         {
-                            var view = entity.view.view as UnityView;
                             if (!entity.view.isEditor)
                             {
                                 entity.movement.moveSpeed = ctrl.moveSpeed;

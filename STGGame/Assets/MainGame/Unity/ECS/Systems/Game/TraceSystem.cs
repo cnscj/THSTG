@@ -23,6 +23,17 @@ namespace STGU3D
         {
             foreach (var entity in __traceGroup.GetEntities())
             {
+                if (entity.trace.target == null)
+                {
+                    if (entity.trace.isAutoSearch)
+                    {
+                        //TODO:
+                        //查看全局是否存在一个追踪目标(主要是以人作为范围
+                        //没有则从KDTree取
+                       
+                    }
+                }
+
                 if (entity.trace.target != null)
                 {
                     var curPos = entity.transform.position;
@@ -34,16 +45,6 @@ namespace STGU3D
                     //将当前物体的角度设置为对应角度
                     entity.movement.rotationSpeed = new Vector3(0, 0, angle_1);
                     entity.movement.moveSpeed = MathUtil.ChangeVectorDirection(entity.movement.rotationSpeed, entity.movement.moveSpeed, out entity.movement.moveSpeed);
-                }
-                else
-                {
-                    if (entity.trace.isAutoSearch)
-                    {
-                        //TODO:
-                        //查看全局是否存在一个追踪目标(主要是以人作为范围
-                        //没有则从KDTree取
-                       
-                    }
                 }
             }
 

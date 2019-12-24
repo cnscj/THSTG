@@ -33,11 +33,6 @@ namespace STGU3D
                     e.transform.position = e.transform.parent.position + e.transform.localPosition;
                     e.transform.rotation = e.transform.parent.rotation + e.transform.localRotation;
                 }
-                else
-                {
-                    e.transform.position = e.transform.localPosition;
-                    e.transform.rotation = e.transform.localRotation;
-                }
             }
         }
     }

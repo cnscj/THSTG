@@ -40,7 +40,7 @@ namespace STGU3D
                 if (entity.follow.isFollowing)
                 {
                     //是否在目标点半径内
-                    Vector3 abVec = (entity.follow.destination - entity.transform.localPosition);
+                    Vector3 abVec = (entity.follow.destination - entity.transform.position);
                     float distance = abVec.magnitude;
                     float safeRadius = Mathf.Max(PRECISION, entity.follow.followRadius);
                     if (distance <= safeRadius)

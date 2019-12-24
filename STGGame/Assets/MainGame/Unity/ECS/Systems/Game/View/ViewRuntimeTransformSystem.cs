@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace STGU3D
 {
+    //TODO:超耗性能
     public class ViewRuntimeTransformSystem : ReactiveSystem<GameEntity>
     {
         public ViewRuntimeTransformSystem(Contexts contexts) : base(contexts.game)
@@ -18,11 +19,12 @@ namespace STGU3D
                       GameMatcher.View,
                       GameMatcher.Transform
                  ));
+            //TODO:这里会把Editor的也加进来,不应该的
         }
 
         protected override bool Filter(GameEntity entity)
         {
-            return entity.hasView && entity.hasTransform;
+            return  entity.hasTransform && entity.hasView && !entity.view.isEditor;
         }
 
         protected override void Execute(List<GameEntity> entities)

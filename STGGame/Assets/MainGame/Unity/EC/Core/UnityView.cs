@@ -12,7 +12,6 @@ namespace STGU3D
         public GameObject node;             //与Unity关联的节点
         public BodyBehaviour bodyCom;       //身体节点
 
-
         public void Clear()
         {
             if (node != null)
@@ -30,7 +29,7 @@ namespace STGU3D
                     bodyCom.Destroy();
                 }
                 //TODO:应该送入缓存区
-                GameObject.Destroy(node);
+                Object.Destroy(node);
             }
             node = null;
             entity = null;
@@ -50,16 +49,16 @@ namespace STGU3D
         public void SetRotation(float x, float y, float z)
         {
             if (node == null) return;
-            var euler = node.transform.localEulerAngles;
+            var euler = node.transform.eulerAngles;
             euler.x = x;
             euler.y = y;
             euler.z = z;
-            node.transform.localEulerAngles = euler;
+            node.transform.eulerAngles = euler;
         }
         public void GetRotation(ref float x, ref float y, ref float z)
         {
             if (node == null) return;
-            var euler = node.transform.localEulerAngles;
+            var euler = node.transform.eulerAngles;
             x = euler.x;
             y = euler.y;
             z = euler.z;
@@ -68,17 +67,17 @@ namespace STGU3D
         public void SetPosition(float x, float y, float z)
         {
             if (node == null) return;
-            var position = node.transform.localPosition;
+            var position = node.transform.position;
             position.x = x;
             position.y = y;
             position.z = z;
-            node.transform.localPosition = position;
+            node.transform.position = position;
         }
 
         public void GetPosition(ref float x, ref float y, ref float z)
         {
             if (node == null) return;
-            var position = node.transform.localPosition;
+            var position = node.transform.position;
             x = position.x;
             y = position.y;
             z = position.z;
@@ -137,7 +136,7 @@ namespace STGU3D
         {
             if (bodyCom != null)
             {
-                GameObject.Destroy(bodyCom);
+                Object.Destroy(bodyCom);
             }
 
             if (node != null)
@@ -184,13 +183,13 @@ namespace STGU3D
                 {
                     if (ent.view.isEditor)
                     {
-                        ent.transform.localPosition = node.transform.localPosition;
-                        ent.transform.localRotation = node.transform.localEulerAngles;
+                        ent.transform.position = node.transform.position;
+                        ent.transform.rotation = node.transform.eulerAngles;
                     }
                     else
                     {
-                        node.transform.localPosition = ent.transform.localPosition;
-                        node.transform.localEulerAngles = ent.transform.localRotation;
+                        node.transform.position = ent.transform.position;
+                        node.transform.eulerAngles = ent.transform.rotation;
                     }
                 }
             }

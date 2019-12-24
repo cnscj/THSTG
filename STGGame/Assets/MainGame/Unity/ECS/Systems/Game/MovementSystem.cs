@@ -12,7 +12,8 @@ namespace STGU3D
             //移动
             __moveGroup = Contexts.sharedInstance.game.GetGroup(
                 GameMatcher.AllOf(
-                     GameMatcher.Movement
+                    GameMatcher.Transform,
+                    GameMatcher.Movement
                 ));
         }
 
@@ -24,12 +25,12 @@ namespace STGU3D
                 bool isChanged = false;
                 if (entity.movement.moveSpeed != Vector3.zero)
                 {
-                    entity.transform.localPosition = entity.transform.localPosition + entity.movement.moveSpeed * Time.deltaTime;
+                    entity.transform.position = entity.transform.position + entity.movement.moveSpeed * Time.deltaTime;
                     isChanged = true;
                 }
                 if (entity.movement.rotationSpeed != Vector3.zero)
                 {
-                    entity.transform.localRotation = entity.transform.localRotation + entity.movement.rotationSpeed * Time.deltaTime;
+                    entity.transform.rotation = entity.transform.rotation + entity.movement.rotationSpeed * Time.deltaTime;
                     isChanged = true;
                 }
 

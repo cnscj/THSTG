@@ -18,14 +18,13 @@ namespace STGU3D
             return context.CreateCollector(
                  GameMatcher.AllOf(
                       GameMatcher.View,
-                      GameMatcher.Transform,
                       GameMatcher.Movement
                  ));
         }
 
         protected override bool Filter(GameEntity entity)
         {
-            return entity.hasView && entity.hasTransform && entity.hasMovement;
+            return entity.hasView && entity.hasMovement;
         }
 
         protected override void Execute(List<GameEntity> entities)
@@ -47,14 +46,11 @@ namespace STGU3D
                                 animator.SetInteger("moveSpeed", 1);
                                 renderer.flipX = true;
 
-                                entity.ReplaceComponent(GameComponentsLookup.Transform, entity.transform);
                             }
                             else if (entity.movement.moveSpeed.x < 0f) //左
                             {
                                 animator.SetInteger("moveSpeed", -1);
                                 renderer.flipX = false;
-
-                                entity.ReplaceComponent(GameComponentsLookup.Transform, entity.transform);
                             }
                             else
                             {

@@ -110,7 +110,7 @@ namespace XLibrary.Collection
                 bool isNeedUpdate = true;
                 if (m_listCache.TryGetValue(index, out retList))    //直接从Cache里取
                 {
-                    bool isDirty = false;
+                    bool isDirty;
                     m_gridDirty.TryGetValue(index, out isDirty);
                     isNeedUpdate = isDirty;
                 }

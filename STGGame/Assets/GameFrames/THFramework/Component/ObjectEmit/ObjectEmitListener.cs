@@ -32,8 +32,8 @@ namespace THGame
             ObjectEmitController ctrl = entity.GetComponent<ObjectEmitController>();
             if (ctrl == null) ctrl = entity.AddComponent<ObjectEmitController>();
 
-            trans.localPosition = args.calculateResult.startPosition;
-            trans.localEulerAngles = args.calculateResult.startEulerAngles;
+            trans.position = args.calculateResult.startPosition;
+            trans.eulerAngles = args.calculateResult.startEulerAngles;
 
             ctrl.moveSpeed = args.calculateResult.startMoveSpeed;
             ctrl.rotationSpeed = args.calculateResult.startAngleSpeed;

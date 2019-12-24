@@ -8,5 +8,11 @@ namespace STGU3D
     {
         public GameObject target;
 
+
+        //灰显
+        public void SetGray(bool val)
+        {
+
+        }
     }
 }

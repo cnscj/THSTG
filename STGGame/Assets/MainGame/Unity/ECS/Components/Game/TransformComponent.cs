@@ -4,7 +4,6 @@ using UnityEngine;
 namespace STGU3D
 {
     [Game]
-    [System.Serializable]
     public class TransformComponent : IComponent
     {
         public TransformComponent parent;

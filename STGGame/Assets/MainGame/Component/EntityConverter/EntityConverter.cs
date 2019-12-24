@@ -41,8 +41,8 @@ namespace STGGame
                 {
                     if (entity.hasTransform)
                     {
-                        entity.transform.localPosition = gameObject.transform.localPosition;
-                        entity.transform.localRotation = gameObject.transform.localEulerAngles;
+                        entity.transform.position = gameObject.transform.position;
+                        entity.transform.rotation = gameObject.transform.eulerAngles;
 
                     }
 

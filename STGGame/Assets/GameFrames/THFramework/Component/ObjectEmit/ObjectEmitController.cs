@@ -12,8 +12,8 @@ namespace THGame
 
         void Update()
         {
-            transform.localPosition += moveSpeed * Time.deltaTime;
-            transform.localEulerAngles += rotationSpeed * Time.deltaTime;
+            transform.position += moveSpeed * Time.deltaTime;
+            transform.eulerAngles += rotationSpeed * Time.deltaTime;
         }
     }
 }
