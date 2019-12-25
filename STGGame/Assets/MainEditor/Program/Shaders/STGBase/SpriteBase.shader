@@ -8,12 +8,23 @@ Shader "STG/SpriteBase"
         _Color ("Tint", Color) = (1,1,1,1)
         [MaterialToggle] PixelSnap ("Pixel snap", Float) = 0
         [PerRendererData] _AlphaTex ("External Alpha", 2D) = "white" {}
-        
+
+        //这里是GRAY_ON
+        _Gray ("Gray", Float) = 0
+
+
     }
 
     SubShader
     {
-        Tags { "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" "PreviewType"="Plane" "CanUseSpriteAtlas"="True" }
+        Tags 
+        {
+            "Queue" = "Transparent" 
+            "IgnoreProjector" = "True" 
+            "RenderType" = "Transparent"
+            "PreviewType" = "Plane" 
+            "CanUseSpriteAtlas" = "True" 
+        }
 
         Cull Off
         Lighting Off
@@ -24,11 +35,20 @@ Shader "STG/SpriteBase"
         Pass
         {
         CGPROGRAM
+            //启用功能
+            #define GRAY_ON
+
+            //
             #pragma vertex vert
             #pragma fragment frag
             #pragma target 3.0
+
+            //变体Shader
             #pragma multi_compile _ PIXELSNAP_ON
             #pragma multi_compile _ ETC1_EXTERNAL_ALPHA
+            
+            //库
+            #include "CGIncludes/_BaseColor.cginc"
             #include "UnityCG.cginc"
             
 
@@ -77,21 +97,24 @@ Shader "STG/SpriteBase"
             {
                 fixed4 color = tex2D (_MainTex, uv);
 
-#if ETC1_EXTERNAL_ALPHA
+                #if ETC1_EXTERNAL_ALPHA
                 // get the color from an external texture (usecase: Alpha support for ETC1 on android)
                 fixed4 alpha = tex2D (_AlphaTex, uv);
                 color.a = lerp (color.a, alpha.r, _EnableExternalAlpha);
-#endif //ETC1_EXTERNAL_ALPHA
+                #endif
 
                 return color;
             }
             
-            fixed4 frag(v2f IN  ) : SV_Target
+            fixed4 frag (v2f IN) : SV_Target
             {
                 
-                fixed4 c = SampleSpriteTexture (IN.texcoord) * IN.color;
-                c.rgb *= c.a;
-                return c;
+                fixed4 color = SampleSpriteTexture (IN.texcoord) * IN.color;
+                color.rgb *= color.a;
+
+                TRY_COLOR_GRAY(color);  //灰显
+
+                return color;
             }
         ENDCG
         }

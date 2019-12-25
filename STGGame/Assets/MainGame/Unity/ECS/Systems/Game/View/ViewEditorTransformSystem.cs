@@ -26,9 +26,9 @@ namespace STGU3D
             foreach (var entity in __editorTransformGroup.GetEntities())
             {
                 //存在1帧的延误
-                if (entity.view.view != null)
+                if (entity.view.isEditor)
                 {
-                    if (entity.view.isEditor)
+                    if (entity.view.view != null)
                     {
                         //因为是使用position做越界判断的,因此,entity的position也要一起变动
                         //影响entity的Trans

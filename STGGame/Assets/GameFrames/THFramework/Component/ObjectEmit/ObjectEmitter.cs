@@ -29,7 +29,7 @@ namespace THGame
         public int launchOrderFixedIndex = 0;
 
         //发射类型:直线
-        public float launchLineDistance = 0f;               //发射角度(水平
+        public float launchLineDistance = 0f;               //发射起始距离
         public float launchLineAngle;                       //发射角度(水平
         public float launchLineRPT;                         //每发射一次转动角度
 

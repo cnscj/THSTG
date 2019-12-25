@@ -25,12 +25,12 @@ namespace STGU3D
                 bool isChanged = false;
                 if (entity.movement.moveSpeed != Vector3.zero)
                 {
-                    entity.transform.position = entity.transform.position + entity.movement.moveSpeed * Time.deltaTime;
+                    entity.transform.position += entity.movement.moveSpeed * Time.deltaTime;
                     isChanged = true;
                 }
                 if (entity.movement.rotationSpeed != Vector3.zero)
                 {
-                    entity.transform.rotation = entity.transform.rotation + entity.movement.rotationSpeed * Time.deltaTime;
+                    entity.transform.rotation += entity.movement.rotationSpeed * Time.deltaTime;
                     isChanged = true;
                 }
 

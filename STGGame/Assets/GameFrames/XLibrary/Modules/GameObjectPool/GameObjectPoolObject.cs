@@ -9,33 +9,26 @@ namespace XLibGame
         /// <summary>
         /// 对象显示的持续时间，若=0，则不隐藏
         /// </summary>
-        public float lifetime = 0;
+        public float lifetime = 0f;
         /// <summary>
         /// 所属对象池的唯一id
         /// </summary>
         public string poolName;
 
-        WaitForSeconds m_waitTime;
-
-        void Awake()
-        {
-            if (lifetime > 0)
-            {
-                m_waitTime = new WaitForSeconds(lifetime);
-            }
-        }
-
         void OnEnable()
         {
+            if (!enabled)
+                return;
+
             if (lifetime > 0)
             {
-                StartCoroutine(CountDown(lifetime));
+                StartCoroutine(CountDown());
             }
         }
 
-        IEnumerator CountDown(float lifetime)
+        IEnumerator CountDown()
         {
-            yield return m_waitTime;
+            yield return new WaitForSeconds(lifetime);
             Release();
         }
 

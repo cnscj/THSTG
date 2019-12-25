@@ -6,6 +6,13 @@ namespace STGU3D
 {
     public class EntityEmitListener : ObjectEmitListener
     {
+        //实例创建
+        public override ObjectEmitCreateResult OnCreate(ObjectEmitCreateParams args)
+        {
+            return base.OnCreate(args);
+        }
+
+
         //发射
         public override void OnLaunch(ObjectEmitLaunchParams args)
         {
@@ -26,16 +33,13 @@ namespace STGU3D
             {
                 convertCom.callback += (GameEntity entity) =>
                 {
-                    if (entity.hasMovement)
+                    if (entity.hasView && entity.hasMovement)
                     {
-                        if (entity.hasView)
+                        if (!entity.view.isEditor)
                         {
-                            if (!entity.view.isEditor)
-                            {
-                                entity.movement.moveSpeed = ctrl.moveSpeed;
-                                entity.movement.rotationSpeed = ctrl.rotationSpeed;
-                                Object.Destroy(ctrl);
-                            }
+                            entity.movement.moveSpeed = ctrl.moveSpeed;
+                            entity.movement.rotationSpeed = ctrl.rotationSpeed;
+                            Object.Destroy(ctrl);
                         }
                     }
                 };

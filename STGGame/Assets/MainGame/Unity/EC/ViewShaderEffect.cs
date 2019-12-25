@@ -12,7 +12,17 @@ namespace STGU3D
         //灰显
         public void SetGray(bool val)
         {
-
+            //TODO:
         }
+
+        //外发光(轮廓光
+
+        //内发光
+
+        //石化
+
+        //溶解
+
+        //闪烁
     }
 }

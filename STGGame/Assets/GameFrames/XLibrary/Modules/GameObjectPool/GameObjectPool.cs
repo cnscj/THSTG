@@ -6,7 +6,11 @@ namespace XLibGame
 {
     public class GameObjectPool : MonoBehaviour
     {
-
+        public enum ReleaseOperate
+        {
+            Active,         //失活
+            Sight,          //视野
+        }
         /// <summary>
         /// 每个对象池的名称，当唯一id
         /// </summary>
@@ -28,6 +32,11 @@ namespace XLibGame
         /// 满池时不会生成
         /// </summary>
         public bool fixedSize = false;
+
+        /// <summary>
+        ///释放模式
+        /// </summary>
+        public ReleaseOperate releaseOperate = ReleaseOperate.Active;
 
         /// <summary>
         /// 被托管
@@ -57,20 +66,23 @@ namespace XLibGame
                 //lifetime<0时，返回null  
                 return null;
             }
+            bool isPoolObj = false;
             GameObject returnObj;
             if (m_queue.Count > 0)
             {
                 //池中有待分配对象
                 returnObj = (GameObject)m_queue.Dequeue();
+                isPoolObj = true;
             }
             else
             {
                 if (prefab == null) return null;
                 if (fixedSize) return null;
                 //池中没有可分配对象了，新生成一个
-                returnObj = GameObject.Instantiate(prefab) as GameObject;
+                returnObj = Object.Instantiate(prefab) as GameObject;
                 returnObj.transform.SetParent(gameObject.transform);
                 returnObj.SetActive(false);
+                
             }
             //使用PrefabInfo脚本保存returnObj的一些信息
             GameObjectPoolObject info = returnObj.GetComponent<GameObjectPoolObject>();
@@ -83,7 +95,28 @@ namespace XLibGame
             {
                 info.lifetime = lifetime;
             }
-            returnObj.SetActive(true);
+
+            switch (releaseOperate)
+            {
+                case ReleaseOperate.Active:
+                    returnObj.SetActive(true);
+                    break;
+                case ReleaseOperate.Sight:
+                {
+                    if (isPoolObj)
+                    {
+                        var position = returnObj.transform.position;
+                        position.z -= -1000f;
+                        returnObj.transform.position = position;
+                    }
+                    else
+                    {
+                        returnObj.SetActive(true);
+                    }
+            }
+                break;
+
+            }
             return returnObj;
         }
 
@@ -101,14 +134,26 @@ namespace XLibGame
             if (m_queue.Count > maxCount)
             {
                 //当前池中object数量已满，直接销毁
-                GameObject.Destroy(obj);
+                Object.Destroy(obj);
             }
             else
             {
                 //放入对象池，入队
                 m_queue.Enqueue(obj);
-                obj.SetActive(false);
+               
                 obj.transform.SetParent(transform, false); //不改变Transform
+                switch (releaseOperate)
+                {
+                    case ReleaseOperate.Active:
+                        obj.SetActive(false);
+                        break;
+                    case ReleaseOperate.Sight:
+                        var position = obj.transform.position;
+                        position.z += -1000f;
+                        obj.transform.position = position;
+                        break;
+
+                }
             }
         }
 
@@ -137,7 +182,7 @@ namespace XLibGame
                 {
                     if (prefab != null)
                     {
-                        GameObject availableGameObject = GameObject.Instantiate(prefab) as GameObject;
+                        GameObject availableGameObject = Object.Instantiate(prefab) as GameObject;
                         Release(availableGameObject);   //放回池中待利用
                     }
                     else
@@ -180,13 +225,15 @@ namespace XLibGame
         /// </summary>
         private void OnDestroy()
         {
-            if (GameObjectPoolManager.GetInstance())
+            var mgrInstance = GameObjectPoolManager.GetInstance();
+            if (mgrInstance != null)
             {
-                if (GameObjectPoolManager.GetInstance().GetGameObjectPool(poolName))
+                if (mgrInstance.GetGameObjectPool(poolName))
                 {
-                    GameObjectPoolManager.GetInstance().DestroyGameObjectPool(poolName);
+                    mgrInstance.DestroyGameObjectPool(poolName);
                 }
             }
+
         }
     }
 }

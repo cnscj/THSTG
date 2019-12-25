@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using XLibrary.Package;
@@ -32,12 +31,12 @@ namespace XLibGame
         /// </summary>
         Action m_onFinish;
 
-        public void onProgress(Action<float> func)
+        public void OnProgress(Action<float> func)
         {
             m_onProgress = func;
         }
 
-        public void onFinih(Action func)
+        public void OnFinih(Action func)
         {
             m_onFinish = func;
         }
@@ -195,8 +194,7 @@ namespace XLibGame
         /// <summary>
         /// 将对象存入对象池中
         /// </summary>
-        /// <param name="poolName">对象池名称</param>
-        /// <param name="go">对象</param>
+        /// <param name="poolObj">对象</param>
         public void ReleaseGameObject(GameObjectPoolObject poolObj)
         {
             if (!poolObj)
@@ -212,7 +210,6 @@ namespace XLibGame
         /// <summary>
         /// 将对象存入对象池中
         /// </summary>
-        /// <param name="poolName">对象池名称</param>
         /// <param name="go">对象</param>
         public void ReleaseGameObject(GameObject go)
         {
@@ -241,7 +238,7 @@ namespace XLibGame
                 pool.Destroy();
             }
             m_poolDic.Clear();
-            GameObject.Destroy(m_parentTrans);
+            UnityEngine.Object.Destroy(m_parentTrans);
         }
 
     }
