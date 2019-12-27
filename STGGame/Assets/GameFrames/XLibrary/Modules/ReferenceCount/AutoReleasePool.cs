@@ -27,11 +27,10 @@ namespace XLibGame
         {
             m_objectArray.Remove(refObj);
         }
-
-        // 将自动释放池中的对象释放掉
-        public void Clear()
+        //
+        public void Purge()
         {
-            for(int i = m_objectArray.Count - 1; i >= 0 ; i--)
+            for (int i = m_objectArray.Count - 1; i >= 0; i--)
             {
                 var iter = m_objectArray[i];
                 if (iter.RefCount() >= iter.ManagedCount())
@@ -46,6 +45,13 @@ namespace XLibGame
                     m_objectArray.Remove(iter);
                 }
             }
+        }
+
+        // 将自动释放池中的对象释放掉
+        public void Clear()
+        {
+            Purge();
+            m_objectArray.Clear();
         }
     }
 

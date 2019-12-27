@@ -35,9 +35,20 @@ namespace XLibGame
         // 清空所有的自动释放池  
         public void Clear()
         {
+            Purge();
             m_autoReleasePoolStack.Clear();
         }
 
+        public void Purge()
+        {
+            Pop();
+        }
+        //
+
+        private void Update()
+        {
+            Purge();
+        }
         // 增加一个自动释放池  
         private void Push()
         {
@@ -81,10 +92,7 @@ namespace XLibGame
             return m_curReleasePool;
         }
 
-        private void Update()
-        {
-            Pop();
-        }
+
     }
 }
 

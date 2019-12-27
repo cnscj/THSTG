@@ -61,13 +61,7 @@ namespace STGU3D
                 entity.playerData.heroType = heroType;
 
                 //根据
-                entity.shot.action = (shotEntity) =>
-                {
-                    var bulletEntity = EntityManager.GetInstance().GetOrNewEntityFactory(EEntityType.Bullet).AsBullet().CreateBullet(ECampType.Hero, shotEntity.entityData.entityData["bulletCode"]);
-                    bulletEntity.transform.position = shotEntity.transform.position;                                                                                                          //在自机处生成
-
-                    return bulletEntity;
-                };
+                entity.shot.action = ShotBullet;
 
                 {
                     entity.view.view = ComponentUtil.CreateView(entity);
@@ -114,7 +108,16 @@ namespace STGU3D
             }
             base.DestroyEntity(entity);
         }
-        
+
+
+
+        private GameEntity ShotBullet(GameEntity shotEntity)
+        {
+            var bulletEntity = EntityManager.GetInstance().GetOrNewEntityFactory(EEntityType.Bullet).AsBullet().CreateBullet(ECampType.Hero, shotEntity.entityData.entityData["bulletCode"]);
+            bulletEntity.transform.position = shotEntity.transform.position;                                                                                                          //在自机处生成
+
+            return bulletEntity;
+        }
     }
 
 }

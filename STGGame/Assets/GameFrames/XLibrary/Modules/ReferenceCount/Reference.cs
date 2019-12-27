@@ -13,6 +13,7 @@ namespace XLibGame
             m_refCount = 1;
             m_managedCount = 0;
         }
+        
         public virtual void Retain()
         {
             ++m_refCount;
@@ -22,7 +23,7 @@ namespace XLibGame
         {
             --m_refCount;
             //如果计数器减为0，释放本类实例化对象占用的内存  
-            if (m_refCount <= 0)
+            if (m_refCount == 0)
             {
                 OnRelease();
             }
@@ -44,19 +45,6 @@ namespace XLibGame
             --m_managedCount;
         }
 
-        public void AutoRelease()
-        {
-            if (m_managedCount > 0)
-            {
-                ReleaseLater();
-            }
-        }
-
-        public bool IsAutoRelease()
-        {
-            return m_managedCount > 0;
-        }
-
         public int RefCount()
         {
             return m_refCount;
@@ -68,7 +56,7 @@ namespace XLibGame
         }
 
         //留给子类调用
-        protected void OnRelease()
+        protected virtual void OnRelease()
         {
 
         }

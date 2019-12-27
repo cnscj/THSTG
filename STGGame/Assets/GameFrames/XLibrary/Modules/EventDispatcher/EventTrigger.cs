@@ -26,5 +26,14 @@ namespace XLibGame
                 }
             }
         }
+
+        public void OnEnable()
+        {
+            if (enabled)
+            {
+                Dispatch();
+                enabled = false;
+            }
+        }
     }
 }
