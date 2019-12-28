@@ -8,18 +8,18 @@
 //------------------------------------------------------------------------------
 public partial class GameEntity {
 
-    static readonly STGU3D.EntitySpellCardComponent entitySpellCardComponent = new STGU3D.EntitySpellCardComponent();
+    static readonly STGU3D.SpellCardComponent spellCardComponent = new STGU3D.SpellCardComponent();
 
-    public bool isEntitySpellCard {
-        get { return HasComponent(GameComponentsLookup.EntitySpellCard); }
+    public bool isSpellCard {
+        get { return HasComponent(GameComponentsLookup.SpellCard); }
         set {
-            if (value != isEntitySpellCard) {
-                var index = GameComponentsLookup.EntitySpellCard;
+            if (value != isSpellCard) {
+                var index = GameComponentsLookup.SpellCard;
                 if (value) {
                     var componentPool = GetComponentPool(index);
                     var component = componentPool.Count > 0
                             ? componentPool.Pop()
-                            : entitySpellCardComponent;
+                            : spellCardComponent;
 
                     AddComponent(index, component);
                 } else {
@@ -40,17 +40,17 @@ public partial class GameEntity {
 //------------------------------------------------------------------------------
 public sealed partial class GameMatcher {
 
-    static Entitas.IMatcher<GameEntity> _matcherEntitySpellCard;
+    static Entitas.IMatcher<GameEntity> _matcherSpellCard;
 
-    public static Entitas.IMatcher<GameEntity> EntitySpellCard {
+    public static Entitas.IMatcher<GameEntity> SpellCard {
         get {
-            if (_matcherEntitySpellCard == null) {
-                var matcher = (Entitas.Matcher<GameEntity>)Entitas.Matcher<GameEntity>.AllOf(GameComponentsLookup.EntitySpellCard);
+            if (_matcherSpellCard == null) {
+                var matcher = (Entitas.Matcher<GameEntity>)Entitas.Matcher<GameEntity>.AllOf(GameComponentsLookup.SpellCard);
                 matcher.componentNames = GameComponentsLookup.componentNames;
-                _matcherEntitySpellCard = matcher;
+                _matcherSpellCard = matcher;
             }
 
-            return _matcherEntitySpellCard;
+            return _matcherSpellCard;
         }
     }
 }

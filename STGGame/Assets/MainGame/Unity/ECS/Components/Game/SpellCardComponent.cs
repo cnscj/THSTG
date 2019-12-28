@@ -3,8 +3,8 @@
 namespace STGU3D
 {
     [Game]
-    public class EntitySpellCardComponent : IComponent
+    public class SpellCardComponent : IComponent
     {
-       
+
     }
 }
