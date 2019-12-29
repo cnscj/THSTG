@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: eff_anima_seq_bomb_01
+  m_Name: eff_bomb_seq
   serializedVersion: 6
   m_Legacy: 0
   m_Compressed: 0

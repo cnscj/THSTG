@@ -83,20 +83,20 @@ namespace XLibrary
             }
 
             string keyLine = lines[0];
-            string[] keys = keyLine.Split(',');
+            string[] keys = SplitStringByComma(keyLine);
 
             _atrributeKeys = new List<string>(keys);
             _dataObjDic = new Dictionary<string, CSVObject>();
 
             for (int i = 1; i < lines.Length; i++)
             {
-                string[] values = lines[i].Split(',');
+                string[] values = SplitStringByComma(lines[i]);
                 string major = values[0].Trim();
                 Dictionary<string, CSVValue> tempAttributeDic = new Dictionary<string, CSVValue>();
                 for (int j = 1; j < values.Length; j++)
                 {
                     string key = keys[j].Trim();
-                    string value = values[j].Trim();
+                    string value = values[j].Trim().Trim('\"');
                     tempAttributeDic.Add(key, new CSVValue(value));
                 }
                 CSVObject dataObj = new CSVObject(major, tempAttributeDic, keys);
@@ -264,6 +264,16 @@ namespace XLibrary
             }
 
             return content;
+        }
+
+        /// <summary>
+        /// 以逗号分隔,但是双引号内的逗号不做处理
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        private string[] SplitStringByComma(string str)
+        {
+            return System.Text.RegularExpressions.Regex.Split(str, "(?<!\"\\d+),(?!\\d+\")");
         }
     }
 }
