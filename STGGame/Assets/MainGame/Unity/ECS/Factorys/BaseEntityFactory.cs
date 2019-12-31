@@ -5,6 +5,7 @@ namespace STGU3D
 {
     public abstract class BaseEntityFactory
     {
+        //唯一实体创建
         public GameEntity CreateEntity(string code)
         {
             var entity = OnCreate(code);
@@ -12,6 +13,7 @@ namespace STGU3D
             return entity;
         }
 
+        //唯一实体销毁
         public void DestroyEntity(GameEntity entity)
         {
             OnDestroy(entity);
@@ -73,7 +75,7 @@ namespace STGU3D
         {
             //用这个法子创建的组件是复用原有的,因此必须手动初始化下
             var transCom = entity.CreateComponent<TransformComponent>(GameComponentsLookup.Transform);
-            var hitboxCom = entity.CreateComponent<HitboxComponent>(GameComponentsLookup.Hitbox);
+            var colliderCom = entity.CreateComponent<ColliderComponent>(GameComponentsLookup.Collider);
             var movementCom = entity.CreateComponent<MovementComponent>(GameComponentsLookup.Movement);
             var viewCom = entity.CreateComponent<ViewComponent>(GameComponentsLookup.View);
             var destroyCom = entity.CreateComponent<DestroyedComponent>(GameComponentsLookup.Destroyed);
@@ -91,7 +93,7 @@ namespace STGU3D
 
             ////
             entity.AddComponent(GameComponentsLookup.Transform, transCom);
-            entity.AddComponent(GameComponentsLookup.Hitbox, hitboxCom);
+            entity.AddComponent(GameComponentsLookup.Collider, colliderCom);
             entity.AddComponent(GameComponentsLookup.Movement, movementCom);
             entity.AddComponent(GameComponentsLookup.View, viewCom);
             entity.AddComponent(GameComponentsLookup.Destroyed, destroyCom);
@@ -100,7 +102,6 @@ namespace STGU3D
         protected void InitCommonComponent(GameEntity entity, string code)
         {
             ComponentUtil.ClearTransform(entity.transform);
-            ComponentUtil.ClearHitbox(entity.hitbox);
             ComponentUtil.ClearMovement(entity.movement);
             ComponentUtil.ClearView(entity.view);
             ComponentUtil.ClearDestroyed(entity.destroyed);

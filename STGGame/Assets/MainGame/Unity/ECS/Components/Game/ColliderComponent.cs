@@ -1,11 +1,15 @@
-﻿using Entitas;
-using UnityEngine;
+﻿
+using System;
+using Entitas;
 
 namespace STGU3D
 {
     [Game]
     public class ColliderComponent : IComponent
     {
-        public Vector3 box;
+        public long tag;
+        public long mask = long.MaxValue;
+        public ColliderObject obj = new ColliderObject();
+        public Action<ColliderContent> onCollide;
     }
 }

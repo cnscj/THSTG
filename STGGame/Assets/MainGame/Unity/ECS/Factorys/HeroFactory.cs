@@ -73,6 +73,19 @@ namespace STGU3D
                     entity.cage.bodySize = DirectorUtil.ScreenSizeInWorld(new Vector2(32, 48)); //TODO:这里应该查找hitbox
                 }
 
+                {
+                    entity.collider.tag = ColliderType.Hero;
+                    entity.collider.mask = ColliderType.Mob;
+                    var circleShape = new CircleCollider();
+                    circleShape.radius = 0.1f;
+                    entity.collider.obj.AddShape(circleShape);
+                    entity.collider.onCollide = (content) =>
+                    {
+                       //TODO::
+                    };
+
+                }
+
                 entity.playerData.moveSpeed = entity.entityData.entityData["speed"].ToFloat();
                 entity.health.maxBlood = entity.entityData.entityData["blood"].ToInt();
 

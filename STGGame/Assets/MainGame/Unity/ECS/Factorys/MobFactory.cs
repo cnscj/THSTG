@@ -29,6 +29,13 @@ namespace STGU3D
                     recycleCom.boundary = DirectorUtil.ScreenRectInWorld(DirectorUtil.GetScreenRect());
                 }
 
+                {
+                    entity.collider.tag = ColliderType.Mob;
+                    entity.collider.mask = 0;
+                    var circleShape = new CircleCollider();
+                    circleShape.radius = 0.1f;
+                    entity.collider.obj.AddShape(circleShape);
+                }
             }
             return entity;
         }

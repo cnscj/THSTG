@@ -11,17 +11,23 @@ public partial class GameEntity {
     public STGU3D.ColliderComponent collider { get { return (STGU3D.ColliderComponent)GetComponent(GameComponentsLookup.Collider); } }
     public bool hasCollider { get { return HasComponent(GameComponentsLookup.Collider); } }
 
-    public void AddCollider(UnityEngine.Vector3 newBox) {
+    public void AddCollider(long newTag, long newMask, STGU3D.ColliderObject newObj, System.Action<STGU3D.ColliderContent> newOnCollide) {
         var index = GameComponentsLookup.Collider;
         var component = (STGU3D.ColliderComponent)CreateComponent(index, typeof(STGU3D.ColliderComponent));
-        component.box = newBox;
+        component.tag = newTag;
+        component.mask = newMask;
+        component.obj = newObj;
+        component.onCollide = newOnCollide;
         AddComponent(index, component);
     }
 
-    public void ReplaceCollider(UnityEngine.Vector3 newBox) {
+    public void ReplaceCollider(long newTag, long newMask, STGU3D.ColliderObject newObj, System.Action<STGU3D.ColliderContent> newOnCollide) {
         var index = GameComponentsLookup.Collider;
         var component = (STGU3D.ColliderComponent)CreateComponent(index, typeof(STGU3D.ColliderComponent));
-        component.box = newBox;
+        component.tag = newTag;
+        component.mask = newMask;
+        component.obj = newObj;
+        component.onCollide = newOnCollide;
         ReplaceComponent(index, component);
     }
 

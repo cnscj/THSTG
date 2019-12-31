@@ -27,6 +27,8 @@ namespace STGU3D
             Add(new RecycleSystem(contexts));
             Add(new CageSystem(contexts));
 
+            Add(new ColliderSystem(contexts));
+
             Add(new CommandSystem(contexts));
 
             Add(new DestroyedSystem(contexts));
