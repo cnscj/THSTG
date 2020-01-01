@@ -13,7 +13,7 @@ namespace STGU3D
         protected override bool OnCheck(ColliderShape shape)
         {
             var other = shape as CircleCollider;
-            var vec3 = ((other.parent == null ? Vector3.zero : other.parent.center) + other.offset) - ((this.parent == null ? Vector3.zero : this.parent.center) + offset);
+            var vec3 = other.GetPosition() - this.GetPosition();
             if (vec3.magnitude < other.radius + this.radius)
             {
                 return true;

@@ -10,7 +10,7 @@ namespace STGService
         {
             if (s_resTb == null)
             {
-                s_resTb = AssetSystem.LoadConfig("G_Resource.csv");
+                s_resTb = ConfigHelper.LoadConfig("G_Resource.csv");
             }
             return s_resTb;
         }

@@ -60,9 +60,6 @@ namespace STGU3D
                 var heroType = EntityUtil.GetHeroTypeByCode(entity.entityData.entityCode);
                 entity.playerData.heroType = heroType;
 
-                //根据
-                entity.shot.action = ShotBullet;
-
                 {
                     entity.view.view = ComponentUtil.CreateView(entity);
                     entity.ReplaceComponent(GameComponentsLookup.View, entity.view);
@@ -70,20 +67,23 @@ namespace STGU3D
 
                 {
                     entity.cage.movableArea = DirectorUtil.ScreenRectInWorld(DirectorUtil.GetScreenRect());
-                    entity.cage.bodySize = DirectorUtil.ScreenSizeInWorld(new Vector2(32, 48)); //TODO:这里应该查找hitbox
+                    entity.cage.bodySize = DirectorUtil.ScreenSizeInWorld(entity.entityData.entityData["hitBox"].ToVec3());
+                }
+
+                {
+                    entity.health.blood = entity.health.maxBlood;
+                    entity.health.trueDeathTime = -1f;
+                    entity.health.isTrueDied = false;
                 }
 
                 {
                     entity.collider.tag = ColliderType.Hero;
-                    entity.collider.mask = ColliderType.Mob;
-                    var circleShape = new CircleCollider();
-                    circleShape.radius = 0.1f;
-                    entity.collider.obj.AddShape(circleShape);
-                    entity.collider.onCollide = (content) =>
+                    entity.collider.mask = ColliderType.Mob | ColliderType.Boss | ColliderType.EntityBullet | ColliderType.Prop;
+                    entity.collider.obj.data = entity;
+                    entity.collider.obj.AddShape(new CircleCollider
                     {
-                       //TODO::
-                    };
-
+                        radius = 0.1f
+                    });
                 }
 
                 entity.playerData.moveSpeed = entity.entityData.entityData["speed"].ToFloat();
@@ -92,7 +92,7 @@ namespace STGU3D
                 //不同主角特有的
                 if (heroType == EHeroType.Reimu)
                 {
-                    //Reimu持有僚机total台:onmyougyoku
+                    //Reimu持有僚机total台: onmyougyoku
                     float[] d = { -0.5f, 0.5f };
                     int total = 2;
                     for (int i = 0; i < total; i++)
@@ -101,9 +101,9 @@ namespace STGU3D
                         if (onmyougyokuWingman.hasEntityData)
                         {
                             onmyougyokuWingman.onmyougyokuWingman.id = i;
-                            onmyougyokuWingman.movement.rotationSpeed.z = 100f;                         //自旋
+                            onmyougyokuWingman.movement.rotationSpeed.z = 100f;                             //自旋
                             onmyougyokuWingman.transform.parent = entity.transform;
-                            onmyougyokuWingman.transform.localPosition = new Vector3(d[i], 0.5f, 0);       //偏移一点
+                            onmyougyokuWingman.transform.localPosition = new Vector3(d[i], 0.5f, 0);        //偏移一点
                         }
                     }
 
@@ -122,15 +122,6 @@ namespace STGU3D
             base.DestroyEntity(entity);
         }
 
-
-
-        private GameEntity ShotBullet(GameEntity shotEntity)
-        {
-            var bulletEntity = EntityManager.GetInstance().GetOrNewEntityFactory(EEntityType.Bullet).AsBullet().CreateBullet(ECampType.Hero, shotEntity.entityData.entityData["bulletCode"]);
-            bulletEntity.transform.position = shotEntity.transform.position;                                                                                                          //在自机处生成
-
-            return bulletEntity;
-        }
     }
 
 }

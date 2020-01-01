@@ -141,7 +141,9 @@ namespace STGU3D
 
             if (node != null)
             {
-                string viewCode = ent.entityData.entityData["viewCode"];
+                //这里取后两位覆盖上去
+                string color = ent.entityData.entityCode.Substring(ent.entityData.entityCode.Length - 2, 2);
+                string viewCode = string.Format(ent.entityData.entityData["viewCode"], color);
                 bodyCom = node.AddComponent<BodyBehaviour>();
                 bodyCom.Create(viewCode);
             }

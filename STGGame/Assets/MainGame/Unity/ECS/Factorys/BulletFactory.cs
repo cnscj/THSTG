@@ -33,6 +33,47 @@ namespace STGU3D
                     recycleCom.boundary = DirectorUtil.ScreenRectInWorld(DirectorUtil.GetScreenRect());
                 }
 
+                {
+                    healthCom.blood = healthCom.maxBlood;
+                    healthCom.trueDeathTime = -1f;
+                    healthCom.isTrueDied = false;
+                }
+
+                {
+                    entity.collider.obj.data = entity;
+                    entity.collider.obj.AddShape(new CircleCollider()
+                    {
+                        radius = 0.1f
+                    });
+                }
+
+                //TODO:先简单通过种类区分阵营
+                var campType = (ECampType)entity.entityData.entityData["category"].ToInt();
+                if (campType == ECampType.Hero)
+                {
+                    var heroBulletFlagCom = entity.CreateComponent<HeroBulletFlagComponent>(GameComponentsLookup.HeroBulletFlag);
+
+                    {
+                        entity.collider.tag = ColliderType.HeroBullet;
+                        entity.collider.mask = ColliderType.Mob | ColliderType.Boss;
+                    }
+
+
+                    entity.AddComponent(GameComponentsLookup.HeroBulletFlag, heroBulletFlagCom);
+                }
+                else if (campType == ECampType.Entity)
+                {
+                    var entityBulletFlagCom = entity.CreateComponent<EntityBulletFlagComponent>(GameComponentsLookup.EntityBulletFlag);
+
+                    {
+                        entity.collider.tag = ColliderType.EntityBullet;
+                        entity.collider.mask = 0;
+                    }
+
+                    entity.AddComponent(GameComponentsLookup.EntityBulletFlag, entityBulletFlagCom);
+                }
+                entity.bulletData.campType = campType;
+
             }
             return entity;
         }
@@ -40,24 +81,15 @@ namespace STGU3D
         public GameEntity CreateBullet(ECampType campType, string code)
         {
             var entity = CreateEntity(code);
-
-            if (campType == ECampType.Hero)
-            {
-                var heroBulletFlagCom = entity.CreateComponent<HeroBulletFlagComponent>(GameComponentsLookup.HeroBulletFlag);
-                entity.AddComponent(GameComponentsLookup.HeroBulletFlag, heroBulletFlagCom);
-            }
-            else if (campType == ECampType.Entity)
-            {
-                var entityBulletFlagCom = entity.CreateComponent<EntityBulletFlagComponent>(GameComponentsLookup.EntityBulletFlag);
-                entity.AddComponent(GameComponentsLookup.EntityBulletFlag, entityBulletFlagCom);
-            }
+            entity.bulletData.campType = campType;
 
             return entity;
         }
 
         public GameEntity CreateBullet(ECampType campType, int bulletType, EColorType colorType = EColorType.Unknow)
         {
-            string code = EntityUtil.GetBulletCode(bulletType, colorType);
+            int bulletCode = 100 * bulletType + (int)colorType;
+            string code = EntityUtil.GetBulletCode(bulletCode);
             return CreateBullet(campType, code);
         }
 

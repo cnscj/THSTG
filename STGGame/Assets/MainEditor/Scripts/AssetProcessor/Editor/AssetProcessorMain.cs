@@ -10,7 +10,7 @@ namespace STGEditor
             new AssetProcessorEffect(AssetProcessorConfig.tempEffectMd5s,AssetProcessorConfig.tempEffect),
             new AssetProcessorLevel(AssetProcessorConfig.tempLevelMd5s,AssetProcessorConfig.tempLevels),
             new AssetProcessorUI(AssetProcessorConfig.tempUIMd5s,AssetProcessorConfig.tempUIs),
-            new AssetProcessorScript(AssetProcessorConfig.tempScriptMd5s,AssetProcessorConfig.tempScripts),
+            //new AssetProcessorScript(AssetProcessorConfig.tempScriptMd5s,AssetProcessorConfig.tempScripts),
             new AssetProcessorCfg(AssetProcessorConfig.tempConfigMd5s,AssetProcessorConfig.tempConfigs),
         });
     }

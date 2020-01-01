@@ -1,13 +1,8 @@
 ﻿namespace STGU3D
 {
-    public enum ECampType
+    public enum EBulletCategory
     {
-        Neutrality = 0,
-        Hero = 1,
-        Entity = 2,
-
-        Force1 = 3,
-        Force2 = 4,
+  
     }
 
 }

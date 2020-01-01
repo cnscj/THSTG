@@ -7,7 +7,12 @@ namespace STGU3D
     public class ColliderContent
     {
         public ColliderObject owner;
-        public ColliderObject other;
-        public Dictionary<ColliderShape,List<ColliderShape>> collisions;
+        public Dictionary<ColliderObject, List<ColliderShape>> collisions;
+
+        public void Clear()
+        {
+            owner = null;
+            collisions?.Clear();
+        }
     }
 }

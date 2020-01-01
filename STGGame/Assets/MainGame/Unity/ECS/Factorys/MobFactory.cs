@@ -30,11 +30,13 @@ namespace STGU3D
                 }
 
                 {
+                    entity.collider.obj.data = entity;
                     entity.collider.tag = ColliderType.Mob;
-                    entity.collider.mask = 0;
-                    var circleShape = new CircleCollider();
-                    circleShape.radius = 0.1f;
-                    entity.collider.obj.AddShape(circleShape);
+                    entity.collider.mask = 0;//不碰撞其他
+                    entity.collider.obj.AddShape(new CircleCollider()
+                    {
+                        radius = 0.1f
+                    });
                 }
             }
             return entity;

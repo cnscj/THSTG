@@ -44,7 +44,13 @@ namespace STGU3D
             return false;
         }
 
+
+
         ///
+        protected Vector3 GetPosition()
+        {
+           return ((parent == null ? Vector3.zero : parent.center) + offset);
+        }
         protected abstract bool OnCheck(ColliderShape shape);
 
     }

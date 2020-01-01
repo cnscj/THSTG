@@ -64,9 +64,9 @@ namespace STGU3D
         {
             return string.Format("{0}", 10000000 + 100000 * (int)EEntityType.Wingman + 100 * (int)wingmanType + (int)1);
         }
-        public static string GetBulletCode(int bulletType, EColorType colorType = EColorType.Unknow)
+        public static string GetBulletCode(int bulletType)
         {
-            return string.Format("{0}", 10000000 + 100000 * (int)EEntityType.Bullet + 100 * (int)bulletType + (int)colorType);
+            return string.Format("{0}", 10000000 + 100000 * (int)EEntityType.Bullet + (int)bulletType);
         }
         public static string GetPropCode(int propType)
         {

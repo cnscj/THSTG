@@ -10,6 +10,5 @@ namespace STGU3D
         public long tag;
         public long mask = long.MaxValue;
         public ColliderObject obj = new ColliderObject();
-        public Action<ColliderContent> onCollide;
     }
 }

@@ -7,7 +7,6 @@ namespace STGU3D
     [Game]
     public class ShotComponent : IComponent
     {
-        public Func<GameEntity, GameEntity> action;             //实体创建函数
         public float interval = 0.3f;                           //射击间隔
 
         public float nextFireTime;                              //下次开火时间

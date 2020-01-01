@@ -102,6 +102,7 @@ namespace STGU3D
         protected void InitCommonComponent(GameEntity entity, string code)
         {
             ComponentUtil.ClearTransform(entity.transform);
+            ComponentUtil.ClearCollider(entity.collider);
             ComponentUtil.ClearMovement(entity.movement);
             ComponentUtil.ClearView(entity.view);
             ComponentUtil.ClearDestroyed(entity.destroyed);

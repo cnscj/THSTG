@@ -8,25 +8,25 @@
 //------------------------------------------------------------------------------
 public partial class GameEntity {
 
-    static readonly STGU3D.BulletDataComponent bulletDataComponent = new STGU3D.BulletDataComponent();
+    public STGU3D.BulletDataComponent bulletData { get { return (STGU3D.BulletDataComponent)GetComponent(GameComponentsLookup.BulletData); } }
+    public bool hasBulletData { get { return HasComponent(GameComponentsLookup.BulletData); } }
 
-    public bool isBulletData {
-        get { return HasComponent(GameComponentsLookup.BulletData); }
-        set {
-            if (value != isBulletData) {
-                var index = GameComponentsLookup.BulletData;
-                if (value) {
-                    var componentPool = GetComponentPool(index);
-                    var component = componentPool.Count > 0
-                            ? componentPool.Pop()
-                            : bulletDataComponent;
+    public void AddBulletData(STGU3D.ECampType newCampType) {
+        var index = GameComponentsLookup.BulletData;
+        var component = (STGU3D.BulletDataComponent)CreateComponent(index, typeof(STGU3D.BulletDataComponent));
+        component.campType = newCampType;
+        AddComponent(index, component);
+    }
 
-                    AddComponent(index, component);
-                } else {
-                    RemoveComponent(index);
-                }
-            }
-        }
+    public void ReplaceBulletData(STGU3D.ECampType newCampType) {
+        var index = GameComponentsLookup.BulletData;
+        var component = (STGU3D.BulletDataComponent)CreateComponent(index, typeof(STGU3D.BulletDataComponent));
+        component.campType = newCampType;
+        ReplaceComponent(index, component);
+    }
+
+    public void RemoveBulletData() {
+        RemoveComponent(GameComponentsLookup.BulletData);
     }
 }
 

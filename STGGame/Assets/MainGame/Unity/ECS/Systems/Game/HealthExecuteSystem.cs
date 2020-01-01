@@ -19,9 +19,9 @@ namespace STGU3D
         {
             Debug.Log("死了");
             entity.health.isTrueDied = true;
-            //发送死亡消息
-            //死亡特效啥的
-            //TODO:不同类型死亡效果不一
+
+            PlayerDie(entity);
+            PlayerBulletDie(entity);
         }
 
         public void Execute()
@@ -42,6 +42,25 @@ namespace STGU3D
                         }
                     }
                 }
+            }
+        }
+
+        private void PlayerDie(GameEntity entity)
+        {
+            if (entity.hasPlayerData)
+            {
+                //玩家死亡,播放特效
+
+            }
+        }
+
+        private void PlayerBulletDie(GameEntity entity)
+        {
+            if (entity.isHeroBulletFlag)
+            {
+                //玩家子弹死亡
+                //TODO:
+                EntityManager.GetInstance().DestroyEntity(entity);
             }
         }
     }

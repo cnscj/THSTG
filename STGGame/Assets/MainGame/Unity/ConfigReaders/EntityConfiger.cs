@@ -13,7 +13,7 @@ namespace STGU3D
 
         private static CSVTable LoadConfig(string code)
         {
-            var content = AssetManager.GetInstance().LoadConfig(code);
+            var content = ConfigerManager.GetInstance().LoadConfig(code);
             return new CSVTable(content);
         }
 
@@ -87,8 +87,6 @@ namespace STGU3D
 
         }
 
-
-
         public static CSVObject GetEntityInfo(string code)
         {
             //按类型区分
@@ -103,18 +101,38 @@ namespace STGU3D
                     obj = GetWingmanInfo(code);
                     break;
                 case EEntityType.Mob:
-                    obj = GetMobInfo(code);
+                    for (int i = 0; i < 2; i++)
+                    {
+                        code = ReplaceChar(code, code.Length - i, '0');
+                        obj = GetMobInfo(code);
+                        if (obj != null) break;
+                    }
                     break;
                 case EEntityType.Boss:
                     obj = GetBossInfo(code);
                     break;
                 case EEntityType.Bullet:
-                    obj = GetBulletInfo(code);
+                    {
+                        for(int i = 0; i < 2; i++)
+                        {
+                            code = ReplaceChar(code, code.Length - i, '0');
+                            obj = GetBulletInfo(code);
+                            if (obj != null) break;
+                        }
+                    }
                     break;
 
             }
             return obj;
         }
 
+        //将末尾起第bit位置c
+        private static string ReplaceChar(string str, int index, char c)
+        {
+            if (index < 0 || index > str.Length - 1) return str;
+            char[] carr = str.ToCharArray();
+            carr[index] = c;
+            return new string(carr);
+        }
     }
 }

@@ -34,9 +34,9 @@ namespace STGU3D
             {
                 showGO.transform.SetParent(body.transform, false);
 
-                renderer = renderer != null ? renderer : showGO.GetComponentInChildren<Renderer>();
-                animator = animator != null ? animator : showGO.GetComponentInChildren<Animator>();
-                collider = collider != null ? collider : showGO.GetComponentInChildren<Collider>();
+                renderer = renderer ?? showGO.GetComponentInChildren<Renderer>();
+                animator = animator ?? showGO.GetComponentInChildren<Animator>();
+                collider = collider ?? showGO.GetComponentInChildren<Collider>();
             }
 
             TryAddEffect(showGO);

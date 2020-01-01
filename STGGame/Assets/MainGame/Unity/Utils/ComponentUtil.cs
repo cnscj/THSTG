@@ -55,6 +55,13 @@ namespace STGU3D
             com.radius = 0f;
         }
 
+        public static void ClearCollider(ColliderComponent com)
+        {
+            com.tag = 0;
+            com.mask = 0;
+            com.obj?.Clear();
+        }
+
         public static void ClearDestroyed(DestroyedComponent com)
         {
             com.what = 0;

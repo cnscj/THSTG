@@ -7,7 +7,7 @@ namespace STGU3D
     [Game]
     public class BulletDataComponent : IComponent
     {
-
+        public ECampType campType;
     }
 
 }

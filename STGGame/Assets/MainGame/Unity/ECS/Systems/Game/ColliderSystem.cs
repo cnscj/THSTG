@@ -22,22 +22,23 @@ namespace STGU3D
 
         public void Execute()
         {
-            
             foreach (var ownerEntity in __colliderGroup.GetEntities())
             {
                 //没有形状
                 if (ownerEntity.collider.obj == null)
                     continue;
 
-                //没有数据
-                if (!ownerEntity.collider.obj.IsReady())
-                    continue;
-
                 //不想发生碰撞
                 if (ownerEntity.collider.mask == 0)
                     continue;
 
+                //挂了的实体不检测
+                if (ownerEntity.hasHealth)
+                    if (ownerEntity.health.isTrueDied)
+                        continue;
+
                 //这里可以进行筛选啥的,比如只找在同一个格子中的
+                ownerEntity.collider.obj.BeginCollide(ownerEntity.transform.position);
                 foreach (var otherEntity in __colliderGroup.GetEntities())
                 {
                     //自己与自己
@@ -52,27 +53,86 @@ namespace STGU3D
                     if (otherEntity.collider.obj == null)
                         continue;
 
-                    //没有数据
-                    if (!otherEntity.collider.obj.IsReady())
-                        continue;
-
                     //碰撞不相干
                     if ((ownerEntity.collider.mask & otherEntity.collider.tag) == 0)
                         continue;
 
+                    // 挂了的实体不检测
+                    if (otherEntity.hasHealth)
+                            if (otherEntity.health.isTrueDied)
+                                continue;
+
                     //进行碰撞检测
-                    ownerEntity.collider.obj.Update(ownerEntity.transform.position);
-                    otherEntity.collider.obj.Update(otherEntity.transform.position);
-                    var content = ownerEntity.collider.obj.Collide(otherEntity.collider.obj);
-                    if (content != null)
+                    ownerEntity.collider.obj.Collide(otherEntity.collider.obj,otherEntity.transform.position);
+                }
+
+                //一帧中可能与多个物体发生碰撞,所以应该在这里执行
+                var content = ownerEntity.collider.obj.GetContent();
+                if (content != null)
+                {
+                    OnCollide(ownerEntity, content);
+                }
+            }
+
+        }
+
+        private void OnCollide(GameEntity owner, ColliderContent content)
+        {
+            //碰撞处理
+            OnHeroCollide(owner, content);
+            OnHeroBulletCollde(owner, content);
+        }
+
+        private void OnHeroCollide(GameEntity owner, ColliderContent content)
+        {
+            if (owner.hasPlayerData)
+            {
+                var ownerEntity = content.owner.data as GameEntity;
+                ownerEntity.health.blood = 0;
+                Debug.Log("主角机发生碰撞");
+            }
+        }
+
+        private void OnHeroBulletCollde(GameEntity owner, ColliderContent content)
+        {
+            if (owner.isHeroBulletFlag)
+            {
+                var ownerEntity = content.owner.data as GameEntity;
+                foreach(var collision in content.collisions)
+                {
+                    var otherEntity = collision.Key.data as GameEntity;
+                    //TODO:伤害计算
+                    if (otherEntity.hasHealth)
                     {
-                        //发生碰撞,执行回调
-                        ownerEntity.collider.onCollide?.Invoke(content);
+                        if (otherEntity.hasDamage)
+                        {
+                            if (ownerEntity.hasDamage)
+                            {
+                                otherEntity.health.blood -= ((int)ownerEntity.damage.attack);
+                            }
+                               
+                        }
+                    }
+                    
+                    if (otherEntity.isMobData)
+                    {
+                        Debug.Log("小怪受击");
+                    }
+                    else if (otherEntity.hasBossData)
+                    {
+                        Debug.Log("Boss受击");
+                    }
+
+                    if (ownerEntity.hasHealth)
+                    {
+                        ownerEntity.health.blood = 0;   //子弹直接消亡
+                        if (ownerEntity.health.blood <=0 )
+                            break;
                     }
                 }
 
+                Debug.Log("子弹发生碰撞");
             }
-
         }
     }
 }

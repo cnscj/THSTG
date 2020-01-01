@@ -16,12 +16,11 @@ namespace STGU3D
                 ));
         }
 
-        private void Shot(GameEntity entity)
+        public void Shot(GameEntity entity)
         {
             //应该根据
-            var bulletEntity = entity.shot.action?.Invoke(entity);
+            PlayerShot(entity);
             
-           
         }
 
         public void Execute()
@@ -38,6 +37,16 @@ namespace STGU3D
                 }
             }
 
+        }
+
+        private void PlayerShot(GameEntity shotEntity)
+        {
+            if (shotEntity.hasPlayerData)
+            {
+                var bulletFactory = EntityManager.GetInstance().GetOrNewEntityFactory(EEntityType.Bullet).AsBullet();
+                var bulletEntity = bulletFactory.CreateBullet(ECampType.Hero, shotEntity.entityData.entityData["bulletCode"]);
+                bulletEntity.transform.localPosition = shotEntity.transform.localPosition;
+            }
         }
     }
 }
