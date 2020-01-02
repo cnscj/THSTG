@@ -54,13 +54,25 @@ namespace STGU3D
             entity.health.trueDeathTime = Time.fixedTime + entity.health.maxNearDeathTime;
         }
 
+        //治疗
+        public void Treat(GameEntity entity)
+        {
+
+        }
+
+        //受伤
+        public void Hurt(GameEntity entity)
+        {
+
+        }
+
         protected override void Execute(List<GameEntity> entities)
         {
             foreach (var entity in entities)
             {
                 if (entity.health.isTrueDied)
                 {
-                    if (entity.health.blood > 0f)
+                    if (entity.health.blood > 0)
                     {
                         if (entity.hasLife)
                         {
@@ -73,12 +85,11 @@ namespace STGU3D
                         {
                             Revive(entity);
                         }
-
                     }
                 }
                 else
                 {
-                    if (entity.health.blood <= 0f)
+                    if (entity.health.blood <= 0)
                     {
                         Dying(entity);
                     }
@@ -96,6 +107,25 @@ namespace STGU3D
                 }
 
                 if (entity.health.blood > entity.health.maxBlood) entity.health.blood = entity.health.maxBlood;
+
+                //
+                if (entity.health.blood - entity.health.prevBlood > 0)
+                {
+                    //复活不算治疗
+                    //if (entity.health.prevBlood > 0)
+                    //{
+                        Treat(entity);
+                    //}
+                }
+                else if (entity.health.blood - entity.health.prevBlood < 0)
+                {
+                    //死亡不算受伤
+                    //if (entity.health.blood > 0)
+                    //{
+                        Hurt(entity);
+                    //}
+                }
+                entity.health.prevBlood = entity.health.blood;
 
             }
         }

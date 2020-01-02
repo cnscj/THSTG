@@ -11,34 +11,40 @@ namespace ASGame
     {
 
         public float length = -2; //-2未知,-1无限,0~Max长度
-        public Action<float> callback;
+        public Action<EffectLengthMono> onComplete;
+        private WaitForSeconds m_waitForSeconds;
 
-        public void Call()
+        private void OnEnable()
         {
-            if (length >= 0)
+            if (enabled)
             {
-                if (callback != null)
-                {
-                    Invoke("TryCallback", length);
-                }
+                Call();
             }
         }
 
-        void Start()
+        private void Call()
         {
-            Call();
+            if (length >= 0 && onComplete != null)
+            {
+                m_waitForSeconds = m_waitForSeconds ?? new WaitForSeconds(length);
+                StartCoroutine(CountDown());
+            }
         }
 
-        void TryCallback()
+        private IEnumerator CountDown()
         {
-            if (callback != null)
+            yield return m_waitForSeconds;
+            if (gameObject != null)
             {
-                callback(length);
+                onComplete.Invoke(this);
             }
         }
 
 #if UNITY_EDITOR
-
+        public void Calculate()
+        {
+            length = EffectLengthTools.CalculatePlayEndTime(gameObject);
+        }
 #endif
     }
 }

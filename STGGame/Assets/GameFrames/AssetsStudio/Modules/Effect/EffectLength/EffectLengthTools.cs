@@ -27,8 +27,6 @@ namespace ASGame
                             {
                                 fxTime = Mathf.Max(clip.length, fxTime);
                             }
-
-
                         }
                     }
                 }
@@ -47,20 +45,20 @@ namespace ASGame
                     else
                     {
                         float dunration = 0f;
-                        if (particle.emission.rateOverTime.constantMin <= 0)
+
+                        if (particle.emission.rateOverTimeMultiplier <= 0f)
                         {
-                            dunration = particle.main.startDelay.constantMin + particle.main.startLifetime.constantMin;
-                            dunration += particle.main.startLifetime.constantMin;
+                            dunration = particle.main.startDelayMultiplier + particle.main.startLifetimeMultiplier;
+                            dunration += particle.main.startLifetimeMultiplier;
+
                         }
                         else
                         {
-                            dunration = particle.main.startDelay.constantMin + Mathf.Max(particle.main.duration, particle.main.startLifetime.constantMin);
-                            dunration += particle.main.startLifetime.constantMin;
-
+                            dunration = particle.main.startDelayMultiplier + Mathf.Max(particle.main.duration, particle.main.startLifetimeMultiplier);
+                            dunration += particle.main.startLifetimeMultiplier;
                         }
 
                         fxTime = Mathf.Max(dunration, fxTime);
-
                     }
                 }
 

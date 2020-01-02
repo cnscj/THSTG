@@ -34,7 +34,7 @@ namespace STGU3D
 
                 //挂了的实体不检测
                 if (ownerEntity.hasHealth)
-                    if (ownerEntity.health.isTrueDied)
+                    if (ownerEntity.health.blood <= 0)
                         continue;
 
                 //这里可以进行筛选啥的,比如只找在同一个格子中的
@@ -59,7 +59,7 @@ namespace STGU3D
 
                     // 挂了的实体不检测
                     if (otherEntity.hasHealth)
-                            if (otherEntity.health.isTrueDied)
+                            if (otherEntity.health.blood <= 0)
                                 continue;
 
                     //进行碰撞检测

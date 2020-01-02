@@ -1,6 +1,7 @@
 ﻿
 using System.Collections.Generic;
 using ASEditor;
+using ASGame;
 using STGGame;
 using UnityEditor;
 using UnityEngine;
@@ -39,6 +40,14 @@ namespace STGEditor
             Do4FxBegin(assetPath, out prefab);
             if (prefab != null)
             {
+                //公共部分处理
+                //计算特效时长
+                {
+                    EffectLengthMono lenCom = prefab.GetComponent<EffectLengthMono>() ?? prefab.AddComponent<EffectLengthMono>();
+                    lenCom.Calculate();
+                }
+
+                //各自的
                 if (assetPath.Contains(AssetProcessorConfig.srcPublicFx))
                 {
                     Do4PublicFx(prefab);

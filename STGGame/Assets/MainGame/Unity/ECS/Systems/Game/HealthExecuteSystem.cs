@@ -17,7 +17,6 @@ namespace STGU3D
 
         public void Die(GameEntity entity)
         {
-            Debug.Log("死了");
             entity.health.isTrueDied = true;
 
             PlayerDie(entity);
@@ -49,7 +48,9 @@ namespace STGU3D
         {
             if (entity.hasPlayerData)
             {
-                //玩家死亡,播放特效
+                //玩家死亡,播放特效,并移除实体
+                EffectManager.GetInstance().PlayOnce("60100002", null, entity.transform.position);
+                EntityManager.GetInstance().DestroyEntity(entity);
 
             }
         }
@@ -59,8 +60,11 @@ namespace STGU3D
             if (entity.isHeroBulletFlag)
             {
                 //玩家子弹死亡
-                //TODO:
-                EntityManager.GetInstance().DestroyEntity(entity);
+                DotweenManager.GetInstance().PlayRotatingNarrow(entity,()=>
+                {
+                    EntityManager.GetInstance().DestroyEntity(entity);
+                });
+                
             }
         }
     }

@@ -10,6 +10,8 @@ namespace STGU3D
         public int blood = 100;                         //当前生命值
         public float trueDeathTime = -1f;               //真实死亡时间
         public bool isTrueDied;                         //是否已经死亡
+
+        public int prevBlood = 100;                     //上一次血量
     }
 
 }

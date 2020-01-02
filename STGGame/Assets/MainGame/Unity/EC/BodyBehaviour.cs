@@ -7,6 +7,7 @@ namespace STGU3D
 {
     public class BodyBehaviour : MonoBehaviour
     {
+        public static readonly string bodyName = "body";
         public GameObject body;
         public GameObject showGO;
 
@@ -54,7 +55,7 @@ namespace STGU3D
         {
             if (body == null)
             {
-                body = new GameObject("Body");
+                body = new GameObject(bodyName);
                 body.transform.localEulerAngles = Vector3.zero;
                 body.transform.localPosition = Vector3.zero;
                 body.transform.SetParent(gameObject.transform, false);
@@ -78,7 +79,6 @@ namespace STGU3D
         private GameObject NewRendererNode(bool usePool, string viewCode, int maxCount = 20)
         {
             string viewName = null;
-            GameObject viewGO = null;
             GameObject prefabInstance = null;
             if (usePool)
             {
@@ -97,11 +97,12 @@ namespace STGU3D
                 var prefab = AssetManager.GetInstance().LoadSprite(viewCode);
                 if (prefab)
                 {
-                    prefabInstance = GameObject.Instantiate(prefab);
+                    prefabInstance = Object.Instantiate(prefab);
                 }
             }
 
 
+            GameObject viewGO;
             if (!string.IsNullOrEmpty(viewName))
             {
                 viewGO = new GameObject(viewName);

@@ -1,9 +1,7 @@
 ﻿
-using System;
 using System.Collections.Generic;
 using System.IO;
 using ASGame;
-using STGU3D;
 using UnityEngine;
 using XLibrary;
 using XLibrary.Package;
@@ -62,6 +60,12 @@ namespace STGU3D
         public GameObject LoadModel(string uid)
         {
             string resPath = Combine2FixPath(EResType.Model, string.Format("{0}.ab", uid), string.Format("{0}.prefab", uid));
+            return ResourceLoader.GetInstance().LoadFromFile<GameObject>(resPath);
+        }
+
+        public GameObject LoadEffect(string uid)
+        {
+            string resPath = Combine2FixPath(EResType.Effect, string.Format("{0}.ab", uid), string.Format("{0}.prefab", uid));
             return ResourceLoader.GetInstance().LoadFromFile<GameObject>(resPath);
         }
 
