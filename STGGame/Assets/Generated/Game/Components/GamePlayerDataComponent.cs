@@ -11,20 +11,22 @@ public partial class GameEntity {
     public STGU3D.PlayerDataComponent playerData { get { return (STGU3D.PlayerDataComponent)GetComponent(GameComponentsLookup.PlayerData); } }
     public bool hasPlayerData { get { return HasComponent(GameComponentsLookup.PlayerData); } }
 
-    public void AddPlayerData(STGU3D.EPlayerType newPlayerType, STGU3D.EHeroType newHeroType, float newMoveSpeed) {
+    public void AddPlayerData(STGU3D.EPlayerType newPlayerType, STGU3D.EHeroType newHeroType, GameEntity[] newWingmans, float newMoveSpeed) {
         var index = GameComponentsLookup.PlayerData;
         var component = (STGU3D.PlayerDataComponent)CreateComponent(index, typeof(STGU3D.PlayerDataComponent));
         component.playerType = newPlayerType;
         component.heroType = newHeroType;
+        component.wingmans = newWingmans;
         component.moveSpeed = newMoveSpeed;
         AddComponent(index, component);
     }
 
-    public void ReplacePlayerData(STGU3D.EPlayerType newPlayerType, STGU3D.EHeroType newHeroType, float newMoveSpeed) {
+    public void ReplacePlayerData(STGU3D.EPlayerType newPlayerType, STGU3D.EHeroType newHeroType, GameEntity[] newWingmans, float newMoveSpeed) {
         var index = GameComponentsLookup.PlayerData;
         var component = (STGU3D.PlayerDataComponent)CreateComponent(index, typeof(STGU3D.PlayerDataComponent));
         component.playerType = newPlayerType;
         component.heroType = newHeroType;
+        component.wingmans = newWingmans;
         component.moveSpeed = newMoveSpeed;
         ReplaceComponent(index, component);
     }

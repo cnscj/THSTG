@@ -10,6 +10,7 @@ namespace STGU3D
         public EPlayerType playerType;
         public EHeroType heroType;
 
+        public GameEntity []wingmans;
         public float moveSpeed;
     }
 

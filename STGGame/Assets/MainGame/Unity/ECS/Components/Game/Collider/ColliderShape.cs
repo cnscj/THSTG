@@ -39,15 +39,28 @@ namespace STGU3D
 
         private bool CheckBoxCircle(BoxCollider a, CircleCollider b)
         {
-            //圆和矩形的碰撞
+            // 圆与矩形的碰撞检测(适用于矩形无旋转的情况下)
+            float radius = b.radius;
 
-            return false;
+            float width = a.box.x;
+            float height = a.box.y;
+            // 圆心与矩形中心的相对距离
+            float relativeX = b.GetPosition().x - (a.GetPosition().x + width * 0.5f);
+            float relativeY = b.GetPosition().y - (a.GetPosition().y + height * 0.5f);
+
+            float dx = Mathf.Min(relativeX, (width * 0.5f));
+            float dx1 = Mathf.Max(dx, (-width * 0.5f));
+            float dy = Mathf.Min(relativeY, (height * 0.5f));
+            float dy1 = Mathf.Max(dy, (-height * 0.5f));
+
+            bool isCollision = (dx1 - relativeX) * (dx1 - relativeX) + (dy1 - relativeY) * (dy1 - relativeY) <= radius * radius;
+
+            return isCollision;
         }
 
 
-
         ///
-        protected Vector3 GetPosition()
+        public Vector3 GetPosition()
         {
            return ((parent == null ? Vector3.zero : parent.center) + offset);
         }

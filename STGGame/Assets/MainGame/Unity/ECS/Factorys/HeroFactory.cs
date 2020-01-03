@@ -92,8 +92,9 @@ namespace STGU3D
                 //不同主角特有的
                 if (heroType == EHeroType.Reimu)
                 {
+                    List<GameEntity> wingmans = new List<GameEntity>();
                     //Reimu持有僚机total台: onmyougyoku
-                    float[] d = { -0.5f, 0.5f };
+                    float[] d = { -0.3f, 0.3f };
                     int total = 2;
                     for (int i = 0; i < total; i++)
                     {
@@ -104,8 +105,12 @@ namespace STGU3D
                             onmyougyokuWingman.movement.rotationSpeed.z = 100f;                             //自旋
                             onmyougyokuWingman.transform.parent = entity.transform;
                             onmyougyokuWingman.transform.localPosition = new Vector3(d[i], 0.5f, 0);        //偏移一点
+
+                            wingmans.Add(onmyougyokuWingman);
                         }
                     }
+
+                    entity.playerData.wingmans = wingmans.ToArray();
 
                 }
 
@@ -118,8 +123,19 @@ namespace STGU3D
             {
                 EPlayerType playerType = entity.playerData.playerType;
                 EntityCache.GetInstance().SetHero(playerType, null);
+
+                //僚机也应该去掉
+                if (entity.playerData.wingmans != null)
+                {
+                    foreach (var wingman in entity.playerData.wingmans)
+                    {
+                        EntityManager.GetInstance().DestroyEntity(wingman);
+                    }
+                    entity.playerData.wingmans = null;
+                }
             }
-            base.DestroyEntity(entity);
+
+            base.OnDestroy(entity);
         }
 
     }

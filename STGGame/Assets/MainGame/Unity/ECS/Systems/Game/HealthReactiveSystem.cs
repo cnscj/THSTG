@@ -57,13 +57,13 @@ namespace STGU3D
         //治疗
         public void Treat(GameEntity entity)
         {
-
+            Debug.Log("治疗");
         }
 
         //受伤
         public void Hurt(GameEntity entity)
         {
-
+            Debug.Log("受伤");
         }
 
         protected override void Execute(List<GameEntity> entities)

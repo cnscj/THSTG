@@ -12,7 +12,7 @@ namespace STGU3D
         {
             type = ShapeType.Box;
         }
-        protected Rect GetRect()
+        public Rect GetRect()
         {
             var pos = GetPosition();
             m_rect.x = pos.x;
@@ -25,7 +25,28 @@ namespace STGU3D
         protected override bool OnCheck(ColliderShape shape)
         {
             var other = shape as BoxCollider;
-            //TODO:矩形相交算法
+            var rt1 = this.m_rect;
+            var rt2 = other.m_rect;
+
+
+            if ((rt1.yMin > rt2.yMin && rt1.yMin < rt2.yMax) ||
+                (rt1.yMax > rt2.yMin && rt1.yMax < rt2.yMax))
+            {
+                if ((rt1.xMin > rt2.xMin && rt1.xMin < rt2.xMax) ||
+                    (rt1.xMax > rt2.xMin && rt1.xMax < rt2.xMax))
+                {
+                    return true;
+                }
+            }
+            if ((rt2.yMin > rt1.yMin && rt2.yMin < rt1.yMax) ||
+                (rt2.yMax > rt1.yMin && rt2.yMax < rt1.yMax))
+            {
+                if ((rt2.xMin > rt1.xMin && rt2.xMin < rt1.xMax) ||
+                    (rt2.xMax > rt1.xMin && rt2.xMax < rt1.xMax))
+                {
+                    return true;
+                }
+            }
             return false;
         }
     }
