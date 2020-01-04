@@ -12,10 +12,8 @@ namespace STGU3D
             var entity = CreateGameEntity(code);
 
             var mobDataCom = entity.CreateComponent<MobDataComponent>(GameComponentsLookup.MobData);
+            var healthCom = entity.CreateComponent<HealthComponent>(GameComponentsLookup.Health);
             var recycleCom = entity.CreateComponent<RecycleComponent>(GameComponentsLookup.Recycle);
-
-            entity.AddComponent(GameComponentsLookup.MobData, mobDataCom);
-            entity.AddComponent(GameComponentsLookup.Recycle, recycleCom);
 
             if (entity.hasEntityData)
             {
@@ -30,6 +28,12 @@ namespace STGU3D
                 }
 
                 {
+                    healthCom.blood = healthCom.maxBlood;
+                    healthCom.trueDeathTime = -1f;
+                    healthCom.isTrueDied = false;
+                }
+
+                {
                     entity.collider.obj.data = entity;
                     entity.collider.tag = ColliderType.Mob;
                     entity.collider.mask = 0;//不碰撞其他
@@ -39,6 +43,10 @@ namespace STGU3D
                     });
                 }
             }
+
+            entity.AddComponent(GameComponentsLookup.MobData, mobDataCom);
+            entity.AddComponent(GameComponentsLookup.Health, healthCom);
+            entity.AddComponent(GameComponentsLookup.Recycle, recycleCom);
             return entity;
         }
         

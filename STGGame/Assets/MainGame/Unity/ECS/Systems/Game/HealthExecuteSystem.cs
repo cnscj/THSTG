@@ -19,8 +19,10 @@ namespace STGU3D
         {
             entity.health.isTrueDied = true;
 
+            MobDie(entity);
             PlayerDie(entity);
             PlayerBulletDie(entity);
+            WingmanBulletDie(entity);
         }
 
         public void Execute()
@@ -44,12 +46,23 @@ namespace STGU3D
             }
         }
 
+        private void MobDie(GameEntity entity)
+        {
+            if (entity.isMobData)
+            {
+                //玩家死亡,播放特效,并移除实体
+                EffectManager.GetInstance().PlayOnce(ConstVars.MOB_DIE_FX_CODE, null, entity.transform.position);
+                EntityManager.GetInstance().DestroyEntity(entity);
+
+            }
+        }
+
         private void PlayerDie(GameEntity entity)
         {
             if (entity.hasPlayerData)
             {
                 //玩家死亡,播放特效,并移除实体
-                EffectManager.GetInstance().PlayOnce("60100002", null, entity.transform.position);
+                EffectManager.GetInstance().PlayOnce(ConstVars.PLAYER_DIE_FX_CODE, null, entity.transform.position);
                 EntityManager.GetInstance().DestroyEntity(entity);
 
             }
@@ -66,6 +79,11 @@ namespace STGU3D
                 });
                 
             }
+        }
+
+        private void WingmanBulletDie(GameEntity entity)
+        {
+            
         }
     }
 }

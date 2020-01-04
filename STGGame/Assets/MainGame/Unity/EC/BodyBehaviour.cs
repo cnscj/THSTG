@@ -24,12 +24,12 @@ namespace STGU3D
                 entityType == EEntityType.Boss
                )
             {
-                showGO = NewRendererNode(true, code);
+                showGO = SpriteManager.GetInstance().GetOrNewSprite(code, true);
             }
             else
             {
                 int maxCount = 50;
-                showGO = NewRendererNode(true, code, maxCount);
+                showGO = SpriteManager.GetInstance().GetOrNewSprite(code, true, maxCount);
             }
 
             {
@@ -76,45 +76,6 @@ namespace STGU3D
             }
         }
 
-        private GameObject NewRendererNode(bool usePool, string viewCode, int maxCount = 20)
-        {
-            string viewName = null;
-            GameObject prefabInstance = null;
-            if (usePool)
-            {
-                if (!GameObjectPoolManager.GetInstance().HasGameObjectPool(viewCode))
-                {
-                    var prefab = AssetManager.GetInstance().LoadSprite(viewCode);
-                    if (prefab)
-                    {
-                        GameObjectPoolManager.GetInstance().NewGameObjectPool(viewCode, prefab, maxCount);
-                    }
-                }
-                prefabInstance = GameObjectPoolManager.GetInstance().GetGameObject(viewCode);
-            }
-            else
-            {
-                var prefab = AssetManager.GetInstance().LoadSprite(viewCode);
-                if (prefab)
-                {
-                    prefabInstance = Object.Instantiate(prefab);
-                }
-            }
-
-
-            GameObject viewGO;
-            if (!string.IsNullOrEmpty(viewName))
-            {
-                viewGO = new GameObject(viewName);
-                prefabInstance.transform.SetParent(viewGO.transform);
-            }
-            else
-            {
-                viewGO = prefabInstance;
-            }
-
-            return viewGO;
-        }
     }
 
 }

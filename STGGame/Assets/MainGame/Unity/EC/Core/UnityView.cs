@@ -43,7 +43,7 @@ namespace STGU3D
             entity = ent;
 
             //延迟一帧后,初始位置有问题
-            SchedulerManager.GetInstance().ScheduleNextFrame(InitView);
+            TimerManager.GetInstance().ScheduleNextFrame(InitView);
         }
 
         public void SetRotation(float x, float y, float z)

@@ -14,10 +14,6 @@ namespace STGU3D
             var wingmanDataCom = entity.CreateComponent<WingmanDataComponent>(GameComponentsLookup.WingmanData);
             var followCom = entity.CreateComponent<FollowComponent>(GameComponentsLookup.Follow);
 
-
-            entity.AddComponent(GameComponentsLookup.Follow, followCom);
-            entity.AddComponent(GameComponentsLookup.WingmanData, wingmanDataCom);
-
             if (entity.hasEntityData)
             {
                 entity.view.view = ComponentUtil.CreateView(entity);
@@ -30,6 +26,10 @@ namespace STGU3D
                     entity.AddComponent(GameComponentsLookup.OnmyougyokuWingman, onmyougyokuCom);
                 }
             }
+
+
+            entity.AddComponent(GameComponentsLookup.Follow, followCom);
+            entity.AddComponent(GameComponentsLookup.WingmanData, wingmanDataCom);
 
             return entity;
         }

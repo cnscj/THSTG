@@ -12,12 +12,14 @@ namespace STGU3D
 
             var propDataCom = entity.CreateComponent<PropDataComponent>(GameComponentsLookup.PropData);
 
-            entity.AddComponent(GameComponentsLookup.PropData, propDataCom);
+            
 
             if (entity.hasEntityData)
             {
                
             }
+
+            entity.AddComponent(GameComponentsLookup.PropData, propDataCom);
             return entity;
         }
     }

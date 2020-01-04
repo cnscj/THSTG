@@ -101,37 +101,33 @@ namespace STGU3D
                 foreach(var collision in content.collisions)
                 {
                     var otherEntity = collision.Key.data as GameEntity;
-                    //TODO:伤害计算
-                    if (otherEntity.hasHealth)
-                    {
-                        if (otherEntity.hasDamage)
-                        {
-                            if (ownerEntity.hasDamage)
-                            {
-                                otherEntity.health.blood -= ((int)ownerEntity.damage.attack);
-                            }
-                               
-                        }
-                    }
                     
                     if (otherEntity.isMobData)
                     {
-                        Debug.Log("小怪受击");
+                        if(otherEntity.hasHealth)
+                        {
+                            //TODO:
+                            otherEntity.health.blood -= 20;
+                        }
                     }
                     else if (otherEntity.hasBossData)
                     {
-                        Debug.Log("Boss受击");
+                        if (otherEntity.hasHealth)
+                        {
+                            //TODO:
+                            otherEntity.health.blood -= 20;
+                        }
                     }
 
                     if (ownerEntity.hasHealth)
                     {
+                        //TODO:根据不同子弹处理,如穿甲弹不应该消亡
                         ownerEntity.health.blood = 0;   //子弹直接消亡
                         if (ownerEntity.health.blood <=0 )
                             break;
                     }
                 }
 
-                Debug.Log("子弹发生碰撞");
             }
         }
     }

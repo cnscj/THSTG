@@ -186,25 +186,9 @@ namespace XLibGame
         {
             if (m_poolDic.ContainsKey(poolName))
             {
-                return m_poolDic[poolName].Create(lifeTime);
+                return m_poolDic[poolName].Get(lifeTime);
             }
             return null;
-        }
-
-        /// <summary>
-        /// 将对象存入对象池中
-        /// </summary>
-        /// <param name="poolObj">对象</param>
-        public void ReleaseGameObject(GameObjectPoolObject poolObj)
-        {
-            if (!poolObj)
-                return;
-
-            string poolName = poolObj.poolName;
-            if (m_poolDic.ContainsKey(poolName))
-            {
-                m_poolDic[poolName].Release(poolObj.gameObject);
-            }
         }
 
         /// <summary>
@@ -219,7 +203,11 @@ namespace XLibGame
             var gameObjectPoolObjectCom = go.GetComponent<GameObjectPoolObject>();
             if (gameObjectPoolObjectCom)
             {
-                ReleaseGameObject(gameObjectPoolObjectCom);
+                string poolName = gameObjectPoolObjectCom.poolName;
+                if (m_poolDic.ContainsKey(poolName))
+                {
+                    m_poolDic[poolName].Release(gameObjectPoolObjectCom.gameObject);
+                }
             }
             else
             {

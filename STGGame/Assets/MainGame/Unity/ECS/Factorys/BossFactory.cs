@@ -12,8 +12,7 @@ namespace STGU3D
 
             var bossDataCom = entity.CreateComponent<BossDataComponent>(GameComponentsLookup.BossData);
 
-            entity.AddComponent(GameComponentsLookup.BossData, bossDataCom);
-
+            
             if (entity.hasEntityData)
             {
                 EBossType bossType = EntityUtil.GetBossTypeByCode(code);
@@ -21,7 +20,10 @@ namespace STGU3D
 
 
             }
-            
+
+            entity.AddComponent(GameComponentsLookup.BossData, bossDataCom);
+
+
             return entity;
         }
     }

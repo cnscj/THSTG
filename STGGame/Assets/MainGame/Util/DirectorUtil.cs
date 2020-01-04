@@ -117,5 +117,27 @@ namespace STGGame
             return ScreenRectInWorld(screenRect);
         }
 
+
+        public static Vector3 WorldPointInScreen(Vector3 position)
+        {
+            var theCamera = Camera.main;
+            if (theCamera != null)
+            {
+                var tx = theCamera.transform;
+                return theCamera.WorldToScreenPoint(new Vector3(position.x, position.y, theCamera.orthographic ? -tx.position.z : position.z));
+            }
+            return position;
+        }
+
+        public static Vector3 ScreenPointInWorld(Vector3 position)
+        {
+            var theCamera = Camera.main;
+            if (theCamera != null)
+            {
+                var tx = theCamera.transform;
+                return theCamera.ScreenToWorldPoint(new Vector3(position.x, position.y, theCamera.orthographic ? -tx.position.z : position.z));
+            }
+            return position;
+        }
     }
 }

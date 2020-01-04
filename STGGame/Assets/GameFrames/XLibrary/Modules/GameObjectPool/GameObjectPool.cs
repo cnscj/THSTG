@@ -55,11 +55,11 @@ namespace XLibGame
         }
 
         /// <summary>
-        /// 生成一个对象
+        /// 获取一个对象
         /// </summary>
         /// <param name="lifetime">对象存在的时间</param>
         /// <returns>生成的对象</returns>
-        public GameObject Create(float lifetime = 0f)
+        public GameObject Get(float lifetime = 0f)
         {
             if (lifetime < 0)
             {

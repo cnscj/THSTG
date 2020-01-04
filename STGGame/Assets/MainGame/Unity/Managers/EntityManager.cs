@@ -7,6 +7,7 @@ using THGame;
 using Entitas;
 using XLibrary;
 using XLibGame;
+using XLibrary.Collection;
 
 namespace STGU3D
 {
@@ -77,6 +78,7 @@ namespace STGU3D
             entityFactoryMap = new Dictionary<EEntityType, BaseEntityFactory>();
 
             ObjectEmitter.ReplaceListener(new EntityEmitListener());
+
         }
 
         private void Start()

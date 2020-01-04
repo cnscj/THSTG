@@ -11,7 +11,7 @@ namespace ASGame
     {
 
         public float length = -2; //-2未知,-1无限,0~Max长度
-        public Action<EffectLengthMono> onComplete;
+        public Action onCompleted;
         private WaitForSeconds m_waitForSeconds;
 
         private void OnEnable()
@@ -24,7 +24,7 @@ namespace ASGame
 
         private void Call()
         {
-            if (length >= 0 && onComplete != null)
+            if (length >= 0f)
             {
                 m_waitForSeconds = m_waitForSeconds ?? new WaitForSeconds(length);
                 StartCoroutine(CountDown());
@@ -36,7 +36,7 @@ namespace ASGame
             yield return m_waitForSeconds;
             if (gameObject != null)
             {
-                onComplete.Invoke(this);
+                onCompleted?.Invoke();
             }
         }
 

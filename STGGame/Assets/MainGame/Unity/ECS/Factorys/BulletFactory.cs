@@ -58,7 +58,6 @@ namespace STGU3D
                         entity.collider.mask = ColliderType.Mob | ColliderType.Boss;
                     }
 
-
                     entity.AddComponent(GameComponentsLookup.HeroBulletFlag, heroBulletFlagCom);
                 }
                 else if (campType == ECampType.Entity)
