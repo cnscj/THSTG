@@ -35,26 +35,27 @@ namespace STGU3D
             {
                 if (entity.view.view != null)
                 {
-                    if (((UnityView)entity.view.view).bodyCom != null)
+                    var viewCtrl = ((UnityView)entity.view.view).viewCtrl;
+                    if (viewCtrl != null)
                     {
-                        var renderer = ((UnityView)entity.view.view).bodyCom.renderer as SpriteRenderer;
-                        var animator = ((UnityView)entity.view.view).bodyCom.animator as Animator;
-                        if (renderer && animator)
+                        var animatorCom = viewCtrl.animatorCom;
+                        var rendererCom = viewCtrl.rendererCom;
+                        if (animatorCom && rendererCom)
                         {
                             if (entity.movement.moveSpeed.x > 0f) //右
                             {
-                                animator.SetInteger("moveSpeed", 1);
-                                renderer.flipX = true;
+                                animatorCom.SetInteger("moveSpeed", 1);
+                                rendererCom.SetFlipX(true);
 
                             }
                             else if (entity.movement.moveSpeed.x < 0f) //左
                             {
-                                animator.SetInteger("moveSpeed", -1);
-                                renderer.flipX = false;
+                                animatorCom.SetInteger("moveSpeed", -1);
+                                rendererCom.SetFlipX(false);
                             }
                             else
                             {
-                                animator.SetInteger("moveSpeed", 0);
+                                animatorCom.SetInteger("moveSpeed", 0);
                             }
                         }
                     }

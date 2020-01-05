@@ -20,6 +20,10 @@ namespace XLibGame
         /// </summary>
         public GameObject prefab;
         /// <summary>
+        /// 如超过gc时间仍空闲,则移除池
+        /// </summary>
+        public float stayTime = 3000f;
+        /// <summary>
         /// 对象池中存放最大数量
         /// </summary>
         public int maxCount = 20;
@@ -47,11 +51,13 @@ namespace XLibGame
         /// 队列，存放对象池中没有用到的对象，即可分配对象
         /// </summary>
         protected Queue m_queue;
-
+        protected float m_startTick;
+        protected int m_totalCount;
 
         public GameObjectPool()
         {
             m_queue = new Queue();
+            m_totalCount = 0;
         }
 
         /// <summary>
@@ -61,6 +67,8 @@ namespace XLibGame
         /// <returns>生成的对象</returns>
         public GameObject Get(float lifetime = 0f)
         {
+            m_startTick = Time.realtimeSinceStartup;
+
             if (lifetime < 0)
             {
                 //lifetime<0时，返回null  
@@ -126,6 +134,8 @@ namespace XLibGame
         /// <param name="obj">对象</param>
         public void Release(GameObject obj)
         {
+            m_startTick = Time.realtimeSinceStartup;
+
             //待分配对象已经在对象池中  
             if (m_queue.Contains(obj))
             {
@@ -140,7 +150,8 @@ namespace XLibGame
             {
                 //放入对象池，入队
                 m_queue.Enqueue(obj);
-               
+                m_totalCount = Mathf.Max(m_totalCount, m_queue.Count);
+
                 obj.transform.SetParent(transform, false); //不改变Transform
                 switch (releaseOperate)
                 {
@@ -162,8 +173,7 @@ namespace XLibGame
         /// </summary>
         public void Destroy()
         {
-            m_queue.Clear();
-            Destroy(gameObject);
+            Object.Destroy(gameObject);
         }
 
         /// <summary>
@@ -206,7 +216,7 @@ namespace XLibGame
             {
                 Init();
             }
-
+            m_startTick = Time.realtimeSinceStartup;
         }
 
         /// <summary>
@@ -225,6 +235,7 @@ namespace XLibGame
         /// </summary>
         private void OnDestroy()
         {
+            m_queue.Clear();
             var mgrInstance = GameObjectPoolManager.GetInstance();
             if (mgrInstance != null)
             {
@@ -233,7 +244,25 @@ namespace XLibGame
                     mgrInstance.DestroyGameObjectPool(poolName);
                 }
             }
+        }
 
+        private void Update()
+        {
+            if (stayTime > 0f)
+            {
+                if (m_queue.Count >= m_totalCount)
+                {
+                    if (m_startTick + stayTime <= Time.realtimeSinceStartup)
+                    {
+                        Destroy();
+                    }
+                }
+                else
+                {
+                    m_startTick = Time.realtimeSinceStartup;
+                }
+                
+            }
         }
     }
 }

@@ -69,13 +69,17 @@ namespace THGame
 
         void Start()
         {
-            m_nextTime = Time.time + launchFreq;
+            //m_nextTime = Time.time + launchFreq;
             
         }
 
         void OnEnable()
         {
-            m_nextTime = Time.time + launchFreq;
+            if (enabled)
+            {
+                Launch();
+                m_nextTime = Time.time + launchFreq;
+            }
         }
 
         void Update()
@@ -90,7 +94,6 @@ namespace THGame
                 {
                     Launch();
 
-                    launchTimes--;
                     m_nextTime = Time.time + launchFreq;
                 }
             }
@@ -155,9 +158,9 @@ namespace THGame
                     }
 
                     launchListener.OnLaunch(m_objectEmitLaunchParams);
-
                 }
             }
+            launchTimes--;
         }
 
         private ObjectEmitCalculateResult OnCalculate(ObjectEmitCalculateParams args, ref ObjectEmitCalculateResult result)

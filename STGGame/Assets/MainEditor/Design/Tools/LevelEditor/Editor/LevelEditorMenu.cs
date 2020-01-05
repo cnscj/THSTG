@@ -14,7 +14,7 @@ namespace STGEditor
         public static readonly string editorLevelScenePath = PathUtil.Combine(editorLevelFolder, string.Format("LevelEditor.unity"));
         public static readonly string saveDefaultName = "LevelEditor.unity";
 
-        [MenuItem("Assets/THEditor/资源编辑器/关卡编辑器/生成关卡编辑模板")]
+        [MenuItem("Assets/STGEditor/资源编辑器/关卡编辑器/生成关卡编辑模板")]
         public static void MenuCreateEditor()
         {
             var selected = Selection.activeObject;

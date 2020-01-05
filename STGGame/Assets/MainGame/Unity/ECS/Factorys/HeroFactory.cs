@@ -102,9 +102,10 @@ namespace STGU3D
                         if (onmyougyokuWingman.hasEntityData)
                         {
                             onmyougyokuWingman.onmyougyokuWingman.id = i;
-                            onmyougyokuWingman.movement.rotationSpeed.z = 100f;                             //自旋
+                            onmyougyokuWingman.movement.rotationSpeed.z = 100f;                                 //自旋
                             onmyougyokuWingman.transform.parent = entity.transform;
-                            onmyougyokuWingman.transform.localPosition = new Vector3(d[i], 0.5f, 0);        //偏移一点
+                            onmyougyokuWingman.transform.localPosition = new Vector3(d[i], 0.3f, 0);            //偏移一点
+                            onmyougyokuWingman.view.view.Scale = new System.Numerics.Vector3(0.7f, 0.7f, 1);    //缩小一点
 
                             wingmans.Add(onmyougyokuWingman);
                         }

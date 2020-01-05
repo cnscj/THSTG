@@ -6,13 +6,41 @@ namespace STGU3D
 {
     public class ViewShaderEffect : MonoBehaviour
     {
-        public GameObject target;
+        public static readonly string KEY_GRAY = "GRAY_ON";
+        //所有渲染器
+        public List<Material> materials ;
 
+        public void Add(GameObject go)
+        {
+            if (go == null)
+                return;
+
+            materials = materials ?? new List<Material>();
+            foreach(var renderer in go.GetComponentsInChildren<Renderer>())
+            {
+                materials.AddRange(renderer.sharedMaterials);
+            }
+            
+        }
 
         //灰显
         public void SetGray(bool val)
         {
-            //TODO:
+            if (materials != null)
+            {
+                foreach(var material in materials)
+                {
+                    if (val)
+                    {
+                        material.EnableKeyword(KEY_GRAY);
+                    }
+                    else
+                    {
+                        material.DisableKeyword(KEY_GRAY);
+                    }
+                    
+                }
+            }
         }
 
         //外发光(轮廓光

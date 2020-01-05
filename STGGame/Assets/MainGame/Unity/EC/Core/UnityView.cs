@@ -1,6 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿
 using Entitas.Unity;
+using STGGame;
 using UnityEngine;
 using XLibGame;
 
@@ -10,7 +10,75 @@ namespace STGU3D
     {
         public GameEntity entity;           //GE
         public GameObject node;             //与Unity关联的节点
-        public BodyBehaviour bodyCom;       //身体节点
+        public ViewController viewCtrl;     //View 控制器
+
+        private System.Numerics.Vector3 m_pos = System.Numerics.Vector3.Zero;
+        private System.Numerics.Vector3 m_rot = System.Numerics.Vector3.Zero;
+        private System.Numerics.Vector3 m_scale = System.Numerics.Vector3.One;
+        public static UnityEngine.Vector3 SysVec3ToU3dVec3(ref System.Numerics.Vector3 sysVec3, ref UnityEngine.Vector3 u3dVec3)
+        {
+            u3dVec3.x = sysVec3.X;
+            u3dVec3.y = sysVec3.Y;
+            u3dVec3.z = sysVec3.Z;
+            return u3dVec3;
+        }
+
+        public static System.Numerics.Vector3 U3dVec3ToSysVec3(ref UnityEngine.Vector3 u3dVec3, ref System.Numerics.Vector3 sysVec3)
+        {
+            sysVec3.X = u3dVec3.x;
+            sysVec3.Y = u3dVec3.y;
+            sysVec3.Z = u3dVec3.z;
+            return sysVec3;
+        }
+
+        public System.Numerics.Vector3 Position
+        {
+            get
+            {
+                if (node == null) return m_pos;
+                var position = node.transform.position;
+                return U3dVec3ToSysVec3(ref position, ref m_pos);
+            }
+            set
+            {
+                m_pos = value;
+                if (node == null) return;
+                var position = node.transform.position;
+                node.transform.position = SysVec3ToU3dVec3(ref m_pos, ref position);
+            }
+        }
+        public System.Numerics.Vector3 Rotation
+        {
+            get
+            {
+                if (node == null) return m_rot;
+                var rotation = node.transform.eulerAngles;
+                return U3dVec3ToSysVec3(ref rotation, ref m_rot);
+            }
+            set
+            {
+                m_rot = value;
+                if (node == null) return;
+                var rotation = node.transform.eulerAngles;
+                node.transform.eulerAngles = SysVec3ToU3dVec3(ref m_rot, ref rotation);
+            }
+        }
+        public System.Numerics.Vector3 Scale
+        {
+            get
+            {
+                if (node == null) return m_scale;
+                var scale = node.transform.localScale;
+                return U3dVec3ToSysVec3(ref scale, ref m_scale); ;
+            }
+            set
+            {
+                m_scale = value;
+                if (node == null) return;
+                var localScale = node.transform.localScale;
+                node.transform.localScale = SysVec3ToU3dVec3(ref m_scale, ref localScale);
+            }
+        }
 
         public void Clear()
         {
@@ -24,9 +92,9 @@ namespace STGU3D
                         entityLink.Unlink();
                     }
                 }
-                if (bodyCom != null)
+                if (viewCtrl != null)
                 {
-                    bodyCom.Destroy();
+                    viewCtrl.Destroy();
                 }
                 //TODO:应该送入缓存区
                 Object.Destroy(node);
@@ -46,41 +114,12 @@ namespace STGU3D
             TimerManager.GetInstance().ScheduleNextFrame(InitView);
         }
 
-        public void SetRotation(float x, float y, float z)
+        public void AddView(string code,string name = null)
         {
-            if (node == null) return;
-            var euler = node.transform.eulerAngles;
-            euler.x = x;
-            euler.y = y;
-            euler.z = z;
-            node.transform.eulerAngles = euler;
-        }
-        public void GetRotation(ref float x, ref float y, ref float z)
-        {
-            if (node == null) return;
-            var euler = node.transform.eulerAngles;
-            x = euler.x;
-            y = euler.y;
-            z = euler.z;
-        }
-
-        public void SetPosition(float x, float y, float z)
-        {
-            if (node == null) return;
-            var position = node.transform.position;
-            position.x = x;
-            position.y = y;
-            position.z = z;
-            node.transform.position = position;
-        }
-
-        public void GetPosition(ref float x, ref float y, ref float z)
-        {
-            if (node == null) return;
-            var position = node.transform.position;
-            x = position.x;
-            y = position.y;
-            z = position.z;
+            if (viewCtrl != null)
+            {
+                viewCtrl.AddView(code, name);
+            }
         }
 
         ///
@@ -125,18 +164,18 @@ namespace STGU3D
                     if (entity.hasEntityData)
                     {
                         MoveNode(entity);
-                        AddBody(entity);
+                        AddViewController(entity);
                         InitNode(entity);
                     }
                 }
             }
         }
 
-        void AddBody(GameEntity ent)
+        void AddViewController(GameEntity ent)
         {
-            if (bodyCom != null)
+            if (viewCtrl != null)
             {
-                Object.Destroy(bodyCom);
+                Object.Destroy(viewCtrl);
             }
 
             if (node != null)
@@ -144,11 +183,12 @@ namespace STGU3D
                 //这里取后两位覆盖上去
                 string color = ent.entityData.entityCode.Substring(ent.entityData.entityCode.Length - 2, 2);
                 string viewCode = string.Format(ent.entityData.entityData["viewCode"], color);
-                bodyCom = node.AddComponent<BodyBehaviour>();
-                bodyCom.Create(viewCode);
+                viewCtrl = node.AddComponent<ViewController>();
+                viewCtrl.Ceate(this);
+
+                AddView(viewCode);
             }
         }
-
 
         void MoveNode(GameEntity ent)
         {
@@ -179,9 +219,16 @@ namespace STGU3D
 
         void InitNode(GameEntity ent)
         {
-            if (ent.hasTransform)
+            var position = node.transform.position;
+            var rotation = node.transform.eulerAngles;
+            var localScale = node.transform.localScale;
+            node.transform.position = SysVec3ToU3dVec3(ref m_pos, ref position);
+            node.transform.eulerAngles = SysVec3ToU3dVec3(ref m_rot, ref rotation);
+            node.transform.localScale = SysVec3ToU3dVec3(ref m_scale, ref localScale);
+
+            if (ent.hasView)
             {
-                if (ent.hasView)
+                if (ent.hasTransform)
                 {
                     if (ent.view.isEditor)
                     {
@@ -194,7 +241,11 @@ namespace STGU3D
                         node.transform.eulerAngles = ent.transform.rotation;
                     }
                 }
-            }
+
+            } 
         }
+
+
+        
     }
 }

@@ -153,6 +153,7 @@ namespace XLibGame
             if (m_poolDic.ContainsKey(poolName))
             {
                 m_poolDic[poolName].Destroy();
+                m_poolDic.Remove(poolName);
             }
         }
 
