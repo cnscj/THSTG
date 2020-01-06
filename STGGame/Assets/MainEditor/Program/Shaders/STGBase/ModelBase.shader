@@ -1,5 +1,6 @@
 ﻿Shader "STG/ModelBase"
 {
+//有一个半透,全透的渲染类型划分
     Properties
     {
         _Color ("Color", Color) = (1,1,1,1)

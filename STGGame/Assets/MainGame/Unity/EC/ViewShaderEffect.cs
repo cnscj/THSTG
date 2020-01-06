@@ -7,6 +7,10 @@ namespace STGU3D
     public class ViewShaderEffect : MonoBehaviour
     {
         public static readonly string KEY_GRAY = "GRAY_ON";
+
+        public static readonly string NAME_COLOR = "_Color";
+        public static readonly string NAME_GRAY = "_Gray";
+
         //所有渲染器
         public List<Material> materials ;
 
@@ -18,9 +22,27 @@ namespace STGU3D
             materials = materials ?? new List<Material>();
             foreach(var renderer in go.GetComponentsInChildren<Renderer>())
             {
+#if UNITY_EDITOR
+                materials.AddRange(renderer.materials);
+#else
+                //编辑模式下这行代码会修改到源文件
                 materials.AddRange(renderer.sharedMaterials);
+#endif
+
             }
-            
+
+        }
+
+        //颜色改变
+        public void SetColor(Color color)
+        {
+            if (materials != null)
+            {
+                foreach (var material in materials)
+                {
+                    material.SetColor(NAME_COLOR, color);
+                }
+            }
         }
 
         //灰显
@@ -32,11 +54,11 @@ namespace STGU3D
                 {
                     if (val)
                     {
-                        material.EnableKeyword(KEY_GRAY);
+                        material.SetFloat(NAME_GRAY, 1f);
                     }
                     else
                     {
-                        material.DisableKeyword(KEY_GRAY);
+                        material.SetFloat(NAME_GRAY, 0f);
                     }
                     
                 }
@@ -50,7 +72,5 @@ namespace STGU3D
         //石化
 
         //溶解
-
-        //闪烁
     }
 }

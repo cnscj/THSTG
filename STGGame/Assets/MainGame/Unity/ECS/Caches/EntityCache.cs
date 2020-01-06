@@ -31,7 +31,7 @@ namespace STGU3D
 
         }
 
-        public GameEntity GetHero(EPlayerType ePlayerType)
+        public GameEntity GetHero(EPlayerType ePlayerType = EPlayerType.Player01)
         {
             return heroMap[ePlayerType];
         }

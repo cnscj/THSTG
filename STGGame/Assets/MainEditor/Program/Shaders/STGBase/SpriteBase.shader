@@ -48,7 +48,7 @@ Shader "STG/SpriteBase"
             #pragma multi_compile _ ETC1_EXTERNAL_ALPHA
             
             //库
-            #include "CGIncludes/_BaseColor.cginc"
+            #include "../CGIncludes/_BaseColor.cginc"
             #include "UnityCG.cginc"
             
 

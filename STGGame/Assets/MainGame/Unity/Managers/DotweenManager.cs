@@ -10,7 +10,7 @@ namespace STGU3D
     public class DotweenManager : MonoSingleton<DotweenManager>
     {
         //一个旋转消亡的动画
-        public Tween PlayRotatingNarrow(GameEntity entity, Action onCompleted = null)
+        public Tween PlayRotatingNarrow(GameEntity entity)
         {
             entity.movement.moveSpeed = Vector3.zero;
             entity.movement.rotationSpeed = Vector3.zero;
@@ -41,17 +41,12 @@ namespace STGU3D
                 }, 0, 2);
                 mySequence.Join(scaleTweener);
             }
- 
-            mySequence.onComplete = () =>
-            {
-                onCompleted?.Invoke();
-            };
 
             return mySequence;
         }
 
         //TODO:一个闪烁的动画
-        public void PlayFlash(GameEntity entity, Action onCompleted = null)
+        public void PlayFlash(GameEntity entity,float freq ,float time)
         {
 
         }

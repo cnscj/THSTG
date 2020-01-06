@@ -73,10 +73,10 @@ namespace STGU3D
             if (entity.isHeroBulletFlag)
             {
                 //玩家子弹死亡
-                DotweenManager.GetInstance().PlayRotatingNarrow(entity,()=>
+                DotweenManager.GetInstance().PlayRotatingNarrow(entity).onComplete = ()=>
                 {
                     EntityManager.GetInstance().DestroyEntity(entity);
-                });
+                };
                 
             }
         }

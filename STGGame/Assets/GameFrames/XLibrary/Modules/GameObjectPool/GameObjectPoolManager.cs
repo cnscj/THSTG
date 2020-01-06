@@ -62,15 +62,9 @@ namespace XLibGame
             {
                 pair.Value.Init();
                 count++;
-                if (m_onProgress != null)
-                {
-                    m_onProgress(count / m_poolDic.Count);
-                }
+                m_onProgress?.Invoke(count / m_poolDic.Count);
             }
-            if (m_onFinish != null)
-            {
-                m_onFinish();
-            }
+            m_onFinish?.Invoke();
             m_isInit = true;
         }
 

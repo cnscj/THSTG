@@ -23,7 +23,5 @@ namespace STGEditor
             Debug.Log(string.Format("处理完成,耗时:{0} s", sw.ElapsedMilliseconds / 1000f));
            
         }
-
-
     }
 }
