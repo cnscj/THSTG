@@ -22,8 +22,12 @@ namespace STGU3D
             {
                 foreach(var renderer in renderers)
                 {
-                    var spriteRenderer = renderer as SpriteRenderer;
-                    spriteRenderer.flipX = val;
+                    if (renderer.GetType().IsAssignableFrom(typeof(SpriteRenderer)))
+                    {
+                        var spriteRenderer = renderer as SpriteRenderer;
+                        spriteRenderer.flipX = val;
+                    }
+
                 }
             }
         }
@@ -34,8 +38,11 @@ namespace STGU3D
             {
                 foreach (var renderer in renderers)
                 {
-                    var spriteRenderer = renderer as SpriteRenderer;
-                    spriteRenderer.flipY = val;
+                    if (renderer.GetType().IsAssignableFrom(typeof(SpriteRenderer)))
+                    {
+                        var spriteRenderer = renderer as SpriteRenderer;
+                        spriteRenderer.flipY = val;
+                    }
                 }
             }
         }

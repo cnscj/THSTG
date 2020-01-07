@@ -15,26 +15,22 @@ namespace XLibEditor
         /// <returns></returns>
         public static string GetScriptPath(ScriptableObject script)
         {
-            MonoScript m_Script = MonoScript.FromScriptableObject(script); //更新 使用UnityEditor API 
-            string path = AssetDatabase.GetAssetPath(m_Script);
-            return path;
+            MonoScript m_Script = MonoScript.FromScriptableObject(script);
+            return AssetDatabase.GetAssetPath(m_Script);
         }
 
         public static string GetScriptPath(MonoBehaviour script)
         {
-            MonoScript m_Script = MonoScript.FromMonoBehaviour(script); //更新 使用UnityEditor API 
-            string path = AssetDatabase.GetAssetPath(m_Script);
-            return path;
+            MonoScript m_Script = MonoScript.FromMonoBehaviour(script);
+            return AssetDatabase.GetAssetPath(m_Script);
         }
 
         public static string GetScriptPath(Type script)
         {
-            string path = AssetDatabase.FindAssets("t:Script")
+            return AssetDatabase.FindAssets("t:Script")
             .Where(v => Path.GetFileNameWithoutExtension(AssetDatabase.GUIDToAssetPath(v)) == script.Name)
             .Select(AssetDatabase.GUIDToAssetPath)
             .FirstOrDefault();
-
-            return path;
         }
     }
 }

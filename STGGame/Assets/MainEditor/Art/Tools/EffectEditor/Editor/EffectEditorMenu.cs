@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using THGame;
+﻿using System.IO;
+using XLibEditor;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -11,8 +9,7 @@ namespace STGEditor
 {
     public static class EffectEditorMenu
     {
-        public static readonly string editorLevelFolder = PathUtil.Combine(ResourceEditorsConfig.editorFolder, string.Format("Effect"));
-        public static readonly string editorLevelScenePath = PathUtil.Combine(editorLevelFolder, string.Format("EffectEditor.unity"));
+        public static readonly string editorName = "EffectEditor.unity";
         public static readonly string saveDefaultName = "EffectEditor.unity";
 
         [MenuItem("Assets/STGEditor/资源编辑器/特效编辑器/生成特效编辑场景")]
@@ -35,10 +32,9 @@ namespace STGEditor
         static void CreateEditor(string assetPath)
         {
             string selectRootPath = PathUtil.GetFileRootPath(assetPath);
-            string selectFileName = Path.GetFileNameWithoutExtension(assetPath);
 
             // 处理开始
-            var scene = EditorSceneManager.OpenScene(editorLevelScenePath);
+            var scene = EditorSceneManager.OpenScene(GetEditorPath());
             if (scene != null)
             {
                 // 保存新场景
@@ -56,6 +52,14 @@ namespace STGEditor
             {
                 Debug.LogWarning("编辑器路径错误");
             }
+
+        }
+
+        private static string GetEditorPath()
+        {
+            var path = EditorHelper.GetScriptPath(typeof(EffectEditorMenu));
+            var folder = Path.GetDirectoryName(path);
+            return Path.Combine(folder, string.Format("{0}", editorName));
 
         }
     }

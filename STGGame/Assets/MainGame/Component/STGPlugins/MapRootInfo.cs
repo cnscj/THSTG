@@ -1,10 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿
 using UnityEngine;
 
 namespace STGGame
 {
-    public class LevelRootInfo : MonoBehaviour
+    public class MapRootInfo : MonoBehaviour
     {
         public Rect region;
 

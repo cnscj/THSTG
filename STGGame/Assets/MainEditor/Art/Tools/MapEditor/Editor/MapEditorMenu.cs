@@ -8,12 +8,12 @@ using XLibrary;
 namespace STGEditor
 {
  
-    public static class LevelEditorMenu
+    public static class MapEditorMenu
     {
-        public static readonly string editorName = "LevelEditor.unity";
-        public static readonly string saveDefaultName = "LevelEditor.unity";
+        public static readonly string editorName = "MapEditor.unity";
+        public static readonly string saveDefaultName = "MapEditor.unity";
 
-        [MenuItem("Assets/STGEditor/资源编辑器/关卡编辑器/生成关卡编辑模板")]
+        [MenuItem("Assets/STGEditor/资源编辑器/地图编辑器/生成地图编辑模板")]
         public static void MenuCreateEditor()
         {
             var selected = Selection.activeObject;
@@ -38,8 +38,7 @@ namespace STGEditor
             var scene = EditorSceneManager.OpenScene(GetEditorPath());
             if (scene != null)
             {
-                //
-              
+
 
                 // 保存新场景
                 string savePath = PathUtil.Combine(selectRootPath, string.Format(saveDefaultName));
@@ -56,7 +55,7 @@ namespace STGEditor
 
         private static string GetEditorPath()
         {
-            var path = EditorHelper.GetScriptPath(typeof(LevelEditorMenu));
+            var path = EditorHelper.GetScriptPath(typeof(MapEditorMenu));
             var folder = Path.GetDirectoryName(path);
             return Path.Combine(folder, string.Format("{0}", editorName));
 

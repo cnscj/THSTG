@@ -4,7 +4,7 @@ using Entitas.Unity;
 using UnityEngine;
 using XLibGame;
 
-namespace STGU3D
+namespace STGService
 {
     public static class ViewUtil
     {
