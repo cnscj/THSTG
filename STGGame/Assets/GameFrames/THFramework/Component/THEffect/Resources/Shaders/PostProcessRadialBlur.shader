@@ -1,4 +1,4 @@
-﻿Shader "Hidden/STGInstance/PostProcessRadialBlur"
+﻿Shader "Hidden/TH/PostProcessRadialBlur"
 {
     Properties
     {

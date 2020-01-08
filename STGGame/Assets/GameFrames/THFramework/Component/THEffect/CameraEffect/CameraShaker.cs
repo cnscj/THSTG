@@ -1,10 +1,10 @@
 using System;
 using UnityEngine;
 
-namespace ASGame
+namespace THGame
 {
     // 技能特效扩展组件，挂在主角技能特效的prefab根节点上
-    public class SkillCameraShaker : MonoBehaviour
+    public class CameraShaker : MonoBehaviour
     {
         // K帧属性：
         [Header("震屏（上下、远近、摇头）")]

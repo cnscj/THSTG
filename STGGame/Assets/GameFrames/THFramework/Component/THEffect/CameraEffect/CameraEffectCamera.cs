@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ASGame
+namespace THGame
 {
     public class CameraEffectCamera : MonoBehaviour
     {

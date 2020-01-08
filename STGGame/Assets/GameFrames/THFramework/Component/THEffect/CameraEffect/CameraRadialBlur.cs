@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace ASGame
+namespace THGame
 {
-    public class SkillRadialBlur : MonoBehaviour
+    public class CameraRadialBlur : MonoBehaviour
     {
         static Material s_material; 
 
@@ -19,7 +19,7 @@ namespace ASGame
 
         void Start()
         {
-            Shader shader = Shader.Find("GY/SkillRadialBlur"); //TODO:
+            Shader shader = Shader.Find("Hidden/TH/PostProcessRadialBlur");
             s_material = new Material(shader);
         }
 
