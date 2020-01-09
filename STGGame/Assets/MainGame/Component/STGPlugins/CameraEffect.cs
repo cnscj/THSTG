@@ -1,5 +1,6 @@
 ﻿
 
+using THGame;
 using UnityEngine;
 
 namespace STGGame
@@ -10,9 +11,9 @@ namespace STGGame
         //相机震屏
         [Header("震屏（上下、远近、摇头）")]
         public bool shakerEnabled;
-        public Vector3 shakeParams = Vector3.forward;
-        public float shakePeriod = 0.12f;
-        public int shakeCount = 6;
+        public float shakeHeight = 0;
+        public float shakeForward = 0;
+        public float shakeRotation = 0;
 
         //场景压黑
         [Header("场景压黑")]
@@ -26,9 +27,31 @@ namespace STGGame
         [Range(0.01f, 2)] public float radialBlurShape = 1;
         [Range(0, 1)] public float radialBlurAlpha = 1;
 
-        private void Start()
+        private void Update()
         {
-            
+            if (shakerEnabled)
+            {
+                if (CameraShaker.Instance)
+                {
+                    CameraShaker.Instance.shakeArgs.x = shakeHeight;
+                    CameraShaker.Instance.shakeArgs.y = shakeForward;
+                    CameraShaker.Instance.shakeArgs.z = shakeRotation;
+                }
+
+            }
+
+            if (sceneColorEnabled)
+            {
+                if (CameraDarken.Instance)
+                {
+
+                }
+            }
+
+            if (radialBlurEnabled)
+            {
+
+            }
         }
     }
 }

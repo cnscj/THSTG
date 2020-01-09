@@ -3,60 +3,68 @@ using UnityEngine;
 
 namespace THGame
 {
-    // 技能特效扩展组件，挂在主角技能特效的prefab根节点上
+    // 震屏控制器,挂载在摄像机上
     public class CameraShaker : MonoBehaviour
     {
-        // K帧属性：
-        [Header("震屏（上下、远近、摇头）")]
-        public float height = 0;
-        public float forward = 0;
-        public float rotation = 0;
+        public static CameraShaker Instance { get; protected set; }
+
+        // K帧属性
+        [Header("震屏(上下、远近、摇头）")]
+        public Vector3 shakeArgs;
+
+        //作用对象
+        public Transform cameraTrans;
+        private Vector3 m_startPosition;
+        private Vector3 s_startEulerAngles;
+
+        private void Awake()
+        {
+            Instance = this;
+        }
 
         // 属性受animation控制，需要在animation之后执行，即使用LateUpdate()
         void LateUpdate()
         {
-            if (CameraEffectCamera.GetInstance())
+            if (cameraTrans == null)
+                return;
+
+            ApplyShake();
+        }
+
+        void OnEnable()
+        {
+            cameraTrans = cameraTrans ?? Camera.main?.transform ?? gameObject?.transform;
+            if (cameraTrans != null)
             {
-                ApplyShake();
+                m_startPosition = cameraTrans.localPosition;
+                s_startEulerAngles = cameraTrans.localEulerAngles;
             }
         }
 
         void OnDisable()
         {
-            if (CameraEffectCamera.GetInstance())
-            {
-                RevertShake();
-            }
+            if (cameraTrans == null)
+                return;
+
+            RevertShake();
         }
 
         void ApplyShake()
         {
-            if (CameraEffectCamera.GetInstance())
-            {
-                foreach(var pair in CameraEffectCamera.GetInstance().cameraMap)
-                {
-                    var cameraTrans = pair.Key;
-                    var cameraInfos = pair.Value;
+            if (cameraTrans == null)
+                return;
 
-                    cameraTrans.localPosition = cameraInfos.startPosition + new Vector3(0, height, forward);
-                    cameraTrans.localEulerAngles = cameraInfos.startEulerAngles + new Vector3(0, 0, rotation);
-                }
-            }
+            cameraTrans.localPosition = m_startPosition + new Vector3(0, shakeArgs.x, shakeArgs.y);
+            cameraTrans.localEulerAngles = s_startEulerAngles + new Vector3(0, 0, shakeArgs.z);   
         }
 
         void RevertShake()
         {
-            if (CameraEffectCamera.GetInstance())
-            {
-                foreach (var pair in CameraEffectCamera.GetInstance().cameraMap)
-                {
-                    var cameraTrans = pair.Key;
-                    var cameraInfos = pair.Value;
+            if (cameraTrans == null)
+                return;
 
-                    cameraTrans.localPosition = cameraInfos.startPosition;
-                    cameraTrans.localEulerAngles = cameraInfos.startEulerAngles;
-                }
-            }
+            cameraTrans.localPosition = m_startPosition;
+            cameraTrans.localEulerAngles = s_startEulerAngles;
         }
 
     }

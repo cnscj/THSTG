@@ -1,74 +1,113 @@
-﻿Shader "Hidden/TH/PostProcessRadialBlur"
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+//径向模糊shader by puppet_master
+//2017.2.20
+Shader "Hidden/TH/PostProcessRadialBlur" 
 {
-    Properties
+    Properties 
     {
-        //_MainTex ("Texture", 2D) = "white" {}
-        _Range ("Range", Float) = 1
-        _Shape ("Shape", Float) = 1
-        _Alpha ("Alpha", Float) = 1
+        _MainTex ("Base (RGB)", 2D) = "white" {}
+        _BlurTex("Blur Tex", 2D) = "white"{}
     }
+ 
+    CGINCLUDE
+    uniform sampler2D _MainTex;
+    uniform sampler2D _BlurTex;
+    uniform float _BlurFactor;  //模糊强度（0-0.05）
+    uniform float _LerpFactor;  //插值的强度（0-1）
+    uniform float4 _BlurCenter; //模糊中心点xy值（0-1）屏幕空间
+    float4 _MainTex_TexelSize;
+    #include "UnityCG.cginc"
+    #define SAMPLE_COUNT 6      //迭代次数
+ 
+    fixed4 frag_blur(v2f_img i) : SV_Target
+    {
+        //模糊方向为模糊中点指向边缘（当前像素点），而越边缘该值越大，越模糊
+        float2 dir = i.uv - _BlurCenter.xy;
+        float4 outColor = 0;
+        //采样SAMPLE_COUNT次
+        for (int j = 0; j < SAMPLE_COUNT; ++j)
+        {
+            //计算采样uv值：正常uv值+从中间向边缘逐渐增加的采样距离
+            //float2 uv = i.uv + _BlurFactor * dir * j;
+            float2 uv = i.uv - _BlurFactor * dir * j;
+            outColor += tex2D(_MainTex, uv);
+        }
+        //取平均值
+        outColor /= SAMPLE_COUNT;
+        return outColor;
+    }
+ 
+    //定义最后插值使用的结构体
+    struct v2f_lerp
+    {
+        float4 pos : SV_POSITION;
+        float2 uv1 : TEXCOORD0; //uv1
+        float2 uv2 : TEXCOORD1; //uv2
+    };
+    
+    v2f_lerp vert_lerp(appdata_img v)
+    {
+        v2f_lerp o;
+        o.pos = UnityObjectToClipPos(v.vertex);
+        o.uv1 = v.texcoord.xy;
+        o.uv2 = v.texcoord.xy;
+        //dx中纹理从左上角为初始坐标，需要反向(在写rt的时候需要注意)
+        #if UNITY_UV_STARTS_AT_TOP
+        if (_MainTex_TexelSize.y < 0)
+            o.uv2.y = 1 - o.uv2.y;
+        #endif
+        return o;
+    }
+ 
+    fixed4 frag_lerp(v2f_lerp i) : SV_Target
+    {
+        float2 dir = i.uv1 - _BlurCenter.xy;
+        float dis = length(dir);
+        fixed4 oriTex = tex2D(_MainTex, i.uv1);
+        fixed4 blurTex = tex2D(_BlurTex, i.uv2);
+        //按照距离乘以插值系数在原图和模糊图之间差值
+        return lerp(oriTex, blurTex, _LerpFactor * dis);
+    }
+    ENDCG
+ 
     SubShader
     {
-        // No culling or depth
-        Cull Off ZWrite Off ZTest Always
-	
+        //Pass 0 模糊操作
         Pass
         {
+            ZTest Always
+            Cull Off
+            ZWrite Off
+            Fog{ Mode off }
+ 
+            //调用CG函数    
             CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-	
-            #include "UnityCG.cginc"
-	
-            struct appdata
-            {
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
-            };
-	
-            struct v2f
-            {
-                float2 uv : TEXCOORD0;                
-                float4 vertex : SV_POSITION;
-            };
-	
-            v2f vert (appdata v)
-            {
-                v2f o;
-                o.vertex = float4(v.vertex.xy, 0.0, 1.0);            
-                o.uv = (v.vertex.xy + 1.0) * 0.5;
-	
-                #if UNITY_UV_STARTS_AT_TOP
-                o.uv = o.uv * float2(1.0, -1.0) + float2(0.0, 1.0);
-                #endif
-                
-                return o;
-            }
-	
-            sampler2D _MainTex;
-            half _Range;
-            half _Shape;
-            half _Alpha;
-            
-            half4 frag (v2f i) : SV_Target
-            {
-                half2 uvViewPort = i.uv * 2 - 1;                
-                half rate = dot(uvViewPort, uvViewPort) * _Range;
-                rate = pow(rate, _Shape);
-                uvViewPort *= rate;
-                
-                half4 tex = tex2D(_MainTex, i.uv);
-                half4 col = tex;
-                col += tex2D(_MainTex, i.uv - uvViewPort * 0.015);
-                col += tex2D(_MainTex, i.uv - uvViewPort * 0.02);
-                col += tex2D(_MainTex, i.uv - uvViewPort * 0.023);
-                col += tex2D(_MainTex, i.uv - uvViewPort * 0.025);
-                col *= 0.2;
-                return lerp(tex, col, _Alpha * rate);
-            }
+            //使效率更高的编译宏
+            #pragma fragmentoption ARB_precision_hint_fastest 
+            //vert_img是在UnityCG.cginc中定义好的，当后处理vert阶段计算常规，可以直接使用自带的vert_img
+            #pragma vertex vert_img
+            #pragma fragment frag_blur 
+            ENDCG
+        }
+ 
+        //Pass 1与原图插值操作
+        Pass
+        {
+            ZTest Always
+            Cull Off
+            ZWrite Off
+            Fog{ Mode off }
+ 
+            //调用CG函数    
+            CGPROGRAM
+            //使效率更高的编译宏
+            #pragma fragmentoption ARB_precision_hint_fastest 
+            //vert_img是在UnityCG.cginc中定义好的，当后处理vert阶段计算常规，可以直接使用自带的vert_img
+            #pragma vertex vert_lerp
+            #pragma fragment frag_lerp 
             ENDCG
         }
     }
-
-    Fallback Off
+    Fallback off
 }
