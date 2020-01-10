@@ -8,9 +8,11 @@ namespace STGU3D
 {
     public class UnityView : IView
     {
+        public delegate void Callback0();
         public GameEntity entity;           //GE
         public GameObject node;             //与Unity关联的节点
-        public ViewController viewCtrl;     //View 控制器
+        public ViewControllerMono viewCtrl; //View 控制器
+        public Callback0 onComplete;        //加载完成回调
 
         private System.Numerics.Vector3 m_pos = System.Numerics.Vector3.Zero;
         private System.Numerics.Vector3 m_rot = System.Numerics.Vector3.Zero;
@@ -104,19 +106,21 @@ namespace STGU3D
         }
 
         //这里需要用协程延迟一帧
-        public void Create(GameEntity ent)
+        //原因:关系到node是否绑定,如果不为空,则直接绑定
+        public IView Create(GameEntity ent)
         {
             Clear();
 
             entity = ent;
 
-            //延迟一帧后,初始位置有问题
             TimerManager.GetInstance().ScheduleNextFrame(InitView);
+
+            return this;
         }
 
-        public void AddView(string code,string name = null)
+        public void AddView(string code, string name = null)
         {
-            if (viewCtrl != null)
+            if (viewCtrl != null && entity != null)
             {
                 viewCtrl.AddView(code, name);
             }
@@ -150,6 +154,7 @@ namespace STGU3D
 
         }
 
+        //这里用协程关系到node是否绑定,如果不为空,则直接绑定
         void InitView()
         {
             if (node == null)
@@ -159,14 +164,14 @@ namespace STGU3D
            
             if (LinkGOAndEntity(node, entity))
             {
-                if (EntityManager.GetInstance())
+                if (entity.hasEntityData)
                 {
-                    if (entity.hasEntityData)
-                    {
-                        MoveNode(entity);
-                        AddViewController(entity);
-                        InitNode(entity);
-                    }
+                    MoveNode(entity);
+                    AddViewController(entity);
+                    InitNode(entity);
+
+                    onComplete?.Invoke();
+                    onComplete = null;
                 }
             }
         }
@@ -180,13 +185,8 @@ namespace STGU3D
 
             if (node != null)
             {
-                //这里取后两位覆盖上去
-                string color = ent.entityData.entityCode.Substring(ent.entityData.entityCode.Length - 2, 2);
-                string viewCode = string.Format(ent.entityData.entityData["viewCode"], color);
-                viewCtrl = node.AddComponent<ViewController>();
+                viewCtrl = node.AddComponent<ViewControllerMono>();
                 viewCtrl.Ceate(this);
-
-                AddView(viewCode);
             }
         }
 

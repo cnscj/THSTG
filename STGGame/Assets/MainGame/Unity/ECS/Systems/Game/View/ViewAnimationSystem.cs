@@ -40,7 +40,7 @@ namespace STGU3D
                     {
                         var animatorCom = viewCtrl.animatorCom;
                         var rendererCom = viewCtrl.rendererCom;
-                        if (animatorCom && rendererCom)
+                        if (animatorCom != null && rendererCom != null)
                         {
                             if (entity.movement.moveSpeed.x > 0f) //右
                             {

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace STGU3D
 {
-    public class ViewRenderer : MonoBehaviour
+    public class ViewRenderer : ViewBaseClass
     {
         public List<Renderer> renderers;
         public void Add(GameObject go)

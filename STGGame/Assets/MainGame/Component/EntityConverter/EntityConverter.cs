@@ -63,7 +63,7 @@ namespace STGGame
                             if (unityView != null)
                             {
                                 entity.view.isEditor = true;
-                                unityView.node = gameObject;
+                                unityView.node = gameObject;    //因此node在此前必须为null
                             }
                         }
                     }

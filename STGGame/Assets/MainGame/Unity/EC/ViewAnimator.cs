@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace STGU3D
 {
-    public class ViewAnimator : MonoBehaviour
+    public class ViewAnimator : ViewBaseClass
     {
         public List<Animator> animators;
         public void Add(GameObject go)
@@ -48,5 +48,17 @@ namespace STGU3D
                 }
             }
         }
+
+        public void SetBool(string name, bool value)
+        {
+            if (animators != null)
+            {
+                foreach (var animator in animators)
+                {
+                    animator.SetBool(name, value);
+                }
+            }
+        }
+
     }
 }

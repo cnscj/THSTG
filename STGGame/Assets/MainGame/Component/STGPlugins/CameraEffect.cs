@@ -42,9 +42,10 @@ namespace STGGame
 
             if (sceneColorEnabled)
             {
-                if (CameraDarken.Instance)
+                if (CameraOverDraw.Instance)
                 {
-
+                    CameraOverDraw.Instance.sceneColorApply = sceneColorEnabled;
+                    CameraOverDraw.Instance.sceneColor = sceneColor;
                 }
             }
 

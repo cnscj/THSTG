@@ -1,12 +1,12 @@
-using System;
 using UnityEngine;
 
 namespace THGame
 {
-    // 震屏控制器,挂载在摄像机上
+    // 震屏控制器,挂载在摄像机上,
+    //摄像机必须挂载一个空的父节点上,否则位置会被锁死
     public class CameraShaker : MonoBehaviour
     {
-        public static CameraShaker Instance { get; protected set; }
+        private static CameraShaker s_instance;
 
         // K帧属性
         [Header("震屏(上下、远近、摇头）")]
@@ -14,12 +14,29 @@ namespace THGame
 
         //作用对象
         public Transform cameraTrans;
+        public float stayTime = -1f;
         private Vector3 m_startPosition;
-        private Vector3 s_startEulerAngles;
+        private Vector3 m_startEulerAngles;
+
+        private float m_startTick;
 
         private void Awake()
         {
-            Instance = this;
+            s_instance = this;
+        }
+
+        public static CameraShaker Instance
+        {
+            get
+            {
+                if (s_instance && s_instance.m_startTick >= 0f)
+                {
+                    s_instance.m_startTick = Time.realtimeSinceStartup;
+                    s_instance.enabled = true;
+                }
+   
+                return s_instance;
+            }
         }
 
         // 属性受animation控制，需要在animation之后执行，即使用LateUpdate()
@@ -27,6 +44,17 @@ namespace THGame
         {
             if (cameraTrans == null)
                 return;
+
+            //访问超时,自动关闭
+            if (stayTime >= 0f)
+            {
+                if (m_startTick + stayTime <= Time.realtimeSinceStartup)
+                {
+                    enabled = false;
+                    return;
+                }
+            }
+
 
             ApplyShake();
         }
@@ -37,7 +65,7 @@ namespace THGame
             if (cameraTrans != null)
             {
                 m_startPosition = cameraTrans.localPosition;
-                s_startEulerAngles = cameraTrans.localEulerAngles;
+                m_startEulerAngles = cameraTrans.localEulerAngles;
             }
         }
 
@@ -55,7 +83,7 @@ namespace THGame
                 return;
 
             cameraTrans.localPosition = m_startPosition + new Vector3(0, shakeArgs.x, shakeArgs.y);
-            cameraTrans.localEulerAngles = s_startEulerAngles + new Vector3(0, 0, shakeArgs.z);   
+            cameraTrans.localEulerAngles = m_startEulerAngles + new Vector3(0, 0, shakeArgs.z);   
         }
 
         void RevertShake()
@@ -64,7 +92,7 @@ namespace THGame
                 return;
 
             cameraTrans.localPosition = m_startPosition;
-            cameraTrans.localEulerAngles = s_startEulerAngles;
+            cameraTrans.localEulerAngles = m_startEulerAngles;
         }
 
     }

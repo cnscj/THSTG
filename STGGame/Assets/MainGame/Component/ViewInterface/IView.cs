@@ -12,7 +12,7 @@ namespace STGGame
 
         object Execute(int operate, object data = null);
 
-        void Create(GameEntity entity);
+        IView Create(GameEntity entity);
         void Clear();
     }
 

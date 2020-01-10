@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace STGU3D
 {
-    public class ViewCollider : MonoBehaviour
+    public class ViewCollider : ViewBaseClass
     {
         public List<Collider> colliders;
         public void Add(GameObject go)
@@ -13,7 +13,25 @@ namespace STGU3D
                 return;
 
             colliders = colliders ?? new List<Collider>();
-            colliders.AddRange(go.GetComponentsInChildren<Collider>());
+            var collidersInGO = go.GetComponentsInChildren<Collider>();
+            colliders.AddRange(collidersInGO);
+
+            BindColidersWithEntity(collidersInGO);
+        }
+
+
+        void BindColidersWithEntity(Collider []colliders)
+        {
+            //TODO:绑定BOX到Entity上
+            if (unityView != null && unityView.entity != null)
+            {
+                if (colliders != null && colliders.Length > 0)
+                {
+                    var collider = colliders[0];
+                    //Debug.Log(collider.bounds.center);
+                    //Debug.Log(collider.bounds.size);
+                }
+            }
         }
     }
 }

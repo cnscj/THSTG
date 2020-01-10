@@ -7,26 +7,18 @@ namespace ASGame
     public class EffectDelayMono : MonoBehaviour
     {
         public float delayTime = 1.0f;
-        public bool isEnabling = false;
+
 
         void OnEnable()
         {
-            if (!isEnabling)
-            {
-                gameObject.SetActive(false);
-                Invoke("DelayFunc", delayTime);
-                isEnabling = true;
-            }
+            gameObject.SetActive(false);
+            Invoke("DelayFunc", delayTime);    
         }
 
         void DelayFunc()
         {
             gameObject.SetActive(true);
-            if (isEnabling)
-            {
-                CancelInvoke("DelayFunc");
-                isEnabling = false;
-            }
+            
         }
     }
 

@@ -5,37 +5,37 @@ using XLibGame;
 
 namespace STGU3D
 {
-    public delegate void ViewLoadComplete(GameObject view);
-    public class ViewController : MonoBehaviour
+    public class ViewControllerMono : MonoBehaviour
     {
         public static readonly string bodyName = "Body";
-        public UnityView unityView;
 
         private GameObject body;
         public List<GameObject> showGOs;
+        public UnityView unityView { get; protected set; }
 
-        public ViewRenderer rendererCom;
-        public ViewCollider colliderCom;
-        public ViewAnimator animatorCom;
-        public ViewShaderEffect shaderEffectCom;
-
-        public ViewLoadComplete onComplete;
+        //记录一些常用的脚本
+        public ViewRenderer rendererCom { get; protected set; }
+        public ViewCollider colliderCom { get; protected set; }
+        public ViewAnimator animatorCom { get; protected set; }
+        public ViewShaderEffect shaderEffectCom { get; protected set; }
 
         public void Ceate(UnityView u3dView)
         {
             TryNewBody();
 
             unityView = u3dView;
-            rendererCom = rendererCom == null ? body.AddComponent<ViewRenderer>() : body.GetComponent<ViewRenderer>();
-            colliderCom = colliderCom == null ? body.AddComponent<ViewCollider>() : body.GetComponent<ViewCollider>();
-            animatorCom = animatorCom == null ? body.AddComponent<ViewAnimator>() : body.GetComponent<ViewAnimator>();
-            shaderEffectCom = shaderEffectCom == null ? body.AddComponent<ViewShaderEffect>() : body.GetComponent<ViewShaderEffect>();
+            rendererCom = (ViewRenderer)(rendererCom?.Bind(u3dView) ?? new ViewRenderer()?.Bind(u3dView));
+            colliderCom = (ViewCollider)(colliderCom?.Bind(u3dView) ?? new ViewCollider()?.Bind(u3dView));
+            animatorCom = (ViewAnimator)(animatorCom?.Bind(u3dView) ?? new ViewAnimator()?.Bind(u3dView));
+            shaderEffectCom = (ViewShaderEffect)(shaderEffectCom?.Bind(u3dView) ?? new ViewShaderEffect()?.Bind(u3dView));
+
+            Init();
         }
 
         public void AddView(string code, string name = null)
         {
-            GameObject showGO;
-            EEntityType entityType = EntityUtil.GetEntityTypeByCode(code);
+            GameObject showGO; 
+             EEntityType entityType = EntityUtil.GetEntityTypeByCode(code);
             if (entityType == EEntityType.Hero ||
                 entityType == EEntityType.Boss
                )
@@ -53,19 +53,34 @@ namespace STGU3D
                 showGOs = showGOs ?? new List<GameObject>();
                 showGOs.Add(showGO);
 
-                name = name ?? showGO.name;
+                showGO.name = name ?? showGO.name;
                 showGO.transform.SetParent(body.transform, false);
 
                 rendererCom.Add(showGO);
                 colliderCom.Add(showGO);
                 animatorCom.Add(showGO);
                 shaderEffectCom.Add(showGO);
-
-                onComplete?.Invoke(showGO);
             }
         }
 
         public void Destroy()
+        {
+            Object.Destroy(this);
+        }
+
+        void Start()
+        {
+            
+        }
+
+        void Init()
+        {
+            string color = unityView.entity.entityData.entityCode.Substring(unityView.entity.entityData.entityCode.Length - 2, 2);
+            string viewCode = string.Format(unityView.entity.entityData.entityData["viewCode"], color);
+            AddView(viewCode);
+        }
+
+        void OnDestroy()
         {
             if (showGOs != null)
             {
@@ -78,7 +93,7 @@ namespace STGU3D
             }
         }
 
-        private void TryNewBody()
+        void TryNewBody()
         {
             if (body == null)
             {

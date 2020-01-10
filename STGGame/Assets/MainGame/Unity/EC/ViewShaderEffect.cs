@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace STGU3D
 {
-    public class ViewShaderEffect : MonoBehaviour
+    public class ViewShaderEffect : ViewBaseClass
     {
         public static readonly string KEY_GRAY = "GRAY_ON";
 
@@ -28,7 +28,6 @@ namespace STGU3D
                 //编辑模式下这行代码会修改到源文件
                 materials.AddRange(renderer.sharedMaterials);
 #endif
-
             }
 
         }
