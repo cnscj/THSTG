@@ -5,9 +5,9 @@ using UnityEngine;
 namespace STGU3D
 {
     [Game]
-    public class ViewComponent : IComponent
+    public class EditorEntityComponent : IComponent
     {
-        public IView view;          //抽象交互
+
     }
 
 }

@@ -192,7 +192,7 @@ namespace STGU3D
 
         void MoveNode(GameEntity ent)
         {
-            if (ent.view.isEditor)
+            if (ent.isEditorEntity)
                 return;
   
             var entityType = ent.entityData.entityType;
@@ -226,26 +226,19 @@ namespace STGU3D
             node.transform.eulerAngles = SysVec3ToU3dVec3(ref m_rot, ref rotation);
             node.transform.localScale = SysVec3ToU3dVec3(ref m_scale, ref localScale);
 
-            if (ent.hasView)
+            if (ent.hasTransform)
             {
-                if (ent.hasTransform)
+                if (ent.isEditorEntity)
                 {
-                    if (ent.view.isEditor)
-                    {
-                        ent.transform.position = node.transform.position;
-                        ent.transform.rotation = node.transform.eulerAngles;
-                    }
-                    else
-                    {
-                        node.transform.position = ent.transform.position;
-                        node.transform.eulerAngles = ent.transform.rotation;
-                    }
+                    ent.transform.position = node.transform.position;
+                    ent.transform.rotation = node.transform.eulerAngles;
                 }
-
-            } 
+                else
+                {
+                    node.transform.position = ent.transform.position;
+                    node.transform.eulerAngles = ent.transform.rotation;
+                }
+            }
         }
-
-
-        
     }
 }

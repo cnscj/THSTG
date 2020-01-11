@@ -1,24 +1,30 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ASGame
 {
     public class EffectDelayMono : MonoBehaviour
     {
         public float delayTime = 1.0f;
-
+        public bool isEnabling = false;
 
         void OnEnable()
         {
-            gameObject.SetActive(false);
-            Invoke("DelayFunc", delayTime);    
+            if (!isEnabling && delayTime > 0f)
+            {
+                gameObject.SetActive(false);
+                Invoke("DelayFunc", delayTime);
+                isEnabling = true;
+            }
         }
 
         void DelayFunc()
         {
             gameObject.SetActive(true);
-            
+            if (isEnabling)
+            {
+                CancelInvoke("DelayFunc");
+                isEnabling = false;
+            }
         }
     }
 

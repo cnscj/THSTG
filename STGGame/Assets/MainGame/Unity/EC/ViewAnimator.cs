@@ -27,13 +27,24 @@ namespace STGU3D
             }
         }
 
-        public void CrossFace(string state)
+        public void CrossFace(string state, float normalizedTransitionDuration)
         {
             if (animators != null)
             {
                 foreach (var animator in animators)
                 {
-                    animator.CrossFade(state,0f);
+                    animator.CrossFade(state, normalizedTransitionDuration);
+                }
+            }
+        }
+
+        public void SetSpeed(float value)
+        {
+            if (animators != null)
+            {
+                foreach (var animator in animators)
+                {
+                    animator.speed = value;
                 }
             }
         }
@@ -60,5 +71,15 @@ namespace STGU3D
             }
         }
 
+        public void SetFloat(string name, float value)
+        {
+            if (animators != null)
+            {
+                foreach (var animator in animators)
+                {
+                    animator.SetFloat(name, value);
+                }
+            }
+        }
     }
 }

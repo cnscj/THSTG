@@ -21,30 +21,34 @@ public static class GameComponentsLookup {
     public const int Damage = 10;
     public const int Decelerate = 11;
     public const int Destroyed = 12;
-    public const int Eliminate = 13;
-    public const int EntityBulletFlag = 14;
-    public const int EntityData = 15;
-    public const int Follow = 16;
-    public const int Health = 17;
-    public const int HeroBulletFlag = 18;
-    public const int Hitbox = 19;
-    public const int Invincible = 20;
-    public const int Life = 21;
-    public const int MobData = 22;
-    public const int Movement = 23;
-    public const int OnmyougyokuWingman = 24;
-    public const int PlayerData = 25;
-    public const int PropData = 26;
-    public const int Recycle = 27;
-    public const int Shift = 28;
-    public const int Shot = 29;
-    public const int SpellCard = 30;
-    public const int Trace = 31;
-    public const int Transform = 32;
-    public const int View = 33;
-    public const int WingmanData = 34;
+    public const int EditorEntity = 13;
+    public const int Eliminate = 14;
+    public const int EntityBulletFlag = 15;
+    public const int EntityData = 16;
+    public const int Follow = 17;
+    public const int Health = 18;
+    public const int HeroBulletFlag = 19;
+    public const int Hitbox = 20;
+    public const int Invincible = 21;
+    public const int Life = 22;
+    public const int MobData = 23;
+    public const int Movement = 24;
+    public const int OnmyougyokuWingman = 25;
+    public const int Parent = 26;
+    public const int PlayerData = 27;
+    public const int Position = 28;
+    public const int PropData = 29;
+    public const int Recycle = 30;
+    public const int Rotation = 31;
+    public const int Shift = 32;
+    public const int Shot = 33;
+    public const int SpellCard = 34;
+    public const int Trace = 35;
+    public const int Transform = 36;
+    public const int View = 37;
+    public const int WingmanData = 38;
 
-    public const int TotalComponents = 35;
+    public const int TotalComponents = 39;
 
     public static readonly string[] componentNames = {
         "ArmorHeadwear",
@@ -60,6 +64,7 @@ public static class GameComponentsLookup {
         "Damage",
         "Decelerate",
         "Destroyed",
+        "EditorEntity",
         "Eliminate",
         "EntityBulletFlag",
         "EntityData",
@@ -72,9 +77,12 @@ public static class GameComponentsLookup {
         "MobData",
         "Movement",
         "OnmyougyokuWingman",
+        "Parent",
         "PlayerData",
+        "Position",
         "PropData",
         "Recycle",
+        "Rotation",
         "Shift",
         "Shot",
         "SpellCard",
@@ -98,6 +106,7 @@ public static class GameComponentsLookup {
         typeof(STGU3D.DamageComponent),
         typeof(STGU3D.DecelerateComponent),
         typeof(STGU3D.DestroyedComponent),
+        typeof(STGU3D.EditorEntityComponent),
         typeof(STGU3D.EliminateComponent),
         typeof(STGU3D.EntityBulletFlagComponent),
         typeof(STGU3D.EntityDataComponent),
@@ -110,9 +119,12 @@ public static class GameComponentsLookup {
         typeof(STGU3D.MobDataComponent),
         typeof(STGU3D.MovementComponent),
         typeof(STGU3D.OnmyougyokuWingmanComponent),
+        typeof(STGU3D.ParentComponent),
         typeof(STGU3D.PlayerDataComponent),
+        typeof(STGU3D.PositionComponent),
         typeof(STGU3D.PropDataComponent),
         typeof(STGU3D.RecycleComponent),
+        typeof(STGU3D.RotationComponent),
         typeof(STGU3D.ShiftComponent),
         typeof(STGU3D.ShotComponent),
         typeof(STGU3D.SpellCardComponent),

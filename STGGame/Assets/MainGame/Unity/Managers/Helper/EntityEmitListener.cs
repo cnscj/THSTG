@@ -33,14 +33,11 @@ namespace STGU3D
             {
                 convertCom.callback += (GameEntity entity) =>
                 {
-                    if (entity.hasView && entity.hasMovement)
+                    if (entity.hasMovement && !entity.isEditorEntity)
                     {
-                        if (!entity.view.isEditor)
-                        {
-                            entity.movement.moveSpeed = ctrl.moveSpeed;
-                            entity.movement.rotationSpeed = ctrl.rotationSpeed;
-                            Object.Destroy(ctrl);
-                        }
+                        entity.movement.moveSpeed = ctrl.moveSpeed;
+                        entity.movement.rotationSpeed = ctrl.rotationSpeed;
+                        Object.Destroy(ctrl);
                     }
                 };
             }

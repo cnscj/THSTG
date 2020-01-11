@@ -11,19 +11,17 @@ public partial class GameEntity {
     public STGU3D.ViewComponent view { get { return (STGU3D.ViewComponent)GetComponent(GameComponentsLookup.View); } }
     public bool hasView { get { return HasComponent(GameComponentsLookup.View); } }
 
-    public void AddView(STGGame.IView newView, bool newIsEditor) {
+    public void AddView(STGGame.IView newView) {
         var index = GameComponentsLookup.View;
         var component = (STGU3D.ViewComponent)CreateComponent(index, typeof(STGU3D.ViewComponent));
         component.view = newView;
-        component.isEditor = newIsEditor;
         AddComponent(index, component);
     }
 
-    public void ReplaceView(STGGame.IView newView, bool newIsEditor) {
+    public void ReplaceView(STGGame.IView newView) {
         var index = GameComponentsLookup.View;
         var component = (STGU3D.ViewComponent)CreateComponent(index, typeof(STGU3D.ViewComponent));
         component.view = newView;
-        component.isEditor = newIsEditor;
         ReplaceComponent(index, component);
     }
 

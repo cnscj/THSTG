@@ -41,9 +41,8 @@ namespace STGGame
                 {
                     if (entity.hasTransform)
                     {
-                        entity.transform.position = gameObject.transform.position;
-                        entity.transform.rotation = gameObject.transform.eulerAngles;
-
+                        entity.transform.localPosition = gameObject.transform.position;
+                        entity.transform.localRotation = gameObject.transform.eulerAngles;
                     }
 
                     if (comsList != null)
@@ -56,13 +55,16 @@ namespace STGGame
 
                     if (isLink)
                     {
+                        //标记为编辑器生成的
+                        var editorEntity = entity.CreateComponent<EditorEntityComponent>(GameComponentsLookup.EditorEntity);
+                        entity.AddComponent(GameComponentsLookup.EditorEntity, editorEntity);
+
                         //直接作为Node节点
                         if (entity.hasView)
                         {
                             var unityView = entity.view.view as UnityView;
                             if (unityView != null)
                             {
-                                entity.view.isEditor = true;
                                 unityView.node = gameObject;    //因此node在此前必须为null
                             }
                         }

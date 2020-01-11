@@ -46,7 +46,6 @@ namespace STGU3D
                 //复用bug,会把正在用的清掉
                 //com.view.Clear();
             }
-            com.isEditor = false;
             com.view = null;
             
         }
