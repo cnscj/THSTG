@@ -48,7 +48,7 @@ namespace STGU3D
 
         private void MobDie(GameEntity entity)
         {
-            if (entity.isMobData)
+            if (entity.hasMobData)
             {
                 //玩家死亡,播放特效,并移除实体
                 EffectManager.GetInstance().PlayOnce(ConstVars.MOB_DIE_FX_CODE, null, entity.transform.position);

@@ -4,7 +4,7 @@ namespace STGU3D
     [Game]
     public class HealthComponent : IComponent
     {
-        public float maxNearDeathTime = 1f;             //最大频死时间
+        public float maxNearDeathTime = 0f;             //最大频死时间
         public int maxBlood = 100;                      //最大生命值
 
         public int blood = 100;                         //当前生命值

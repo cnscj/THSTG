@@ -11,17 +11,19 @@ public partial class GameEntity {
     public STGU3D.BossDataComponent bossData { get { return (STGU3D.BossDataComponent)GetComponent(GameComponentsLookup.BossData); } }
     public bool hasBossData { get { return HasComponent(GameComponentsLookup.BossData); } }
 
-    public void AddBossData(STGU3D.EBossType newBossType) {
+    public void AddBossData(STGU3D.EBossType newBossType, DG.Tweening.Tween newFlashTween) {
         var index = GameComponentsLookup.BossData;
         var component = (STGU3D.BossDataComponent)CreateComponent(index, typeof(STGU3D.BossDataComponent));
         component.bossType = newBossType;
+        component.flashTween = newFlashTween;
         AddComponent(index, component);
     }
 
-    public void ReplaceBossData(STGU3D.EBossType newBossType) {
+    public void ReplaceBossData(STGU3D.EBossType newBossType, DG.Tweening.Tween newFlashTween) {
         var index = GameComponentsLookup.BossData;
         var component = (STGU3D.BossDataComponent)CreateComponent(index, typeof(STGU3D.BossDataComponent));
         component.bossType = newBossType;
+        component.flashTween = newFlashTween;
         ReplaceComponent(index, component);
     }
 

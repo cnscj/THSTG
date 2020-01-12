@@ -33,6 +33,17 @@ namespace STGU3D
         }
 
         //颜色改变
+        public Color GetColor()
+        {
+            if (materials != null)
+            {
+                foreach (var material in materials)
+                {
+                    return material.GetColor(NAME_COLOR);
+                }
+            }
+            return Color.black;
+        }
         public void SetColor(Color color)
         {
             if (materials != null)
@@ -40,6 +51,31 @@ namespace STGU3D
                 foreach (var material in materials)
                 {
                     material.SetColor(NAME_COLOR, color);
+                }
+            }
+        }
+
+        //透明度
+        public float GetAlpha()
+        {
+            if (materials != null)
+            {
+                foreach (var material in materials)
+                {
+                    return material.color.a;
+                }
+            }
+            return 0;
+        }
+        public void SetAlpha(float color)
+        {
+            if (materials != null)
+            {
+                foreach (var material in materials)
+                {
+                    var oldColor = material.color;
+                    oldColor.a = color;
+                    material.color = oldColor;
                 }
             }
         }
@@ -58,10 +94,21 @@ namespace STGU3D
                     else
                     {
                         material.SetFloat(NAME_GRAY, 0f);
-                    }
-                    
+                    } 
                 }
             }
+        }
+
+        public bool GetGray()
+        {
+            if (materials != null)
+            {
+                foreach (var material in materials)
+                {
+                    return material.GetFloat(NAME_GRAY) >= 1 ? true : false;
+                }
+            }
+            return false;
         }
 
         //外发光(轮廓光

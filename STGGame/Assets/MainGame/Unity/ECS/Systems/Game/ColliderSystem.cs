@@ -83,13 +83,13 @@ namespace STGU3D
             OnHeroBulletCollde(owner, content);
         }
 
+        ///////////////////////////////////
         private void OnHeroCollide(GameEntity owner, ColliderContent content)
         {
             if (owner.hasPlayerData)
             {
                 var ownerEntity = content.owner.data as GameEntity;
                 ownerEntity.health.blood = 0;
-                Debug.Log("主角机发生碰撞");
             }
         }
 
@@ -101,30 +101,32 @@ namespace STGU3D
                 foreach(var collision in content.collisions)
                 {
                     var otherEntity = collision.Key.data as GameEntity;
-                    
-                    if (otherEntity.isMobData)
-                    {
-                        if(otherEntity.hasHealth)
-                        {
-                            //TODO:
-                            otherEntity.health.blood -= 20;
-                        }
-                    }
-                    else if (otherEntity.hasBossData)
-                    {
-                        if (otherEntity.hasHealth)
-                        {
-                            //TODO:
-                            otherEntity.health.blood -= 20;
-                        }
-                    }
 
+                    if (otherEntity.hasHealth)
+                    {
+                        if (otherEntity.hasMobData)
+                        {
+                            //TODO:
+                            otherEntity.health.blood -= 20;
+                            otherEntity.ReplaceComponent(GameComponentsLookup.Health, otherEntity.health);
+                        }
+                        else if (otherEntity.hasBossData)
+                        {
+                            //TODO:
+                            otherEntity.health.blood -= 20;
+                            otherEntity.ReplaceComponent(GameComponentsLookup.Health, otherEntity.health);
+                        }
+
+                    }
+                    
+                    //自己的
                     if (ownerEntity.hasHealth)
                     {
                         //TODO:根据不同子弹处理,如穿甲弹不应该消亡
                         ownerEntity.health.blood = 0;   //子弹直接消亡
+
                         if (ownerEntity.health.blood <=0 )
-                            break;
+                            break; 
                     }
                 }
 

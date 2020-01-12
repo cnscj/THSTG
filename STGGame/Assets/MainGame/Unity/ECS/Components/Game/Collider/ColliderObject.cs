@@ -70,19 +70,20 @@ namespace STGU3D
         }
 
         //碰撞检测
-        public void Collide(ColliderObject bObj, Vector3 bPos)
+        public bool Collide(ColliderObject bObj, Vector3 bPos)
         {
             ColliderObject aObj = this;
 
             if (aObj == null || bObj == null)
-                return;
+                return false;
 
             if (aObj.m_shapes == null || bObj.m_shapes == null)
-                return;
+                return false;
 
+            bool isCollide = false;
             {
                 bObj.center = bPos;
-
+                
                 foreach (var aShape in aObj.m_shapes)
                 {
                     foreach (var bShape in bObj.m_shapes)
@@ -92,12 +93,14 @@ namespace STGU3D
                             m_result.collisions = m_result.collisions ?? new Dictionary<ColliderObject, List<ColliderShape>>();
                             if (!m_result.collisions.ContainsKey(bObj)) m_result.collisions[bObj] = new List<ColliderShape>();
                             m_result.collisions[bObj].Add(bShape);
-
+                            isCollide = true;
                         }
                     }
                 }
 
             }
+
+            return isCollide;
         }
 
         //返回结果

@@ -39,10 +39,13 @@ namespace STGGame
                 var entity = EntityManager.GetInstance().CreateEntity(entityCode);
                 if (entity != null)
                 {
-                    if (entity.hasTransform)
+                    var transCom = (TransformComponent)entity.GetComponent(GameComponentsLookup.Transform);
+                    if (transCom != null)
                     {
-                        entity.transform.localPosition = gameObject.transform.position;
-                        entity.transform.localRotation = gameObject.transform.eulerAngles;
+                        transCom.localPosition = gameObject.transform.position;
+                        transCom.localRotation = gameObject.transform.eulerAngles;
+
+                        entity.ReplaceComponent(GameComponentsLookup.Transform, transCom);
                     }
 
                     if (comsList != null)

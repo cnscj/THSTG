@@ -46,6 +46,7 @@ namespace STGU3D
                 var bulletFactory = EntityManager.GetInstance().GetOrNewEntityFactory(EEntityType.Bullet).AsBullet();
                 var bulletEntity = bulletFactory.CreateBullet(ECampType.Hero, shotEntity.entityData.entityData["bulletCode"]);
                 bulletEntity.transform.localPosition = shotEntity.transform.localPosition;
+                bulletEntity.ReplaceComponent(GameComponentsLookup.Transform, bulletEntity.transform);
             }
         }
     }

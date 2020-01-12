@@ -8,25 +8,25 @@
 //------------------------------------------------------------------------------
 public partial class GameEntity {
 
-    static readonly STGU3D.MobDataComponent mobDataComponent = new STGU3D.MobDataComponent();
+    public STGU3D.MobDataComponent mobData { get { return (STGU3D.MobDataComponent)GetComponent(GameComponentsLookup.MobData); } }
+    public bool hasMobData { get { return HasComponent(GameComponentsLookup.MobData); } }
 
-    public bool isMobData {
-        get { return HasComponent(GameComponentsLookup.MobData); }
-        set {
-            if (value != isMobData) {
-                var index = GameComponentsLookup.MobData;
-                if (value) {
-                    var componentPool = GetComponentPool(index);
-                    var component = componentPool.Count > 0
-                            ? componentPool.Pop()
-                            : mobDataComponent;
+    public void AddMobData(DG.Tweening.Tween newFlashTween) {
+        var index = GameComponentsLookup.MobData;
+        var component = (STGU3D.MobDataComponent)CreateComponent(index, typeof(STGU3D.MobDataComponent));
+        component.flashTween = newFlashTween;
+        AddComponent(index, component);
+    }
 
-                    AddComponent(index, component);
-                } else {
-                    RemoveComponent(index);
-                }
-            }
-        }
+    public void ReplaceMobData(DG.Tweening.Tween newFlashTween) {
+        var index = GameComponentsLookup.MobData;
+        var component = (STGU3D.MobDataComponent)CreateComponent(index, typeof(STGU3D.MobDataComponent));
+        component.flashTween = newFlashTween;
+        ReplaceComponent(index, component);
+    }
+
+    public void RemoveMobData() {
+        RemoveComponent(GameComponentsLookup.MobData);
     }
 }
 

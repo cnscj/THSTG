@@ -2,6 +2,7 @@
 using System;
 using ASGame;
 using UnityEngine;
+using XLibGame;
 using XLibrary.Package;
 
 namespace STGU3D
@@ -18,18 +19,27 @@ namespace STGU3D
         /// <param name="onComplete"></param>
         public void PlayOnce(string code, GameObject hangNode, Vector3 position, Action onCompleted = null)
         {
-            GameObject prefab = AssetManager.GetInstance().LoadEffect(code);
-            if (prefab)
+            var pool = GameObjectPoolManager.GetInstance().GetGameObjectPool(code);
+            if (pool == null)
             {
-                var fxGO = UnityEngine.Object.Instantiate(prefab, hangNode?.transform, false);
+                GameObject prefab = AssetManager.GetInstance().LoadEffect(code);
+                pool = GameObjectPoolManager.GetInstance().NewGameObjectPool(code, prefab,10);
+            }
+            var fxGO = pool.Get();
+            if (fxGO)
+            {
                 fxGO.transform.position = position;
+                if (hangNode != null)
+                {
+                    fxGO.transform.SetParent(hangNode.transform, false);
+                }
                 var fxLenMono = fxGO.GetComponent<EffectLengthMono>();
                 if (fxLenMono != null)
                 {
                     fxLenMono.onCompleted = () =>
                     {
                         onCompleted?.Invoke();
-                        UnityEngine.Object.Destroy(fxGO);
+                        GameObjectPoolManager.GetInstance().ReleaseGameObject(fxGO);
                     };
                 }
             }

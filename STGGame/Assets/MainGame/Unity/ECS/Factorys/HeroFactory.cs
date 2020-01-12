@@ -71,6 +71,7 @@ namespace STGU3D
                 }
 
                 {
+                    entity.health.maxNearDeathTime = 1f;
                     entity.health.blood = entity.health.maxBlood;
                     entity.health.trueDeathTime = -1f;
                     entity.health.isTrueDied = false;

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DG.Tweening;
 using Entitas;
 using UnityEngine;
 
@@ -63,7 +64,8 @@ namespace STGU3D
         //受伤
         public void Hurt(GameEntity entity)
         {
-            Debug.Log("受伤");
+            MobHurt(entity);
+            BossHurt(entity);
         }
 
         protected override void Execute(List<GameEntity> entities)
@@ -127,6 +129,27 @@ namespace STGU3D
                 }
                 entity.health.prevBlood = entity.health.blood;
 
+            }
+        }
+
+        //////////////
+        public void MobHurt(GameEntity entity)
+        {
+            if (entity.hasMobData)
+            {
+                //只保留1个
+                string sUID = string.Format("flash_%s", entity.creationIndex);
+                DotweenManager.GetInstance().Kill(sUID);
+                DotweenManager.GetInstance().PlayFlash(entity, 8, 0.5f).SetId(sUID);
+                
+            }
+        }
+
+        public void BossHurt(GameEntity entity)
+        {
+            if (entity.hasBossData)
+            {
+                DotweenManager.GetInstance().PlayFlash(entity, 10, 2);
             }
         }
     }

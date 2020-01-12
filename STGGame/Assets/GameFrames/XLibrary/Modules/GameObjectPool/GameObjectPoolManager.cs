@@ -144,9 +144,9 @@ namespace XLibGame
         /// <param name="poolName"></param>
         public void DestroyGameObjectPool(string poolName)
         {
-            if (m_poolDic.ContainsKey(poolName))
+            if (m_poolDic.TryGetValue(poolName, out var pool))
             {
-                m_poolDic[poolName].Destroy();
+                pool.Destroy();
                 m_poolDic.Remove(poolName);
             }
         }
@@ -158,7 +158,11 @@ namespace XLibGame
         /// <returns></returns>
         public GameObjectPool GetGameObjectPool(string poolName)
         {
-            return m_poolDic[poolName];
+            if (m_poolDic.TryGetValue(poolName,out var pool))
+            {
+                return pool;
+            }
+            return null;
         }
 
         /// <summary>

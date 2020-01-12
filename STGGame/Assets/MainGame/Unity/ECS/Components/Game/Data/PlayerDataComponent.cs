@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using DG.Tweening;
 using Entitas;
 using UnityEngine;
 
@@ -12,6 +13,7 @@ namespace STGU3D
 
         public GameEntity []wingmans;
         public float moveSpeed;
+        public Tween flashTween;
     }
 
 }
