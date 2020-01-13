@@ -12,32 +12,53 @@ namespace STGU3D
         public static readonly string NAME_GRAY = "_Gray";
 
         //所有渲染器
-        public List<Material> materials ;
+        private List<Material> m_materials;
+        private Queue<Renderer> m_prepareRenderer;
 
         public void Add(GameObject go)
         {
             if (go == null)
                 return;
 
-            materials = materials ?? new List<Material>();
-            foreach(var renderer in go.GetComponentsInChildren<Renderer>())
+            m_prepareRenderer = m_prepareRenderer ?? new Queue<Renderer>();
+            foreach (var renderer in go.GetComponentsInChildren<Renderer>())
             {
-#if UNITY_EDITOR
-                materials.AddRange(renderer.materials);
-#else
-                //编辑模式下这行代码会修改到源文件
-                materials.AddRange(renderer.sharedMaterials);
-#endif
+                m_prepareRenderer.Enqueue(renderer);
             }
 
+        }
+
+        public List<Material> GetMaterials()
+        {
+            if (m_prepareRenderer == null)
+                return m_materials;
+
+            if (m_prepareRenderer.Count <= 0)
+                return m_materials;
+
+            m_materials = m_materials ?? new List<Material>();
+            while (m_prepareRenderer.Count > 0)
+            {
+                var renderer = m_prepareRenderer.Dequeue();
+                var tempMaterials = new List<Material>();
+                foreach (var material in renderer.sharedMaterials)
+                {
+                    var newMaterial = Object.Instantiate(material);
+                    tempMaterials.Add(newMaterial);
+                }
+                renderer.sharedMaterials = tempMaterials.ToArray();    //实例化一份新的Material
+                m_materials.AddRange(renderer.sharedMaterials);
+            }
+
+            return m_materials;
         }
 
         //颜色改变
         public Color GetColor()
         {
-            if (materials != null)
+            if (GetMaterials() != null)
             {
-                foreach (var material in materials)
+                foreach (var material in GetMaterials())
                 {
                     return material.GetColor(NAME_COLOR);
                 }
@@ -46,9 +67,9 @@ namespace STGU3D
         }
         public void SetColor(Color color)
         {
-            if (materials != null)
+            if (GetMaterials() != null)
             {
-                foreach (var material in materials)
+                foreach (var material in GetMaterials())
                 {
                     material.SetColor(NAME_COLOR, color);
                 }
@@ -58,9 +79,9 @@ namespace STGU3D
         //透明度
         public float GetAlpha()
         {
-            if (materials != null)
+            if (GetMaterials() != null)
             {
-                foreach (var material in materials)
+                foreach (var material in GetMaterials())
                 {
                     return material.color.a;
                 }
@@ -69,9 +90,9 @@ namespace STGU3D
         }
         public void SetAlpha(float color)
         {
-            if (materials != null)
+            if (GetMaterials() != null)
             {
-                foreach (var material in materials)
+                foreach (var material in GetMaterials())
                 {
                     var oldColor = material.color;
                     oldColor.a = color;
@@ -83,9 +104,9 @@ namespace STGU3D
         //灰显
         public void SetGray(bool val)
         {
-            if (materials != null)
+            if (GetMaterials() != null)
             {
-                foreach(var material in materials)
+                foreach(var material in GetMaterials())
                 {
                     if (val)
                     {
@@ -101,9 +122,9 @@ namespace STGU3D
 
         public bool GetGray()
         {
-            if (materials != null)
+            if (GetMaterials() != null)
             {
-                foreach (var material in materials)
+                foreach (var material in GetMaterials())
                 {
                     return material.GetFloat(NAME_GRAY) >= 1 ? true : false;
                 }

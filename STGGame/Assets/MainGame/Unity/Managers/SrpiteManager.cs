@@ -39,10 +39,8 @@ namespace STGU3D
                 if (!GameObjectPoolManager.GetInstance().HasGameObjectPool(viewCode))
                 {
                     var prefab = AssetManager.GetInstance().LoadSprite(viewCode);
-                    if (prefab)
-                    {
-                        GameObjectPoolManager.GetInstance().NewGameObjectPool(viewCode, prefab, maxCount);
-                    }
+                    GameObjectPoolManager.GetInstance().NewGameObjectPool(viewCode, prefab, maxCount);
+                    
                 }
                 prefabInstance = GameObjectPoolManager.GetInstance().GetGameObject(viewCode);
             }
@@ -60,7 +58,7 @@ namespace STGU3D
             if (!string.IsNullOrEmpty(viewName))
             {
                 viewGO = new GameObject(viewName);
-                prefabInstance.transform.SetParent(viewGO.transform);
+                prefabInstance.transform.SetParent(viewGO.transform, false);
             }
             else
             {

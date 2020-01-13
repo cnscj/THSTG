@@ -14,7 +14,7 @@ namespace STGU3D
                 GameMatcher.AllOf(
                     GameMatcher.Transform,
                     GameMatcher.Movement
-                ));
+                ).NoneOf(GameMatcher.EditorEntity));
         }
 
         public void Execute()

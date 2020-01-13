@@ -9,8 +9,6 @@ namespace ASEditor
 {
     public static class EffectLevelEditTools
     {
-
-
         public static void ChangEffectLevel(int level)
         {
             if (Selection.transforms.Length > 0)
