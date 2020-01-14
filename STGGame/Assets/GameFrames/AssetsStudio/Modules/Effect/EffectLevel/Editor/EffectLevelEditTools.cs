@@ -105,6 +105,12 @@ namespace ASEditor
                 {
                     GameObject newGO = GameObject.Instantiate(srcGO);
 
+                    var levelCtrl = newGO.GetComponent<EffectLevelController>();
+                    if (!levelCtrl) levelCtrl = newGO.AddComponent<EffectLevelController>();
+                    levelCtrl.level = ridLv;
+                    levelCtrl.nodeList = (levelCtrl.nodeList != null) ? levelCtrl.nodeList : new List<EffectLevelController.EffectLevelInfo>();
+                    levelCtrl.nodeList.Clear();
+
                     foreach (var node in newGO.GetComponentsInChildren<Transform>(true))
                     {
                         int nodeLv = EffectLevelUtil.GetEffectLevel(node.gameObject);
@@ -116,7 +122,14 @@ namespace ASEditor
                             }
                             else
                             {
+                                var info = new EffectLevelController.EffectLevelInfo();
+                                info.node = node.gameObject;
+                                info.level = nodeLv;
+
+                                levelCtrl.nodeList.Add(info);
+
                                 EffectLevelUtil.ResetEffectLevel(node.gameObject);
+
                             }
                         }
                     }
@@ -142,89 +155,6 @@ namespace ASEditor
                     string saveName = Path.Combine(finalPath, string.Format("{0}_{1:D2}.prefab", effectId, i));
                     SavePrefabByLevel(srcGO, saveName, i);
                 }
-            }
-
-        }
-        //补丁包的形式-配合EffectLevelController
-        public static void SaveAllLevelPrefabs2(GameObject srcGO, string savePath)
-        {
-            if (srcGO)
-            {
-                string effectId = XStringTools.SplitPathId(srcGO.name);
-                GameObject newGO = GameObject.Instantiate(srcGO);
-
-                Dictionary<int, List<GameObject>> nodeMap = new Dictionary<int, List<GameObject>>();
-                foreach (var effectGO in newGO.GetComponentsInChildren<Transform>())
-                {
-                    if (effectGO.gameObject == newGO) continue;     //不包括头结点
-                    int effectLv = EffectLevelUtil.GetEffectLevel(effectGO.gameObject);
-                    if (effectLv == -1)
-                    {
-                        effectLv = EffectLevelUtil.defaultLv;
-                    }
-                    if (effectLv >= EffectLevelUtil.defaultLv && effectLv <= EffectLevelUtil.maxLevel)
-                    {
-                        List<GameObject> list = null;
-                        if (nodeMap.ContainsKey(effectLv))
-                        {
-                            list = nodeMap[effectLv];
-                        }
-                        else
-                        {
-                            list = new List<GameObject>();
-                            nodeMap.Add(effectLv, list);
-                        }
-                        list.Add(effectGO.gameObject);
-                    }
-                    else
-                    {
-                        EffectLevelUtil.ResetEffectLevel(effectGO.gameObject);
-                    }
-
-                }
-                foreach (var pair in nodeMap)
-                {
-                    int level = pair.Key;
-                    for (int i = 0; i < pair.Value.Count; i++)
-                    {
-                        pair.Value[i].name = string.Format("{0:D2}_{1}", level, i);
-                    }
-
-                }
-                string finalPath = Path.Combine(savePath, effectId);
-                if (!XFolderTools.Exists(finalPath))
-                {
-                    XFolderTools.CreateDirectory(finalPath);
-                }
-                var ctrl = newGO.AddComponent<EffectLevelController>();
-                ctrl.metadataList = new List<EffectLevelMetadata>();
-
-                for (int i = EffectLevelUtil.maxLevel; i >= EffectLevelUtil.defaultLv; i--)
-                {
-                    if (nodeMap.ContainsKey(i))
-                    {
-                        EffectLevelMetadata newData = new EffectLevelMetadata();
-                        newData.effectList = new List<string>();
-                        newData.level = i;
-                        foreach (var effect in nodeMap[i])
-                        {
-                            newData.effectList.Add(XMiscTools.GetGameObjectPath(effect, newGO));
-                        }
-                        string packName = string.Format("{0}_{1:D2}", effectId, i);
-                        GameObject levelPack = new GameObject(packName);
-                        foreach (var effect in nodeMap[i])
-                        {
-                            effect.transform.SetParent(levelPack.transform);
-                        }
-                        PrefabUtility.SaveAsPrefabAsset(levelPack, Path.Combine(finalPath, packName + ".prefab"));
-                        Object.DestroyImmediate(levelPack);
-
-                        ctrl.metadataList.Add(newData);
-                    }
-                }
-                ctrl.metadataList.Reverse();
-                PrefabUtility.SaveAsPrefabAsset(newGO, Path.Combine(savePath, string.Format("{0}.prefab", effectId)));
-                Object.DestroyImmediate(newGO);
             }
 
         }

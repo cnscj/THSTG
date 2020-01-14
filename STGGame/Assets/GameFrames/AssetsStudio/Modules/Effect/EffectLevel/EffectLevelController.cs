@@ -1,90 +1,111 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using XLibrary;
 
 namespace ASGame
 {
-    [System.Serializable]
+
     public class EffectLevelController : MonoBehaviour
     {
-        public List<EffectLevelMetadata> metadataList;       //数据源
-
-        public void SetupPacks(GameObject[] packs)
+        [System.Serializable]
+        public class EffectLevelInfo
         {
-            for (int i = 0; i < packs.Length; i++)
+            public GameObject node;
+            public int level;
+        }
+        public string code;
+        public int level;   //当前级别,受升级影响
+        public List<EffectLevelInfo> nodeList;
+
+        public void Change(int lv, GameObject prefab = null)
+        {
+            if (lv > level)
             {
-                int level = EffectLevelUtil.GetEffectLevel(packs[i]);
-                if (level == metadataList[i].level)
+                Upgrade(lv, prefab);
+            }
+            else if (lv < level)
+            {
+                Demote(lv);
+            }
+        }
+
+        public void Demote(int lv)
+        {
+            //直接隐藏完事
+            lv = FixLevel(lv);
+
+            if (lv == level)
+                return;
+
+            if (nodeList != null)
+            {
+                foreach (var fxPair in nodeList)
                 {
-                    GameObject pack = packs[i];
-                    for(int j = 0; j< metadataList[i].effectList.Count; j++)
+                    var fxNode = fxPair.node;
+                    var fxNodeLv = fxPair.level;
+                    if (fxNodeLv > lv)
                     {
-                        string path = metadataList[i].effectList[j];
-                        Transform effectNode = pack.transform.GetChild(j);
-                        if (effectNode)
-                        {
-                            string fatherPath = GetParentPath(path);
-                            if (fatherPath != "")
-                            {
-                                Transform fatherNode = gameObject.transform.Find(fatherPath);
-                                if (fatherNode)
-                                {
-                                    var go = GameObject.Instantiate(effectNode.gameObject, fatherNode, false);
-                                    go.name = go.name.Replace("(Clone)", "");
-                                }
-                            }
-                            else
-                            {
-                                var go = GameObject.Instantiate(effectNode.gameObject, gameObject.transform,false);
-                                go.name = go.name.Replace("(Clone)", "");
-                            }
-                        }
+                        fxNode.SetActive(false);
                     }
                 }
             }
-          
+
+
+            level = lv;
         }
 
-        public void UninstallPack(int limitLv)
+        public void Upgrade(int lv, GameObject prefab)
         {
-            for (int i = metadataList.Count - 1; i >= 0; i--)
+            lv = FixLevel(lv);
+
+            if (lv == level)
+                return;
+
+            if (prefab == null)
+                return;
+
+            var ctrl = prefab.GetComponent<EffectLevelController>();
+            if (ctrl == null)
+                return;
+
+            //填充
+            XGameObjectTools.UnionGameObject(gameObject, prefab, (fxGO) =>
             {
-                int packLv = metadataList[i].level;
-                if (packLv > limitLv)
+                //新或旧的节点
+                fxGO.SetActive(true);
+            });
+
+
+            //更新节点信息
+            if (ctrl.nodeList != null)
+            {
+                nodeList = (nodeList != null) ? nodeList : new List<EffectLevelInfo>();
+                nodeList.Clear();
+                foreach (var fxPair in ctrl.nodeList)
                 {
-                    foreach(var childPath in metadataList[i].effectList)
+                    var fxNodePath = XGameObjectTools.GetPathByGameObject(fxPair.node, prefab);
+                    var newNode = XGameObjectTools.GetGameObjectByPath(gameObject, fxNodePath);
+                    if (newNode != null)
                     {
-                        Transform childNode = gameObject.transform.Find(childPath);
-                        if (childNode)
-                        {
-                            Destroy(childNode.gameObject);
-                        }
+                        var info = new EffectLevelInfo();
+                        info.node = newNode;
+                        info.level = fxPair.level;
+
+                        nodeList.Add(info);
                     }
                 }
             }
+
+            level = lv;
         }
 
-        private void Start()
+        private int FixLevel(int lv)
         {
-            EffectLevelManager.instance.levelChangedCallback += OnLimitLevelChanged;
-        }
-        private void OnDestroy()
-        {
-            EffectLevelManager.instance.levelChangedCallback -= OnLimitLevelChanged;
-        }
+            int okLv = lv;
+            okLv = Mathf.Min(10, okLv);
+            okLv = Mathf.Max(1, okLv);
 
-        private void OnLimitLevelChanged(int val)
-        {
-
-        }
-        private string GetParentPath(string childPath)
-        {
-            string fatherPath = "";
-            int index = childPath.LastIndexOf("/", System.StringComparison.Ordinal);
-            if (index >= 0)
-            {
-                fatherPath = childPath.Remove(index);
-            }
-            return fatherPath;
+            return okLv;
         }
     }
 }
