@@ -1,16 +1,11 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System;
-using System.Collections.Generic;
-using UnityEngine.Events;
 
 namespace THGame
 {
     public class ObjectEmitter : MonoBehaviour
     {
-        private static readonly ObjectEmitListener defaultLaunchListener = new ObjectEmitListener();
-
-        private static ObjectEmitListener launchListener = defaultLaunchListener;
+        public string launchName;
         public GameObject[] launchEntities;
         public GameObject launchParent;
         public GameObject launchRelative;
@@ -50,18 +45,34 @@ namespace THGame
         public ObjectEmitCustom launchCustomCallback;
 
         //
+        private bool m_isCanEmit = true;
         private float m_nextTime;
-        private System.Random m_rd = new System.Random();
         private ObjectEmitCreateParams m_objectEmitCreateParams = new ObjectEmitCreateParams();
         private ObjectEmitCalculateParams m_objectEmitCalculateParams = new ObjectEmitCalculateParams();
         private ObjectEmitLaunchParams m_objectEmitLaunchParams = new ObjectEmitLaunchParams();
         private ObjectEmitCalculateResult m_objectEmitCalculateResult = new ObjectEmitCalculateResult();
 
-        public static void ReplaceListener(ObjectEmitListener listener)
+        public void Emit()
         {
-            launchListener = (listener == null ? defaultLaunchListener : listener);
+            Launch();
         }
 
+        public void Kill()
+        {
+            Destroy(this);
+        }
+
+        public void Pause()
+        {
+            m_isCanEmit = false;
+        }
+
+        public void Resume()
+        {
+            m_isCanEmit = true;
+        }
+
+        //
         void Awake()
         {
             launchRelative = launchRelative != null ? launchRelative : gameObject;
@@ -69,17 +80,23 @@ namespace THGame
 
         void Start()
         {
-            //m_nextTime = Time.time + launchFreq;
-            
+            ObjectEmitManager.GetInstance().AddEmitter(this, launchName);
+        }
+
+        void OnDestroy()
+        {
+            ObjectEmitManager.GetInstance().RemoveEmitter(this);
         }
 
         void OnEnable()
         {
-            if (enabled)
-            {
-                Launch();
-                m_nextTime = Time.time + launchFreq;
-            }
+            Launch();
+            m_nextTime = Time.time + launchFreq;
+        }
+
+        void OnDisable()
+        {
+            
         }
 
         void Update()
@@ -100,6 +117,9 @@ namespace THGame
         }
         void Launch()
         {
+            if (!m_isCanEmit)
+                return;
+
             if (launchEntities.Length > 0)
             {
                 int index = 0;
@@ -117,7 +137,7 @@ namespace THGame
                             {
                                 if (!isNeedIndex) break;
                                 if (launchOrderOrderlyByTimes) isNeedIndex = false;
-                                index = m_rd.Next(0, launchEntities.Length);//随机函数,从中取一个
+                                index = ObjectEmitManager.GetInstance().GetRandom().Next(0, launchEntities.Length);//随机函数,从中取一个
                             }
                             break;
                         case EObjectEmitCreateOrderType.Fixed:
@@ -141,7 +161,7 @@ namespace THGame
                     m_objectEmitCalculateResult.startMoveSpeed = Vector3.zero;
 
                     ///
-                    m_objectEmitLaunchParams.createResult = launchListener.OnCreate(m_objectEmitCreateParams);
+                    m_objectEmitLaunchParams.createResult = ObjectEmitManager.GetInstance().GetHandler().OnCreate(m_objectEmitCreateParams);
                     m_objectEmitLaunchParams.calculateResult = OnCalculate(m_objectEmitCalculateParams, ref m_objectEmitCalculateResult);
 
                     //发射前的校验
@@ -157,7 +177,7 @@ namespace THGame
                         m_objectEmitLaunchParams.calculateResult.startAngleSpeed.z = 0;
                     }
 
-                    launchListener.OnLaunch(m_objectEmitLaunchParams);
+                    ObjectEmitManager.GetInstance().GetHandler().OnLaunch(m_objectEmitLaunchParams);
                 }
             }
             launchTimes--;
@@ -202,8 +222,8 @@ namespace THGame
                         //随机位置
                         float minR = args.emitter.launchRandomMinRadius;
                         float maxR = args.emitter.launchRandomMaxRadius;
-                        float r = m_rd.Next((int)(minR * 100), (int)((maxR * 100) + 1)) / 100f;
-                        float angle = m_rd.Next(0, 361) * Mathf.Deg2Rad;
+                        float r = ObjectEmitManager.GetInstance().GetRandom().Next((int)(minR * 100), (int)((maxR * 100) + 1)) / 100f;
+                        float angle = ObjectEmitManager.GetInstance().GetRandom().Next(0, 361) * Mathf.Deg2Rad;
                         float rX = r * Mathf.Cos(angle);
                         float rY = r * Mathf.Sin(angle);
                         result.startPosition.x = rX;

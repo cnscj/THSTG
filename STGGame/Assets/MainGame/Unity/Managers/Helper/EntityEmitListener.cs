@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace STGU3D
 {
-    public class EntityEmitListener : ObjectEmitListener
+    public class EntityEmitListener : ObjectEmitHandler
     {
         //实例创建
         public override ObjectEmitCreateResult OnCreate(ObjectEmitCreateParams args)

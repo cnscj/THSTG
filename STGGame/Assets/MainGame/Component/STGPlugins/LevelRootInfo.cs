@@ -1,11 +1,19 @@
 ﻿
+using THGame;
 using UnityEngine;
 
 namespace STGGame
 {
     public class LevelRootInfo : MonoBehaviour
     {
+        public int randomRoot;  //随机数种子
         public Rect region;
+
+
+        private void Awake()
+        {
+            ObjectEmitManager.GetInstance().UpdateRandom(randomRoot);
+        }
 
         //绘制一个安全框,确保美术K帧不超过这个区域
         private void OnDrawGizmos()

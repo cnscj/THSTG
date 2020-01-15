@@ -113,6 +113,7 @@ namespace THEditor
             m_editor = (ObjectEmitter)target;
             Clear();
 
+            AddPropertys(normalProps, "发射器名字", "launchName");
             AddPropertys(normalProps, "发射实体队列", "launchEntities");
             AddPropertys(normalProps, "发射父节点", "launchParent");
             AddPropertys(normalProps, "发射相对节点", "launchRelative");

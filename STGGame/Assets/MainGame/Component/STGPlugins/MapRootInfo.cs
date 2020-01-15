@@ -5,7 +5,7 @@ namespace STGGame
 {
     public class MapRootInfo : MonoBehaviour
     {
-        public Rect region;
+        public Rect region;     //可视区域
 
         //绘制一个安全框,确保美术K帧不超过这个区域
         private void OnDrawGizmos()

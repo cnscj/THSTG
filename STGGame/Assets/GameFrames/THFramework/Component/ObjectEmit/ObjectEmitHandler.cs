@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace THGame
 {
-    public class ObjectEmitListener
+    public class ObjectEmitHandler
     {
         //实例创建
         public virtual ObjectEmitCreateResult OnCreate(ObjectEmitCreateParams args)
