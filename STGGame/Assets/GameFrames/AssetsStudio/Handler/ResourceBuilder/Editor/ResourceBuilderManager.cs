@@ -84,12 +84,12 @@ namespace ASEditor
                 if (ResourceBuilderConfig.GetInstance().targetType == ResourceBuilderConfig.BuildPlatform.Auto)
                 {
                     string buildPlatformStr = Enum.GetName(typeof(BuildTarget), buildPlatform);
-                    finalExportFolder = PathUtil.Combine(exportFolder, buildPlatformStr).Replace("\\", "/");
+                    finalExportFolder = XPathTools.Combine(exportFolder, buildPlatformStr).Replace("\\", "/");
                 }
                 else
                 {
                     string buildPlatformStr = Enum.GetName(typeof(ResourceBuilderConfig.BuildPlatform), ResourceBuilderConfig.GetInstance().targetType);
-                    finalExportFolder = PathUtil.Combine(exportFolder, buildPlatformStr).Replace("\\", "/");
+                    finalExportFolder = XPathTools.Combine(exportFolder, buildPlatformStr).Replace("\\", "/");
                 }
 
             }

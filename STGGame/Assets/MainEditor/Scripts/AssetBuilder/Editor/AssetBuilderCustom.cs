@@ -39,7 +39,7 @@ namespace STGEditor
 
         private string GetRelationPath(string assetPath,string fileName)
         {
-            string relaPath = PathUtil.GetRelativePath(AssetBuilderConfig.tempCustoms, assetPath);
+            string relaPath = XPathTools.GetRelativePath(AssetBuilderConfig.tempCustoms, assetPath);
             string relaRootPath = Path.GetDirectoryName(relaPath);
             return string.Format(AssetBuilderConfig.bundleNameCustoms, string.Format("{0}/{1}", relaRootPath, fileName));
         }

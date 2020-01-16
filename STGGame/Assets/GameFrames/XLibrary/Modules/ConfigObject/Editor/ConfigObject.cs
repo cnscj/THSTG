@@ -7,7 +7,7 @@ namespace XLibEditor
     public class ConfigObject<T> : ScriptableObject where T : ScriptableObject, new()
     {
         public static string resourcePath = "Assets/Resources";
-        public static string configAssetsPath = PathUtil.Combine(resourcePath, string.Format("{0}.asset",typeof(T).Name));
+        public static string configAssetsPath = XPathTools.Combine(resourcePath, string.Format("{0}.asset",typeof(T).Name));
 
         private static T s_asset;
 

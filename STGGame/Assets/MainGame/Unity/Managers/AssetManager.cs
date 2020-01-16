@@ -14,11 +14,11 @@ namespace STGU3D
 
         public static string Combine2BundlePath(EResType resType, string fileName, string assetName)
         {
-            return ResourceLoaderUtil.CombineBundlePath(PathUtil.Combine(ResourceBookConfig.bundleRes, GameConfig.resTypeMap[resType].ToLower(), fileName), assetName);
+            return ResourceLoaderUtil.CombineBundlePath(XPathTools.Combine(ResourceBookConfig.bundleRes, GameConfig.resTypeMap[resType].ToLower(), fileName), assetName);
         }
         public static string Combine2EditPath(EResType resType, string assetName)
         {
-            return PathUtil.Combine(ResourceBookConfig.srcRes, GameConfig.resTypeMap[resType], assetName);
+            return XPathTools.Combine(ResourceBookConfig.srcRes, GameConfig.resTypeMap[resType], assetName);
         }
         public static string Combine2FixPath(EResType resType, string fileName, string assetName)
         {

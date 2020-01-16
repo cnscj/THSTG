@@ -179,7 +179,7 @@ namespace ASEditor
                     string saveOutRootPath = saveRootPath;
                     for (int i = 0; i < subFolders.Length; i++)
                     {
-                        saveOutRootPath = PathUtil.Combine(saveOutRootPath, subFolders[i]);
+                        saveOutRootPath = XPathTools.Combine(saveOutRootPath, subFolders[i]);
                         if (!XFolderTools.Exists(saveOutRootPath))
                         {
                             XFolderTools.CreateDirectory(saveOutRootPath);
@@ -446,7 +446,7 @@ namespace ASEditor
 
                 if (savePath == "")
                 {
-                    savePath = PathUtil.Combine(assetRootPath, string.Format("{0}.json", assetFileNonExtName));
+                    savePath = XPathTools.Combine(assetRootPath, string.Format("{0}.json", assetFileNonExtName));
                 }
                 File.WriteAllText(savePath, jsonStr, Encoding.UTF8);
                 AssetDatabase.Refresh();
@@ -465,7 +465,7 @@ namespace ASEditor
 
             //查看是否有对应的json文件
 
-            string jsonFilePath = PathUtil.Combine(assetRootPath, string.Format("{0}.json", assetFileNonExtName));
+            string jsonFilePath = XPathTools.Combine(assetRootPath, string.Format("{0}.json", assetFileNonExtName));
 
             if (!XFileTools.Exists(jsonFilePath))
             {

@@ -28,7 +28,7 @@ namespace ASGame
         T load<T>(string path) where T : class
         {
 #if UNITY_EDITOR
-            path = PathUtil.NormalizePath(path);
+            path = XPathTools.NormalizePath(path);
 
             string resPath;
             string assetName;

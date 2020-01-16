@@ -38,8 +38,8 @@ namespace ASEditor
 
 
                     string srcPathName = Path.GetFileNameWithoutExtension(buildInfo.srcPath);
-                    string outputAssembly = PathUtil.Combine(buildInfo.buildPath, string.Format("{0}.dll", srcPathName));
-                    string assemblyProjectPath = PathUtil.Combine(buildInfo.projectPath, string.Format("{0}.dll", srcPathName));
+                    string outputAssembly = XPathTools.Combine(buildInfo.buildPath, string.Format("{0}.dll", srcPathName));
+                    string assemblyProjectPath = XPathTools.Combine(buildInfo.projectPath, string.Format("{0}.dll", srcPathName));
                     if (csFilePaths.Count > 0)
                     {
                         if (!XFolderTools.Exists(buildInfo.buildPath))

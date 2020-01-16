@@ -196,11 +196,11 @@ namespace ASEditor
             }
             foreach (var exportRootPath in exportPathList)
             {
-                string ctrlFilePath = PathUtil.Combine(exportRootPath, SpriteEditorTools.controllerName);
+                string ctrlFilePath = XPathTools.Combine(exportRootPath, SpriteEditorTools.controllerName);
 
                 string folderId = ResourceUtil.GetFolderId(exportRootPath);
-                string spriteSavePath = PathUtil.Combine(exportRootPath, string.Format("{0}.prefab", folderId));
-                string materialSavePath = PathUtil.Combine(exportRootPath, string.Format("{0}.mat", folderId));
+                string spriteSavePath = XPathTools.Combine(exportRootPath, string.Format("{0}.prefab", folderId));
+                string materialSavePath = XPathTools.Combine(exportRootPath, string.Format("{0}.mat", folderId));
                 var sprite = SpriteEditorTools.GeneratePrefabFromAnimationControllerFile(ctrlFilePath, spriteSavePath);
                 var material = SpriteEditorTools.GenerateMaterialFromAnimationControllerFile(ctrlFilePath, materialSavePath);
 
@@ -237,9 +237,9 @@ namespace ASEditor
                     //上层目录检查
                     //如果上层有公共的,直接用公共的
                     //如果上层有模板,生成继承控制器
-                    string prevRootPath = PathUtil.GetParentPath(clipRootPath);
-                    string parentCtrl = PathUtil.Combine(prevRootPath, SpriteEditorTools.controllerName);
-                    string parentCtrlTmpl = PathUtil.Combine(prevRootPath, SpriteEditorTools.controllerTmplName);
+                    string prevRootPath = XPathTools.GetParentPath(clipRootPath);
+                    string parentCtrl = XPathTools.Combine(prevRootPath, SpriteEditorTools.controllerName);
+                    string parentCtrlTmpl = XPathTools.Combine(prevRootPath, SpriteEditorTools.controllerTmplName);
                     if (XFileTools.Exists(parentCtrl))
                     {
                         var ctrl = AssetDatabase.LoadAssetAtPath<AnimatorController>(parentCtrl);
@@ -247,13 +247,13 @@ namespace ASEditor
                     }
                     else if (XFileTools.Exists(parentCtrlTmpl))
                     {
-                        string overrideCtrlSavePath = PathUtil.Combine(clipRootPath, SpriteEditorTools.overrideControllerName);
+                        string overrideCtrlSavePath = XPathTools.Combine(clipRootPath, SpriteEditorTools.overrideControllerName);
                         var overrideCtrl = SpriteEditorTools.GenerateAnimationOverrideControllerFromAnimationClipFile("", parentCtrlTmpl, overrideCtrlSavePath);
                         SpriteEditorTools.SetupOverrideMotion(overrideCtrl, clip);
                     }
                     else
                     {
-                        string ctrlSavePath = PathUtil.Combine(clipRootPath, SpriteEditorTools.controllerName);
+                        string ctrlSavePath = XPathTools.Combine(clipRootPath, SpriteEditorTools.controllerName);
 
                         var ctrl = SpriteEditorTools.GenerateAnimationControllerFromAnimationClipFile("", ctrlSavePath);
                         SpriteEditorTools.SetupAnimationState(ctrl, clip, isDefault);
@@ -263,7 +263,7 @@ namespace ASEditor
                 if (exportPathList != null)
                 {
                     string groupPath = SpriteEditorTools.GroupName2Path(groupPair.Key);
-                    string exportRootPath = PathUtil.Combine(selectRootPath, groupPath);
+                    string exportRootPath = XPathTools.Combine(selectRootPath, groupPath);
 
                     exportPathList.Add(exportRootPath);
                 }

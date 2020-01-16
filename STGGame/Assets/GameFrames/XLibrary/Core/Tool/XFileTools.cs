@@ -23,9 +23,39 @@ namespace XLibrary
 			return File.Exists(path);
 		}
 
-		public static string GetFileText(string fullPath)
+
+		public static bool WriteAllText(string path, string content)
+		{
+			try
+			{
+				File.WriteAllText(path, content);
+				return true;
+			}
+			catch (System.Exception)
+			{
+				Debug.LogWarning(string.Format("error Write %s", path));
+				return false;
+			}
+		}
+
+		public static bool AppendAllText(string path, string content)
+		{
+			try
+			{
+				File.AppendAllText(path, content);
+				return true;
+			}
+			catch (System.Exception)
+			{
+				Debug.LogWarning(string.Format("error WriteAppend %s", path));
+				return false;
+			}
+		}
+
+		public static string ReadAllText(string fullPath)
 		{
 			return File.ReadAllText(fullPath);
+
 		}
 
 		public static void Move(string srcPath, string destPath, bool isMoveMeta = true)
@@ -57,6 +87,12 @@ namespace XLibrary
 				}
 				File.Move(srcPath, destPath);
 			}
+		}
+
+		public static void Create(string path)
+		{
+			if (!Exists(path))
+				File.Create(path);
 		}
 
 		public static void Delete(string path)

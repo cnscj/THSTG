@@ -6,19 +6,19 @@ namespace STGGame
     {
         public static readonly string artSourceFolder = "Assets/MainEditor/";
 
-        public static readonly string srcProgramResource = PathUtil.Combine(artSourceFolder, "Program");
-        public static readonly string srcShaders = PathUtil.Combine(srcProgramResource, "Shaders");
+        public static readonly string srcProgramResource = XPathTools.Combine(artSourceFolder, "Program");
+        public static readonly string srcShaders = XPathTools.Combine(srcProgramResource, "Shaders");
 
 
         public static readonly string artTempFolder = "Assets/GameAssets";
-        public static readonly string temResource = PathUtil.Combine(artTempFolder, "");
-        public static readonly string tempModels = PathUtil.Combine(temResource, "Models");
-        public static readonly string tempSprites = PathUtil.Combine(temResource, "Sprites");
-        public static readonly string tempPublicFx = PathUtil.Combine(temResource, "Effects");
-        public static readonly string tempLevels = PathUtil.Combine(temResource, "Levels");
-        public static readonly string tempUIs = PathUtil.Combine(temResource, "UIs");
-        public static readonly string tempConfigs = PathUtil.Combine(temResource, "Configs");
-        public static readonly string tempCustoms = PathUtil.Combine(temResource, "Customs");
+        public static readonly string temResource = XPathTools.Combine(artTempFolder, "");
+        public static readonly string tempModels = XPathTools.Combine(temResource, "Models");
+        public static readonly string tempSprites = XPathTools.Combine(temResource, "Sprites");
+        public static readonly string tempPublicFx = XPathTools.Combine(temResource, "Effects");
+        public static readonly string tempLevels = XPathTools.Combine(temResource, "Levels");
+        public static readonly string tempUIs = XPathTools.Combine(temResource, "UIs");
+        public static readonly string tempConfigs = XPathTools.Combine(temResource, "Configs");
+        public static readonly string tempCustoms = XPathTools.Combine(temResource, "Customs");
 
         public static readonly string bundleNameShaders = "shaders/{0}.ab";
         public static readonly string bundleNameLevels = "levels/{0}.ab";

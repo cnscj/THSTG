@@ -3,13 +3,15 @@ using System.IO;
 
 namespace XLibrary
 {
-    public static class PathUtil
+    public static class XPathTools
     {
+        //平台统一路径
         public static string NormalizePath(string path)
         {
             return path.Replace(@"\", "/");
         }
 
+        //连接路径
         public static string Combine(params string[] path)
         {
             string combinePath = Path.Combine(path);
@@ -41,6 +43,12 @@ namespace XLibrary
                 return filePath.Substring(startPos + relaPath.Length + 1);
             }
             return filePath;
+        }
+
+        //获取上层目录
+        public static string GetLastPath(string curPath)
+        {
+            return Path.GetDirectoryName(curPath);
         }
 
         //获取上层目录

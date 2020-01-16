@@ -125,7 +125,7 @@ namespace ASEditor
                     string relaRootPath = Path.GetDirectoryName(relaPath);
                     AssetDatabase.DeleteAsset(relaPath);
 
-                    string relaFoldePath = PathUtil.Combine(relaRootPath, fileNameWithNotEx);
+                    string relaFoldePath = XPathTools.Combine(relaRootPath, fileNameWithNotEx);
                     if (XFolderTools.Exists(relaFoldePath))
                     {
                         XFolderTools.DeleteDirectory(relaFoldePath, true);
@@ -169,7 +169,7 @@ namespace ASEditor
 
         protected void SetExportName(string exportName)
         {
-            m_exportFilePath = PathUtil.Combine(m_exportFolder, exportName);
+            m_exportFilePath = XPathTools.Combine(m_exportFolder, exportName);
         }
 
         protected string GetExportPath(string fileName = "")

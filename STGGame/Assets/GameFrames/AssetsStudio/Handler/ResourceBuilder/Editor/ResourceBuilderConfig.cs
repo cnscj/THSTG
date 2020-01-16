@@ -19,7 +19,7 @@ namespace ASEditor
 
 
         public static readonly string resourcePath = "Assets/Resources";
-        public static readonly string configAssetsPath = PathUtil.Combine(resourcePath, "ASResourceBuilderConfig.asset");
+        public static readonly string configAssetsPath = XPathTools.Combine(resourcePath, "ASResourceBuilderConfig.asset");
 
         private static ResourceBuilderConfig s_asset;
 

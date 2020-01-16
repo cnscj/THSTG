@@ -32,7 +32,7 @@ namespace STGEditor
         ///
         static void CreateEditor(string assetPath)
         {
-            string selectRootPath = PathUtil.GetFileRootPath(assetPath);
+            string selectRootPath = XPathTools.GetFileRootPath(assetPath);
             
             // 处理开始
             var scene = EditorSceneManager.OpenScene(GetEditorPath());
@@ -42,8 +42,8 @@ namespace STGEditor
               
 
                 // 保存新场景
-                string savePath = PathUtil.Combine(selectRootPath, string.Format(saveDefaultName));
-                savePath = PathUtil.GetUniquePath(savePath);
+                string savePath = XPathTools.Combine(selectRootPath, string.Format(saveDefaultName));
+                savePath = XPathTools.GetUniquePath(savePath);
 
                 EditorSceneManager.SaveScene(scene, savePath);
             }

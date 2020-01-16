@@ -116,7 +116,7 @@ namespace ASGame
                         StringBuilder stringBuilder = new StringBuilder();
                         foreach (var bone in bones)
                         {
-                            string path = XMiscTools.GetGameObjectPath(bone.gameObject, modelGO);
+                            string path = XGameObjectTools.GetPathByGameObject(bone.gameObject, modelGO);
                             stringBuilder.Append(path);
                             stringBuilder.Append("\r\n");
 

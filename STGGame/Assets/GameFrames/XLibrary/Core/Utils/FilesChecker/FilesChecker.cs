@@ -70,7 +70,7 @@ namespace XLibrary
                 }
             }
 
-            m_curRecPath = PathUtil.Combine(saveFolderPath, string.Format("{0}", (m_saveCodeName == "" ? fileNotExName : m_saveCodeName)));
+            m_curRecPath = XPathTools.Combine(saveFolderPath, string.Format("{0}", (m_saveCodeName == "" ? fileNotExName : m_saveCodeName)));
             m_checkCode = GetCode(paths);
 
             string recCode = LoadCode(m_curRecPath);
