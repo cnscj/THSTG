@@ -94,9 +94,30 @@ namespace ASGame
                         nodeList.Add(info);
                     }
                 }
+                SortList();
             }
 
             level = lv;
+        }
+
+        public void SortList()
+        {
+            if (nodeList != null)
+            {
+                nodeList.Sort(delegate (EffectLevelInfo a, EffectLevelInfo b)
+                {
+                    if (a.node && b.node)
+                    {
+                        if (a.level == b.level)
+                        {
+                            string aPath = XGameObjectTools.GetPathByGameObject(a.node, gameObject);
+                            string bPath = XGameObjectTools.GetPathByGameObject(b.node, gameObject);
+                            return string.Compare(aPath, bPath);
+                        }
+                    }
+                    return a.level - b.level;
+                });
+            }
         }
 
         private int FixLevel(int lv)

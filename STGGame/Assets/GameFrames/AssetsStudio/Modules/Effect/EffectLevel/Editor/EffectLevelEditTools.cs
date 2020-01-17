@@ -95,16 +95,13 @@ namespace ASEditor
             }
         }
 
-        //10级包含所有
-        public static GameObject SavePrefabByLevel(GameObject srcGO, string saveName, int ridLv)
+        //处理一个
+        public static bool RidGameObjectByLv(GameObject newGO, int ridLv)
         {
-            GameObject outGO = null;
-            if (srcGO)
+            if (newGO)
             {
                 if (ridLv > 0 && ridLv <= EffectLevelUtil.maxLevel)
                 {
-                    GameObject newGO = GameObject.Instantiate(srcGO);
-
                     var levelCtrl = newGO.GetComponent<EffectLevelController>();
                     if (!levelCtrl) levelCtrl = newGO.AddComponent<EffectLevelController>();
                     levelCtrl.level = ridLv;
@@ -127,18 +124,35 @@ namespace ASEditor
                                 info.level = nodeLv;
 
                                 levelCtrl.nodeList.Add(info);
-
-                                EffectLevelUtil.ResetEffectLevel(node.gameObject);
-
                             }
                         }
                     }
-                    outGO = PrefabUtility.SaveAsPrefabAsset(newGO, saveName);
-                    Object.DestroyImmediate(newGO);
+                    levelCtrl.SortList();
+
+                    return true;
                 }
+            }
+            return false;
+        }
+
+        //10级包含所有
+        public static GameObject SavePrefabByLevel(GameObject srcGO, string saveName, int ridLv)
+        {
+            GameObject outGO = null;
+            if (srcGO)
+            {
+               
+                GameObject newGO = GameObject.Instantiate(srcGO);
+
+                RidGameObjectByLv(newGO, ridLv);
+
+                outGO = PrefabUtility.SaveAsPrefabAsset(newGO, saveName);
+                Object.DestroyImmediate(newGO);
+                
             }
             return outGO;
         }
+
         //拆成10个
         public static void SaveAllLevelPrefabs(GameObject srcGO, string savePath)
         {
