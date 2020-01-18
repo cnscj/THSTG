@@ -71,12 +71,27 @@ namespace XLibrary
 			return sBuilder.ToString();
 		}
 
-		/// <summary>
-		/// 提取字符串包含的ID
-		/// </summary>
-		/// <param name="path">文件路径/文件名</param>
-		/// <returns></returns>
-		public static string SplitPathId(string path)
+
+        /// <summary>
+        /// 提取字符串包含的Key
+        /// </summary>
+        /// <param name="path">文件路径/文件名</param>
+        /// <returns></returns>
+        public static string SplitPathKey(string path)
+        {
+            string fileName = Path.GetFileNameWithoutExtension(path);
+            int indexOf_ = fileName.IndexOf('_');
+            string pathKey = (indexOf_ == -1) ? path : fileName.Remove(indexOf_);
+
+            return pathKey;
+        }
+
+        /// <summary>
+        /// 提取字符串包含的ID
+        /// </summary>
+        /// <param name="path">文件路径/文件名</param>
+        /// <returns></returns>
+        public static string SplitPathId(string path)
 		{
             string fileName = Path.GetFileNameWithoutExtension(path);
             int indexOf_ = fileName.IndexOf('_');
@@ -84,6 +99,7 @@ namespace XLibrary
             long iPathId;
             return !long.TryParse(pathId, out iPathId) ? "" : pathId;
         }
+
 
         /// <summary>
         /// 提取字符串包含的模块名

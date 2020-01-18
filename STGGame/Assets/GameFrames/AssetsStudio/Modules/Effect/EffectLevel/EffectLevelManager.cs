@@ -1,46 +1,48 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.IO;
+using XLibrary.Package;
+using System.Collections.Generic;
 
 namespace ASGame
 {
-    public class EffectLevelManager
+    public class EffectLevelManager :Singleton<EffectLevelManager>
     {
-        private const string s_effectPath = "effects";
-        public delegate void LevelChangedDelegate(int level);
-        public LevelChangedDelegate levelChangedCallback;
-        private static EffectLevelManager s_instance;
-        private int m_limitLevel = 10;
+        private HashSet<EffectLevelController> m_allCtrls;
 
-        public static EffectLevelManager instance
+        public void AddController(EffectLevelController ctrl)
         {
-            get
+            if (ctrl == null)
+                return;
+
+            m_allCtrls = m_allCtrls ?? new HashSet<EffectLevelController>();
+            if (!m_allCtrls.Contains(ctrl))
             {
-                if (s_instance == null)
-                {
-                    s_instance = new EffectLevelManager();
-                }
-                return s_instance;
+                m_allCtrls.Add(ctrl);
             }
         }
-
-        public int limitLevel
+        public void RemoveController(EffectLevelController ctrl)
         {
-            get
+            if (ctrl == null)
+                return;
+
+            if (m_allCtrls == null)
+                return;
+
+            if (m_allCtrls.Contains(ctrl))
             {
-                return m_limitLevel;
+                m_allCtrls.Remove(ctrl);
             }
-            set
-            {
-                if (m_limitLevel != value)
-                {
-                    m_limitLevel = value;
-                    if (levelChangedCallback != null)
-                    {
-                        levelChangedCallback.Invoke(m_limitLevel);
-                    }
-                }
-            }
+        }
+        public List<EffectLevelController> GetControllers()
+        {
+            if (m_allCtrls == null)
+                return null;
+
+            if (m_allCtrls.Count <= 0)
+                return null;
+
+            return new List<EffectLevelController>(m_allCtrls);
         }
     }
 }

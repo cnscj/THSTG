@@ -121,6 +121,7 @@ namespace ASEditor
                             {
                                 var info = new EffectLevelController.EffectLevelInfo();
                                 info.node = node.gameObject;
+                                info.path = XGameObjectTools.GetPathByGameObject(node.gameObject, newGO);
                                 info.level = nodeLv;
 
                                 levelCtrl.nodeList.Add(info);

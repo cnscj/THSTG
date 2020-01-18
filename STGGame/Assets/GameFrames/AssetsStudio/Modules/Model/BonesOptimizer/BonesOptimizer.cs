@@ -8,9 +8,9 @@ using XLibrary;
 namespace ASGame
 {
     //XXX:每次优化都要遍历一遍所有节点,非常耗时,待优化
-    public class BoneOptimize : MonoBehaviour
+    public class BonesOptimizer : MonoBehaviour
     {
-        public string exposeBoneKey;                                //只要包含了这个key的都会暴露
+        public string[] exposeBoneKeys;                             //只要包含了这个key的都会暴露
         public List<string> exposeBoneList;                         //名字或路径
 
         private bool m_isOptimezed = false;
@@ -61,7 +61,7 @@ namespace ASGame
         {
             if (isSaveChildren)
             {
-                foreach (var subOptmize in gameObject.GetComponentsInChildren<BoneOptimize>())
+                foreach (var subOptmize in gameObject.GetComponentsInChildren<BonesOptimizer>())
                 {
                     subOptmize.m_hasVisited = false;
                 }
@@ -85,13 +85,20 @@ namespace ASGame
                         {
                             bonesMap.Add(node.name, true);
                         }
-                        if (!string.IsNullOrEmpty(exposeBoneKey))
+                        if (exposeBoneKeys != null)
                         {
-                            if (node.name.Contains(exposeBoneKey))
+                            foreach(var boneKey in exposeBoneKeys)
                             {
-                                exposeNodes.Add(node.name);
+                                if (!string.IsNullOrEmpty(boneKey))
+                                {
+                                    if (node.name.Contains(boneKey))
+                                    {
+                                        exposeNodes.Add(node.name);
+                                    }
+                                }
                             }
                         }
+                        
                     }
                     
                     foreach (var bonePath in exposedTransforms)
@@ -124,7 +131,7 @@ namespace ASGame
                     }
 
                     List<KeyValuePair<GameObject, string>> tmpList = new List<KeyValuePair<GameObject, string>>();
-                    foreach (var subOptmize in go.GetComponentsInChildren<BoneOptimize>())
+                    foreach (var subOptmize in go.GetComponentsInChildren<BonesOptimizer>())
                     {
                         if (subOptmize.gameObject == go)
                             continue;

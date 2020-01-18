@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using XLibGame;
@@ -32,10 +33,10 @@ namespace STGU3D
             Init();
         }
 
-        public void AddView(string code, string name = null)
+        public void AddView(string code, Action<GameObject> callback = null)
         {
             GameObject showGO; 
-             EEntityType entityType = EntityUtil.GetEntityTypeByCode(code);
+            EEntityType entityType = EntityUtil.GetEntityTypeByCode(code);
             if (entityType == EEntityType.Hero ||
                 entityType == EEntityType.Boss
                )
@@ -53,24 +54,20 @@ namespace STGU3D
                 showGOs = showGOs ?? new List<GameObject>();
                 showGOs.Add(showGO);
 
-                showGO.name = name ?? showGO.name;
                 showGO.transform.SetParent(body.transform, false);
 
                 rendererCom.Add(showGO);
                 colliderCom.Add(showGO);
                 animatorCom.Add(showGO);
                 shaderEffectCom.Add(showGO);
+
+                callback?.Invoke(showGO);
             }
         }
 
         public void Destroy()
         {
-            Object.Destroy(this);
-        }
-
-        void Start()
-        {
-            
+            UnityEngine.Object.Destroy(this);
         }
 
         void Init()

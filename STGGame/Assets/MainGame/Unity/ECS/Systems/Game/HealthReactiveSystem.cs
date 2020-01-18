@@ -114,18 +114,18 @@ namespace STGU3D
                 if (entity.health.blood - entity.health.prevBlood > 0)
                 {
                     //复活不算治疗
-                    //if (entity.health.prevBlood > 0)
-                    //{
+                    if (entity.health.prevBlood > 0)
+                    {
                         Treat(entity);
-                    //}
+                    }
                 }
                 else if (entity.health.blood - entity.health.prevBlood < 0)
                 {
                     //死亡不算受伤
-                    //if (entity.health.blood > 0)
-                    //{
+                    if (entity.health.blood > 0)
+                    {
                         Hurt(entity);
-                    //}
+                    }
                 }
                 entity.health.prevBlood = entity.health.blood;
 

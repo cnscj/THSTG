@@ -118,11 +118,11 @@ namespace STGU3D
             return this;
         }
 
-        public void AddView(string code, string name = null)
+        public void AddView(string code, System.Action<GameObject> callback = null)
         {
             if (viewCtrl != null && entity != null)
             {
-                viewCtrl.AddView(code, name);
+                viewCtrl.AddView(code, callback);
             }
         }
 

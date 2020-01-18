@@ -75,6 +75,7 @@ TextureImporter:
     21300140: Role@400002_yukari#movesu#03
     21300142: Role@400002_yukari#movesu#04
     21300144: Role@400002_yukari#movesu#05
+    21300146: player00_0
   externalObjects: {}
   serializedVersion: 9
   mipmaps:
@@ -160,9 +161,9 @@ TextureImporter:
       name: player00_23
       rect:
         serializedVersion: 2
-        x: 0
+        x: 48
         y: 96
-        width: 64
+        width: 16
         height: 16
       alignment: 9
       pivot: {x: 0.875, y: 0.5}
@@ -872,6 +873,26 @@ TextureImporter:
       tessellationDetail: -1
       bones: []
       spriteID: 5d943b50bfec25343ad7d1439835ef44
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player00_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 96
+        width: 48
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a5625e0388dccd44a86f5bfd80be8fa8
       vertices: []
       indices: 
       edges: []

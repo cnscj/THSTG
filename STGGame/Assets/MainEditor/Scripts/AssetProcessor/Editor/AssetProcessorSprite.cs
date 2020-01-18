@@ -4,6 +4,7 @@ using ASEditor;
 using STGGame;
 using UnityEditor;
 using UnityEngine;
+using XLibrary;
 
 namespace STGEditor
 {
@@ -20,7 +21,13 @@ namespace STGEditor
             foreach (string guid in guids)
             {
                 string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-                filList.Add(assetPath);
+
+                //Key不为空才处理
+                string assetKey = XStringTools.SplitPathKey(assetPath);
+                if (!string.IsNullOrEmpty(assetKey))
+                {
+                    filList.Add(assetPath);
+                }
             }
             return filList;
         }
@@ -35,7 +42,6 @@ namespace STGEditor
             PrefabUtility.SaveAsPrefabAsset(newPrefab, savePath);
             Object.DestroyImmediate(newPrefab);
         }
-
 
     }
 }

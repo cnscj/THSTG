@@ -1,4 +1,4 @@
-﻿Shader "STGScene/SceneUVAnima"
+﻿Shader "STG/Scene/SceneUVAnima"
 {
     Properties {
         _Color ("Color", Color) = (1,1,1,1)

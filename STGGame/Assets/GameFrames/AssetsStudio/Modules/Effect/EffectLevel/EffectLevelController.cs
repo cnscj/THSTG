@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using XLibrary;
 
@@ -11,11 +12,22 @@ namespace ASGame
         public class EffectLevelInfo
         {
             public GameObject node;
+            public string path;
             public int level;
         }
         public string code;
         public int level;   //当前级别,受升级影响
         public List<EffectLevelInfo> nodeList;
+
+        public void Start()
+        {
+            EffectLevelManager.GetInstance().AddController(this);
+        }
+
+        public void OnDestroy()
+        {
+            EffectLevelManager.GetInstance().RemoveController(this);
+        }
 
         public void Change(int lv, GameObject prefab = null)
         {
@@ -68,33 +80,43 @@ namespace ASGame
             if (ctrl == null)
                 return;
 
-            //填充
-            XGameObjectTools.UnionGameObject(gameObject, prefab, (fxGO) =>
-            {
-                //新或旧的节点
-                fxGO.SetActive(true);
-            });
+            if (ctrl.nodeList == null)
+                return;
 
-
-            //更新节点信息
-            if (ctrl.nodeList != null)
+            nodeList = (nodeList != null) ? nodeList : new List<EffectLevelInfo>();
+            foreach (var fxInfo in ctrl.nodeList)
             {
-                nodeList = (nodeList != null) ? nodeList : new List<EffectLevelInfo>();
-                nodeList.Clear();
-                foreach (var fxPair in ctrl.nodeList)
+                var fxNode = fxInfo.node;
+                if (fxNode == null)
+                    continue;
+
+                var fxNodePath = fxInfo.path;
+                if (string.IsNullOrEmpty(fxNodePath))
                 {
-                    var fxNodePath = XGameObjectTools.GetPathByGameObject(fxPair.node, prefab);
-                    var newNode = XGameObjectTools.GetGameObjectByPath(gameObject, fxNodePath);
-                    if (newNode != null)
-                    {
-                        var info = new EffectLevelInfo();
-                        info.node = newNode;
-                        info.level = fxPair.level;
+                    fxNodePath = XGameObjectTools.GetPathByGameObject(fxInfo.node, prefab);
+                }
 
-                        nodeList.Add(info);
+                var newNode = XGameObjectTools.GetGameObjectByPath(gameObject, fxNodePath);
+                if (newNode != null)
+                {
+                    newNode.SetActive(true);
+                }
+                else
+                {
+                    string fxNodeParentPath = Path.GetDirectoryName(fxNodePath);
+                    var newNodeParent = XGameObjectTools.GetGameObjectByPath(gameObject, fxNodePath);
+                    if (newNodeParent != null)
+                    {
+                        var fxLevel = fxInfo.level;
+                        newNode = Instantiate(fxNode, newNodeParent.transform, false);
+                        var newInfo = new EffectLevelInfo();
+                        newInfo.node = newNode;
+                        newInfo.path = Path.Combine(fxNodeParentPath, newNode.name);
+                        newInfo.level = fxLevel;
+
+                        nodeList.Add(newInfo);
                     }
                 }
-                SortList();
             }
 
             level = lv;
@@ -102,6 +124,7 @@ namespace ASGame
 
         public void SortList()
         {
+            //保证顺序是从小到大,由浅到深
             if (nodeList != null)
             {
                 nodeList.Sort(delegate (EffectLevelInfo a, EffectLevelInfo b)
