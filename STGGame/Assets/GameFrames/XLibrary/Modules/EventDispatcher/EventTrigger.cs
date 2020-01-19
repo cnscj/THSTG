@@ -9,19 +9,35 @@ namespace XLibGame
         [Header("派发器名称")]
         public string dispatchr = defaultDispatcherName;
 
-        [Header("事件名称")]
-        public int evt;
+        [Header("事件类型")]
+        public string evt;
 
-        [Header("事件数据")]
-        public string data;
+        [HideInInspector]
+        private Dispatcher GetDispatcher()
+        {
+            return DispatcherManager.GetInstance().GetOrNewDispatcher(dispatchr);
+        }
+
+        public void DispatchEvent(int e)
+        {
+            GetDispatcher().Dispatch(e, this);
+        }
 
         public void Dispatch()
         {
-            var dispatcher = DispatcherManager.GetInstance().GetOrNewDispatcher(dispatchr);
-            if (dispatcher != null)
-            {
-                dispatcher.Dispatch(evt, this, data);
-            }
+            GetDispatcher().Dispatch(evt, this);
         }
+
+        public void DispatchString(string obj)
+        {
+            GetDispatcher().Dispatch(evt, this, obj);
+        }
+
+        public void DispatchObject(Object obj)
+        {
+            GetDispatcher().Dispatch(evt, this, obj);
+        }
+
+
     }
 }
