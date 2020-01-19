@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using XLibrary;
+using STGGame.Editor;
 
 namespace STGEditor
 {
@@ -11,6 +12,10 @@ namespace STGEditor
     {
         public static readonly string editorName = "EffectEditor.unity";
         public static readonly string saveDefaultName = "EffectEditor.unity";
+
+        public static readonly string nodeNameModelFx = "ModelFx";
+        public static readonly string viewFxNodeName = "603";
+
 
         [MenuItem("Assets/STGEditor/资源编辑器/特效编辑器/生成特效编辑场景")]
         public static void MenuCreateEditor()
@@ -28,6 +33,39 @@ namespace STGEditor
             }
         }
 
+        [MenuItem("Assets/STGEditor/资源编辑器/特效编辑器/创建节点特效模板")]
+        public static void CreateModelEffectWorkspace()
+        {
+            Object[] objs = Selection.objects;
+            foreach (var obj in objs)
+            {
+                GameObject prefab = obj as GameObject;
+                if (!prefab)
+                {
+                    Debug.LogError("请选择模型prefab文件");
+                    return;
+                }
+
+                GameObject modelFxNode = GameObject.Find(nodeNameModelFx);
+                if (modelFxNode)
+                {
+                    string prefabPath = AssetDatabase.GetAssetPath(prefab);
+                    string rootFolderName = Path.GetFileNameWithoutExtension(Path.GetDirectoryName(prefabPath));
+                    GameObject go = Object.Instantiate(prefab, modelFxNode.transform, false);
+                    //改下名字
+                    go.name = string.Format("{0}{1}", viewFxNodeName, rootFolderName);
+
+                    var editor = go.AddComponent<ViewEffectEditor>();
+                    editor.srcPrefab = prefab;
+
+                    EditorGUIUtility.PingObject(go);
+                }
+                else
+                {
+                    Debug.LogError("打开特效编辑场景后再进行该操作");
+                }
+            }
+        }
         ///
         static void CreateEditor(string assetPath)
         {

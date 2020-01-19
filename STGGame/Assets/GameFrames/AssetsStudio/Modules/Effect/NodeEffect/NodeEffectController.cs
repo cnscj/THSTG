@@ -41,7 +41,7 @@ namespace ASGame
                 if (info.node != null && !string.IsNullOrEmpty(info.path))
                 {
                     var nodeParentPath = Path.GetDirectoryName(info.path);
-                    var parentNode = XGameObjectTools.GetGameObjectByPath(gameObject, nodeParentPath);
+                    var parentNode = XGameObjectTools.GetGameObjectByPath(go, nodeParentPath);
 
                     if (parentNode != null)
                     {

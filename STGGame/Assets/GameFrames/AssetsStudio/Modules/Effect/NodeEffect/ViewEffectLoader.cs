@@ -23,7 +23,7 @@ namespace ASGame
             return pathList;
         }
 
-        public void Setup(GameObject fxPackage,bool isReplaceMode = true)
+        public void Setup(GameObject fxPackage, bool isReplaceMode = true)
         {
             if (fxPackage == null)
                 return;
@@ -42,7 +42,6 @@ namespace ASGame
 
             datas = datas ?? new List<NodeEffectData>();
 
-            int index = 0;
             foreach (var data in fxCtrl.datas)
             {
                 if (data.node != null && !string.IsNullOrEmpty(data.path))
@@ -70,7 +69,6 @@ namespace ASGame
                     } 
                         
                     newFxNode.name = newFxNode.name.Replace("(Clone)", "");
-                    newFxNode.name = string.Format("{0}({1})", newFxNode.name, index++);
 
                     var newData = new NodeEffectData();
                     newData.node = newFxNode;
@@ -81,6 +79,7 @@ namespace ASGame
             }
         }
 
+        [ContextMenu("Unsetup")]
         public void Unsetup()
         {
             if (datas == null)

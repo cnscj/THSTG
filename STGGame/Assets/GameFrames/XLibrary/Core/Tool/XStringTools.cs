@@ -91,13 +91,13 @@ namespace XLibrary
         /// </summary>
         /// <param name="path">文件路径/文件名</param>
         /// <returns></returns>
-        public static string SplitPathId(string path)
+        public static long SplitPathId(string path)
 		{
             string fileName = Path.GetFileNameWithoutExtension(path);
             int indexOf_ = fileName.IndexOf('_');
             string pathId = (indexOf_ == -1) ? fileName : fileName.Remove(indexOf_);
             long iPathId;
-            return !long.TryParse(pathId, out iPathId) ? "" : pathId;
+            return !long.TryParse(pathId, out iPathId) ? -1 : iPathId;
         }
 
 

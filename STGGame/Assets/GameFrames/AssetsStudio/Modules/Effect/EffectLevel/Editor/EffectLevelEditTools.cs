@@ -159,7 +159,7 @@ namespace ASEditor
         {
             if (srcGO)
             {
-                string effectId = XStringTools.SplitPathId(srcGO.name);
+                string effectId = XStringTools.SplitPathKey(srcGO.name);
                 string finalPath = Path.Combine(savePath, effectId);
                 if (!XFolderTools.Exists(finalPath))
                 {

@@ -179,7 +179,7 @@ namespace ASEditor
 
         protected string GetResourceId(string path)
         {
-            return XStringTools.SplitPathId(Path.GetFileNameWithoutExtension(path));
+            return XStringTools.SplitPathKey(Path.GetFileNameWithoutExtension(path));
         }
 
         protected void SetCheckList(string[] filesList)

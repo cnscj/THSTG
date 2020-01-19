@@ -75,7 +75,7 @@ namespace ASEditor
                 PackageNodeEffect(tmplGo, packageGo);
 
                 outGO = PrefabUtility.SaveAsPrefabAsset(packageGo, savePath);
-                Object.Destroy(packageGo);
+                Object.DestroyImmediate(packageGo);
             }
             return outGO;
         }

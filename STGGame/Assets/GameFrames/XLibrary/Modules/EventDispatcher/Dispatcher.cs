@@ -9,7 +9,7 @@ namespace XLibGame
     public class Dispatcher
     {
         
-        private Dictionary<int, EventListener> m_listeners = new Dictionary<int, EventListener>();
+        private Dictionary<EventType, EventListener> m_listeners = new Dictionary<EventType, EventListener>();
 
         /// <summary>
         /// 广播指定事件。
@@ -28,10 +28,10 @@ namespace XLibGame
         /// <summary>
         /// 广播指定事件。
         /// </summary>
-        /// <param name="type">事件编号</param>
+        /// <param name="type">事件类型</param>
         /// <param name="sender">发送者</param>
         /// <param name="args">事件参数</param>
-        public void Dispatch(int type, object sender = null, params object[] args)
+        public void Dispatch(EventType type, object sender = null, params object[] args)
         {
             EventContext context = new EventContext(type, sender, args);
             Dispatch(context);
@@ -40,9 +40,9 @@ namespace XLibGame
         /// <summary>
         /// 添加对指定事件的监听。
         /// </summary>
-        /// <param name="type">事件编号</param>
+        /// <param name="type">事件类型</param>
         /// <param name="callback0">回调委托</param>
-        public void AddListener(int type, EventCallback0 callback0, int priority = 1)
+        public void AddListener(EventType type, EventCallback0 callback0, int priority = 1)
         {
             EventListener listener = null;
             if (!m_listeners.TryGetValue(type, out listener))
@@ -56,9 +56,9 @@ namespace XLibGame
         /// <summary>
         /// 添加对指定事件的监听。
         /// </summary>
-        /// <param name="type">事件编号</param>
+        /// <param name="type">事件类型</param>
         /// <param name="callback1">回调委托</param>
-        public void AddListener(int type, EventCallback1 callback1, int priority = 1)
+        public void AddListener(EventType type, EventCallback1 callback1, int priority = 1)
         {
             EventListener listener = null;
             if (!m_listeners.TryGetValue(type, out listener))
@@ -73,9 +73,9 @@ namespace XLibGame
         /// <summary>
         /// 移除对指定事件的监听。
         /// </summary>
-        /// <param name="type">事件编号</param>
+        /// <param name="type">事件类型</param>
         /// <param name="callback0">回调委托</param>
-        public void RemoveListener(int type, EventCallback0 callback0)
+        public void RemoveListener(EventType type, EventCallback0 callback0)
         {
             EventListener listener = null;
             if (m_listeners.TryGetValue(type, out listener))
@@ -87,9 +87,9 @@ namespace XLibGame
         /// <summary>
         /// 移除对指定事件的监听。
         /// </summary>
-        /// <param name="type">事件编号</param>
+        /// <param name="type">事件类型</param>
         /// <param name="callback1">回调委托</param>
-        public void RemoveListener(int type, EventCallback1 callback1)
+        public void RemoveListener(EventType type, EventCallback1 callback1)
         {
             EventListener listener = null;
             if (m_listeners.TryGetValue(type, out listener))
@@ -111,7 +111,7 @@ namespace XLibGame
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public bool HasListener(int type)
+        public bool HasListener(EventType type)
         {
             EventListener listener = null;
             if (m_listeners.TryGetValue(type, out listener))

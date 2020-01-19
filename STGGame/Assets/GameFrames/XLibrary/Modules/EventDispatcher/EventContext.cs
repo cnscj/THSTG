@@ -5,7 +5,7 @@ namespace XLibGame
 {
     public class EventContext
     {
-        public int type;
+        public EventType type;
 
         public System.Object sender;
 
@@ -37,18 +37,18 @@ namespace XLibGame
             return new EventContext(type, args, sender);
         }
 
-        public EventContext(int type)
+        public EventContext(EventType type)
         {
             this.type = type;
         }
 
-        public EventContext(int type, params System.Object[] args)
+        public EventContext(EventType type, params System.Object[] args)
         {
             this.type = type;
             this.args = args;
         }
 
-        public EventContext(int type, System.Object sender, params System.Object[] args)
+        public EventContext(EventType type, System.Object sender, params System.Object[] args)
         {
             this.type = type;
             this.sender = sender;

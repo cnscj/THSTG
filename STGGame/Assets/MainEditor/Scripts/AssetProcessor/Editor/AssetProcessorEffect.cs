@@ -5,6 +5,7 @@ using ASGame;
 using STGGame;
 using UnityEditor;
 using UnityEngine;
+using XLibrary;
 
 namespace STGEditor
 {
@@ -22,7 +23,11 @@ namespace STGEditor
             foreach (string guid in guids)
             {
                 string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-                filList.Add(assetPath);
+                string assetKey = XStringTools.SplitPathKey(assetPath);
+                if (!string.IsNullOrEmpty(assetKey))
+                {
+                    filList.Add(assetPath);
+                }
             }
             return filList;
         }
@@ -52,6 +57,14 @@ namespace STGEditor
                 {
                     Do4PublicFx(prefab);
                 }
+                else if(assetPath.Contains(AssetProcessorConfig.srcModelFx))
+                {
+                    Do4ModelFx(prefab);
+                }
+                else
+                {
+                    Do4Normal(prefab);
+                }
             }
             Do4FxEnd(prefab);
         }
@@ -65,20 +78,35 @@ namespace STGEditor
             gameObject = newPrefab;
         }
 
+
+
         private void Do4FxEnd(GameObject GO)
         {
             if (GO != null)
             {
-                string savePath = GetExportPath();
-                PrefabUtility.SaveAsPrefabAsset(GO, savePath);
                 Object.DestroyImmediate(GO);
             }
 
         }
         //
+        private void Do4Normal(GameObject GO)
+        {
+            string savePath = GetExportPath();
+            PrefabUtility.SaveAsPrefabAsset(GO, savePath);
+        }
         private void Do4PublicFx(GameObject GO)
         {
-            
+            Do4Normal(GO);
+        }
+        private void Do4ModelFx(GameObject srcGO)
+        {
+            GameObject newGO = new GameObject();
+            NodeEffectEditorTool.PackageNodeEffect(srcGO, newGO);
+
+            string savePath = GetExportPath();
+            PrefabUtility.SaveAsPrefabAsset(newGO, savePath);
+            Object.DestroyImmediate(newGO);
+
         }
     }
 }

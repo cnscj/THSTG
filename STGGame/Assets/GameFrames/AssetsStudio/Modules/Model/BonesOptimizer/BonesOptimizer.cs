@@ -94,6 +94,7 @@ namespace ASGame
                                     if (node.name.Contains(boneKey))
                                     {
                                         exposeNodes.Add(node.name);
+                                        break;
                                     }
                                 }
                             }

@@ -10,29 +10,17 @@ namespace XLibGame
         public string dispatchr = defaultDispatcherName;
 
         [Header("事件名称")]
-        public string evt;
+        public int evt;
 
         [Header("事件数据")]
         public string data;
 
         public void Dispatch()
         {
-            if (!string.IsNullOrEmpty(evt))
+            var dispatcher = DispatcherManager.GetInstance().GetOrNewDispatcher(dispatchr);
+            if (dispatcher != null)
             {
-                var dispatcher = DispatcherManager.GetInstance().GetOrNewDispatcher(dispatchr);
-                if (dispatcher != null)
-                {
-                    dispatcher.Dispatch(evt.GetHashCode(), this, data);
-                }
-            }
-        }
-
-        public void OnEnable()
-        {
-            if (enabled)
-            {
-                Dispatch();
-                enabled = false;
+                dispatcher.Dispatch(evt, this, data);
             }
         }
     }
