@@ -119,16 +119,15 @@ namespace XLibrary
         }
 
         /// <summary>
-        /// 用一个GO填充另一个GO
+        /// 用一个GO填充另一个GO,如果dest没有,则在src中找
         /// </summary>
         /// <param name="dest"></param>
         /// <param name="src"></param>
         /// <param name="cndtFunc">填充条件</param>
-        public static void UnionGameObject(GameObject dest, GameObject src, bool isReplace = false, Action<GameObject> action = null, Func<GameObject, bool> cndtFunc = null)
+        public static void UnionGameObject(GameObject dest, GameObject src, bool isReplace = true, Action<GameObject> action = null)
         {
             if (dest == null || src == null)
                 return;
-
 
             TraverseBFS(src, (curNode) =>
             {
@@ -136,29 +135,102 @@ namespace XLibrary
                 {
                     string curNodePath = GetPathByGameObject(curNode, src);
                     GameObject destNode = GetGameObjectByPath(dest, curNodePath);
+                    bool isNeedCreate = false;
                     if (destNode == null)   //目标没有这个节点
+                    {
+                        isNeedCreate = true;
+                    }
+                    else
+                    {
+                        if (isReplace)  //有这个节点,但是要替换
+                        {
+                            isNeedCreate = true;
+                            UnityEngine.Object.Destroy(destNode);
+                        }
+                    }
+
+                    if (isNeedCreate)
                     {
                         string destParentPath = Path.GetDirectoryName(curNodePath);
                         GameObject destParentNode = GetGameObjectByPath(dest, destParentPath);
                         if (destParentNode != null)
                         {
-                            if (cndtFunc == null || (cndtFunc != null && cndtFunc(curNode)))
-                            {
-                                var newNode = UnityEngine.Object.Instantiate(curNode, destParentNode.transform, false);
-                                newNode.name = curNode.name;
-                                destNode = newNode;
-                            }
+                            var newNode = UnityEngine.Object.Instantiate(curNode, destParentNode.transform, false);
+                            newNode.name = curNode.name;
+                            destNode = newNode;
                         }
                     }
-
                     action?.Invoke(destNode);
                 }
             });
         }
 
-        public static void MergeGameObject(GameObject dest, GameObject src, bool isReplace = false, Action<GameObject> action = null, Func<GameObject, bool> cndtFunc = null)
+        /// <summary>
+        /// 替换GO,如果在src中找到对应node,则替换dest对应node
+        /// </summary>
+        /// <param name="dest"></param>
+        /// <param name="src"></param>
+        public static void RelpaceGameObject(GameObject dest, GameObject src)
         {
+            if (dest == null || src == null)
+                return;
 
+            TraverseBFS(dest, (curNode) =>
+            {
+                if (curNode != dest)
+                {
+                    string curNodePath = GetPathByGameObject(curNode, dest);
+                    GameObject srcNode = GetGameObjectByPath(src, curNodePath);
+
+                    if (srcNode != null)
+                    {
+                        GameObject parentNode = curNode.transform.parent.gameObject;
+                        UnityEngine.Object.Destroy(curNode);
+                        var newNode = UnityEngine.Object.Instantiate(srcNode, parentNode.transform, false);
+                        newNode.name = curNode.name;
+                        curNode = newNode;
+                    }
+                }
+            });
+        }
+
+        /// <summary>
+        /// 合并2个GO,如果src中没有在src找到对应的,则移除
+        /// </summary>
+        /// <param name="dest"></param>
+        /// <param name="src"></param>
+        /// <param name="isReplace"></param>
+        /// <param name="action"></param>
+        public static void MergeGameObject(GameObject dest, GameObject src, bool isReplace = true, Action<GameObject> action = null)
+        {
+            if (dest == null || src == null)
+                return;
+
+            TraverseBFS(dest, (curNode) =>
+            {
+                if (curNode != dest)
+                {
+                    string curNodePath = GetPathByGameObject(curNode, dest);
+                    GameObject srcNode = GetGameObjectByPath(src, curNodePath);
+
+                    if (srcNode == null)
+                    {
+                        UnityEngine.Object.Destroy(curNode);
+                    }
+                    else
+                    {
+                        if(isReplace)
+                        {
+                            GameObject parentNode = curNode.transform.parent.gameObject;
+                            UnityEngine.Object.Destroy(curNode);
+                            var newNode = UnityEngine.Object.Instantiate(srcNode, parentNode.transform, false);
+                            newNode.name = curNode.name;
+                            curNode = newNode;
+                        }
+                        action?.Invoke(curNode);
+                    }
+                }
+            });
         }
     }
 
