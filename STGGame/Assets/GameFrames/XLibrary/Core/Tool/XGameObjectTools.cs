@@ -124,7 +124,7 @@ namespace XLibrary
         /// <param name="dest"></param>
         /// <param name="src"></param>
         /// <param name="cndtFunc">填充条件</param>
-        public static void UnionGameObject(GameObject dest, GameObject src, Action<GameObject> action = null, Func<GameObject, bool> cndtFunc = null)
+        public static void UnionGameObject(GameObject dest, GameObject src, bool isReplace = false, Action<GameObject> action = null, Func<GameObject, bool> cndtFunc = null)
         {
             if (dest == null || src == null)
                 return;
@@ -154,6 +154,11 @@ namespace XLibrary
                     action?.Invoke(destNode);
                 }
             });
+        }
+
+        public static void MergeGameObject(GameObject dest, GameObject src, bool isReplace = false, Action<GameObject> action = null, Func<GameObject, bool> cndtFunc = null)
+        {
+
         }
     }
 
