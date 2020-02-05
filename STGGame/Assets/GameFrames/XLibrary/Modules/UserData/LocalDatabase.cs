@@ -61,7 +61,7 @@ namespace XLibGame
             }
             catch(Exception e)
             {
-                Debug.Log(e);
+                UnityEngine.Debug.Log(e);
                 return false;
             }
             
@@ -83,7 +83,7 @@ namespace XLibGame
             }
             catch (Exception e)
             {
-                Debug.Log(e);
+                UnityEngine.Debug.Log(e);
                 return default;
             }
 
@@ -114,7 +114,7 @@ namespace XLibGame
             }
             catch(Exception e)
             {
-                Debug.Log(e);
+                UnityEngine.Debug.Log(e);
                 return false;
             }
         }
@@ -140,7 +140,7 @@ namespace XLibGame
             }
             catch(Exception e)
             {
-                Debug.Log(e);
+                UnityEngine.Debug.Log(e);
                 return default;
             }
         }
