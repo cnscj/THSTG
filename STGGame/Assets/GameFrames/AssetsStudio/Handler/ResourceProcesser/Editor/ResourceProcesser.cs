@@ -113,7 +113,7 @@ namespace ASEditor
                 string fileNameWithNotEx = Path.GetFileNameWithoutExtension(fullPath);
                 string fileEx = Path.GetExtension(fullPath);
                 string resId = GetResourceId(fileNameWithNotEx);
-                resId = resId == "" ? fileNameWithNotEx.ToLower() : resId;
+                resId = string.IsNullOrEmpty(resId) ? fileNameWithNotEx.ToLower() : resId;
                 if (fileEx.Contains("meta"))
                 {
                     return;
@@ -179,7 +179,27 @@ namespace ASEditor
 
         protected string GetResourceId(string path)
         {
+            var resId = XStringTools.SplitPathId(Path.GetFileNameWithoutExtension(path));
+            if (resId != -1)
+                return string.Format("{0}", resId);
+            else
+                return null;
+        }
+
+        protected string GetResourceKey(string path)
+        {
             return XStringTools.SplitPathKey(Path.GetFileNameWithoutExtension(path));
+           
+        }
+
+        protected string GetCheckName(string path)
+        {
+            var resId = XStringTools.SplitPathId(Path.GetFileNameWithoutExtension(path));
+            if (resId == -1)
+                return Path.GetFileName(path);
+            else
+                return string.Format("{0}", resId);
+
         }
 
         protected void SetCheckList(string[] filesList)
@@ -236,8 +256,9 @@ namespace ASEditor
             string checkName = GetResourceId(fileName);
             string saveFilePath = GetExportPath(fileName);
             string saveFileName = Path.GetFileNameWithoutExtension(saveFilePath);
-            checkName = checkName == "" ? saveFileName.ToLower() : checkName;
+            checkName = string.IsNullOrEmpty(checkName) ? saveFileName.ToLower() : checkName;
 
+            //
             if (checkMaps.ContainsKey(checkName))
             {
                 return;

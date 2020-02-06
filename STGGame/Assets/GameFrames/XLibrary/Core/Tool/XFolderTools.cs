@@ -56,21 +56,94 @@ namespace XLibrary
 			return folder.Parent.Name;
 		}
 
-		/// <summary>
+        /// <summary>
 		/// 遍历文件
 		/// </summary>
 		/// <param name="dirs">文件夹们的路径</param>
 		/// <param name="callBack">找到文件回调</param>
 		/// <param name="isTraverse">是否递归遍历</param>
-		public static void TraverseFiles(string[] dirs, Action<string> callBack, bool isTraverse = false)
-		{
-            if (dirs == null)
+        public static void TraverseFiles(string[] dirs, Action<string> callBack, bool isTraverse = false, bool isLower = false)
+        {
+            if (dirs == null || callBack == null)
+            {
+                return;
+            }
+
+            foreach (var dir in dirs)
+            {
+                if (!Exists(dir))
+                {
+                    continue;
+                }
+
+                var fileList = isTraverse ? Directory.EnumerateFiles(dir, "*", SearchOption.AllDirectories) :
+                                        Directory.EnumerateFiles(dir, "*", SearchOption.TopDirectoryOnly);
+
+                foreach (string path in fileList)
+                {
+                    string fullPath = path.Replace('\\', '/');
+                    if (isLower)
+                    {
+                        fullPath = fullPath.ToLower();
+                    }
+                    callBack(fullPath);
+                }
+            }
+        }
+        public static void TraverseFiles(string dir, Action<string> callBack, bool isTraverse = false, bool isLower = false)
+        {
+            TraverseFiles(new string[] { dir }, callBack, isTraverse, isLower);
+        }
+
+        /// <summary>
+        /// 遍历文件夹
+        /// </summary>
+        /// <param name="dir">文件夹路径</param>
+        /// <param name="callBack">找到文件夹回调</param>
+        /// <param name="isTraverse">是否递归遍历</param>
+        public static void TraverseFolder(string[] dirs, Action<string> callBack, bool isTraverse = false, bool isLower = false)
+        {
+            if (dirs == null || callBack == null)
+            {
+                return;
+            }
+
+            foreach (var dir in dirs)
+            {
+                if (!Exists(dir))
+                {
+                    continue;
+                }
+                var folderList = isTraverse ? Directory.EnumerateDirectories(dir, "*", SearchOption.AllDirectories) :
+                                        Directory.EnumerateDirectories(dir, "*", SearchOption.TopDirectoryOnly);
+
+                foreach (string path in folderList)
+                {
+                    string fullPath = path.Replace('\\', '/');
+                    if (isLower)
+                    {
+                        fullPath = fullPath.ToLower();
+                    }
+                    callBack(fullPath);
+                }
+            }
+        }
+        public static void TraverseFolder(string dir, Action<string> callBack, bool isTraverse = false, bool isLower = false)
+        {
+            TraverseFolder(new string[] { dir }, callBack, isTraverse, isLower);
+        }
+
+        [Obsolete]
+        public static void TraverseFilesEx(string[] dirs, Action<string> callBack, bool isTraverse = false)
+        {
+            if (dirs == null || callBack == null)
                 return;
 
-            foreach(var dir in dirs)
+            foreach (var dir in dirs)
             {
-                if (!Exists(dir) || callBack == null)
-                    return;
+                if (!Exists(dir))
+                    continue;
+
                 DirectoryInfo folder = new DirectoryInfo(dir);
                 FileSystemInfo[] files = folder.GetFileSystemInfos();
                 for (int i = 0, length = files.Length; i < length; i++)
@@ -79,7 +152,7 @@ namespace XLibrary
                     if (file is DirectoryInfo)
                     {
                         if (isTraverse)
-                            TraverseFiles(file.FullName, callBack, isTraverse);
+                            TraverseFilesEx(file.FullName, callBack, isTraverse);
                     }
                     else
                     {
@@ -87,38 +160,45 @@ namespace XLibrary
                     }
                 }
             }
-		}
-
-		public static void TraverseFiles(string dir, Action<string> callBack, bool isTraverse = false)
-        {
-            TraverseFiles(new string[] { dir }, callBack, isTraverse);
         }
 
+        [Obsolete]
+        public static void TraverseFilesEx(string dir, Action<string> callBack, bool isTraverse = false)
+        {
+            TraverseFilesEx(new string[] { dir }, callBack, isTraverse);
+        }
 
+        [Obsolete]
+        public static void TraverseFolderEx(string[] dirs, Action<string> callBack, bool isTraverse = false)
+        {
+            if (dirs == null || callBack == null)
+                return;
 
-        /// <summary>
-        /// 遍历文件夹
-        /// </summary>
-        /// <param name="dir">文件夹路径</param>
-        /// <param name="callBack">找到文件夹回调</param>
-        /// <param name="isTraverse">是否递归遍历</param>
-        public static void TraverseFolder(string dir, Action<string> callBack, bool isTraverse = false)
-		{
-			if (!Exists(dir) || callBack == null)
-				return;
-			DirectoryInfo folder = new DirectoryInfo(dir);
-			FileSystemInfo[] files = folder.GetFileSystemInfos();
-			for (int i = 0, length = files.Length; i < length; i++)
-			{
-				var file = files[i];
-				if (file is DirectoryInfo)
-				{
-					if (isTraverse)
-						TraverseFolder(file.FullName, callBack, isTraverse);
-					callBack(file.FullName.Replace('\\', '/').ToLower());
-				}
-			}
-		}
+            foreach (var dir in dirs)
+            {
+                if (!Exists(dir))
+                    continue;
 
-	}
+                DirectoryInfo folder = new DirectoryInfo(dir);
+                FileSystemInfo[] files = folder.GetFileSystemInfos();
+                for (int i = 0, length = files.Length; i < length; i++)
+                {
+                    var file = files[i];
+                    if (file is DirectoryInfo)
+                    {
+                        if (isTraverse)
+                            TraverseFolderEx(file.FullName, callBack, isTraverse);
+                        callBack(file.FullName.Replace('\\', '/').ToLower());
+                    }
+                }
+            }
+        }
+
+        [Obsolete]
+        public static void TraverseFolderEx(string dir, Action<string> callBack, bool isTraverse = false)
+        {
+            TraverseFolderEx(new string[] { dir }, callBack, isTraverse);
+        }
+
+    }
 }

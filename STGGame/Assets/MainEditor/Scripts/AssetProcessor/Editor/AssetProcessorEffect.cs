@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.Generic;
+using System.IO;
 using ASEditor;
 using ASGame;
 using STGGame;
@@ -34,8 +35,11 @@ namespace STGEditor
         protected override void OnPreOnce(string assetPath)
         {
             string resId = GetResourceId(assetPath);
-            SetSaveCodeName(string.Format("{0}", resId));
-            SetExportName(string.Format("{0}.prefab", resId));
+            string resKey = GetResourceKey(assetPath);
+            string outName = resId ?? resKey ?? Path.GetFileNameWithoutExtension(assetPath);
+
+            SetSaveCodeName(string.Format("{0}", outName));
+            SetExportName(string.Format("{0}.prefab", outName));
         }
 
         protected override void OnOnce(string assetPath)

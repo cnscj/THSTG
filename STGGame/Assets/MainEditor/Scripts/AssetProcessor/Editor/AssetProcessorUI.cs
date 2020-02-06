@@ -24,17 +24,17 @@ namespace STGEditor
 
         protected override List<string> OnFilter()
         {
-            List<string> filList = new List<string>();
+            List<string> fileList = new List<string>();
             XFolderTools.TraverseFiles(AssetProcessorConfig.srcUIs, (fullPath) =>
              {
                  //值拷贝png和bytes文件
                  string fileEx = Path.GetExtension(fullPath).ToLower();
                  if (fileEx == ".png" || fileEx == ".bytes")
                  {
-                     filList.Add(fullPath);
+                     fileList.Add(fullPath);
                  }
              });
-            return filList;
+            return fileList;
         }
 
         protected override void OnOnce(string assetPath)

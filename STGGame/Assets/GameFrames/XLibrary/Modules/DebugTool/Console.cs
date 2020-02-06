@@ -6,7 +6,7 @@ using XLibrary.Package;
 
 namespace XLibGame.Debug
 {
-    public class Consular: Singleton<Consular>
+    public class Console: Singleton<Console>
     {
         public void Format(string format, params object[] args)
         {

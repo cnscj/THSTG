@@ -15,7 +15,7 @@ namespace STGGame
         {
             if (flag <= 0 || flag == MY_FLAG)
             {
-                Consular.GetInstance().Format(format, args);
+                Console.GetInstance().Format(format, args);
             }
         }
 
@@ -24,7 +24,7 @@ namespace STGGame
         {
             if (flag <= 0 || flag == MY_FLAG)
             {
-                Consular.GetInstance().Print(objs);
+                Console.GetInstance().Print(objs);
             }
         }
 
@@ -32,7 +32,7 @@ namespace STGGame
         {
             if (flag <= 0 || flag == MY_FLAG)
             {
-                Consular.GetInstance().Dump(obj); 
+                Console.GetInstance().Dump(obj); 
             }
         }
     }

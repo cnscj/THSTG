@@ -9,7 +9,6 @@ namespace STGU3D
     {
         private void Awake()
         {
-            DontDestroyOnLoad(this.gameObject);
             STGService.Main.InitAwake();
         }
         private void Start()
