@@ -252,6 +252,70 @@ MonoBehaviour:
   bossType: 0
   wingmanType: 0
   comsList: []
+--- !u!1 &2106534324
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2106534325}
+  - component: {fileID: 2106534327}
+  - component: {fileID: 2106534326}
+  m_Layer: 0
+  m_Name: MainGame
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2106534325
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2106534324}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2125908312}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2106534326
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2106534324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50788656069924e0fb74a74a5d03d591, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stageRoot: {fileID: 0}
+  mapRoot: {fileID: 0}
+  heroRoot: {fileID: 0}
+  bossRoot: {fileID: 0}
+  mobRoot: {fileID: 0}
+  bulletRoot: {fileID: 0}
+  propRoot: {fileID: 0}
+  wingmanRoot: {fileID: 0}
+--- !u!114 &2106534327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2106534324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8df4bf1bef7464eaebfa1cb92792ee1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2125908311
 GameObject:
   m_ObjectHideFlags: 0
@@ -261,12 +325,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2125908312}
-  - component: {fileID: 2125908314}
+  - component: {fileID: 2125908318}
   - component: {fileID: 2125908315}
   - component: {fileID: 2125908316}
   - component: {fileID: 2125908317}
-  - component: {fileID: 2125908313}
-  - component: {fileID: 2125908318}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -285,42 +347,11 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 2106534325}
   - {fileID: 668933855}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2125908313
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2125908311}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8df4bf1bef7464eaebfa1cb92792ee1d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &2125908314
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2125908311}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 50788656069924e0fb74a74a5d03d591, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stageRoot: {fileID: 0}
-  mapRoot: {fileID: 0}
-  heroRoot: {fileID: 0}
-  bossRoot: {fileID: 0}
-  mobRoot: {fileID: 0}
-  bulletRoot: {fileID: 0}
-  propRoot: {fileID: 0}
-  wingmanRoot: {fileID: 0}
 --- !u!114 &2125908315
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -449,7 +480,7 @@ PrefabInstance:
     - target: {fileID: 8287892597242938341, guid: fdfae3b3b90245046a9a8c450e9b8251,
         type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8287892597242938341, guid: fdfae3b3b90245046a9a8c450e9b8251,
         type: 3}

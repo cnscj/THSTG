@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using XLibrary.Package;
-using XLibGame.Debug;
+using XLibGame.Debugger;
 
-using Logger = XLibGame.Debug.Logger;
+using Logger = XLibGame.Debugger.Logger;
 namespace STGU3D
 {
     public class DebugManager : MonoSingleton<SpriteManager>

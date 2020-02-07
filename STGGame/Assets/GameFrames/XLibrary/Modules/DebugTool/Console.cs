@@ -4,7 +4,7 @@ using System.Text;
 using UnityEngine;
 using XLibrary.Package;
 
-namespace XLibGame.Debug
+namespace XLibGame.Debugger
 {
     public class Console: Singleton<Console>
     {

@@ -11,19 +11,17 @@ public partial class InputEntity {
     public STGU3D.InputComponent input { get { return (STGU3D.InputComponent)GetComponent(InputComponentsLookup.Input); } }
     public bool hasInput { get { return HasComponent(InputComponentsLookup.Input); } }
 
-    public void AddInput(int newType, THGame.BehaviourMapper newKeymaps) {
+    public void AddInput(int newType) {
         var index = InputComponentsLookup.Input;
         var component = (STGU3D.InputComponent)CreateComponent(index, typeof(STGU3D.InputComponent));
         component.type = newType;
-        component.keymaps = newKeymaps;
         AddComponent(index, component);
     }
 
-    public void ReplaceInput(int newType, THGame.BehaviourMapper newKeymaps) {
+    public void ReplaceInput(int newType) {
         var index = InputComponentsLookup.Input;
         var component = (STGU3D.InputComponent)CreateComponent(index, typeof(STGU3D.InputComponent));
         component.type = newType;
-        component.keymaps = newKeymaps;
         ReplaceComponent(index, component);
     }
 

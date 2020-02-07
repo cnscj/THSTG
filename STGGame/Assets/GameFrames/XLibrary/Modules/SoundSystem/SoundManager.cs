@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace ASGame
+namespace XLibGame
 {
     /// <summary>
     /// 游戏音效管理组件
@@ -201,7 +201,7 @@ namespace ASGame
             }
             else
             {
-                Debug.LogError($"没有此音效 ={clipName}");
+                UnityEngine.Debug.LogError($"没有此音效 ={clipName}");
             }
         }
 

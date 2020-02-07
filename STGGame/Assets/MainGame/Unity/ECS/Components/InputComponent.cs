@@ -9,7 +9,6 @@ namespace STGU3D
     public class InputComponent : IComponent
     {
         public int type;//类型
-        public BehaviourMapper keymaps;
     }
 
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ASGame
+namespace XLibGame
 {
     [RequireComponent(typeof(AudioSource))]
     public class SoundData : MonoBehaviour

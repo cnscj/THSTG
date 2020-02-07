@@ -1,5 +1,5 @@
 ﻿
-namespace ASGame
+namespace XLibGame
 {
     /// <summary>
     /// 音效类型

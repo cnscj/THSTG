@@ -5,7 +5,7 @@ using System.IO;
 using UnityEngine;
 using XLibrary.Package;
 
-namespace XLibGame.Debug
+namespace XLibGame.Debugger
 {
     /**
      * 将所有日志信息,包括控制台信息输出到文件

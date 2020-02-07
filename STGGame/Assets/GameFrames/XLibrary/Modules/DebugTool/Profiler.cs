@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using XLibrary.Package;
 
-namespace XLibGame.Debug
+namespace XLibGame.Debugger
 {
     public class Profiler : Singleton<Profiler>
     {

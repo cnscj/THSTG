@@ -2,7 +2,7 @@
 
 using System.Diagnostics;
 using System.Text;
-using XLibGame.Debug;
+using XLibGame.Debugger;
 
 namespace STGGame
 {

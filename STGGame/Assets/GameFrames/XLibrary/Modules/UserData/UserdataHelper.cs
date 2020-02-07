@@ -9,7 +9,7 @@ namespace XLibGame
     /// <summary>
     /// 本地数据管理类 
     /// </summary>
-    public static class LocalDatabase
+    public static class UserdataHelper
     {
         public static readonly string SAVES_NAME = "Saves";
 
