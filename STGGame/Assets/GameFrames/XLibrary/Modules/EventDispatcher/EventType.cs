@@ -4,8 +4,7 @@ namespace XLibGame
 {
     public class EventType
     {
-        //XXX:尽管可以兼容两种情况,然而并不能保证没有冲突
-        private int m_type;
+        private string m_type;
 
         public static bool operator ==(EventType c1, EventType c2)
         {
@@ -39,12 +38,12 @@ namespace XLibGame
 
         public EventType(int t)
         {
-            m_type = t;
+            m_type = string.Format("Int:{0}",t);
         }
 
         public EventType(string t)
         {
-            m_type = t.GetHashCode();
+            m_type = string.Format("Str:{0}", t);
         }
 
         //容器对比函数重载

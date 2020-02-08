@@ -2,28 +2,40 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using XLibrary.Package;
 
 namespace XLibGame
 {
     /// <summary>
     /// 游戏音效管理组件
     /// </summary>
-    public class SoundManager
+    public class SoundManager : MonoSingleton<SoundManager>
     {
-        public static SoundManager s_instance;
+        public static readonly string KEY_SOUND_VOLUME = "SoundVolume";
+        public static readonly string KEY_MUSIC_VOLUME = "MusicVolume";
+        public static readonly string KEY_EFFECT_VOLUME = "EffectVolume";
+        public static readonly string KEY_SOUND_MUTE = "SoundMute";
+        public static readonly string KEY_MUSIC_MUTE = "MusicMute";
+        public static readonly string KEY_EFFECT_MUTE = "EffectMute";
 
-        public static SoundManager instance
+        private Dictionary<string, SoundData> m_clips = new Dictionary<string, SoundData>();                                                        //所有音效
+
+        private Dictionary<SoundType, Dictionary<string, SoundData>> m_allClips = new Dictionary<SoundType, Dictionary<string, SoundData>>          //根据类型分类所有音效
         {
-            get
-            {
-                if (s_instance == null)
-                {
-                    s_instance = new SoundManager();
-                }
+            [SoundType.Music] = new Dictionary<string, SoundData>(),
+            [SoundType.Effect] = new Dictionary<string, SoundData>(),
+        };
 
-                return s_instance;
-            }
-        }
+        private Transform m_root;           //根物体
+
+        private float m_soundVolume = 1f;
+        private float m_effectVolume = 0.8f;
+        private float m_musicVolume = 0.8f;
+
+        private bool m_soundMute = false;
+        private bool m_effectMute = false;
+        private bool m_musicMute = false;
+
 
         /// <summary>
         /// 控制游戏全局音量
@@ -34,31 +46,52 @@ namespace XLibGame
             set
             {
                 m_soundVolume = Mathf.Clamp(value, 0, 1);
-                foreach (SoundData clip in m_clips.Values)
-                {
-                    clip.Volume = m_soundVolume * clip.volume;
-                }
+                
+                PlayerPrefs.SetFloat(KEY_SOUND_VOLUME, value);
             }
         }
 
-        private float m_soundVolume = 0.8f;
-
-        //所有音效
-        private Dictionary<string, SoundData> m_clips = new Dictionary<string, SoundData>();
-
-        //根据类型分类所有音效
-        private Dictionary<SoundType, Dictionary<string, SoundData>> m_allClips =
-            new Dictionary<SoundType, Dictionary<string, SoundData>>()
+        /// <summary>
+        /// 音乐全局音量
+        /// </summary>
+        public float MusicVolume
+        {
+            get { return m_musicVolume; }
+            set
             {
-                {SoundType.Music, new Dictionary<string, SoundData>()},
-                {SoundType.Sound, new Dictionary<string, SoundData>()}
-            };
+                m_musicVolume = Mathf.Clamp(value, 0, 1);
+               
+                PlayerPrefs.SetFloat(KEY_MUSIC_VOLUME, value);
+            }
+        }
 
-        //catch ab资源
-        private static Dictionary<string, SoundData> m_abSounds = new Dictionary<string, SoundData>();
+        /// <summary>
+        /// 音效游戏全局静音
+        /// </summary>
+        public float EffectVolume
+        {
+            get { return m_musicVolume; }
+            set
+            {
+                m_musicVolume = Mathf.Clamp(value, 0, 1);
+                
+                PlayerPrefs.SetFloat(KEY_EFFECT_VOLUME, value);
+            }
+        }
 
-        //根物体
-        private Transform m_root;
+        /// <summary>
+        /// 控制游戏静音
+        /// </summary>
+        public bool SoundMute
+        {
+            get { return m_soundMute; }
+            set
+            {
+                m_soundMute = value;
+
+                PlayerPrefs.SetInt(KEY_SOUND_MUTE, value ? 1 : 0);
+            }
+        }
 
         /// <summary>
         /// 音乐静音
@@ -69,46 +102,37 @@ namespace XLibGame
             set
             {
                 m_musicMute = value;
-                foreach (var soundData in m_allClips[SoundType.Music].Values)
-                {
-                    soundData.Mute = m_musicMute;
-                }
 
-                PlayerPrefs.SetInt("MusicMute", value ? 1 : 0);
+                PlayerPrefs.SetInt(KEY_MUSIC_VOLUME, value ? 1 : 0);
             }
         }
-
-        private bool m_musicMute = false;
 
         /// <summary>
         /// 音效静音
         /// </summary>
-        public bool SoundMute
+        public bool EffectMute
         {
-            get { return m_soundMute; }
+            get { return m_effectMute; }
             set
             {
-                m_soundMute = value;
-                foreach (var soundData in m_allClips[SoundType.Sound].Values)
-                {
-                    soundData.Mute = m_soundMute;
-                }
+                m_effectMute = value;
 
-                PlayerPrefs.SetInt("SoundMute", value ? 1 : 0);
+                PlayerPrefs.SetInt(KEY_EFFECT_MUTE, value ? 1 : 0);
             }
         }
 
-        private bool m_soundMute = false;
-
         public void Initialize()
         {
-            m_musicMute = PlayerPrefs.GetInt("MusicMute", 0) == 1;
-            m_soundMute = PlayerPrefs.GetInt("SoundMute", 0) == 1;
+            m_soundVolume = PlayerPrefs.GetFloat(KEY_SOUND_VOLUME, 1f);
+            m_musicVolume = PlayerPrefs.GetFloat(KEY_MUSIC_VOLUME, 0.8f);
+            m_effectVolume = PlayerPrefs.GetFloat(KEY_EFFECT_VOLUME, 0.8f);
 
-            m_root = new GameObject("SoundDatas").transform;
-            GameObject.DontDestroyOnLoad(m_root.gameObject);
+            m_soundMute = PlayerPrefs.GetInt(KEY_SOUND_MUTE, 0) > 0 ? true : false;
+            m_musicMute = PlayerPrefs.GetInt(KEY_MUSIC_MUTE, 0) > 0 ? true : false;
+            m_effectMute = PlayerPrefs.GetInt(KEY_EFFECT_MUTE, 0) > 0 ? true : false;
         }
 
+        ///
         private bool IsContainClip(string clipName)
         {
             lock (m_clips)
@@ -147,28 +171,13 @@ namespace XLibGame
         }
 
         /// <summary>
-        /// 短暂的声音和特效
+        /// 短暂的音效
         /// 无法暂停
         /// 异步加载音效
         /// </summary>
-        public async void PlayClip(string clipName, float volume = 1)
+        public async void PlayEffect(string clipName, float volume = 1)
         {
-//            SoundData sd = await LoadSound(clipName);
-//            if (sd != null)
-//            {
-//                sd.volume = Mathf.Clamp(volume, 0, 1);
-//                sd.Mute = SoundMute;
-//                if (!IsContainClip(clipName))
-//                {
-//                    AddClip(clipName, sd, SoundType.Sound);
-//                }
-//
-//                PlayMusic(clipName, sd);
-//            }
-//            else
-//            {
-//                Debug.LogError($"没有此音效 ={clipName}");
-//            }
+
         }
 
         /// <summary>
@@ -245,7 +254,6 @@ namespace XLibGame
                 }
 
                 m_clips.Remove(clipName);
-                m_abSounds.Remove(clipName);
                 data.Dispose();
             }
         }
