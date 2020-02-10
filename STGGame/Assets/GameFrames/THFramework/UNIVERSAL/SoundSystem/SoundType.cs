@@ -1,5 +1,5 @@
 ﻿
-namespace XLibGame
+namespace THGame
 {
     /// <summary>
     /// 声音类型

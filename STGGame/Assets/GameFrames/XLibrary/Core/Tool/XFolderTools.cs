@@ -133,15 +133,6 @@ namespace XLibrary
             TraverseFolder(new string[] { dir }, callBack, isTraverse, isLower);
         }
 
-        public static void ExporeDolder(string dir)
-        {
-#if UNITY_STANDALONE_WIN
-            System.Diagnostics.Process.Start("explorer.exe", dir);
-#elif UNITY_STANDALONE_OSX
-
-#endif
-        }
-
         [Obsolete]
         public static void TraverseFilesEx(string[] dirs, Action<string> callBack, bool isTraverse = false)
         {

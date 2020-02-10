@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using XLibrary.Package;
 
-namespace XLibGame
+namespace THGame
 {
     /// <summary>
     /// 游戏音效管理组件
