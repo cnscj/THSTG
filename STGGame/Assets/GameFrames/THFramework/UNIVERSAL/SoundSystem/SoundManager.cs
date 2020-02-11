@@ -70,10 +70,10 @@ namespace THGame
         /// </summary>
         public float EffectVolume
         {
-            get { return m_musicVolume; }
+            get { return m_effectVolume; }
             set
             {
-                m_musicVolume = Mathf.Clamp(value, 0, 1);
+                m_effectVolume = Mathf.Clamp(value, 0, 1);
                 
                 PlayerPrefs.SetFloat(KEY_EFFECT_VOLUME, value);
             }
@@ -133,6 +133,16 @@ namespace THGame
         }
 
         ///
+        private float GetRealMusicVolume()
+        {
+            return SoundMute || MusicMute ? 0f : SoundVolume * MusicVolume;
+        }
+
+        private float GetRealEffectVolume()
+        {
+            return SoundMute || EffectMute ? 0f : SoundVolume * EffectVolume;
+        }
+
         private bool IsContainClip(string clipName)
         {
             lock (m_clips)
