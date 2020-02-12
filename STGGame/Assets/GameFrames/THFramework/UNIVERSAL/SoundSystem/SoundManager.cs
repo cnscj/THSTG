@@ -8,6 +8,7 @@ namespace THGame
 {
     /// <summary>
     /// 游戏音效管理组件
+    /// 包括预加载声音,同一声音资源唯一
     /// </summary>
     public class SoundManager : MonoSingleton<SoundManager>
     {
@@ -143,49 +144,12 @@ namespace THGame
             return SoundMute || EffectMute ? 0f : SoundVolume * EffectVolume;
         }
 
-        private bool IsContainClip(string clipName)
-        {
-            lock (m_clips)
-            {
-                if (m_clips.ContainsKey(clipName))
-                    return true;
-                return false;
-            }
-        }
-
-        private SoundData GetAudioSource(string clipName)
-        {
-            if (IsContainClip(clipName))
-                return m_clips[clipName];
-            return null;
-        }
-
-        private void AddClip(string clipName, SoundData data, SoundType type)
-        {
-            lock (m_clips)
-            {
-                data.IsPause = false;
-                data.transform.transform.SetParent(m_root);
-                data.Sound = type;
-                if (IsContainClip(clipName))
-                {
-                    m_clips[clipName] = data;
-                    m_allClips[type][clipName] = data;
-                }
-                else
-                {
-                    m_clips.Add(clipName, data);
-                    m_allClips[type].Add(clipName, data);
-                }
-            }
-        }
 
         /// <summary>
         /// 短暂的音效
         /// 无法暂停
-        /// 异步加载音效
         /// </summary>
-        public async void PlayEffect(string clipName, float volume = 1)
+        public void PlayEffect(string clipName, float volume = 1)
         {
 
         }
@@ -203,50 +167,13 @@ namespace THGame
         public void PlayMusic(string clipName, UnityEngine.Object soundObj, ulong delay = 0, float volume = 1,
             bool isloop = false, bool forceReplay = false)
         {
-            SoundData sd = ((GameObject) soundObj).GetComponent<SoundData>();
-            if (sd != null)
-            {
-                sd.isForceReplay = forceReplay;
-                sd.isLoop = isloop;
-                sd.delay = delay;
-                sd.volume = Mathf.Clamp(volume, 0, 1);
-                sd.Mute = MusicMute;
-                if (!IsContainClip(clipName))
-                {
-                    AddClip(clipName, sd, SoundType.Music);
-                }
-
-                PlayMusic(clipName, sd);
-            }
-            else
-            {
-                UnityEngine.Debug.LogError($"没有此音效 ={clipName}");
-            }
+           
         }
 
         //播放SoundData
         private void PlayMusic(string clipName, SoundData asource)
         {
-            if (null == asource)
-                return;
-            bool forceReplay = asource.isForceReplay;
-            asource.audio.volume = asource.volume * SoundVolume;
-            asource.audio.loop = asource.isLoop;
-            if (!forceReplay)
-            {
-                if (!asource.IsPlaying)
-                {
-                    if (!asource.IsPause)
-                        asource.audio.Play(asource.delay);
-                    else
-                        Resume(clipName);
-                }
-            }
-            else
-            {
-                asource.audio.PlayDelayed(asource.delay);
-                asource.audio.PlayScheduled(0);
-            }
+   
         }
 
         /// <summary>
@@ -255,17 +182,7 @@ namespace THGame
         /// <param name="clipName"></param>
         public void Stop(string clipName)
         {
-            SoundData data = GetAudioSource(clipName);
-            if (null != data)
-            {
-                if (m_allClips[data.Sound].ContainsKey(clipName))
-                {
-                    m_allClips[data.Sound].Remove(clipName);
-                }
-
-                m_clips.Remove(clipName);
-                data.Dispose();
-            }
+           
         }
 
         /// <summary>
@@ -274,12 +191,7 @@ namespace THGame
         /// <param name="clipName"></param>
         public void Pause(string clipName)
         {
-            SoundData data = GetAudioSource(clipName);
-            if (null != data)
-            {
-                data.IsPause = true;
-                data.audio.Pause();
-            }
+           
         }
 
         /// <summary>
@@ -288,12 +200,7 @@ namespace THGame
         /// <param name="clipName"></param>
         public void Resume(string clipName)
         {
-            SoundData data = GetAudioSource(clipName);
-            if (null != data)
-            {
-                data.IsPause = false;
-                data.audio.UnPause();
-            }
+            
         }
 
         /// <summary>
@@ -301,17 +208,6 @@ namespace THGame
         /// </summary>
         public void DisposeAll()
         {
-            foreach (var allClip in m_allClips.Values)
-            {
-                allClip.Clear();
-            }
-
-            foreach (var item in m_clips)
-            {
-                item.Value.Dispose();
-            }
-
-            m_clips.Clear();
         }
     }
 }
