@@ -21,13 +21,13 @@ namespace XLibGame
             Clear();
         }
         //添加对象
-        public void AddObject(Reference refObj)
+        public void AddObject(BaseRef refObj)
         {
             GetCurReleasePool().AddObject(refObj);
         }
 
         //移除对象
-        public void RemoveObject(Reference refObj)
+        public void RemoveObject(BaseRef refObj)
         {
             m_curReleasePool.RemoveObject(refObj);
         }

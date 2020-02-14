@@ -18,16 +18,7 @@ namespace ASGame
         //从下载,到加载能直接用
         public void LoadBundle(string path, string name)
         {
-            var handler = AssetLoader.GetInstance().Load(path);
-            handler.onCompleted += (Object obj) =>
-            {
-                AssetBundle bundle = obj as AssetBundle;
-                if (bundle != null)
-                {
-                    var bundleRef = new AssetBundleReference(bundle);
-
-                }
-            };
+            
         }
 
     }

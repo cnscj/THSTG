@@ -27,7 +27,7 @@ namespace THGame
             [SoundType.Effect] = new Dictionary<string, SoundData>(),
         };
 
-        private Transform m_root;           //根物体
+        private Queue<AudioClip> m_soundPool;   //存放缓存声音的对象池
 
         private float m_soundVolume = 1f;
         private float m_effectVolume = 0.8f;
@@ -149,29 +149,13 @@ namespace THGame
         /// 短暂的音效
         /// 无法暂停
         /// </summary>
-        public void PlayEffect(string clipName, float volume = 1)
+        public void PlayEffect(string clipName)
         {
 
-        }
-
-        /// <summary>
-        /// 播放长音乐 背景音乐等
-        /// 可以暂停 继续播放
-        /// 异步加载音效
-        /// </summary>
-        /// <param name="clipName">声音的预设名字(不包括前缀路径名)</param>
-        /// <param name="delay">延迟播放 单位秒</param>
-        /// <param name="volume">音量</param>
-        /// <param name="isloop">是否循环播放</param>
-        /// /// <param name="forceReplay">是否强制重头播放</param>
-        public void PlayMusic(string clipName, UnityEngine.Object soundObj, ulong delay = 0, float volume = 1,
-            bool isloop = false, bool forceReplay = false)
-        {
-           
         }
 
         //播放SoundData
-        private void PlayMusic(string clipName, SoundData asource)
+        private void PlayMusic(string clipName)
         {
    
         }

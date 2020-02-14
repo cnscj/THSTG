@@ -1,25 +1,23 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
+﻿
 namespace XLibGame
 {
-    public class Reference
+    public abstract class BaseRef : IRefCount
     {
         private int m_refCount;           //引用次数
         private int m_managedCount;       //自释放
-        public Reference()
+
+        public BaseRef()
         {
             m_refCount = 1;
             m_managedCount = 0;
         }
         
-        public virtual void Retain()
+        public void Retain()
         {
             ++m_refCount;
         }
 
-        public virtual void Release()
+        public void Release()
         {
             --m_refCount;
             //如果计数器减为0，释放本类实例化对象占用的内存  
@@ -29,6 +27,13 @@ namespace XLibGame
             }
         }
 
+        public int RefCount()
+        {
+            return m_refCount;
+        }
+
+
+        ///以下为管理器用
         public void ReleaseLater()
         {
             if (m_refCount > m_managedCount)
@@ -45,11 +50,6 @@ namespace XLibGame
             --m_managedCount;
         }
 
-        public int RefCount()
-        {
-            return m_refCount;
-        }
-
         public int ManagedCount()
         {
             return m_managedCount;
@@ -60,6 +60,7 @@ namespace XLibGame
         {
 
         }
+
     }
 
 }

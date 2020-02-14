@@ -6,10 +6,10 @@ namespace XLibGame
 {
     public class AutoReleasePool
     {
-        public List<Reference> m_objectArray;
+        public List<BaseRef> m_objectArray;
         public AutoReleasePool()
         {
-            m_objectArray = new List<Reference>();
+            m_objectArray = new List<BaseRef>();
         }
 
         ~AutoReleasePool()
@@ -17,13 +17,13 @@ namespace XLibGame
             Clear();
         }
         // 将对象添加到自动释放池
-        public void AddObject(Reference refObj)
+        public void AddObject(BaseRef refObj)
         {
             m_objectArray.Add(refObj);
         }
 
         // 将对象从自动释放池中移除  
-        public void RemoveObject(Reference refObj)
+        public void RemoveObject(BaseRef refObj)
         {
             m_objectArray.Remove(refObj);
         }
