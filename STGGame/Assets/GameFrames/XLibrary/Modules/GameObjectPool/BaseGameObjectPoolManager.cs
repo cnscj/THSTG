@@ -5,7 +5,7 @@ using XLibrary.Package;
 
 namespace XLibGame
 {
-    public abstract class GameObjectPoolBaseManager : MonoBehaviour
+    public class BaseGameObjectPoolManager : MonoBehaviour
     {
         /// <summary>
         /// 存放所有的对象池
@@ -41,7 +41,7 @@ namespace XLibGame
             m_onFinish = func;
         }
 
-        protected GameObjectPoolBaseManager()
+        protected BaseGameObjectPoolManager()
         {
             m_poolDic = new Dictionary<string, GameObjectPool>();
         }
@@ -58,7 +58,7 @@ namespace XLibGame
         {
             //初始化所有池
             int count = 0;
-            foreach(var pair in m_poolDic)
+            foreach (var pair in m_poolDic)
             {
                 pair.Value.Init();
                 count++;
@@ -74,7 +74,7 @@ namespace XLibGame
         /// <typeparam name="T">对象池类型</typeparam>
         /// <param name="poolName">对象池名称，唯一id</param>
         /// <returns>对象池对象</returns>
-        public GameObjectPool NewGameObjectPool(string poolName, GameObject prefab, int maxCount = 20,int defaultCount = 0)
+        public GameObjectPool NewGameObjectPool(string poolName, GameObject prefab, int maxCount = 20, int defaultCount = 0)
         {
             if (string.IsNullOrEmpty(poolName))
             {
@@ -87,9 +87,10 @@ namespace XLibGame
             }
             GameObject obj = new GameObject(poolName);
             GameObjectPool pool = obj.AddComponent<GameObjectPool>();
-            
+
             if (m_parentTrans)
             {
+                pool.mgrObj = this;
                 pool.poolName = poolName;
                 pool.prefab = prefab;
                 pool.maxCount = maxCount;
@@ -100,12 +101,12 @@ namespace XLibGame
                     pool.Init();
                 }
             }
-            
+
             m_poolDic[poolName] = pool;
 
             return pool;
         }
-     
+
 
         /// <summary>
         /// 添加一个对象池
@@ -158,7 +159,7 @@ namespace XLibGame
         /// <returns></returns>
         public GameObjectPool GetGameObjectPool(string poolName)
         {
-            if (m_poolDic.TryGetValue(poolName,out var pool))
+            if (m_poolDic.TryGetValue(poolName, out var pool))
             {
                 return pool;
             }
@@ -202,11 +203,7 @@ namespace XLibGame
             var gameObjectPoolObjectCom = go.GetComponent<GameObjectPoolObject>();
             if (gameObjectPoolObjectCom)
             {
-                string poolName = gameObjectPoolObjectCom.poolName;
-                if (m_poolDic.ContainsKey(poolName))
-                {
-                    m_poolDic[poolName].Release(gameObjectPoolObjectCom.gameObject);
-                }
+                gameObjectPoolObjectCom.Release();
             }
             else
             {
@@ -217,9 +214,9 @@ namespace XLibGame
         /// <summary>
         /// 销毁所有对象池操作
         /// </summary>
-        public void Dispose()
+        public void DisposeAll()
         {
-            foreach(var poolPair in m_poolDic)
+            foreach (var poolPair in m_poolDic)
             {
                 var pool = poolPair.Value;
                 pool.Destroy();

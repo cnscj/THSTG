@@ -4,11 +4,13 @@ using UnityEngine;
 
 namespace THGame
 {
-    [RequireComponent(typeof(AudioSource))]
-    public class SoundData : MonoBehaviour
+    [System.Serializable]
+    public class SoundData
     {
-        //音频源控件
-        public new AudioSource audio;
+        /// <summary>
+        /// 音效类型
+        /// </summary>
+        public SoundType type = SoundType.Effect;
 
         /// <summary>
         /// 是否强制重新播放
@@ -34,44 +36,8 @@ namespace THGame
         //[HideInInspector]
         public ulong delay = 0;
 
-        public AudioSource GetAudio()
-        {
-            return audio;
-        }
 
-        public bool IsPlaying
-        {
-            get
-            {
-                return audio != null && audio.isPlaying;
-            }
-        }
-        public bool IsPause
-        {
-            get;
-            set;
-        }
-        public void Dispose()
-        {
-            Destroy(gameObject);
-        }
 
-        /// <summary>
-        /// 音效类型
-        /// </summary>
-        public SoundType Sound { get; set; }
-
-        public bool Mute
-        {
-            get { return audio.mute; }
-            set { audio.mute = value; }
-        }
-
-        public float Volume
-        {
-            get { return audio.volume; }
-            set { audio.volume = value; }
-        }
     }
 
 

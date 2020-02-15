@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using XLibGame;
 using XLibrary.Package;
 
 namespace THGame
@@ -19,15 +20,8 @@ namespace THGame
         public static readonly string KEY_MUSIC_MUTE = "MusicMute";
         public static readonly string KEY_EFFECT_MUTE = "EffectMute";
 
-        private Dictionary<string, SoundData> m_clips = new Dictionary<string, SoundData>();                                                        //所有音效
-
-        private Dictionary<SoundType, Dictionary<string, SoundData>> m_allClips = new Dictionary<SoundType, Dictionary<string, SoundData>>          //根据类型分类所有音效
-        {
-            [SoundType.Music] = new Dictionary<string, SoundData>(),
-            [SoundType.Effect] = new Dictionary<string, SoundData>(),
-        };
-
-        private Queue<AudioClip> m_soundPool;   //存放缓存声音的对象池
+        private Dictionary<string, SoundData> m_sounds;                             //
+        private Dictionary<SoundType, Dictionary<string, SoundData>> m_soundDic;
 
         private float m_soundVolume = 1f;
         private float m_effectVolume = 0.8f;
@@ -37,6 +31,7 @@ namespace THGame
         private bool m_effectMute = false;
         private bool m_musicMute = false;
 
+        private SoundPool m_soundPool;
 
         /// <summary>
         /// 控制游戏全局音量
@@ -122,29 +117,6 @@ namespace THGame
             }
         }
 
-        public void Initialize()
-        {
-            m_soundVolume = PlayerPrefs.GetFloat(KEY_SOUND_VOLUME, 1f);
-            m_musicVolume = PlayerPrefs.GetFloat(KEY_MUSIC_VOLUME, 0.8f);
-            m_effectVolume = PlayerPrefs.GetFloat(KEY_EFFECT_VOLUME, 0.8f);
-
-            m_soundMute = PlayerPrefs.GetInt(KEY_SOUND_MUTE, 0) > 0 ? true : false;
-            m_musicMute = PlayerPrefs.GetInt(KEY_MUSIC_MUTE, 0) > 0 ? true : false;
-            m_effectMute = PlayerPrefs.GetInt(KEY_EFFECT_MUTE, 0) > 0 ? true : false;
-        }
-
-        ///
-        private float GetRealMusicVolume()
-        {
-            return SoundMute || MusicMute ? 0f : SoundVolume * MusicVolume;
-        }
-
-        private float GetRealEffectVolume()
-        {
-            return SoundMute || EffectMute ? 0f : SoundVolume * EffectVolume;
-        }
-
-
         /// <summary>
         /// 短暂的音效
         /// 无法暂停
@@ -155,7 +127,7 @@ namespace THGame
         }
 
         //播放SoundData
-        private void PlayMusic(string clipName)
+        public void PlayMusic(string clipName)
         {
    
         }
@@ -192,6 +164,42 @@ namespace THGame
         /// </summary>
         public void DisposeAll()
         {
+
+        }
+
+        //
+        void Awake()
+        {
+            m_soundVolume = PlayerPrefs.GetFloat(KEY_SOUND_VOLUME, 1f);
+            m_musicVolume = PlayerPrefs.GetFloat(KEY_MUSIC_VOLUME, 0.8f);
+            m_effectVolume = PlayerPrefs.GetFloat(KEY_EFFECT_VOLUME, 0.8f);
+
+            m_soundMute = PlayerPrefs.GetInt(KEY_SOUND_MUTE, 0) > 0 ? true : false;
+            m_musicMute = PlayerPrefs.GetInt(KEY_MUSIC_MUTE, 0) > 0 ? true : false;
+            m_effectMute = PlayerPrefs.GetInt(KEY_EFFECT_MUTE, 0) > 0 ? true : false;
+
+            
+        }
+
+        ///
+        private float GetRealMusicVolume()
+        {
+            return SoundMute || MusicMute ? 0f : SoundVolume * MusicVolume;
+        }
+
+        private float GetRealEffectVolume()
+        {
+            return SoundMute || EffectMute ? 0f : SoundVolume * EffectVolume;
+        }
+
+        private SoundPool GetPool()
+        {
+            if (m_soundPool == null)
+            {
+                GameObject poolGobj = new GameObject("SoundPool");
+                m_soundPool = poolGobj.AddComponent<SoundPool>();
+            }
+            return m_soundPool;
         }
     }
 }

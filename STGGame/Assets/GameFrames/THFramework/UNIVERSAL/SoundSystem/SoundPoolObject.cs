@@ -1,10 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
 
-namespace XLibGame
+namespace THGame
 {
-    public class GameObjectPoolObject : MonoBehaviour
+    public class SoundPoolObject : MonoBehaviour
     {
         /// <summary>
         /// 对象显示的持续时间，若=0，则不隐藏
@@ -14,7 +13,7 @@ namespace XLibGame
         /// <summary>
         /// 所属对象池
         /// </summary>
-        public GameObjectPool poolObj;
+        public SoundPool poolObj;
 
         void OnEnable()
         {
@@ -45,7 +44,6 @@ namespace XLibGame
                 Destroy(gameObject);
             }
         }
+
     }
-
-
 }

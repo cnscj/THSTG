@@ -12,6 +12,10 @@ namespace XLibGame
             Sight,          //视野
         }
         /// <summary>
+        /// 所属对象池管理器
+        /// </summary>
+        public BaseGameObjectPoolManager mgrObj;
+        /// <summary>
         /// 每个对象池的名称，当唯一id
         /// </summary>
         public string poolName;
@@ -41,11 +45,6 @@ namespace XLibGame
         ///释放模式
         /// </summary>
         public ReleaseOperate releaseOperate = ReleaseOperate.Active;
-
-        /// <summary>
-        /// 被托管
-        /// </summary>
-        public bool isManaged = true;
 
         /// <summary>
         /// 队列，存放对象池中没有用到的对象，即可分配对象
@@ -98,7 +97,7 @@ namespace XLibGame
             {
                 info = returnObj.AddComponent<GameObjectPoolObject>();
             }
-            info.poolName = poolName;
+            info.poolObj = this;
             if (lifetime > 0)
             {
                 info.lifetime = lifetime;
@@ -208,14 +207,8 @@ namespace XLibGame
         /// </summary>
         private void Awake()
         {
-            if (isManaged)
-            {
-                GameObjectPoolManager.GetInstance().AddGameObjectPool(this);
-            }
-            else
-            {
-                Init();
-            }
+           
+            Init();
             m_startTick = Time.realtimeSinceStartup;
         }
 
@@ -224,7 +217,7 @@ namespace XLibGame
         /// </summary>
         private void Start()
         {
-            if (string.IsNullOrEmpty(poolName) || (isManaged && !GameObjectPoolManager.GetInstance().GetGameObjectPool(poolName)))
+            if (string.IsNullOrEmpty(poolName))
             {
                 Destroy();
             }
@@ -236,14 +229,6 @@ namespace XLibGame
         private void OnDestroy()
         {
             m_queue.Clear();
-            var mgrInstance = GameObjectPoolManager.GetInstance();
-            if (mgrInstance != null)
-            {
-                if (mgrInstance.GetGameObjectPool(poolName))
-                {
-                    mgrInstance.DestroyGameObjectPool(poolName);
-                }
-            }
         }
 
         private void Update()
