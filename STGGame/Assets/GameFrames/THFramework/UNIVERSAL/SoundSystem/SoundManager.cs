@@ -20,18 +20,17 @@ namespace THGame
         public static readonly string KEY_MUSIC_MUTE = "MusicMute";
         public static readonly string KEY_EFFECT_MUTE = "EffectMute";
 
-        private Dictionary<string, SoundData> m_sounds;                             //
-        private Dictionary<SoundType, Dictionary<string, SoundData>> m_soundDic;
+        public int maxEffectCount;  //最大音效数量
 
-        private float m_soundVolume = 1f;
-        private float m_effectVolume = 0.8f;
-        private float m_musicVolume = 0.8f;
+        private float m_soundVolume;
+        private float m_effectVolume;
+        private float m_musicVolume;
 
-        private bool m_soundMute = false;
-        private bool m_effectMute = false;
-        private bool m_musicMute = false;
+        private bool m_soundMute;
+        private bool m_effectMute;
+        private bool m_musicMute;
 
-        private SoundPool m_soundPool;
+        private Dictionary<SoundType, SoundPlayer> m_soundDict;
 
         /// <summary>
         /// 控制游戏全局音量
@@ -42,8 +41,8 @@ namespace THGame
             set
             {
                 m_soundVolume = Mathf.Clamp(value, 0, 1);
+                UpdateAllVolume();
                 
-                PlayerPrefs.SetFloat(KEY_SOUND_VOLUME, value);
             }
         }
 
@@ -56,8 +55,7 @@ namespace THGame
             set
             {
                 m_musicVolume = Mathf.Clamp(value, 0, 1);
-               
-                PlayerPrefs.SetFloat(KEY_MUSIC_VOLUME, value);
+                UpdateMusicVolume();
             }
         }
 
@@ -70,8 +68,7 @@ namespace THGame
             set
             {
                 m_effectVolume = Mathf.Clamp(value, 0, 1);
-                
-                PlayerPrefs.SetFloat(KEY_EFFECT_VOLUME, value);
+                UpdateEffectVolume();
             }
         }
 
@@ -84,8 +81,7 @@ namespace THGame
             set
             {
                 m_soundMute = value;
-
-                PlayerPrefs.SetInt(KEY_SOUND_MUTE, value ? 1 : 0);
+                UpdateAllVolume();
             }
         }
 
@@ -98,8 +94,7 @@ namespace THGame
             set
             {
                 m_musicMute = value;
-
-                PlayerPrefs.SetInt(KEY_MUSIC_VOLUME, value ? 1 : 0);
+                UpdateMusicVolume();
             }
         }
 
@@ -112,8 +107,7 @@ namespace THGame
             set
             {
                 m_effectMute = value;
-
-                PlayerPrefs.SetInt(KEY_EFFECT_MUTE, value ? 1 : 0);
+                UpdateEffectVolume();
             }
         }
 
@@ -127,7 +121,7 @@ namespace THGame
         }
 
         //播放SoundData
-        public void PlayMusic(string clipName)
+        public void PlayMusic(string clipName, SoundArgs args)
         {
    
         }
@@ -136,7 +130,7 @@ namespace THGame
         /// 停止并销毁声音
         /// </summary>
         /// <param name="clipName"></param>
-        public void Stop(string clipName)
+        public void StopMusic()
         {
            
         }
@@ -145,7 +139,7 @@ namespace THGame
         /// 暂停声音
         /// </summary>
         /// <param name="clipName"></param>
-        public void Pause(string clipName)
+        public void PauseMusic(float fadeOut = 0f)
         {
            
         }
@@ -154,9 +148,23 @@ namespace THGame
         /// 继续播放
         /// </summary>
         /// <param name="clipName"></param>
-        public void Resume(string clipName)
+        public void ResumeMusic(float fadeIn = 0f)
         {
             
+        }
+
+        /// <summary>
+        /// 设置音乐速度
+        /// </summary>
+        /// <param name="speed"></param>
+        public void SetMuiscSpeed(float speed)
+        {
+
+        }
+
+        public float GetMuiscSpeed()
+        {
+            return 0;
         }
 
         /// <summary>
@@ -170,36 +178,75 @@ namespace THGame
         //
         void Awake()
         {
+            
+         
+        }
+
+        public float GetlMusicVolume()
+        {
+            return (SoundMute || MusicMute) ? 0f : SoundVolume * MusicVolume;
+        }
+
+        public float GetEffectVolume()
+        {
+            return (SoundMute || EffectMute) ? 0f : SoundVolume * EffectVolume;
+        }
+
+        public SoundPlayer GetPlayer(SoundType type)
+        {
+            return null;
+        }
+
+        public void LoadConfig()
+        {
             m_soundVolume = PlayerPrefs.GetFloat(KEY_SOUND_VOLUME, 1f);
-            m_musicVolume = PlayerPrefs.GetFloat(KEY_MUSIC_VOLUME, 0.8f);
-            m_effectVolume = PlayerPrefs.GetFloat(KEY_EFFECT_VOLUME, 0.8f);
+            m_musicVolume = PlayerPrefs.GetFloat(KEY_MUSIC_VOLUME, 1f);
+            m_effectVolume = PlayerPrefs.GetFloat(KEY_EFFECT_VOLUME, 1f);
 
             m_soundMute = PlayerPrefs.GetInt(KEY_SOUND_MUTE, 0) > 0 ? true : false;
             m_musicMute = PlayerPrefs.GetInt(KEY_MUSIC_MUTE, 0) > 0 ? true : false;
             m_effectMute = PlayerPrefs.GetInt(KEY_EFFECT_MUTE, 0) > 0 ? true : false;
-
-            
         }
 
+        public void SaveConfig()
+        {
+            PlayerPrefs.SetFloat(KEY_SOUND_VOLUME, m_soundVolume);
+            PlayerPrefs.SetFloat(KEY_MUSIC_VOLUME, m_musicVolume);
+            PlayerPrefs.SetFloat(KEY_EFFECT_VOLUME, m_effectVolume);
+
+            PlayerPrefs.SetInt(KEY_SOUND_MUTE, m_soundMute ? 1 : 0);
+            PlayerPrefs.SetInt(KEY_MUSIC_VOLUME, m_musicMute ? 1 : 0);
+            PlayerPrefs.SetInt(KEY_EFFECT_MUTE, m_effectMute ? 1 : 0);
+        }
         ///
-        private float GetRealMusicVolume()
+        private SoundPlayer GetOrCreatePlayer(SoundType type)
         {
-            return SoundMute || MusicMute ? 0f : SoundVolume * MusicVolume;
-        }
-
-        private float GetRealEffectVolume()
-        {
-            return SoundMute || EffectMute ? 0f : SoundVolume * EffectVolume;
-        }
-
-        private SoundPool GetPool()
-        {
-            if (m_soundPool == null)
+            m_soundDict = m_soundDict ?? new Dictionary<SoundType, SoundPlayer>();
+            if (!m_soundDict.ContainsKey(type))
             {
-                GameObject poolGobj = new GameObject("SoundPool");
-                m_soundPool = poolGobj.AddComponent<SoundPool>();
+                string typeName = Enum.Parse(typeof(SoundType), type.ToString()).ToString();
+                string playerName = string.Format("{0}Player", typeName);
+                GameObject playerGobj = new GameObject(playerName);
+                SoundPlayer soundPlayer = playerGobj.AddComponent<SoundPlayer>();
+                m_soundDict[type] = soundPlayer;
             }
-            return m_soundPool;
+            return m_soundDict[type];
         }
+
+        private void UpdateAllVolume()
+        {
+            UpdateMusicVolume();
+            UpdateEffectVolume();
+        }
+
+        private void UpdateMusicVolume()
+        {
+
+        }
+
+        private void UpdateEffectVolume()
+        {
+
+        }  
     }
 }

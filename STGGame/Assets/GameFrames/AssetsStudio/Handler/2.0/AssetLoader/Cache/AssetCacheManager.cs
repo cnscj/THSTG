@@ -9,25 +9,23 @@ namespace ASGame
     public class AssetCacheManager : MonoSingleton<AssetCacheManager>
     {
         [Header("定时清理缓存间隔(秒):")]
-        public float clearCacheDuration = 10f;
+        public float clearCacheCDTime = 10f;
 
+        private Dictionary<string, AssetCacheObjectInfo> m_cacheDataDict = new Dictionary<string, AssetCacheObjectInfo>();//缓冲区[key 为绝对路径]
         private float m_cacheTimeTemp;
 
-        //缓冲区[key 为绝对路径]
-        private Dictionary<string, AssetObjectInfo> cacheDataDic = new Dictionary<string, AssetObjectInfo>();
-
         //检测缓冲区
-        public AssetObjectInfo QueryCache(string key)
+        public AssetCacheObjectInfo Query(string key)
         {
-            if (cacheDataDic.ContainsKey(key))
+            if (m_cacheDataDict.ContainsKey(key))
             {
-                return cacheDataDic[key];
+                return m_cacheDataDict[key];
             }
             return null;
         }
 
         //加入缓冲区
-        public void PushCache(string key, Object obj, float stayTime = 30f)
+        public void Push(string key, Object obj, float stayTime = 30f)
         {
             if (key == null)
                 return;
@@ -35,50 +33,56 @@ namespace ASGame
             if (obj == null)
                 return;
 
-            lock (cacheDataDic)
+            lock (m_cacheDataDict)
             {
-                if (cacheDataDic.ContainsKey(key))
+                if (m_cacheDataDict.ContainsKey(key))
                 {
-                    cacheDataDic[key].UpdateTick();
+                    m_cacheDataDict[key].UpdateTick();
                 }
                 else
                 {
-                    AssetObjectInfo info = new AssetObjectInfo(key, obj, stayTime);
-                    cacheDataDic.Add(key, info);
+                    AssetCacheObjectInfo info = new AssetCacheObjectInfo(key, obj);
+                    info.stayTime = stayTime;
+
+                    m_cacheDataDict.Add(key, info);
                     info.UpdateTick();
                 }
             }
         }
 
+        public void Remove(string key)
+        {
+            m_cacheDataDict.Remove(key);
+        }
+
         //清空缓冲区
-        public void RemoveCache()
+        public void Clear()
         {
-            cacheDataDic.Clear();
+            m_cacheDataDict.Clear();
         }
 
-        //清理缓冲区
-        private void UpdateCache()
+        public void Update()
         {
-            foreach (var iter in cacheDataDic.ToList())
-            {
-                if (iter.Value.startTick + iter.Value.stayTime <= Time.realtimeSinceStartup)
-                {
-                    cacheDataDic.Remove(iter.Key);
-                }
-            }
-        }
-
-
-        private void Update()
-        {
-            if (clearCacheDuration < 0) return;
+            if (clearCacheCDTime < 0) return;
 
             m_cacheTimeTemp += Time.deltaTime;
 
-            if (m_cacheTimeTemp >= clearCacheDuration)
+            if (m_cacheTimeTemp >= clearCacheCDTime)
             {
-                UpdateCache();
-                m_cacheTimeTemp -= clearCacheDuration;
+                PurgeCache();
+                m_cacheTimeTemp -= clearCacheCDTime;
+            }
+        }
+
+        //清理缓冲区
+        private void PurgeCache()
+        {
+            foreach (var iter in m_cacheDataDict.ToList())
+            {
+                if (iter.Value.CheckRemove())
+                {
+                    m_cacheDataDict.Remove(iter.Key);
+                }
             }
         }
     }

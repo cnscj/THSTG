@@ -6,10 +6,15 @@ namespace THGame
 {
     public class SoundPool : MonoBehaviour
     {
+
         public long stayTime;
 
-        private GameObject m_pooGObj;
+        private GameObject m_poolGObj;
         private Dictionary<string, Queue<SoundPlayer>> m_idleMap;
+        public void Add(string key, SoundPlayer player)
+        {
+
+        }
         public void Get(string key)
         {
             //TODO:
@@ -19,10 +24,10 @@ namespace THGame
         {
             if (go != null)
             {
-                var soundpoolObj = go.GetComponent<SoundPoolObject>();
-                if (soundpoolObj)
+                var soundPoolObj = go.GetComponent<SoundPoolObject>();
+                if (soundPoolObj)
                 {
-                    Release(soundpoolObj);
+                    Release(soundPoolObj);
                 }
             }
         }
@@ -38,5 +43,13 @@ namespace THGame
         {
             
         }
+
+        private Queue GetAvailableQueue(string key)
+        {
+
+            return null;
+        }
+
+
     }
 }
