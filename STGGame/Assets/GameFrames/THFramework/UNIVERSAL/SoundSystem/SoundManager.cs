@@ -182,21 +182,7 @@ namespace THGame
          
         }
 
-        public float GetlMusicVolume()
-        {
-            return (SoundMute || MusicMute) ? 0f : SoundVolume * MusicVolume;
-        }
-
-        public float GetEffectVolume()
-        {
-            return (SoundMute || EffectMute) ? 0f : SoundVolume * EffectVolume;
-        }
-
-        public SoundPlayer GetPlayer(SoundType type)
-        {
-            return null;
-        }
-
+        
         public void LoadConfig()
         {
             m_soundVolume = PlayerPrefs.GetFloat(KEY_SOUND_VOLUME, 1f);
@@ -206,6 +192,9 @@ namespace THGame
             m_soundMute = PlayerPrefs.GetInt(KEY_SOUND_MUTE, 0) > 0 ? true : false;
             m_musicMute = PlayerPrefs.GetInt(KEY_MUSIC_MUTE, 0) > 0 ? true : false;
             m_effectMute = PlayerPrefs.GetInt(KEY_EFFECT_MUTE, 0) > 0 ? true : false;
+
+            UpdateAllPlayers();
+
         }
 
         public void SaveConfig()
@@ -219,6 +208,17 @@ namespace THGame
             PlayerPrefs.SetInt(KEY_EFFECT_MUTE, m_effectMute ? 1 : 0);
         }
         ///
+
+        private float GetRealMusicVolume()
+        {
+            return (SoundMute || MusicMute) ? 0f : SoundVolume * MusicVolume;
+        }
+
+        private float GetRealEffectVolume()
+        {
+            return (SoundMute || EffectMute) ? 0f : SoundVolume * EffectVolume;
+        }
+
         private SoundPlayer GetOrCreatePlayer(SoundType type)
         {
             m_soundDict = m_soundDict ?? new Dictionary<SoundType, SoundPlayer>();
@@ -233,20 +233,42 @@ namespace THGame
             return m_soundDict[type];
         }
 
+        private void UpdateAllPlayers()
+        {
+            UpdateAllVolume();
+            UpdateAllMute();
+        }
+
         private void UpdateAllVolume()
         {
             UpdateMusicVolume();
             UpdateEffectVolume();
         }
 
+        private void UpdateAllMute()
+        {
+            UpdateMusicMute();
+            UpdateEffectMute();
+        }
+
         private void UpdateMusicVolume()
         {
-
+            GetOrCreatePlayer(SoundType.Music).Volume = GetRealMusicVolume();
         }
 
         private void UpdateEffectVolume()
         {
+            GetOrCreatePlayer(SoundType.Effect).Volume = GetRealEffectVolume();
+        }
 
-        }  
+        private void UpdateMusicMute()
+        {
+            GetOrCreatePlayer(SoundType.Music).Mute = MusicMute;
+        }
+
+        private void UpdateEffectMute()
+        {
+            GetOrCreatePlayer(SoundType.Effect).Mute = EffectMute;
+        }
     }
 }

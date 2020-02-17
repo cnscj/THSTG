@@ -10,32 +10,64 @@ namespace THGame
         public long stayTime;
 
         private GameObject m_poolGObj;
-        private Dictionary<string, Queue<SoundPlayer>> m_idleMap;
-        public void Add(string key, SoundPlayer player)
+        private Dictionary<string, SoundController> m_idleMap;
+        
+        public SoundController GetOrCreate(string key)
         {
-
-        }
-        public void Get(string key)
-        {
-            //TODO:
-        }
-
-        public void Release(GameObject go)
-        {
-            if (go != null)
+            SoundController ctrl = null;
+            GameObject ctrlGobj = null;
+            if (!m_idleMap.TryGetValue(key, out ctrl))
             {
-                var soundPoolObj = go.GetComponent<SoundPoolObject>();
-                if (soundPoolObj)
-                {
-                    Release(soundPoolObj);
-                }
+                ctrlGobj = new GameObject(key);
+                ctrl = ctrlGobj.AddComponent<SoundController>();
+
+                m_idleMap.Add(key, ctrl);
+            }
+
+            //定时清理脚本
+            ctrlGobj = ctrl.gameObject;
+            var poolObj = ctrlGobj.GetComponent<SoundPoolObject>();
+            if (poolObj == null)
+            {
+                poolObj = ctrlGobj.AddComponent<SoundPoolObject>();
+            }
+            ctrlGobj.SetActive(true);
+
+            return ctrl;
+        }
+
+        public void Release(SoundPoolObject poolObj)
+        {
+            if (poolObj != null)
+            {
+
+                GameObject ctrlGobj = poolObj.gameObject;
+                ctrlGobj.SetActive(false);
             }
         }
-        public void Release(SoundPoolObject obj)
-        {
-            if (obj != null)
-            {
 
+        public void Release(GameObject gobj)
+        {
+            if (gobj != null)
+            {
+                var poolObj = gobj.GetComponent<SoundPoolObject>();
+                if (poolObj != null)
+                {
+                    Release(poolObj);
+                }
+                else
+                {
+                    Destroy(poolObj);
+                }
+
+            }
+        }
+
+        public void Release(SoundController ctrl)
+        {
+            if (ctrl != null)
+            {
+                Release(gameObject);
             }
         }
 

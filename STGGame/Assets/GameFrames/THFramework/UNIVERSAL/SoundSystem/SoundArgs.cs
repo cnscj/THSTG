@@ -21,6 +21,11 @@ namespace THGame
         public bool isLoop = false;
 
         /// <summary>
+        /// 播放的开始时间
+        /// </summary>
+        public float pointTime = 0;
+
+        /// <summary>
         /// 延迟
         /// </summary>
         //[HideInInspector]
