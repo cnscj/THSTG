@@ -1,14 +1,12 @@
 ﻿
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using XLibrary.Package;
-
+using Object = UnityEngine.Object;
 namespace ASGame
 {
-    /// <summary>
-    /// 一个简易对象池及轮询系统
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class AssetBaseManager<T> : MonoSingleton<T> where T: MonoBehaviour
+    public class AssetBaseCache : MonoBehaviour
     {
         [Header("定时清理缓存间隔(秒):")]
         public float clearCacheDuration = 10f;

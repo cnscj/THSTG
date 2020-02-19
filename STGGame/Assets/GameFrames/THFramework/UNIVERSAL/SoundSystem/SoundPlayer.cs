@@ -95,7 +95,7 @@ namespace THGame
         {
             if (m_playingSounds.TryGetValue(key, out var ctrl))
             {
-                ctrl.Pause(fadeOut);
+                //ctrl.Pause(fadeOut);
             }
         }
 
@@ -103,7 +103,7 @@ namespace THGame
         {
             if (m_playingSounds.TryGetValue(key, out var ctrl))
             {
-                ctrl.Resume(fadeIn);
+                //ctrl.Resume(fadeIn);
             }
         }
 
@@ -142,7 +142,7 @@ namespace THGame
         {
             foreach (var pair in m_playingSounds)
             {
-                pair.Value.Speed = GetRealSpeed();
+                pair.Value.Pitch = GetRealSpeed();
             }
 
         }
@@ -185,6 +185,14 @@ namespace THGame
             }
             return m_poolObj;
         }
+
+        //用于判断声音是否播放结束
+        private IEnumerator UpdateSoundState()
+        {
+            
+            yield return 1;
+        }
+
     }
 
 

@@ -6,7 +6,7 @@ using XLibrary.Package;
 using Object = UnityEngine.Object;
 namespace ASGame
 {
-    public class AssetCacheManager : MonoSingleton<AssetCacheManager>
+    public abstract class AssetCacheBaseManager<T> : MonoSingleton<T> where T: MonoBehaviour
     {
         [Header("定时清理缓存间隔(秒):")]
         public float clearCacheCDTime = 10f;

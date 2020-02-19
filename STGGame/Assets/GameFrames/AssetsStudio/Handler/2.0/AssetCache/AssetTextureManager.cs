@@ -4,7 +4,7 @@ using XLibrary.Package;
 
 namespace ASGame
 {
-    public class AssetTextureManager : AssetBaseManager<AssetTextureManager>
+    public class AssetTextureManager : AssetCacheBaseManager<AssetTextureManager>
     {
         public delegate void OnLoadSuccess(object texture);
         public delegate void OnLoadFailed(string error);
