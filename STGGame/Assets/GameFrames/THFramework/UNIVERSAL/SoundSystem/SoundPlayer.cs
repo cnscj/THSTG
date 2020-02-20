@@ -40,7 +40,7 @@ namespace THGame
             set
             {
                 m_mute = value;
-                UpdateVolume();
+                UpdateMute();
             }
         }
 
@@ -95,7 +95,7 @@ namespace THGame
         {
             if (m_playingSounds.TryGetValue(key, out var ctrl))
             {
-                //ctrl.Pause(fadeOut);
+                ctrl.Pause(fadeOut);
             }
         }
 
@@ -103,7 +103,7 @@ namespace THGame
         {
             if (m_playingSounds.TryGetValue(key, out var ctrl))
             {
-                //ctrl.Resume(fadeIn);
+                ctrl.Resume(fadeIn);
             }
         }
 
@@ -128,11 +128,6 @@ namespace THGame
             }
         }
 
-        private float GetRealVolume()
-        {
-            return Mute ? 0f : Volume;
-        }
-
         private float GetRealSpeed()
         {
             return m_speed;
@@ -151,7 +146,15 @@ namespace THGame
         {
             foreach(var pair in m_playingSounds)
             {
-                pair.Value.Volume = GetRealVolume();
+                pair.Value.Volume = Volume;
+            }
+        }
+
+        private void UpdateMute()
+        {
+            foreach (var pair in m_playingSounds)
+            {
+                pair.Value.Mute = Mute;
             }
         }
 
