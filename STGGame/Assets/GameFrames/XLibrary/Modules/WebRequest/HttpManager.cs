@@ -16,7 +16,7 @@ namespace XLibGame
             POST
         }
 
-        public enum DownloadHanlderType
+        public enum DateType
         {
             Byte,
             Text
@@ -67,22 +67,38 @@ namespace XLibGame
             return ret;
         }
 
-        public void Get(string url, RequestForm form, Action<object> onSuccess = null, Action<string> onFailed = null)
+        public void Get(string url, RequestForm form, DateType dateType, Action<object> onSuccess = null, Action<string> onFailed = null)
         {
-            StartCoroutine(InvokeRequest(MethodType.GET, url, form, CreateCallback(onSuccess, onFailed, DownloadHanlderType.Byte)));
+            StartCoroutine(InvokeRequest(MethodType.GET, url, form, CreateCallback(onSuccess, onFailed, dateType)));
         }
 
-        public void Post(string url, RequestForm form, Action<object> onSuccess = null, Action<string> onFailed = null)
+        public void Post(string url, RequestForm form, DateType dateType, Action<object> onSuccess = null, Action<string> onFailed = null)
         {
-            StartCoroutine(InvokeRequest(MethodType.POST, url, form, CreateCallback(onSuccess, onFailed, DownloadHanlderType.Byte)));
+            StartCoroutine(InvokeRequest(MethodType.POST, url, form, CreateCallback(onSuccess, onFailed, dateType)));
+        }
+        public void Get(string url, DateType dateType, Action<object> onSuccess = null, Action<string> onFailed = null)
+        {
+            Get(url, null, dateType, onSuccess, onFailed);
+        }
+        public void Get(string url, RequestForm form, Action<object> onSuccess = null, Action<string> onFailed = null)
+        {
+            Get(url, form, DateType.Byte ,onSuccess, onFailed);
         }
         public void Get(string url, Action<object> onSuccess = null, Action<string> onFailed = null)
         {
-            Get(url, null, onSuccess, onFailed);
+            Get(url, null, DateType.Text, onSuccess, onFailed);
+        }
+        public void Post(string url, DateType dateType, Action<object> onSuccess = null, Action<string> onFailed = null)
+        {
+            Post(url, null, dateType, onSuccess, onFailed);
+        }
+        public void Post(string url, RequestForm form, Action<object> onSuccess = null, Action<string> onFailed = null)
+        {
+            Post(url, form, DateType.Byte, onSuccess, onFailed);
         }
         public void Post(string url, Action<object> onSuccess = null, Action<string> onFailed = null)
         {
-            Post(url, null, onSuccess, onFailed);
+            Post(url, null, DateType.Text, onSuccess, onFailed);
         }
 
         public void Request(MethodType methodType, string url, RequestForm form = null, Action<UnityWebRequest> callback = null)
@@ -108,7 +124,7 @@ namespace XLibGame
             callback?.Invoke(request);
         }
 
-        Action<UnityWebRequest> CreateCallback(Action<object> onSuccess, Action<string> onFailed, DownloadHanlderType dateType)
+        Action<UnityWebRequest> CreateCallback(Action<object> onSuccess, Action<string> onFailed, DateType dateType)
         {
             if (onSuccess == null && onFailed == null)
                 return null;
@@ -121,11 +137,11 @@ namespace XLibGame
 
                 if (request.isDone)
                 {
-                    if (dateType == DownloadHanlderType.Text)
+                    if (dateType == DateType.Text)
                     {
                         onSuccess?.Invoke(request.downloadHandler.text);
                     }
-                    else if (dateType == DownloadHanlderType.Byte)
+                    else if (dateType == DateType.Byte)
                     {
                         onSuccess?.Invoke(request.downloadHandler.data);
                     }

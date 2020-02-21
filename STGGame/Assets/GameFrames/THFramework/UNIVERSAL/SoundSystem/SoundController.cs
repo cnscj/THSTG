@@ -16,6 +16,8 @@ namespace THGame
         private bool m_mute = false;
 
         private Coroutine m_fadeCoroutine = null;
+        private Coroutine m_finishCoroutine = null;
+
         public AudioSource GetAudio()
         {
             if (audio == null)
@@ -107,13 +109,17 @@ namespace THGame
             }
         }
 
+        public float Length
+        {
+            get { return (GetAudio().clip ? GetAudio().clip.length : 0f); }
+        }
+
         //
         public void Play(AudioClip clip, SoundArgs args = null)
         {
             Play();
         }
 
-        [ContextMenu("Play")]
         public void Play()
         {
             if (clip == null) return;
@@ -125,7 +131,6 @@ namespace THGame
             GetAudio().PlayDelayed(GetArgs().delay);
         }
 
-        [ContextMenu("Stop")]
         public void Stop()
         {
             StopFadeCoroutine();
@@ -133,7 +138,6 @@ namespace THGame
             GetAudio().Stop();
         }
 
-        [ContextMenu("Pause")]
         public void Pause(float fadeOut = 1f)
         {
 
@@ -141,7 +145,7 @@ namespace THGame
 
             if (fadeOut > 0f)
             {
-                m_fadeCoroutine = StartCoroutine(StartFadeOut(fadeOut));
+                m_fadeCoroutine = StartCoroutine(TweenFadeOut(fadeOut));
             }
             else
             {
@@ -149,14 +153,14 @@ namespace THGame
             }
         }
 
-        [ContextMenu("Resume")]
         public void Resume(float fadeIn = 1f)
         {
             StopFadeCoroutine();
+            StopFinishCoroutine();
 
             if (fadeIn > 0f)
             {
-                m_fadeCoroutine = StartCoroutine(StartFadeIn(fadeIn));
+                m_fadeCoroutine = StartCoroutine(TweenFadeIn(fadeIn));
             }
             else
             {
@@ -166,6 +170,30 @@ namespace THGame
 
 
         ///
+        //如果有暂停,继续,重新播放快播慢播,延迟,循环播等操作,需要更新下
+        private void StartFinishCoroutine()
+        {
+            if (IsLoop) return;
+
+            //取得最新的的时长
+            float soundPitch = Pitch;
+            float soundLength = Length;
+            bool soundLoop = IsLoop;
+
+            float waitTime = 0f;            //受播放延迟,速度影响,重新估算需要等待的时间
+            m_finishCoroutine = StartCoroutine(WaitFinish(waitTime));
+        }
+
+
+        private void StopFinishCoroutine()
+        {
+            if (m_finishCoroutine != null)
+            {
+                StopCoroutine(m_finishCoroutine);
+                m_finishCoroutine = null;
+            }
+        }
+
         private void StopFadeCoroutine()
         {
             if (m_fadeCoroutine != null)
@@ -175,13 +203,13 @@ namespace THGame
             }
         }
 
-        private IEnumerator StartFadeIn(float fadeIn)
+        private IEnumerator TweenFadeIn(float fadeIn)
         {
             GetAudio().UnPause();
             float time = 0f;
             while (time <= fadeIn)
             {
-                GetAudio().volume = m_volume - Mathf.Pow(3, time / fadeIn);
+                GetAudio().volume = 0f + (m_volume - 0f) * Mathf.Pow(time / fadeIn, 3f);
                 time += UnityEngine.Time.deltaTime;
                 yield return null;
             }
@@ -189,12 +217,12 @@ namespace THGame
             m_fadeCoroutine = null;
         }
 
-        private IEnumerator StartFadeOut(float fadeOut)
+        private IEnumerator TweenFadeOut(float fadeOut)
         {
             float time = 0f;
             while(time <= fadeOut)
             {
-                GetAudio().volume = m_volume - m_volume * (Mathf.Pow(3, (time / fadeOut - 1f)) + 1.0f);
+                GetAudio().volume = m_volume + (0f - m_volume) * (Mathf.Pow(time / fadeOut - 1f, 3f) + 1.0f);
                 time += UnityEngine.Time.deltaTime;
                 yield return null;
             }
@@ -203,8 +231,18 @@ namespace THGame
             m_fadeCoroutine = null;
         }
 
+        private IEnumerator WaitFinish(float waitTime)
+        {
+            yield return new WaitForSeconds(waitTime);
+            //等待结束,执行回调
+            m_finishCoroutine = null;
+        }
 
-
+        private void OnDestroy()
+        {
+            StopFadeCoroutine();
+            StopFinishCoroutine();
+        }
     }
 
 

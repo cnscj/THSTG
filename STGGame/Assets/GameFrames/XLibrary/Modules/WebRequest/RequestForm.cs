@@ -31,6 +31,16 @@ namespace XLibGame
 
         }
 
+        public object this[string key]
+        {
+            get => m_params != null ? m_params[key] : null;
+            set {
+
+                m_params = m_params ?? new Dictionary<string, object>();
+                m_params[key] = value;
+            }
+        }
+
         public void Add(string field, object data)
         {
             if (m_params == null)
