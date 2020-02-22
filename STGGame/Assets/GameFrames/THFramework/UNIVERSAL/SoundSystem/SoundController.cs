@@ -6,11 +6,13 @@ namespace THGame
 {
     public class SoundController : MonoBehaviour
     {
+        public delegate void FinishCallback();
         public static readonly SoundArgs DEFAULT_ARGS = new SoundArgs();
         //音频源控件
         public new AudioSource audio;
         public AudioClip clip;
         public SoundArgs args = DEFAULT_ARGS;
+        public FinishCallback onFinish;
 
         private float m_volume = 1f;
         private bool m_mute = false;
@@ -236,6 +238,7 @@ namespace THGame
             yield return new WaitForSeconds(waitTime);
             //等待结束,执行回调
             m_finishCoroutine = null;
+            onFinish?.Invoke();
         }
 
         private void OnDestroy()
