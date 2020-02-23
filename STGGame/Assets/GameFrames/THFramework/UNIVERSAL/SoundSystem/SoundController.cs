@@ -16,8 +16,10 @@ namespace THGame
 
         private float m_volume = 1f;
         private bool m_mute = false;
+        private float m_pitch = 1f;
 
-        private Coroutine m_fadeCoroutine = null;
+        private Coroutine m_fadeSpeedCoroutine = null;
+        private Coroutine m_fadeVolumeCoroutine = null;
         private Coroutine m_finishCoroutine = null;
 
         public AudioSource GetAudio()
@@ -39,7 +41,7 @@ namespace THGame
                     m_volume = audio.volume;
                     m_mute = audio.mute;
                 }
-                
+
             }
 
             return audio;
@@ -89,8 +91,11 @@ namespace THGame
 
         public float Pitch
         {
-            get { return GetAudio().pitch; }
-            set { GetAudio().pitch = value; }
+            get { return m_pitch; }
+            set {
+                m_pitch = value;
+                GetAudio().pitch = m_pitch;
+            }
         }
 
         public float Time
@@ -126,28 +131,40 @@ namespace THGame
         {
             if (clip == null) return;
 
-            StopFadeCoroutine();
+            Stop();
 
             GetAudio().clip = clip;
+            GetAudio().mute = m_mute;
+            GetAudio().volume = m_volume;
+
             GetAudio().loop = GetArgs().isLoop;
             GetAudio().PlayDelayed(GetArgs().delay);
+
+            StartFinishCoroutine();
         }
 
         public void Stop()
         {
-            StopFadeCoroutine();
+            StopFadeVolumeCoroutine();
+            StopFinishCoroutine();
+            StopFadeSpeedCoroutine();
 
             GetAudio().Stop();
         }
 
+        public void Speed(float form,float to, float fadeTime)
+        {
+            StopFadeSpeedCoroutine();
+            StartFadeSpeedCoroutine(form, to, fadeTime);
+        }
+
         public void Pause(float fadeOut = 1f)
         {
-
-            StopFadeCoroutine();
+            StopFadeVolumeCoroutine();
 
             if (fadeOut > 0f)
             {
-                m_fadeCoroutine = StartCoroutine(TweenFadeOut(fadeOut));
+                StartFadeVolumeCoroutine(m_volume, 0f, fadeOut);
             }
             else
             {
@@ -157,12 +174,11 @@ namespace THGame
 
         public void Resume(float fadeIn = 1f)
         {
-            StopFadeCoroutine();
-            StopFinishCoroutine();
+            StopFadeVolumeCoroutine();
 
             if (fadeIn > 0f)
             {
-                m_fadeCoroutine = StartCoroutine(TweenFadeIn(fadeIn));
+                StartFadeVolumeCoroutine(0f, m_volume, fadeIn);
             }
             else
             {
@@ -170,20 +186,12 @@ namespace THGame
             }
         }
 
-
         ///
         //如果有暂停,继续,重新播放快播慢播,延迟,循环播等操作,需要更新下
         private void StartFinishCoroutine()
         {
-            if (IsLoop) return;
 
-            //取得最新的的时长
-            float soundPitch = Pitch;
-            float soundLength = Length;
-            bool soundLoop = IsLoop;
-
-            float waitTime = 0f;            //受播放延迟,速度影响,重新估算需要等待的时间
-            m_finishCoroutine = StartCoroutine(WaitFinish(waitTime));
+            m_finishCoroutine = StartCoroutine(WaitFinish());
         }
 
 
@@ -196,16 +204,43 @@ namespace THGame
             }
         }
 
-        private void StopFadeCoroutine()
+        private void StartFadeSpeedCoroutine(float form, float to, float fadeTime)
         {
-            if (m_fadeCoroutine != null)
+
+            m_fadeSpeedCoroutine = StartCoroutine(TweenFadeSpeed(form, to, fadeTime));
+        }
+
+
+        private void StopFadeSpeedCoroutine()
+        {
+            if (m_fadeSpeedCoroutine != null)
             {
-                StopCoroutine(m_fadeCoroutine);
-                m_fadeCoroutine = null;
+                StopCoroutine(m_fadeSpeedCoroutine);
+                m_fadeSpeedCoroutine = null;
             }
         }
 
-        private IEnumerator TweenFadeIn(float fadeIn)
+        private void StartFadeVolumeCoroutine(float form, float to, float fadeTime)
+        {
+            if (form > to)
+            {
+                m_fadeVolumeCoroutine = StartCoroutine(TweenFadeVolumeOut(fadeTime));
+            }
+            else
+            {
+                m_fadeVolumeCoroutine = StartCoroutine(TweenFadeVolumeIn(fadeTime));
+            }
+        }
+        private void StopFadeVolumeCoroutine()
+        {
+            if (m_fadeVolumeCoroutine != null)
+            {
+                StopCoroutine(m_fadeVolumeCoroutine);
+                m_fadeVolumeCoroutine = null;
+            }
+        }
+
+        private IEnumerator TweenFadeVolumeIn(float fadeIn)
         {
             GetAudio().UnPause();
             float time = 0f;
@@ -216,10 +251,10 @@ namespace THGame
                 yield return null;
             }
             GetAudio().volume = m_volume;
-            m_fadeCoroutine = null;
+            m_fadeVolumeCoroutine = null;
         }
 
-        private IEnumerator TweenFadeOut(float fadeOut)
+        private IEnumerator TweenFadeVolumeOut(float fadeOut)
         {
             float time = 0f;
             while(time <= fadeOut)
@@ -230,12 +265,30 @@ namespace THGame
             }
             GetAudio().volume = 0f;
             GetAudio().Pause();
-            m_fadeCoroutine = null;
+            m_fadeVolumeCoroutine = null;
         }
 
-        private IEnumerator WaitFinish(float waitTime)
+        private IEnumerator TweenFadeSpeed(float form, float to, float fadeTime)
         {
-            yield return new WaitForSeconds(waitTime);
+            float time = 0f;
+            GetAudio().pitch = form;
+            while (time <= fadeTime)
+            {
+                GetAudio().pitch = (form > to) ? (to + (form - to) * Mathf.Pow(time / fadeTime, 3f)) : (form + (to - form) * (Mathf.Pow(time / fadeTime - 1f, 3f) + 1.0f));
+                time += UnityEngine.Time.deltaTime;
+                yield return null;
+            }
+            GetAudio().pitch = to;
+           
+        }
+
+        private IEnumerator WaitFinish()
+        {
+            while (NormalizedTime >= 1f)
+            {
+                yield return null;  //每帧检查
+            }
+
             //等待结束,执行回调
             m_finishCoroutine = null;
             onFinish?.Invoke();
@@ -243,7 +296,7 @@ namespace THGame
 
         private void OnDestroy()
         {
-            StopFadeCoroutine();
+            StopFadeVolumeCoroutine();
             StopFinishCoroutine();
         }
     }
