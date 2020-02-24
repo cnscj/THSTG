@@ -7,16 +7,9 @@ namespace THGame
     public class SoundController : MonoBehaviour
     {
         public delegate void FinishCallback();
-        public static readonly SoundArgs DEFAULT_ARGS = new SoundArgs();
         //音频源控件
         public new AudioSource audio;
-        public AudioClip clip;
-        public SoundArgs args = DEFAULT_ARGS;
         public FinishCallback onFinish;
-
-        private float m_volume = 1f;
-        private bool m_mute = false;
-        private float m_pitch = 1f;
 
         private Coroutine m_fadeSpeedCoroutine = null;
         private Coroutine m_fadeVolumeCoroutine = null;
@@ -30,26 +23,22 @@ namespace THGame
                 if (audio == null)
                 {
                     gameObject.AddComponent<AudioSource>();
-                    audio.clip = clip;
-                    audio.volume = m_volume;
-                    audio.mute = m_mute;
+
                     audio.playOnAwake = false;
                 }
-                else
-                {
-                    clip = audio.clip;
-                    m_volume = audio.volume;
-                    m_mute = audio.mute;
-                }
+                
 
             }
 
             return audio;
         }
 
-        public SoundArgs GetArgs()
+        public AudioClip Clip
         {
-            return args ?? DEFAULT_ARGS;
+            get
+            {
+                return GetAudio().clip;
+            }
         }
 
         public bool IsPlaying
@@ -59,6 +48,13 @@ namespace THGame
                 return GetAudio() != null && GetAudio().isPlaying;
             }
         }
+        public bool IsPause
+        {
+            get
+            {
+                return IsPlaying && NormalizedTime <= 0f;
+            }
+        }
 
         public bool IsLoop
         {
@@ -66,35 +62,36 @@ namespace THGame
             {
                 return GetAudio() != null && GetAudio().loop;
             }
+            set
+            {
+                GetAudio().loop = value;
+            }
         }
 
         public float Volume
         {
-            get { return m_volume; }
+            get { return GetAudio().volume; }
             set
             {
-                m_volume = value;
-                GetAudio().volume = Volume;
+                GetAudio().volume = value;
 
             }
         }
 
         public bool Mute
         {
-            get { return m_mute; }
+            get { return GetAudio().mute; }
             set
             {
-                m_mute = value;
-                GetAudio().mute = m_mute;
+                GetAudio().mute = value;
             }
         }
 
         public float Pitch
         {
-            get { return m_pitch; }
+            get { return GetAudio().pitch; }
             set {
-                m_pitch = value;
-                GetAudio().pitch = m_pitch;
+                GetAudio().pitch = value;
             }
         }
 
@@ -122,23 +119,15 @@ namespace THGame
         }
 
         //
-        public void Play(AudioClip clip, SoundArgs args = null)
-        {
-            Play();
-        }
-
-        public void Play()
+        public void Play(AudioClip clip, float delay = 0f)
         {
             if (clip == null) return;
 
             Stop();
 
             GetAudio().clip = clip;
-            GetAudio().mute = m_mute;
-            GetAudio().volume = m_volume;
 
-            GetAudio().loop = GetArgs().isLoop;
-            GetAudio().PlayDelayed(GetArgs().delay);
+            GetAudio().PlayDelayed(delay);
 
             StartFinishCoroutine();
         }
@@ -164,7 +153,7 @@ namespace THGame
 
             if (fadeOut > 0f)
             {
-                StartFadeVolumeCoroutine(m_volume, 0f, fadeOut);
+                StartFadeVolumeCoroutine(Volume, 0f, fadeOut);
             }
             else
             {
@@ -178,7 +167,7 @@ namespace THGame
 
             if (fadeIn > 0f)
             {
-                StartFadeVolumeCoroutine(0f, m_volume, fadeIn);
+                StartFadeVolumeCoroutine(0f, Volume, fadeIn);
             }
             else
             {
@@ -206,7 +195,6 @@ namespace THGame
 
         private void StartFadeSpeedCoroutine(float from, float to, float fadeTime)
         {
-
             m_fadeSpeedCoroutine = StartCoroutine(TweenFadeSpeed(from, to, fadeTime));
         }
 
@@ -222,14 +210,7 @@ namespace THGame
 
         private void StartFadeVolumeCoroutine(float from, float to, float fadeTime)
         {
-            if (from > to)
-            {
-                m_fadeVolumeCoroutine = StartCoroutine(TweenFadeVolumeOut(fadeTime));
-            }
-            else
-            {
-                m_fadeVolumeCoroutine = StartCoroutine(TweenFadeVolumeIn(fadeTime));
-            }
+            m_fadeVolumeCoroutine = StartCoroutine(TweenFadeVolume(from, to, fadeTime)); 
         }
         private void StopFadeVolumeCoroutine()
         {
@@ -240,34 +221,29 @@ namespace THGame
             }
         }
 
-        private IEnumerator TweenFadeVolumeIn(float fadeIn)
+        private IEnumerator TweenFadeVolume(float from, float to, float fadeTime)
         {
-            GetAudio().UnPause();
-            float time = 0f;
-            while (time <= fadeIn)
+            if (from < to)//淡入
             {
-                GetAudio().volume = 0f + (m_volume - 0f) * Mathf.Pow(time / fadeIn, 3f);
+                GetAudio().UnPause();
+            }
+            
+            float time = 0f;
+            while (time <= fadeTime)
+            {
+                GetAudio().volume = (from > to) ? (to + (from - to) * Mathf.Pow(time / fadeTime, 3f)) : (from + (to - from) * (Mathf.Pow(time / fadeTime - 1f, 3f) + 1.0f)); ;
                 time += UnityEngine.Time.deltaTime;
                 yield return null;
             }
-            GetAudio().volume = m_volume;
-            m_fadeVolumeCoroutine = null;
-        }
-
-        private IEnumerator TweenFadeVolumeOut(float fadeOut)
-        {
-            float time = 0f;
-            while(time <= fadeOut)
+            if (from > to)//淡出
             {
-                GetAudio().volume = m_volume + (0f - m_volume) * (Mathf.Pow(time / fadeOut - 1f, 3f) + 1.0f);
-                time += UnityEngine.Time.deltaTime;
-                yield return null;
+                GetAudio().Pause();
             }
-            GetAudio().volume = 0f;
-            GetAudio().Pause();
+
+            GetAudio().volume = to;
             m_fadeVolumeCoroutine = null;
         }
-
+        
         private IEnumerator TweenFadeSpeed(float from, float to, float fadeTime)
         {
             float time = 0f;
@@ -282,12 +258,13 @@ namespace THGame
            
         }
 
-        private IEnumerator WaitFinishByMoment(float length)
+
+        private IEnumerator WaitFinishByMoment(float delay)
         {
-            yield return new WaitForSeconds(length * UnityEngine.Time.timeScale);
-            //等待结束,执行回调
+            float waitTime = (delay + Length) * UnityEngine.Time.timeScale;
+            yield return new WaitForSeconds(waitTime);
             m_finishCoroutine = null;
-            onFinish?.Invoke();
+            if (!IsLoop) onFinish?.Invoke();
         }
 
         private IEnumerator WaitFinishByStep()
@@ -296,7 +273,6 @@ namespace THGame
             {
                 yield return null;  //每帧检查
             }
-
             //等待结束,执行回调
             m_finishCoroutine = null;
             onFinish?.Invoke();

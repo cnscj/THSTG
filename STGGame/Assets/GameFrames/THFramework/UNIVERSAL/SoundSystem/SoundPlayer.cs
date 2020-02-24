@@ -161,12 +161,9 @@ namespace THGame
         private void PlaySound(string key, SoundArgs args)
         {
             //入队并播放
-            //检查是否存在可用控制器
+            //TODO:检查是否存在可用控制器
             var ctrl = GetOrCreateSoundController(key);
-            ctrl.args = args;
-            ctrl.clip = null;
-
-            ctrl.Play();
+            
             m_playingSounds.Add(key, ctrl);
 
         }
