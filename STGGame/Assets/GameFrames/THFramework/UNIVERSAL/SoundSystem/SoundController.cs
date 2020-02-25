@@ -13,7 +13,8 @@ namespace THGame
 
         private Coroutine m_fadeSpeedCoroutine = null;
         private Coroutine m_fadeVolumeCoroutine = null;
-        private Coroutine m_finishCoroutine = null;
+        private Coroutine m_finishByStepCoroutine = null;
+        private Coroutine m_finishByMonentCoroutine = null;
 
         public AudioSource GetAudio()
         {
@@ -129,7 +130,7 @@ namespace THGame
 
             GetAudio().PlayDelayed(delay);
 
-            StartFinishCoroutine();
+            StartFinishCoroutine(delay);
         }
 
         public void Stop()
@@ -177,19 +178,26 @@ namespace THGame
 
         ///
         //如果有暂停,继续,重新播放快播慢播,延迟,循环播等操作,需要更新下
-        private void StartFinishCoroutine()
+        private void StartFinishCoroutine(float delay)
         {
-            //如果播放速度没有改变,就不用每帧update了,否则用每帧的
-            m_finishCoroutine = StartCoroutine(WaitFinishByStep());
+            //TODO:如果播放速度没有改变,就不用每帧update了,否则用每帧的
+
+            m_finishByStepCoroutine = StartCoroutine(WaitFinishByStep());
         }
 
 
         private void StopFinishCoroutine()
         {
-            if (m_finishCoroutine != null)
+            if (m_finishByStepCoroutine != null)
             {
-                StopCoroutine(m_finishCoroutine);
-                m_finishCoroutine = null;
+                StopCoroutine(m_finishByStepCoroutine);
+                m_finishByStepCoroutine = null;
+            }
+
+            if (m_finishByMonentCoroutine != null)
+            {
+                StopCoroutine(m_finishByMonentCoroutine);
+                m_finishByMonentCoroutine = null;
             }
         }
 
@@ -258,12 +266,11 @@ namespace THGame
            
         }
 
-
         private IEnumerator WaitFinishByMoment(float delay)
         {
             float waitTime = (delay + Length) * UnityEngine.Time.timeScale;
             yield return new WaitForSeconds(waitTime);
-            m_finishCoroutine = null;
+            m_finishByMonentCoroutine = null;
             if (!IsLoop) onFinish?.Invoke();
         }
 
@@ -274,7 +281,7 @@ namespace THGame
                 yield return null;  //每帧检查
             }
             //等待结束,执行回调
-            m_finishCoroutine = null;
+            m_finishByStepCoroutine = null;
             onFinish?.Invoke();
         }
 
