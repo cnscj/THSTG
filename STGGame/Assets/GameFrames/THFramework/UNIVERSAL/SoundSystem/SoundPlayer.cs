@@ -14,6 +14,7 @@ namespace THGame
 
         private Queue<SoundData> m_readingSounds = new Queue<SoundData>();                                          //准备队列
         private Dictionary<string,SoundController> m_playingSounds = new Dictionary<string, SoundController>();     //播放队列
+        private Queue<SoundController> m_releaseSounds = new Queue<SoundController>();                                          //销毁队列
 
 
         private SoundPool m_poolObj;
@@ -118,6 +119,12 @@ namespace THGame
             m_playingSounds.Clear();
         }
         //
+        private void Update()
+        {
+            //轮询
+            PollSound();
+        }
+        //TODO:
         private void PollSound()
         {
             //如果准备队列中还有音源,出队播放
@@ -125,6 +132,13 @@ namespace THGame
             {
                 var data = m_readingSounds.Dequeue();
                 PlaySound(data.key, data.args);
+            }
+
+            //如果释放队列中有音源,出队释放
+            if (m_releaseSounds.Count > 0)
+            {
+                var soundCtrl = m_releaseSounds.Dequeue();
+
             }
         }
 
@@ -189,8 +203,16 @@ namespace THGame
         //用于判断声音是否播放结束
         private IEnumerator UpdateSoundState()
         {
-            
-            yield return 1;
+            //检查播放队列的播放状态
+            foreach(var soundPair in m_playingSounds)
+            {
+                var soundCtrl = soundPair.Value;
+                if (!soundCtrl.IsLoop && soundCtrl.NormalizedTime >= 1f)
+                {
+                    m_releaseSounds.Enqueue(soundCtrl);
+                }
+            }
+            yield return null;
         }
 
     }

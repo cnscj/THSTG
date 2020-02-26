@@ -120,6 +120,7 @@ namespace THGame
 
         }
 
+        ///////////////////
         //播放SoundData
         public void PlayMusic(string clipName, SoundArgs args)
         {
@@ -162,6 +163,10 @@ namespace THGame
 
         }
 
+        /// <summary>
+        /// 获取音乐速度
+        /// </summary>
+        /// <returns></returns>
         public float GetMuiscSpeed()
         {
             return 0;
@@ -175,14 +180,18 @@ namespace THGame
 
         }
 
-        //
-        void Awake()
+        /// <summary>
+        /// 销毁声音
+        /// </summary>
+        /// <param name="type"></param>
+        public void Dispose(SoundType type)
         {
-            
-         
+
         }
 
-        
+        /// <summary>
+        /// 读取配置
+        /// </summary>
         public void LoadConfig()
         {
             m_soundVolume = PlayerPrefs.GetFloat(KEY_SOUND_VOLUME, 1f);
@@ -197,6 +206,9 @@ namespace THGame
 
         }
 
+        /// <summary>
+        /// 保存配置
+        /// </summary>
         public void SaveConfig()
         {
             PlayerPrefs.SetFloat(KEY_SOUND_VOLUME, m_soundVolume);
@@ -208,6 +220,11 @@ namespace THGame
             PlayerPrefs.SetInt(KEY_EFFECT_MUTE, m_effectMute ? 1 : 0);
         }
         ///
+        private void Awake()
+        {
+
+
+        }
 
         private float GetRealMusicVolume()
         {

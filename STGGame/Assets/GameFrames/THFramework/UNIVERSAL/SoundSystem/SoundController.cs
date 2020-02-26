@@ -6,7 +6,7 @@ namespace THGame
 {
     public class SoundController : MonoBehaviour
     {
-        public delegate void FinishCallback();
+        public delegate void FinishCallback(SoundController ctrl);
         //音频源控件
         public new AudioSource audio;
         public FinishCallback onFinish;
@@ -184,11 +184,18 @@ namespace THGame
         //如果有暂停,继续,重新播放快播慢播,延迟,循环播等操作,需要更新下
         private void UpdateFinishCoroutine(bool isForce, float delay = 0)
         {
+            if (onFinish == null)
+            {
+                StopFinishCoroutine();
+                return;
+            }
+
             if (IsLoop)
             {
                 StopFinishCoroutine();
                 return;
             }
+
             //如果播放速度没有改变,就不用每帧update了,否则用每帧的
             if (Pitch == 1.0f)
             {
@@ -225,7 +232,6 @@ namespace THGame
         }
         private void StartFinishCoroutine(float delay)
         {
-            
             StopFinishCoroutine();
             UpdateFinishCoroutine(false, delay);
         }
@@ -315,7 +321,7 @@ namespace THGame
             float waitTime = (delay + Length) * UnityEngine.Time.timeScale;
             yield return new WaitForSeconds(waitTime);
             m_finishByMonentCoroutine = null;
-            if (!IsLoop) onFinish?.Invoke();
+            if (!IsLoop) onFinish?.Invoke(this);
         }
 
         private IEnumerator WaitFinishByStep()
@@ -326,7 +332,7 @@ namespace THGame
             }
             //等待结束,执行回调
             m_finishByStepCoroutine = null;
-            onFinish?.Invoke();
+            onFinish?.Invoke(this);
         }
 
         private void OnDestroy()
