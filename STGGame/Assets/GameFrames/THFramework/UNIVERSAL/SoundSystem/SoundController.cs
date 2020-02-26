@@ -27,8 +27,6 @@ namespace THGame
 
                     audio.playOnAwake = false;
                 }
-                
-
             }
 
             return audio;
@@ -53,7 +51,7 @@ namespace THGame
         {
             get
             {
-                return IsPlaying && NormalizedTime <= 0f;
+                return !IsPlaying && NormalizedTime >= 0f;
             }
         }
 
@@ -66,6 +64,7 @@ namespace THGame
             set
             {
                 GetAudio().loop = value;
+                UpdateFinishCoroutine(false);
             }
         }
 
@@ -93,13 +92,17 @@ namespace THGame
             get { return GetAudio().pitch; }
             set {
                 GetAudio().pitch = value;
+                UpdateFinishCoroutine(false);
             }
         }
 
         public float Time
         {
             get { return GetAudio().time; }
-            set { GetAudio().time = value; }
+            set {
+                GetAudio().time = value;
+                UpdateFinishCoroutine(true);
+            }
         }
 
         public float NormalizedTime
@@ -111,6 +114,7 @@ namespace THGame
             set
             {
                 GetAudio().time = value / (GetAudio().clip ? GetAudio().clip.length : 1f);
+                UpdateFinishCoroutine(true);
             }
         }
 
@@ -178,13 +182,53 @@ namespace THGame
 
         ///
         //如果有暂停,继续,重新播放快播慢播,延迟,循环播等操作,需要更新下
+        private void UpdateFinishCoroutine(bool isForce, float delay = 0)
+        {
+            if (IsLoop)
+            {
+                StopFinishCoroutine();
+                return;
+            }
+            //如果播放速度没有改变,就不用每帧update了,否则用每帧的
+            if (Pitch == 1.0f)
+            {
+                if (m_finishByStepCoroutine != null)
+                {
+                    StopCoroutine(m_finishByStepCoroutine);
+                    m_finishByStepCoroutine = null;
+                }
+                if (isForce)
+                {
+                    if (m_finishByMonentCoroutine != null)
+                    {
+                        StopCoroutine(m_finishByMonentCoroutine);
+                        m_finishByMonentCoroutine = null;
+                    }
+                }
+                if (m_finishByMonentCoroutine == null)
+                {
+                    m_finishByMonentCoroutine = StartCoroutine(WaitFinishByMoment(delay));
+                }
+            }
+            else
+            {
+                if (m_finishByMonentCoroutine != null)
+                {
+                    StopCoroutine(m_finishByMonentCoroutine);
+                    m_finishByMonentCoroutine = null;
+                }
+                if (m_finishByStepCoroutine == null)
+                {
+                    m_finishByStepCoroutine = StartCoroutine(WaitFinishByStep());
+                }
+            }
+        }
         private void StartFinishCoroutine(float delay)
         {
-            //TODO:如果播放速度没有改变,就不用每帧update了,否则用每帧的
-
-            m_finishByStepCoroutine = StartCoroutine(WaitFinishByStep());
+            
+            StopFinishCoroutine();
+            UpdateFinishCoroutine(false, delay);
         }
-
 
         private void StopFinishCoroutine()
         {
