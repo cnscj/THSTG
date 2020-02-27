@@ -35,6 +35,11 @@ namespace XLibGame
             return Schedule(action, 0f, 1);
         }
 
+        public int ScheduleEachFrame(Action action)
+        {
+            return Schedule(action, 0, 1);
+        }
+
         public int ScheduleOnce(Action action, float interval)
         {
             return Schedule(action, interval, 1);
