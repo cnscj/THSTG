@@ -6,7 +6,6 @@ namespace THGame
 {
     public class SoundPool : MonoBehaviour
     {
-
         public long stayTime;
 
         private GameObject m_poolGObj;
@@ -16,6 +15,7 @@ namespace THGame
         {
             SoundController ctrl = null;
             GameObject ctrlGobj = null;
+            m_idleMap = m_idleMap ?? new Dictionary<string, SoundController>();
             if (!m_idleMap.TryGetValue(key, out ctrl))
             {
                 ctrlGobj = new GameObject(key);
@@ -40,7 +40,6 @@ namespace THGame
         {
             if (poolObj != null)
             {
-
                 GameObject ctrlGobj = poolObj.gameObject;
                 ctrlGobj.SetActive(false);
             }
@@ -70,18 +69,5 @@ namespace THGame
                 Release(gameObject);
             }
         }
-
-        private void Start()
-        {
-            
-        }
-
-        private Queue GetAvailableQueue(string key)
-        {
-
-            return null;
-        }
-
-
     }
 }

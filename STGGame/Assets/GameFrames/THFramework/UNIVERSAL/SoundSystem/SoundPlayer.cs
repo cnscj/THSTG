@@ -6,18 +6,18 @@ namespace THGame
 {
     public class SoundPlayer : MonoBehaviour
     {
-        public int maxSoundCount = 6;               //最大同时播放个数
+        public int maxCount = 6;               //最大同时播放个数
 
         private float m_volume;
         private bool m_mute;
         private float m_speed;
 
-        private Queue<SoundData> m_readingSounds = new Queue<SoundData>();                                          //准备队列
-        private Dictionary<string,SoundController> m_playingSounds = new Dictionary<string, SoundController>();     //播放队列
-        private Queue<SoundController> m_releaseSounds = new Queue<SoundController>();                                          //销毁队列
-
+        private Queue<SoundData> m_readingSounds = new Queue<SoundData>();                                                  //准备队列
+        private Dictionary<string,SoundController> m_playingSounds = new Dictionary<string, SoundController>();             //播放队列
+        private Queue<SoundController> m_releaseSounds = new Queue<SoundController>();                                      //销毁队列
 
         private SoundPool m_poolObj;
+        private Coroutine m_updateStateCoroutine;
 
         /// <summary>
         /// 播放器音量
@@ -27,7 +27,7 @@ namespace THGame
             get { return m_volume; }
             set
             {
-                m_volume = Mathf.Clamp(value, 0, 1);
+                m_volume = Mathf.Clamp(value, 0f, 1f);
                 UpdateVolume();
             }
         }
@@ -61,21 +61,19 @@ namespace THGame
         public void Play(string key, SoundArgs args)
         {
             //
-            if (m_playingSounds.Count >= maxSoundCount)
+            if (m_playingSounds.Count >= maxCount)
             {
                 //如果是强制播放
                 if (args.isForceReplay)
                 {
-
+                    //找到一个播放最久的踢掉
+                    KickoutOneSound(true);
+                    PlaySound(key, args);
                 }
                 else
                 {
-                    var data = new SoundData();
-                    data.key = key;
-                    data.args = args;
-                    m_readingSounds.Enqueue(data);
+                    PushSound(key, args);
                 }
-                
             }
             else
             {
@@ -114,17 +112,78 @@ namespace THGame
             {
                 var ctrl = pairs.Value;
                 ctrl.Stop();
-                GetorCreateSoundPool().Release(ctrl);
+                GetOrCreateSoundPool().Release(ctrl);
             }
             m_playingSounds.Clear();
         }
-        //
+        
         private void Update()
         {
             //轮询
+            PollState();
             PollSound();
         }
-        //TODO:
+        private void OnDestroy()
+        {
+            if (m_updateStateCoroutine != null)
+            {
+                StopCoroutine(m_updateStateCoroutine);
+                m_updateStateCoroutine = null;
+            }
+        }
+        private void KickoutOneSound(bool iskickLongTime)
+        {
+            SoundController ctrl = null;
+            if (iskickLongTime)
+            {
+                float longTime = 0f;
+                foreach (var pair in m_playingSounds)
+                {
+                    if (pair.Value.NormalizedTime >= longTime)
+                    {
+                        ctrl = pair.Value;
+                    }
+                }
+            }
+            else
+            {
+                foreach(var pair in m_playingSounds)
+                {
+                    ctrl = pair.Value;
+                    break;
+                }
+            }
+
+            if (ctrl != null)
+            {
+                StopSound(ctrl);
+            }
+        }
+
+        private void PushSound(string key, SoundArgs args)
+        {
+            var data = new SoundData();
+            data.key = key;
+            data.args = args;
+            m_readingSounds.Enqueue(data);
+        }
+
+        private void PollState()
+        {
+            //检查播放队列的播放状态
+            if (m_playingSounds.Count > 0)
+            {
+                foreach (var soundPair in m_playingSounds)
+                {
+                    var soundCtrl = soundPair.Value;
+                    if (!soundCtrl.IsLoop && soundCtrl.NormalizedTime >= 1f)
+                    {
+                        m_releaseSounds.Enqueue(soundCtrl);
+                    }
+                }
+            }
+        }
+
         private void PollSound()
         {
             //如果准备队列中还有音源,出队播放
@@ -138,20 +197,15 @@ namespace THGame
             if (m_releaseSounds.Count > 0)
             {
                 var soundCtrl = m_releaseSounds.Dequeue();
-
+                StopSound(soundCtrl);
             }
         }
 
-        private float GetRealSpeed()
-        {
-            return m_speed;
-        }
-  
         private void UpdateSpeed()
         {
             foreach (var pair in m_playingSounds)
             {
-                pair.Value.Pitch = GetRealSpeed();
+                pair.Value.Pitch = Speed;
             }
 
         }
@@ -175,22 +229,30 @@ namespace THGame
         private void PlaySound(string key, SoundArgs args)
         {
             //入队并播放
-            //TODO:检查是否存在可用控制器
             var ctrl = GetOrCreateSoundController(key);
-            
-            m_playingSounds.Add(key, ctrl);
+            ctrl.Volume = args.volume * Volume;
+            ctrl.Mute = args.mute && Mute;
 
+
+            ctrl.Play(null, args.delay); //TODO:
+            m_playingSounds.Add(key, ctrl);
+        }
+        
+        private void StopSound(SoundController ctrl)
+        {
+            ctrl.Stop();
+            GetOrCreateSoundPool().Release(ctrl);
         }
 
         private SoundController GetOrCreateSoundController(string key)
         {
-            var pool = GetorCreateSoundPool();
+            var pool = GetOrCreateSoundPool();
             SoundController ctrl = pool.GetOrCreate(key);
             
             return ctrl;
         }
 
-        private SoundPool GetorCreateSoundPool()
+        private SoundPool GetOrCreateSoundPool()
         {
             if (m_poolObj == null)
             {
@@ -199,23 +261,5 @@ namespace THGame
             }
             return m_poolObj;
         }
-
-        //用于判断声音是否播放结束
-        private IEnumerator UpdateSoundState()
-        {
-            //检查播放队列的播放状态
-            foreach(var soundPair in m_playingSounds)
-            {
-                var soundCtrl = soundPair.Value;
-                if (!soundCtrl.IsLoop && soundCtrl.NormalizedTime >= 1f)
-                {
-                    m_releaseSounds.Enqueue(soundCtrl);
-                }
-            }
-            yield return null;
-        }
-
     }
-
-
 }

@@ -9,15 +9,23 @@ namespace THGame
     public class SoundArgs
     {
         /// <summary>
+        /// 音量大小
+        /// </summary>
+        public float volume = 1f;
+
+        /// <summary>
+        /// 是否静音
+        /// </summary>
+        public bool mute = false;
+        
+        /// <summary>
         /// 是否强制重新播放
         /// </summary>
-        //[HideInInspector]
         public bool isForceReplay = false;
 
         /// <summary>
         /// 是否循环播放
         /// </summary>
-        //[HideInInspector]
         public bool isLoop = false;
 
         /// <summary>
@@ -44,7 +52,7 @@ namespace THGame
         /// <summary>
         /// 结束回调
         /// </summary>
-        public Action onCompleted;
+        public Action onCompleted = null;
     }
 
 

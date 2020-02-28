@@ -321,7 +321,11 @@ namespace THGame
             float waitTime = (delay + Length) * UnityEngine.Time.timeScale;
             yield return new WaitForSeconds(waitTime);
             m_finishByMonentCoroutine = null;
-            if (!IsLoop) onFinish?.Invoke(this);
+            if (!IsLoop)
+            { 
+                onFinish?.Invoke(this);
+                onFinish = null;
+            }
         }
 
         private IEnumerator WaitFinishByStep()
@@ -333,6 +337,7 @@ namespace THGame
             //等待结束,执行回调
             m_finishByStepCoroutine = null;
             onFinish?.Invoke(this);
+            onFinish = null;
         }
 
         private void OnDestroy()
