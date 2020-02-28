@@ -11,6 +11,7 @@ namespace THGame
         public new AudioSource audio;
         public FinishCallback onFinish;
 
+        private float m_volume = 1f;
         private Coroutine m_fadeSpeedCoroutine = null;
         private Coroutine m_fadeVolumeCoroutine = null;
         private Coroutine m_finishByStepCoroutine = null;
@@ -23,8 +24,7 @@ namespace THGame
                 audio = gameObject.GetComponent<AudioSource>();
                 if (audio == null)
                 {
-                    gameObject.AddComponent<AudioSource>();
-
+                    audio = gameObject.AddComponent<AudioSource>();
                     audio.playOnAwake = false;
                 }
             }
@@ -70,11 +70,11 @@ namespace THGame
 
         public float Volume
         {
-            get { return GetAudio().volume; }
+            get { return m_volume; }
             set
             {
+                m_volume = value;
                 GetAudio().volume = value;
-
             }
         }
 
@@ -131,7 +131,7 @@ namespace THGame
             Stop();
 
             GetAudio().clip = clip;
-
+            GetAudio().volume = m_volume;
             GetAudio().PlayDelayed(delay);
 
             StartFinishCoroutine(delay);
@@ -289,7 +289,7 @@ namespace THGame
             float time = 0f;
             while (time <= fadeTime)
             {
-                GetAudio().volume = (from > to) ? (to + (from - to) * Mathf.Pow(time / fadeTime, 3f)) : (from + (to - from) * (Mathf.Pow(time / fadeTime - 1f, 3f) + 1.0f)); ;
+                GetAudio().volume = (from > to) ? (from + (to - from) * Mathf.Pow(time / fadeTime, 3f)) : (from + (to - from) * (Mathf.Pow(time / fadeTime - 1f, 3f) + 1.0f));
                 time += UnityEngine.Time.deltaTime;
                 yield return null;
             }
@@ -308,7 +308,7 @@ namespace THGame
             GetAudio().pitch = from;
             while (time <= fadeTime)
             {
-                GetAudio().pitch = (from > to) ? (to + (from - to) * Mathf.Pow(time / fadeTime, 3f)) : (from + (to - from) * (Mathf.Pow(time / fadeTime - 1f, 3f) + 1.0f));
+                GetAudio().pitch = (from > to) ? (from + (to - from) * Mathf.Pow(time / fadeTime, 3f)) : (from + (to - from) * (Mathf.Pow(time / fadeTime - 1f, 3f) + 1.0f));
                 time += UnityEngine.Time.deltaTime;
                 yield return null;
             }
@@ -330,7 +330,7 @@ namespace THGame
 
         private IEnumerator WaitFinishByStep()
         {
-            while (NormalizedTime >= 1f)
+            while (NormalizedTime < 1f)
             {
                 yield return null;  //每帧检查
             }
