@@ -9,17 +9,17 @@ namespace STGU3D
     {
         private void Awake()
         {
-            STGService.Main.InitAwake();
+            STGRuntime.Main.InitAwake();
         }
         private void Start()
         {
-            STGService.Main.InitStart();
+            STGRuntime.Main.InitStart();
 
         }
 
         private void Update()
         {
-            STGService.Main.Update();
+            STGRuntime.Main.Update();
         }
         private GameManager()
         {
