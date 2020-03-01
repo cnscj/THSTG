@@ -17,11 +17,6 @@ namespace THGame
         /// 是否静音
         /// </summary>
         public bool mute = false;
-        
-        /// <summary>
-        /// 是否强制重新播放
-        /// </summary>
-        public bool isForceReplay = false;
 
         /// <summary>
         /// 是否循环播放
@@ -36,7 +31,6 @@ namespace THGame
         /// <summary>
         /// 延迟
         /// </summary>
-        //[HideInInspector]
         public ulong delay = 0;
 
         /// <summary>
@@ -53,6 +47,7 @@ namespace THGame
         /// 结束回调
         /// </summary>
         public Action onCompleted = null;
+
     }
 
 

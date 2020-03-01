@@ -7,8 +7,8 @@ namespace THGame
     [System.Serializable]
     public class SoundData
     {
-        public string key;
-        public SoundArgs args;
+        public AudioClip clip;
+
     }
 
 

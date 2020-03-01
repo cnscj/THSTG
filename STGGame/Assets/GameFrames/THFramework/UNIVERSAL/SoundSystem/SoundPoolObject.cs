@@ -11,9 +11,19 @@ namespace THGame
         public float lifetime = 0f;
 
         /// <summary>
+        /// 
+        /// </summary>
+        public int times;
+
+        /// <summary>
         /// 所属对象池
         /// </summary>
         public SoundPool poolObj;
+
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public string key;
 
         void OnEnable()
         {

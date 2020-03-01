@@ -20,15 +20,16 @@ namespace THGame
         public static readonly string KEY_MUSIC_MUTE = "MusicMute";
         public static readonly string KEY_EFFECT_MUTE = "EffectMute";
 
-        public int maxEffectCount;  //最大音效数量
+        public int maxEffectCount = 6;  //最大音效数量
+        public int maxMusicCount = 1;  //最大音效数量
 
-        private float m_soundVolume;
-        private float m_effectVolume;
-        private float m_musicVolume;
+        private float m_soundVolume = 1f;
+        private float m_effectVolume = 1f;
+        private float m_musicVolume = 1f;
 
-        private bool m_soundMute;
-        private bool m_effectMute;
-        private bool m_musicMute;
+        private bool m_soundMute = false;
+        private bool m_effectMute = false;
+        private bool m_musicMute = false;
 
         private Dictionary<SoundType, SoundPlayer> m_soundDict;
 
@@ -115,16 +116,16 @@ namespace THGame
         /// 短暂的音效
         /// 无法暂停
         /// </summary>
-        public void PlayEffect(string clipName)
+        public int PlayEffect(AudioClip clip, SoundArgs args = null)
         {
-
+           return GetOrCreatePlayer(SoundType.Effect).PlayForce(new SoundData() { clip = clip }, args);
         }
 
         ///////////////////
         //播放SoundData
-        public void PlayMusic(string clipName, SoundArgs args)
+        public int PlayMusic(AudioClip clip, SoundArgs args = null)
         {
-   
+            return GetOrCreatePlayer(SoundType.Music).PlayForce(new SoundData() { clip = clip }, args);
         }
 
         /// <summary>
@@ -133,7 +134,11 @@ namespace THGame
         /// <param name="clipName"></param>
         public void StopMusic()
         {
-           
+            var player = GetSoundPlayer(SoundType.Music);
+            if (player != null)
+            {
+                player.StopAll();
+            }
         }
 
         /// <summary>
@@ -142,7 +147,11 @@ namespace THGame
         /// <param name="clipName"></param>
         public void PauseMusic(float fadeOut = 0f)
         {
-           
+            var player = GetSoundPlayer(SoundType.Music);
+            if (player != null)
+            {
+                player.Resume(fadeOut);
+            }
         }
 
         /// <summary>
@@ -151,25 +160,11 @@ namespace THGame
         /// <param name="clipName"></param>
         public void ResumeMusic(float fadeIn = 0f)
         {
-            
-        }
-
-        /// <summary>
-        /// 设置音乐速度
-        /// </summary>
-        /// <param name="speed"></param>
-        public void SetMuiscSpeed(float speed)
-        {
-
-        }
-
-        /// <summary>
-        /// 获取音乐速度
-        /// </summary>
-        /// <returns></returns>
-        public float GetMuiscSpeed()
-        {
-            return 0;
+            var player = GetSoundPlayer(SoundType.Music);
+            if (player != null)
+            {
+                player.Resume(fadeIn);
+            }
         }
 
         /// <summary>
@@ -177,7 +172,13 @@ namespace THGame
         /// </summary>
         public void DisposeAll()
         {
-
+            if (m_soundDict != null)
+            {
+                foreach(var pair in m_soundDict)
+                {
+                    pair.Value.DisposeAll();
+                }
+            }
         }
 
         /// <summary>
@@ -186,7 +187,11 @@ namespace THGame
         /// <param name="type"></param>
         public void Dispose(SoundType type)
         {
-
+            var player = GetSoundPlayer(type);
+            if (player != null)
+            {
+                player.DisposeAll();
+            }
         }
 
         /// <summary>
@@ -222,7 +227,13 @@ namespace THGame
         ///
         private void Awake()
         {
+            //新建两个播放器,音效和音乐
+            var effectPlayer = GetOrCreatePlayer(SoundType.Effect);
+            effectPlayer.maxCount = maxEffectCount;
 
+
+            var musicPlayer = GetOrCreatePlayer(SoundType.Music);
+            musicPlayer.maxCount = maxMusicCount;   //音乐播放最大可播放一个
 
         }
 
@@ -234,6 +245,18 @@ namespace THGame
         private float GetRealEffectVolume()
         {
             return (SoundMute || EffectMute) ? 0f : SoundVolume * EffectVolume;
+        }
+
+        private SoundPlayer GetSoundPlayer(SoundType type)
+        {
+            if (m_soundDict != null)
+            {
+                if (m_soundDict.ContainsKey(type))
+                {
+                    return m_soundDict[type];
+                }
+            }
+            return null;
         }
 
         private SoundPlayer GetOrCreatePlayer(SoundType type)

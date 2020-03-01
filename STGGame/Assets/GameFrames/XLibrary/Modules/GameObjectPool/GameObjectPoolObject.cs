@@ -12,6 +12,11 @@ namespace XLibGame
         public float lifetime = 0f;
 
         /// <summary>
+        /// 与Dispose挂钩
+        /// </summary>
+        public int postTimes;
+
+        /// <summary>
         /// 所属对象池
         /// </summary>
         public GameObjectPool poolObj;

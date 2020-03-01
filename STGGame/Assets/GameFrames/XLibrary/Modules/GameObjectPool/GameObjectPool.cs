@@ -52,6 +52,7 @@ namespace XLibGame
         protected Queue m_queue;
         protected float m_startTick;
         protected int m_totalCount;
+        protected int m_disposeTimes;
 
         public GameObjectPool()
         {
@@ -97,6 +98,7 @@ namespace XLibGame
             {
                 info = returnObj.AddComponent<GameObjectPoolObject>();
             }
+            info.postTimes = m_disposeTimes;
             info.poolObj = this;
             if (lifetime > 0)
             {
@@ -133,8 +135,9 @@ namespace XLibGame
         /// <param name="obj">对象</param>
         public void Release(GameObject obj)
         {
-            m_startTick = Time.realtimeSinceStartup;
-
+            if (obj == null)
+                return;
+      
             //待分配对象已经在对象池中  
             if (m_queue.Contains(obj))
             {
@@ -144,27 +147,48 @@ namespace XLibGame
             {
                 //当前池中object数量已满，直接销毁
                 Object.Destroy(obj);
+                return;
             }
-            else
+
+            GameObjectPoolObject goPo = obj.GetComponent<GameObjectPoolObject>();
+            if (goPo)
             {
-                //放入对象池，入队
-                m_queue.Enqueue(obj);
-                m_totalCount = Mathf.Max(m_totalCount, m_queue.Count);
-
-                obj.transform.SetParent(transform, false); //不改变Transform
-                switch (releaseOperate)
+                if (goPo.postTimes < m_disposeTimes)
                 {
-                    case ReleaseOperate.Active:
-                        obj.SetActive(false);
-                        break;
-                    case ReleaseOperate.Sight:
-                        var position = obj.transform.position;
-                        position.z += -1000f;
-                        obj.transform.position = position;
-                        break;
-
+                    Object.Destroy(obj);
+                    return;
                 }
             }
+
+            //放入对象池，入队
+            m_startTick = Time.realtimeSinceStartup;
+            m_queue.Enqueue(obj);
+            m_totalCount = Mathf.Max(m_totalCount, m_queue.Count);
+
+            obj.transform.SetParent(transform, false); //不改变Transform
+            switch (releaseOperate)
+            {
+                case ReleaseOperate.Active:
+                    obj.SetActive(false);
+                    break;
+                case ReleaseOperate.Sight:
+                    var position = obj.transform.position;
+                    position.z += -1000f;
+                    obj.transform.position = position;
+                    break;
+
+            }
+            
+        }
+
+        public void Dispose()
+        {
+            while(m_queue.Count > 0)
+            {
+                var go = (GameObject)m_queue.Dequeue();
+                Object.Destroy(go);
+            }
+            m_disposeTimes++;
         }
 
         /// <summary>

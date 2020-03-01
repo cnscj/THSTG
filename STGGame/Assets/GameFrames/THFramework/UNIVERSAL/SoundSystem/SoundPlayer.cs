@@ -6,18 +6,20 @@ namespace THGame
 {
     public class SoundPlayer : MonoBehaviour
     {
+        private static readonly SoundArgs DEFAULT_ARGS = new SoundArgs();
         public int maxCount = 6;               //最大同时播放个数
 
-        private float m_volume;
-        private bool m_mute;
-        private float m_speed;
+        private float m_volume = 1f;
+        private bool m_mute = false;
+        private float m_speed = 1f;
+        private bool m_isAbort = false;
+        private int m_id = 0;
 
-        private Queue<SoundData> m_readingSounds = new Queue<SoundData>();                                                  //准备队列
-        private Dictionary<string,SoundController> m_playingSounds = new Dictionary<string, SoundController>();             //播放队列
-        private Queue<SoundController> m_releaseSounds = new Queue<SoundController>();                                      //销毁队列
+        private List<SoundCommand> m_readingSounds = new List<SoundCommand>();                                      //准备队列
+        private Dictionary<int,SoundController> m_playingSounds = new Dictionary<int, SoundController>();           //播放队列
+        private Queue<int> m_releaseSounds = new Queue<int>();                                                      //释放队列
 
         private SoundPool m_poolObj;
-        private Coroutine m_updateStateCoroutine;
 
         /// <summary>
         /// 播放器音量
@@ -58,54 +60,114 @@ namespace THGame
             }
         }
 
-        public void Play(string key, SoundArgs args)
+        public int PlayList(SoundData data = null, SoundArgs args = null)
         {
-            //
+            var id = PushSound(data, args);
+            m_isAbort = false;
+            return id;
+        }
+
+        public int PlayWait(SoundData data, SoundArgs args = null)
+        {
             if (m_playingSounds.Count >= maxCount)
             {
-                //如果是强制播放
-                if (args.isForceReplay)
-                {
-                    //找到一个播放最久的踢掉
-                    KickoutOneSound(true);
-                    PlaySound(key, args);
-                }
-                else
-                {
-                    PushSound(key, args);
-                }
+                return PushSound(data, args);
             }
             else
             {
-                PlaySound(key, args);
+                return PlaySound(data, args);
             }
         }
 
-        public void Stop(string key)
+        public int PlayForce(SoundData data, SoundArgs args = null)
+        {
+            if (m_playingSounds.Count >= maxCount)
+            {
+                //找到一个播放最久的踢掉
+                KickoutOneSound(true);
+            }
+            return PlaySound(data, args);
+        }
+
+        public int Play(SoundData data, SoundArgs args = null)
+        {
+
+            if (m_playingSounds.Count < maxCount)
+            {
+                return PlaySound(data, args);
+            }
+            return -1;
+        }
+
+        public void Stop(int key)
         {
             if (m_playingSounds.TryGetValue(key,out var ctrl))
             {
-                ctrl.Stop();
+                StopSound(key);
+            }else
+            {
+                RemoveCommandFormReading(key);
             }
-
+        }
+        public void Stop()
+        {
+            foreach (var pair in m_playingSounds)
+            {
+                Stop(pair.Key);
+                break;
+            }
         }
 
-        public void Pause(string key, float fadeOut = 0f)
+        public void Pause(int key, float fadeOut = 0f)
         {
             if (m_playingSounds.TryGetValue(key, out var ctrl))
             {
                 ctrl.Pause(fadeOut);
             }
         }
+        public void Pause(float fadeOut = 0f)
+        {
+            foreach (var pair in m_playingSounds)
+            {
+                Pause(pair.Key, fadeOut);
+                break;
+            }
+        }
+        public void PauseAll(float fadeOut = 0f)
+        {
+            foreach (var pair in m_playingSounds)
+            {
+                Pause(pair.Key, fadeOut);
+            }
+        }
 
-        public void Resume(string key, float fadeIn = 0f)
+        public void Resume(int key, float fadeIn = 0f)
         {
             if (m_playingSounds.TryGetValue(key, out var ctrl))
             {
                 ctrl.Resume(fadeIn);
             }
         }
+        public void Resume(float fadeIn = 0f)
+        {
+            foreach (var pair in m_playingSounds)
+            {
+                Resume(pair.Key, fadeIn);
+                break;
+            }
+        }
 
+        public void ResumeAll(float fadeIn = 0f)
+        {
+            foreach (var pair in m_playingSounds)
+            {
+                Resume(pair.Key, fadeIn);
+            }
+        }
+
+        /// <summary>
+        /// 停止所有正作播放的,但是不会清空播放列表
+        /// </summary>
         public void StopAll()
         {
             foreach (var pairs in m_playingSounds)
@@ -115,6 +177,28 @@ namespace THGame
                 GetOrCreateSoundPool().Release(ctrl);
             }
             m_playingSounds.Clear();
+            m_isAbort = true;
+        }
+
+        /// <summary>
+        /// 清空播放列表
+        /// </summary>
+        public void ClearList()
+        {
+            m_readingSounds.Clear();
+        }
+
+
+        public void ClearAll()
+        {
+            StopAll();
+            ClearList();
+        }
+
+        public void DisposeAll()
+        {
+            ClearAll();
+            m_poolObj.Dispose();
         }
         
         private void Update()
@@ -123,17 +207,10 @@ namespace THGame
             PollState();
             PollSound();
         }
-        private void OnDestroy()
-        {
-            if (m_updateStateCoroutine != null)
-            {
-                StopCoroutine(m_updateStateCoroutine);
-                m_updateStateCoroutine = null;
-            }
-        }
+       
         private void KickoutOneSound(bool iskickLongTime)
         {
-            SoundController ctrl = null;
+            int ctrlKey = -1;
             if (iskickLongTime)
             {
                 float longTime = 0f;
@@ -141,7 +218,7 @@ namespace THGame
                 {
                     if (pair.Value.NormalizedTime >= longTime)
                     {
-                        ctrl = pair.Value;
+                        ctrlKey = pair.Key;
                     }
                 }
             }
@@ -149,23 +226,28 @@ namespace THGame
             {
                 foreach(var pair in m_playingSounds)
                 {
-                    ctrl = pair.Value;
+                    ctrlKey = pair.Key;
                     break;
                 }
             }
 
-            if (ctrl != null)
+            if (ctrlKey > 0)
             {
-                StopSound(ctrl);
+                StopSound(ctrlKey);
             }
         }
 
-        private void PushSound(string key, SoundArgs args)
+        private int PushSound(SoundData data, SoundArgs args)
         {
-            var data = new SoundData();
-            data.key = key;
-            data.args = args;
-            m_readingSounds.Enqueue(data);
+            if (data == null)
+                return -1;
+            if (data.clip == null)
+                return -1;
+
+            SoundCommand command = NewCommand(data, args);
+            m_readingSounds.Add(command);
+
+            return command.id;
         }
 
         private void PollState()
@@ -178,7 +260,7 @@ namespace THGame
                     var soundCtrl = soundPair.Value;
                     if (!soundCtrl.IsLoop && soundCtrl.NormalizedTime >= 1f)
                     {
-                        m_releaseSounds.Enqueue(soundCtrl);
+                        m_releaseSounds.Enqueue(soundPair.Key);
                     }
                 }
             }
@@ -186,18 +268,30 @@ namespace THGame
 
         private void PollSound()
         {
-            //如果准备队列中还有音源,出队播放
-            if (m_readingSounds.Count > 0)
+            //被StopAll后,无法在继续播放,除非手动Play
+            if (!m_isAbort)
             {
-                var data = m_readingSounds.Dequeue();
-                PlaySound(data.key, data.args);
+                //如果准备队列中还有音源,出队播放
+                if (m_readingSounds.Count > 0)
+                {
+                    var command = m_readingSounds[0];
+                    PlaySound(command);
+                    m_readingSounds.RemoveAt(0);
+                }
             }
 
             //如果释放队列中有音源,出队释放
             if (m_releaseSounds.Count > 0)
             {
-                var soundCtrl = m_releaseSounds.Dequeue();
-                StopSound(soundCtrl);
+                SoundController soundCtrl = null;
+                int soundId = m_releaseSounds.Dequeue();
+                if (m_playingSounds.TryGetValue(soundId, out soundCtrl))
+                {
+                    //TODO:冗余代码
+                    ReleaseSound(soundCtrl);
+                    m_playingSounds.Remove(soundId);
+                }
+
             }
         }
 
@@ -226,29 +320,72 @@ namespace THGame
             }
         }
 
-        private void PlaySound(string key, SoundArgs args)
+
+        private int PlaySound(SoundCommand command)
         {
+            if (command == null)
+                return -1;
+            if (command.data == null)
+                return -1;
+            if (command.data.clip == null)
+                return -1;
+
             //入队并播放
-            var ctrl = GetOrCreateSoundController(key);
+            var id = command.id;
+            var data = command.data;
+            var args = command.args;
+
+            var ctrl = GetOrCreateSoundController(command);
+            ctrl.name = string.Format("{0}|{1}", data.clip.name, id);
             ctrl.Volume = args.volume * Volume;
             ctrl.Mute = args.mute && Mute;
+            ctrl.IsLoop = args.isLoop;
 
+            ctrl.Play(data.clip, args.delay);
+            m_playingSounds.Add(id, ctrl);
+            m_isAbort = false;
 
-            ctrl.Play(null, args.delay); //TODO:
-            m_playingSounds.Add(key, ctrl);
+            return id;
         }
-        
-        private void StopSound(SoundController ctrl)
+
+        private int PlaySound(SoundData data ,SoundArgs args)
+        {
+            return PlaySound(NewCommand(data, args));
+        }
+
+        private void StopSound(int key)
+        {
+            if (m_playingSounds.TryGetValue(key, out var ctrl))
+            {
+                ctrl.Stop();
+                m_releaseSounds.Enqueue(key);
+                m_playingSounds.Remove(key);
+            }
+        }
+
+        private void ReleaseSound(SoundController ctrl)
         {
             ctrl.Stop();
             GetOrCreateSoundPool().Release(ctrl);
+        }
+
+        private string GetPoolObjectKey(SoundCommand command)
+        {
+            return string.Format("{0}", command.ToString());
+        }
+
+        private SoundController GetOrCreateSoundController(SoundCommand command)
+        {
+            var key = GetPoolObjectKey(command);
+            return GetOrCreateSoundController(key);
         }
 
         private SoundController GetOrCreateSoundController(string key)
         {
             var pool = GetOrCreateSoundPool();
             SoundController ctrl = pool.GetOrCreate(key);
-            
+            ctrl.transform.SetParent(transform);
+
             return ctrl;
         }
 
@@ -258,8 +395,46 @@ namespace THGame
             {
                 GameObject poolGobj = new GameObject("SoundPool");
                 m_poolObj = poolGobj.AddComponent<SoundPool>();
+                poolGobj.transform.SetParent(transform);
             }
             return m_poolObj;
+        }
+
+        private SoundCommand NewCommand(SoundData data, SoundArgs args)
+        {
+            var command = new SoundCommand();
+            command.id = ++m_id;
+            command.data = data;
+            command.args = args ?? DEFAULT_ARGS;
+
+            return command;
+        }
+
+        private SoundCommand FindCommandFormReading(int id)
+        {
+            SoundCommand ret = null;
+
+            foreach(var command in m_readingSounds)
+            {
+                if (id == command.id)
+                {
+                    return command;
+                }
+            }
+            return ret;
+        }
+
+        private void RemoveCommandFormReading(int id)
+        {
+            for( int i = m_readingSounds.Count - 1; i >= 0 ; i--)
+            {
+                var command = m_readingSounds[i];
+                if (id == command.id)
+                {
+                    m_readingSounds.RemoveAt(i);
+                    break;
+                }
+            }
         }
     }
 }

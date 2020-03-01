@@ -17,21 +17,6 @@ namespace THGame
         private Coroutine m_finishByStepCoroutine = null;
         private Coroutine m_finishByMonentCoroutine = null;
 
-        public AudioSource GetAudio()
-        {
-            if (audio == null)
-            {
-                audio = gameObject.GetComponent<AudioSource>();
-                if (audio == null)
-                {
-                    audio = gameObject.AddComponent<AudioSource>();
-                    audio.playOnAwake = false;
-                }
-            }
-
-            return audio;
-        }
-
         public AudioClip Clip
         {
             get
@@ -123,18 +108,35 @@ namespace THGame
             get { return (GetAudio().clip ? GetAudio().clip.length : 0f); }
         }
 
-        //
-        public void Play(AudioClip clip, float delay = 0f)
+        public AudioSource GetAudio()
         {
-            if (clip == null) return;
+            if (audio == null)
+            {
+                audio = gameObject.GetComponent<AudioSource>();
+                if (audio == null)
+                {
+                    audio = gameObject.AddComponent<AudioSource>();
+                    audio.playOnAwake = false;
+                }
+            }
 
+            return audio;
+        }
+
+        //
+        public void Play(AudioClip clip = null, float delay = 0f)
+        {
             Stop();
+            AudioClip realClip = clip ?? GetAudio().clip;
 
-            GetAudio().clip = clip;
-            GetAudio().volume = m_volume;
-            GetAudio().PlayDelayed(delay);
+            if (realClip != null) 
+            {
+                GetAudio().clip = realClip;
+                GetAudio().volume = m_volume;
+                GetAudio().PlayDelayed(delay);
 
-            StartFinishCoroutine(delay);
+                StartFinishCoroutine(delay);
+            }
         }
 
         public void Stop()
