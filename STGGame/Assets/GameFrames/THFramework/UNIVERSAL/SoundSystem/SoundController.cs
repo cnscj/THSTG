@@ -9,9 +9,11 @@ namespace THGame
         public delegate void FinishCallback(SoundController ctrl);
         //音频源控件
         public new AudioSource audio;
+
         public FinishCallback onFinish;
 
         private float m_volume = 1f;
+        public object m_userData;
         private Coroutine m_fadeSpeedCoroutine = null;
         private Coroutine m_fadeVolumeCoroutine = null;
         private Coroutine m_finishByStepCoroutine = null;
@@ -106,6 +108,18 @@ namespace THGame
         public float Length
         {
             get { return (GetAudio().clip ? GetAudio().clip.length : 0f); }
+        }
+
+        public object CustomData
+        {
+            get
+            {
+                return m_userData;
+            }
+            set
+            {
+                m_userData = value;
+            }
         }
 
         public AudioSource GetAudio()

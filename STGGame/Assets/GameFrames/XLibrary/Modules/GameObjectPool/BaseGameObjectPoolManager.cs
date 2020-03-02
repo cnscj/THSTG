@@ -182,11 +182,11 @@ namespace XLibGame
         /// <param name="poolName">对象池名称</param>
         /// <param name="lifeTime">对象显示时间</param>
         /// <returns>新对象</returns>
-        public GameObject GetGameObject(string poolName, float lifeTime = 0f)
+        public GameObject GetOrCreateGameObject(string poolName, float lifeTime = 0f)
         {
             if (m_poolDic.ContainsKey(poolName))
             {
-                return m_poolDic[poolName].Get(lifeTime);
+                return m_poolDic[poolName].GetOrCreate(lifeTime);
             }
             return null;
         }

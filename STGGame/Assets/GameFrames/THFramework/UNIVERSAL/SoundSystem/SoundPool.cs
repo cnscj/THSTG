@@ -6,12 +6,12 @@ namespace THGame
 {
     public class SoundPool : MonoBehaviour
     {
-        public long stayTime = -1;
+        //public long stayTime = -1;
 
         private int m_disposeTimes = 0;
         private Dictionary<string, Queue<SoundController>> m_idleMap;
         
-        public SoundController GetOrCreate(string key)
+        public SoundController GetOrCreate(string key,float lifeTime = 0f)
         {
             Queue<SoundController> queue = null;
             SoundController ctrl = null;
@@ -39,6 +39,7 @@ namespace THGame
             {
                 poolObj = ctrlGobj.AddComponent<SoundPoolObject>();
             }
+            poolObj.lifetime = lifeTime;
             poolObj.times = m_disposeTimes;
             poolObj.poolObj = this;
             poolObj.key = key;
@@ -93,17 +94,6 @@ namespace THGame
                     Destroy(gobj);
                     return;
                 }
-
-                if (soundCtrl != null)
-                {
-                    
-                }
-                else
-                {
-                    Destroy(gobj);
-                    return;
-                }
-               
             }
         }
 
@@ -129,7 +119,6 @@ namespace THGame
                     {
                         Object.Destroy(ctrl.gameObject);
                     }
-
                 }
             }
             m_idleMap.Clear();

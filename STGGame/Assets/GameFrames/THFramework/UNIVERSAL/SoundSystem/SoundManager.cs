@@ -13,6 +13,9 @@ namespace THGame
     /// </summary>
     public class SoundManager : MonoSingleton<SoundManager>
     {
+        private static readonly SoundArgs DEFAULT_MUSIC_ARGS = new SoundArgs() { isLoop = false };
+        private static readonly SoundArgs DEFAULT_EFFECT_ARGS = new SoundArgs() { isLoop = false };
+
         public static readonly string KEY_SOUND_VOLUME = "SoundVolume";
         public static readonly string KEY_MUSIC_VOLUME = "MusicVolume";
         public static readonly string KEY_EFFECT_VOLUME = "EffectVolume";
@@ -118,13 +121,15 @@ namespace THGame
         /// </summary>
         public int PlayEffect(AudioClip clip, SoundArgs args = null)
         {
-           return GetOrCreatePlayer(SoundType.Effect).PlayForce(new SoundData() { clip = clip }, args);
+            args = args ?? DEFAULT_EFFECT_ARGS;
+            return GetOrCreatePlayer(SoundType.Effect).Play(new SoundData() { clip = clip }, args);
         }
 
         ///////////////////
         //播放SoundData
         public int PlayMusic(AudioClip clip, SoundArgs args = null)
         {
+            args = args ?? DEFAULT_MUSIC_ARGS;
             return GetOrCreatePlayer(SoundType.Music).PlayForce(new SoundData() { clip = clip }, args);
         }
 
@@ -268,6 +273,7 @@ namespace THGame
                 string playerName = string.Format("{0}Player", typeName);
                 GameObject playerGobj = new GameObject(playerName);
                 SoundPlayer soundPlayer = playerGobj.AddComponent<SoundPlayer>();
+                playerGobj.transform.SetParent(transform);
                 m_soundDict[type] = soundPlayer;
             }
             return m_soundDict[type];

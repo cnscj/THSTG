@@ -42,7 +42,7 @@ namespace STGU3D
                     GameObjectPoolManager.GetInstance().NewGameObjectPool(viewCode, prefab, maxCount);
                     
                 }
-                prefabInstance = GameObjectPoolManager.GetInstance().GetGameObject(viewCode);
+                prefabInstance = GameObjectPoolManager.GetInstance().GetOrCreateGameObject(viewCode);
             }
             else
             {

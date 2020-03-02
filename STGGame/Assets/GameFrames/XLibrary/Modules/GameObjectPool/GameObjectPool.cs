@@ -65,15 +65,10 @@ namespace XLibGame
         /// </summary>
         /// <param name="lifetime">对象存在的时间</param>
         /// <returns>生成的对象</returns>
-        public GameObject Get(float lifetime = 0f)
+        public GameObject GetOrCreate(float lifetime = 0f)
         {
             m_startTick = Time.realtimeSinceStartup;
 
-            if (lifetime < 0)
-            {
-                //lifetime<0时，返回null  
-                return null;
-            }
             bool isPoolObj = false;
             GameObject returnObj;
             if (m_queue.Count > 0)

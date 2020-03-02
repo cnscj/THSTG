@@ -26,22 +26,17 @@ namespace THGame
         /// <summary>
         /// 播放的开始时间
         /// </summary>
-        public float pointTime = 0;
+        public float startTime = 0;
+
+        /// <summary>
+        /// 播放的结束时间
+        /// </summary>
+        public float endTime = -1;
 
         /// <summary>
         /// 延迟
         /// </summary>
         public ulong delay = 0;
-
-        /// <summary>
-        /// 淡入
-        /// </summary>
-        public ulong fadeIn = 0;
-
-        /// <summary>
-        /// 淡出
-        /// </summary>
-        public ulong fadeOut = 0;
 
         /// <summary>
         /// 结束回调

@@ -25,7 +25,7 @@ namespace STGU3D
                 GameObject prefab = AssetManager.GetInstance().LoadEffect(code);
                 pool = GameObjectPoolManager.GetInstance().NewGameObjectPool(code, prefab,10);
             }
-            var fxGO = pool.Get();
+            var fxGO = pool.GetOrCreate();
             if (fxGO)
             {
                 fxGO.transform.position = position;
