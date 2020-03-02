@@ -13,7 +13,7 @@ namespace THGame
     /// </summary>
     public class SoundManager : MonoSingleton<SoundManager>
     {
-        private static readonly SoundArgs DEFAULT_MUSIC_ARGS = new SoundArgs() { isLoop = false };
+        private static readonly SoundArgs DEFAULT_MUSIC_ARGS = new SoundArgs() { isLoop = true };
         private static readonly SoundArgs DEFAULT_EFFECT_ARGS = new SoundArgs() { isLoop = false };
 
         public static readonly string KEY_SOUND_VOLUME = "SoundVolume";
@@ -155,7 +155,7 @@ namespace THGame
             var player = GetSoundPlayer(SoundType.Music);
             if (player != null)
             {
-                player.Resume(fadeOut);
+                player.Pause(fadeOut);
             }
         }
 

@@ -211,28 +211,48 @@ namespace THGame
             PollSound();
         }
        
-        private void KickoutOneSound(bool iskickLongTime)
+        private void KickoutOneSound(bool isKickLongTime)
         {
             int ctrlKey = -1;
-            if (iskickLongTime)
+            int pauseCtrlKey = -1;
+            int longCtrlKey = -1;
+            int lastCtrlKey = -1;
+            float longTime = 0f;
+            //如果有暂停的,先干掉暂停的
+            foreach (var pair in m_playingSounds)
             {
-                float longTime = 0f;
-                foreach (var pair in m_playingSounds)
+                if (pair.Value.Value.IsPause)
+                {
+                    pauseCtrlKey = pair.Key;
+                    break;
+                }
+
+                if (isKickLongTime)
                 {
                     var ctrl = pair.Value.Value;
                     if (ctrl.NormalizedTime >= longTime)
                     {
-                        ctrlKey = pair.Key;
+                        longCtrlKey = pair.Key;
                     }
                 }
+
+                lastCtrlKey = pair.Key;
+            }
+
+            if (pauseCtrlKey > 0)
+            {
+                ctrlKey = pauseCtrlKey;
             }
             else
             {
-                foreach(var pair in m_playingSounds)
+                if (isKickLongTime)
                 {
-                    ctrlKey = pair.Key;
-                    break;
+                    ctrlKey = longCtrlKey;
                 }
+                else
+                {
+                    ctrlKey = lastCtrlKey;
+                }     
             }
 
             if (ctrlKey > 0)
