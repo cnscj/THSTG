@@ -26,6 +26,7 @@ namespace THGame
         public int maxEffectCount = 6;  //最大音效数量
         public int maxMusicCount = 1;  //最大音效数量
 
+        //TODO:最大音量与实际音量不能混在一起?
         private float m_soundVolume = 1f;
         private float m_effectVolume = 1f;
         private float m_musicVolume = 1f;
@@ -173,6 +174,21 @@ namespace THGame
         }
 
         /// <summary>
+        /// 音量渐变
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="fadeTime"></param>
+        public void TweenMusicVolume(float from, float to, float fadeTime)
+        {
+            var player = GetSoundPlayer(SoundType.Music);
+            if (player != null)
+            {
+                player.TweenVolume(GetRealMusicVolume(from), GetRealMusicVolume(to), fadeTime);
+            }
+        }
+
+        /// <summary>
         /// 销毁所有声音
         /// </summary>
         public void DisposeAll()
@@ -242,14 +258,14 @@ namespace THGame
 
         }
 
-        private float GetRealMusicVolume()
+        private float GetRealMusicVolume(float volume)
         {
-            return (SoundMute || MusicMute) ? 0f : SoundVolume * MusicVolume;
+            return (SoundMute || MusicMute) ? 0f : SoundVolume * volume;
         }
 
-        private float GetRealEffectVolume()
+        private float GetRealEffectVolume(float volume)
         {
-            return (SoundMute || EffectMute) ? 0f : SoundVolume * EffectVolume;
+            return (SoundMute || EffectMute) ? 0f : SoundVolume * volume;
         }
 
         private SoundPlayer GetSoundPlayer(SoundType type)
@@ -299,12 +315,12 @@ namespace THGame
 
         private void UpdateMusicVolume()
         {
-            GetOrCreatePlayer(SoundType.Music).Volume = GetRealMusicVolume();
+            GetOrCreatePlayer(SoundType.Music).Volume = GetRealMusicVolume(MusicVolume);
         }
 
         private void UpdateEffectVolume()
         {
-            GetOrCreatePlayer(SoundType.Effect).Volume = GetRealEffectVolume();
+            GetOrCreatePlayer(SoundType.Effect).Volume = GetRealEffectVolume(EffectVolume);
         }
 
         private void UpdateMusicMute()

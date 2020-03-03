@@ -18,7 +18,7 @@ namespace THGame
         private List<SoundCommand> m_readingSounds = new List<SoundCommand>();                                      //准备队列
         private Dictionary<int,KeyValuePair<SoundArgs,SoundController>> m_playingSounds = new Dictionary<int, KeyValuePair<SoundArgs, SoundController>>();           //播放队列
         private Queue<int> m_releaseSounds = new Queue<int>();                                                      //释放队列
-
+        private Coroutine m_fadeVolumeCoroutine = null;
         private SoundPool m_poolObj;
 
         /// <summary>
@@ -81,7 +81,6 @@ namespace THGame
 
         public int PlayForce(SoundData data, SoundArgs args = null)
         {
-
             while(m_playingSounds.Count >= maxCount)
             {
                 //找到一个播放最久的踢掉
@@ -203,14 +202,33 @@ namespace THGame
             ClearAll();
             m_poolObj.Dispose();
         }
+        ///
         
+        public void TweenVolume(float from, float to, float fadeTime)
+        {
+            if (m_fadeVolumeCoroutine != null)
+            {
+                StopCoroutine(m_fadeVolumeCoroutine);
+                m_fadeVolumeCoroutine = null;
+            }
+            m_fadeVolumeCoroutine = StartCoroutine(TweenFadeVolume(from, to, fadeTime));
+        }
+            
         private void Update()
         {
             //轮询
             PollState();
             PollSound();
         }
-       
+        private void OnDestroy()
+        {
+            if (m_fadeVolumeCoroutine != null)
+            {
+                StopCoroutine(m_fadeVolumeCoroutine);
+                m_fadeVolumeCoroutine = null;
+            }
+        }
+
         private void KickoutOneSound(bool isKickLongTime)
         {
             int ctrlKey = -1;
@@ -483,6 +501,21 @@ namespace THGame
                     break;
                 }
             }
+        }
+
+        private IEnumerator TweenFadeVolume(float from, float to, float fadeTime)
+        {
+            Volume = from;
+            float time = 0f;
+            while (time <= fadeTime)
+            {
+                Volume = (from > to) ? (from + (to - from) * Mathf.Pow(time / fadeTime, 3f)) : (from + (to - from) * (Mathf.Pow(time / fadeTime - 1f, 3f) + 1.0f));
+                time += UnityEngine.Time.deltaTime;
+                Debug.LogFormat("{0},{1},{2}", from,to,Volume);
+                yield return null;
+            }
+            Volume = to;
+            m_fadeVolumeCoroutine = null;
         }
     }
 }

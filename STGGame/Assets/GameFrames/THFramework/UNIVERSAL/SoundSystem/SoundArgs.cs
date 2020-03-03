@@ -9,6 +9,11 @@ namespace THGame
     public class SoundArgs
     {
         /// <summary>
+        /// tag标记
+        /// </summary>
+        public string tag = null;
+
+        /// <summary>
         /// 音量大小
         /// </summary>
         public float volume = 1f;
