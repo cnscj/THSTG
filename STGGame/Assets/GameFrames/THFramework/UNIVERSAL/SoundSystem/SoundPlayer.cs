@@ -511,7 +511,6 @@ namespace THGame
             {
                 Volume = (from > to) ? (from + (to - from) * Mathf.Pow(time / fadeTime, 3f)) : (from + (to - from) * (Mathf.Pow(time / fadeTime - 1f, 3f) + 1.0f));
                 time += UnityEngine.Time.deltaTime;
-                Debug.LogFormat("{0},{1},{2}", from,to,Volume);
                 yield return null;
             }
             Volume = to;
