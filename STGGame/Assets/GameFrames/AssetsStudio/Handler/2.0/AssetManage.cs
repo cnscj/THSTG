@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using System;
 using XLibrary.Package;
 using Object = UnityEngine.Object;
-
 namespace ASGame
 {
+
     public class AssetManage : MonoSingleton<AssetManage>
     {
 
@@ -23,7 +21,10 @@ namespace ASGame
         [Header("资源更新")]
         public string updateServerUrl = "";
 
-        public void LoadAsset(string path,Action<Object> onSuccess)
+
+        private AssetDebugger m_debugger;
+
+        public void LoadAsset(string path, Action<Object> onSuccess)
         {
             //先从Cache中查找
             //然后到本地查找
@@ -35,6 +36,17 @@ namespace ASGame
 
         }
 
-    }
 
+        public AssetDebugger GetOrCreateDebugger()
+        {
+            if (m_debugger == null)
+            {
+                GameObject debuggerGObj = new GameObject("Debugger");
+                debuggerGObj.transform.SetParent(transform);
+                m_debugger = debuggerGObj.AddComponent<AssetDebugger>();
+            }
+
+            return m_debugger;
+        }
+    }
 }

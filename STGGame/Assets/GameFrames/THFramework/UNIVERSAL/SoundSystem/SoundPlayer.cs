@@ -15,7 +15,7 @@ namespace THGame
         private bool m_isAbort = false;
         private int m_id = 0;
 
-        private List<SoundCommand> m_readingSounds = new List<SoundCommand>();                                      //准备队列
+        private LinkedList<SoundCommand> m_readingSounds = new LinkedList<SoundCommand>();                                      //准备队列
         private Dictionary<int,KeyValuePair<SoundArgs,SoundController>> m_playingSounds = new Dictionary<int, KeyValuePair<SoundArgs, SoundController>>();           //播放队列
         private Queue<int> m_releaseSounds = new Queue<int>();                                                      //释放队列
         private Coroutine m_fadeVolumeCoroutine = null;
@@ -287,7 +287,7 @@ namespace THGame
                 return -1;
 
             SoundCommand command = NewCommand(data, args);
-            m_readingSounds.Add(command);
+            m_readingSounds.AddLast(command);
 
             return command.id;
         }
@@ -334,9 +334,9 @@ namespace THGame
                 //如果准备队列中还有音源,出队播放
                 if (m_readingSounds.Count > 0)
                 {
-                    var command = m_readingSounds[0];
+                    var command = m_readingSounds.First.Value;
                     PlaySound(command);
-                    m_readingSounds.RemoveAt(0);
+                    m_readingSounds.RemoveFirst();
                 }
             }
         }
@@ -492,12 +492,12 @@ namespace THGame
 
         private void RemoveCommandFromReading(int id)
         {
-            for( int i = m_readingSounds.Count - 1; i >= 0 ; i--)
+            for (LinkedListNode<SoundCommand> iterNode = m_readingSounds.Last; iterNode != null; iterNode = iterNode.Previous)
             {
-                var command = m_readingSounds[i];
+                var command = iterNode.Value;
                 if (id == command.id)
                 {
-                    m_readingSounds.RemoveAt(i);
+                    m_readingSounds.Remove(iterNode);
                     break;
                 }
             }
