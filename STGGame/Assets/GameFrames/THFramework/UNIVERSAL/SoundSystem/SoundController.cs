@@ -361,7 +361,6 @@ namespace THGame
             StopFadeVolumeCoroutine();
             StopFinishCoroutine();
         }
+
     }
-
-
 }

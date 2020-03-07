@@ -10,8 +10,5 @@ namespace THGame
         public int id;
         public SoundData data;
         public SoundArgs args;
-
     }
-
-
 }

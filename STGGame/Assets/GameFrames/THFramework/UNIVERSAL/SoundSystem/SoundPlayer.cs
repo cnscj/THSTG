@@ -17,7 +17,10 @@ namespace THGame
 
         private LinkedList<SoundCommand> m_readingSounds = new LinkedList<SoundCommand>();                                      //准备队列
         private Dictionary<int,KeyValuePair<SoundArgs,SoundController>> m_playingSounds = new Dictionary<int, KeyValuePair<SoundArgs, SoundController>>();           //播放队列
-        private Queue<int> m_releaseSounds = new Queue<int>();                                                      //释放队列
+        private Queue<int> m_releaseSounds = new Queue<int>();                                                                  //释放队列
+
+        private Dictionary<string, int> m_curTagCount = new Dictionary<string, int>();  //当前最大个数
+        private Dictionary<string, int> m_maxTagCount = new Dictionary<string, int>();  //最大同类型播放个数
         private Coroutine m_fadeVolumeCoroutine = null;
         private SoundPool m_poolObj;
         private SoundArgsCache m_argsCache;
@@ -49,6 +52,14 @@ namespace THGame
         }
 
         /// <summary>
+        /// 正作播放的音效个数
+        /// </summary>
+        public int Count
+        {
+            get { return m_playingSounds.Count; }
+        }
+
+        /// <summary>
         /// 播放器速度
         /// </summary>
         public float Speed
@@ -61,8 +72,13 @@ namespace THGame
             }
         }
 
+        ///////////////////
+ 
         public int PlayList(SoundData data = null, SoundArgs args = null)
         {
+            if (!IsTagCanPlay(args))
+                return -1;
+
             var id = PushSound(data, args);
             m_isAbort = false;
             return id;
@@ -70,6 +86,9 @@ namespace THGame
 
         public int PlayWait(SoundData data, SoundArgs args = null)
         {
+            if (!IsTagCanPlay(args))
+                return -1;
+
             if (maxCount >= 0 && m_playingSounds.Count >= maxCount)
             {
                 return PushSound(data, args);
@@ -82,7 +101,10 @@ namespace THGame
 
         public int PlayForce(SoundData data, SoundArgs args = null)
         {
-            while(maxCount >= 0 && m_playingSounds.Count >= maxCount)
+            if (!IsTagCanPlay(args))
+                return -1;
+
+            while (maxCount >= 0 && m_playingSounds.Count >= maxCount)
             {
                 //找到一个播放最久的踢掉
                 KickoutOneSound(true);
@@ -93,6 +115,9 @@ namespace THGame
 
         public int Play(SoundData data, SoundArgs args = null)
         {
+            if (!IsTagCanPlay(args))
+                return -1;
+
             if (maxCount < 0 || m_playingSounds.Count < maxCount)
             {
                 return PlaySound(data, args);
@@ -203,7 +228,24 @@ namespace THGame
             m_poolObj.Dispose();
         }
         ///
-        
+        public void SetTagMaxCount(string key, int count)
+        {
+            if(!string.IsNullOrEmpty(key))
+            {
+                m_maxTagCount[key] = count;
+            }
+        }
+        public int GetTagMaxCount(string key)
+        {
+            if (!string.IsNullOrEmpty(key))
+            {
+                if (m_maxTagCount.TryGetValue(key,out var count))
+                {
+                    return count;
+                }
+            }
+            return maxCount >= 0 ? maxCount : int.MaxValue;
+        }
         public void TweenVolume(float from, float to, float fadeTime)
         {
             if (m_fadeVolumeCoroutine != null)
@@ -339,16 +381,20 @@ namespace THGame
                     var soundArgs = soundPair.Value.Key;
                     if (!soundCtrl.IsLoop)
                     {
-                        if (soundCtrl.NormalizedTime < 1f)
+                        if (soundCtrl.IsPlaying)
                         {
-                            continue;
-                        }
-                     
-                        if (soundArgs.endTime >= 0 && soundCtrl.Time < soundArgs.endTime)
-                        {
-                            continue;
+                            if (soundCtrl.NormalizedTime < 1f)
+                            {
+                                continue;
+                            }
                         }
 
+                        if (soundArgs.endTime >= 0f && soundCtrl.Time < soundArgs.endTime)
+                        {
+                            continue;
+                        }
+                        
+                        //大量循环居然没有执行到这里
                         FinishSound(soundPair.Key);
                     }
                 }
@@ -358,7 +404,7 @@ namespace THGame
         private void PollSound()
         {
             //如果释放队列中有音源,出队释放
-            if (m_releaseSounds.Count > 0)
+            while (m_releaseSounds.Count > 0)
             {
                 int soundId = m_releaseSounds.Dequeue();
                 ReleaseSound(soundId);
@@ -370,9 +416,15 @@ namespace THGame
                 //如果准备队列中还有音源,出队播放
                 if (m_readingSounds.Count > 0)
                 {
-                    var command = m_readingSounds.First.Value;
-                    PlaySound(command);
-                    m_readingSounds.RemoveFirst();
+                    while (maxCount < 0 || m_playingSounds.Count < maxCount)
+                    {
+                        var command = m_readingSounds.First.Value;
+                        m_readingSounds.RemoveFirst();
+                        if (IsTagCanPlay(command))
+                        {
+                            PlaySound(command);
+                        }
+                    }
                 }
             }
         }
@@ -401,6 +453,36 @@ namespace THGame
             }
         }
 
+        private int GetCurTagCount(string key)
+        {
+            if (m_curTagCount.TryGetValue(key,out var count))
+            {
+                return count;
+            }
+            return 0;
+        }
+
+        private bool IsTagCanPlay(SoundArgs args)
+        {
+            if (args != null)
+            {
+                if (!string.IsNullOrEmpty(args.tag))
+                {
+                    var curCount = GetCurTagCount(args.tag);
+                    var maxCount = GetTagMaxCount(args.tag);
+                    return curCount < maxCount;
+                }
+            }
+            return true;
+        }
+        private bool IsTagCanPlay(SoundCommand command)
+        {
+            if (command != null)
+            {
+                return IsTagCanPlay(command.args);
+            }
+            return true;
+        }
 
         private int PlaySound(SoundCommand command)
         {
@@ -409,6 +491,8 @@ namespace THGame
             if (command.data == null)
                 return -1;
             if (command.data.clip == null)
+                return -1;
+            if (!IsTagCanPlay(command?.args))
                 return -1;
 
             //入队并播放
@@ -425,6 +509,11 @@ namespace THGame
 
             ctrl.Play(data.clip, args.delay);
             m_playingSounds.Add(id, new KeyValuePair<SoundArgs, SoundController>(args, ctrl));
+            if (!string.IsNullOrEmpty(args.tag))
+            {
+                if (m_curTagCount.ContainsKey(args.tag)) m_curTagCount[args.tag]++;
+                else m_curTagCount[args.tag] = 1;
+            }
             m_isAbort = false;
 
             return id;
@@ -450,7 +539,7 @@ namespace THGame
             {
                 var args = pair.Key;
                 args?.onCompleted?.Invoke();
-                m_releaseSounds.Enqueue(key);
+                m_releaseSounds.Enqueue(key);   //因为在循环中不能直接释放,留到释放队列释放
             }
         }
 
@@ -459,9 +548,16 @@ namespace THGame
             if (m_playingSounds.TryGetValue(key, out var pair))
             {
                 pair.Value.Stop();
+                if (!string.IsNullOrEmpty(pair.Key.tag))
+                {
+                    if (m_curTagCount.ContainsKey(pair.Key.tag)) m_curTagCount[pair.Key.tag]--;
+                    else m_curTagCount[pair.Key.tag] = 1;
+                }
+
                 GetOrCreateSoundPool().Release(pair.Value);
                 GetOrCreateSoundArgsCache().Release(pair.Key);
                 m_playingSounds.Remove(key);
+                
             }
         }
 

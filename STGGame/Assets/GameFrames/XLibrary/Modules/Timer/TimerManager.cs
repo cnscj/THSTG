@@ -22,7 +22,7 @@ namespace XLibGame
             m_id = 0;
         }
 
-        public int Schedule(Action action, float interval, int times = 1)
+        public int Schedule(Action action, float interval, int times = -1)
         {
             int id = m_id++;
             IEnumerator co = CreateCoroutine(id, action, interval, times);
@@ -37,7 +37,7 @@ namespace XLibGame
 
         public int ScheduleEachFrame(Action action)
         {
-            return Schedule(action, 0, 1);
+            return Schedule(action, 0f, -1);
         }
 
         public int ScheduleOnce(Action action, float interval)
@@ -45,7 +45,7 @@ namespace XLibGame
             return Schedule(action, interval, 1);
         }
 
-        public int ScheduleDuration(float interval, int duration, Action<float> pollFunc, Action<float> endFunc = null)
+        public int ScheduleDuration(float interval, int duration, Action<float> pollFunc, Action endFunc = null)
         {
             float usedTime = 0;
             int timerId = -1;
@@ -54,12 +54,12 @@ namespace XLibGame
                 if (usedTime > duration)
                 {
                     Unschedule(timerId);
-                    endFunc?.Invoke(usedTime);
+                    endFunc?.Invoke();
                     return;
                 }
                 pollFunc?.Invoke(usedTime);
                 usedTime += interval;
-            }, interval, 1);
+            }, interval);
 
             return timerId;
         }
@@ -82,7 +82,7 @@ namespace XLibGame
                     yield return null;
                     action();
                 }
-                while (times == 0 || times-- > 1);
+                while (times <= 0 || times-- > 1);
             }
             else
             {
@@ -92,7 +92,7 @@ namespace XLibGame
                     yield return wait;
                     action();
                 }
-                while (times == 0 || times-- > 1);
+                while (times <= 0 || times-- > 1);
             }
 
             m_coroutines.Remove(id);
