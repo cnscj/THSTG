@@ -7,7 +7,7 @@ namespace THGame
     public class SoundPlayer : MonoBehaviour
     {
         private static readonly SoundArgs DEFAULT_ARGS = new SoundArgs();
-        public int maxCount = 6;               //最大同时播放个数
+        public int maxCount = 6;               //最大同时播放个数,-1无限制
 
         private float m_volume = 1f;
         private bool m_mute = false;
@@ -20,6 +20,7 @@ namespace THGame
         private Queue<int> m_releaseSounds = new Queue<int>();                                                      //释放队列
         private Coroutine m_fadeVolumeCoroutine = null;
         private SoundPool m_poolObj;
+        private SoundArgsCache m_argsCache;
 
         /// <summary>
         /// 播放器音量
@@ -69,7 +70,7 @@ namespace THGame
 
         public int PlayWait(SoundData data, SoundArgs args = null)
         {
-            if (m_playingSounds.Count >= maxCount)
+            if (maxCount >= 0 && m_playingSounds.Count >= maxCount)
             {
                 return PushSound(data, args);
             }
@@ -81,7 +82,7 @@ namespace THGame
 
         public int PlayForce(SoundData data, SoundArgs args = null)
         {
-            while(m_playingSounds.Count >= maxCount)
+            while(maxCount >= 0 && m_playingSounds.Count >= maxCount)
             {
                 //找到一个播放最久的踢掉
                 KickoutOneSound(true);
@@ -92,8 +93,7 @@ namespace THGame
 
         public int Play(SoundData data, SoundArgs args = null)
         {
-
-            if (m_playingSounds.Count < maxCount)
+            if (maxCount < 0 || m_playingSounds.Count < maxCount)
             {
                 return PlaySound(data, args);
             }
@@ -187,7 +187,7 @@ namespace THGame
         /// </summary>
         public void ClearList()
         {
-            m_readingSounds.Clear();
+            ClearCommandFromReading();
         }
 
 
@@ -212,6 +212,42 @@ namespace THGame
                 m_fadeVolumeCoroutine = null;
             }
             m_fadeVolumeCoroutine = StartCoroutine(TweenFadeVolume(from, to, fadeTime));
+        }
+
+        public int[] GetSounds(string tag)
+        {
+            if (string.IsNullOrEmpty(tag))
+                return null;
+
+            List<int> ret = new List<int>();
+            foreach(var playingPair in m_playingSounds)
+            {
+                if (!string.IsNullOrEmpty(playingPair.Value.Key.tag))
+                {
+                    if (playingPair.Value.Key.tag == tag)
+                    {
+                        ret.Add(playingPair.Key);
+                    }
+                }
+            }
+
+            foreach (var reading in m_readingSounds)
+            {
+                if (!string.IsNullOrEmpty(reading.args.tag))
+                {
+                    if (reading.args.tag == tag)
+                    {
+                        ret.Add(reading.id);
+                    }
+                }
+            }
+
+            return ret.ToArray();
+        }
+
+        public SoundArgs GetOrCreateArgs()
+        {
+            return GetOrCreateSoundArgsCache().GetOrCreate();
         }
             
         private void Update()
@@ -424,6 +460,7 @@ namespace THGame
             {
                 pair.Value.Stop();
                 GetOrCreateSoundPool().Release(pair.Value);
+                GetOrCreateSoundArgsCache().Release(pair.Key);
                 m_playingSounds.Remove(key);
             }
         }
@@ -438,6 +475,15 @@ namespace THGame
         {
             string key = string.Format("Crtl");//string.Format("{0}", command?.data?.clip?.GetHashCode());
             return key;
+        }
+
+        private SoundArgsCache GetOrCreateSoundArgsCache()
+        {
+            if (m_argsCache == null)
+            {
+                m_argsCache = new SoundArgsCache();
+            }
+            return m_argsCache;
         }
 
         private SoundController GetOrCreateSoundController(SoundCommand command)
@@ -498,9 +544,20 @@ namespace THGame
                 if (id == command.id)
                 {
                     m_readingSounds.Remove(iterNode);
+                    GetOrCreateSoundArgsCache().Release(command.args);
                     break;
                 }
             }
+        }
+
+        private void ClearCommandFromReading()
+        {
+            for (LinkedListNode<SoundCommand> iterNode = m_readingSounds.Last; iterNode != null; iterNode = iterNode.Previous)
+            {
+                var command = iterNode.Value;
+                GetOrCreateSoundArgsCache().Release(command.args);
+            }
+            m_readingSounds.Clear();
         }
 
         private IEnumerator TweenFadeVolume(float from, float to, float fadeTime)

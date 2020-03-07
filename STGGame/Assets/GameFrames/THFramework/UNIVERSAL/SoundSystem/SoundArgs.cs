@@ -48,6 +48,21 @@ namespace THGame
         /// </summary>
         public Action onCompleted = null;
 
+
+        /// <summary>
+        /// 恢复成默认值
+        /// </summary>
+        public void Reset()
+        {
+            tag = null;
+            volume = 1f;
+            mute = false;
+            isLoop = false;
+            startTime = 0;
+            endTime = -1;
+            delay = 0;
+            onCompleted = null;
+        }
     }
 
 

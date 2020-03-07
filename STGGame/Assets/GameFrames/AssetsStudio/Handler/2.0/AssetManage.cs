@@ -21,8 +21,7 @@ namespace ASGame
         [Header("资源更新")]
         public string updateServerUrl = "";
 
-
-        private AssetDebugger m_debugger;
+        private AssetBaseDebugger m_debugger;
 
         public void LoadAsset(string path, Action<Object> onSuccess)
         {
@@ -37,13 +36,15 @@ namespace ASGame
         }
 
 
-        public AssetDebugger GetOrCreateDebugger()
+        public AssetBaseDebugger GetOrCreateDebugger()
         {
             if (m_debugger == null)
             {
-                GameObject debuggerGObj = new GameObject("Debugger");
-                debuggerGObj.transform.SetParent(transform);
-                m_debugger = debuggerGObj.AddComponent<AssetDebugger>();
+#if UNITY_EDITOR
+                m_debugger = AssetBaseDebugger.CreateDebugger<AssetInstanceDebugger>("_Debugger_", transform);
+#else
+                m_debugger = AssetBaseDebugger.CreateDebugger<AssetNullDebugger>("_Debugger_", transform);
+#endif
             }
 
             return m_debugger;

@@ -17,16 +17,15 @@ namespace THGame
 
         private static readonly SoundArgs DEFAULT_MUSIC_ARGS = new SoundArgs() { isLoop = true };
         private static readonly SoundArgs DEFAULT_EFFECT_ARGS = new SoundArgs() { isLoop = false };
+        private static readonly int DEFAULT_MUSIC_COUNT = 1;
+        private static readonly int DEFAULT_EFFECT_COUNT = 6;
 
-        public static readonly string KEY_SOUND_VOLUME = "SoundVolume";
-        public static readonly string KEY_MUSIC_VOLUME = "MusicVolume";
-        public static readonly string KEY_EFFECT_VOLUME = "EffectVolume";
-        public static readonly string KEY_SOUND_MUTE = "SoundMute";
-        public static readonly string KEY_MUSIC_MUTE = "MusicMute";
-        public static readonly string KEY_EFFECT_MUTE = "EffectMute";
-
-        public int maxEffectCount = 6;  //最大音效数量
-        public int maxMusicCount = 1;  //最大音效数量
+        public static readonly string KEY_SOUND_VOLUME = "MaxSoundVolume";
+        public static readonly string KEY_MUSIC_VOLUME = "MaxMusicVolume";
+        public static readonly string KEY_EFFECT_VOLUME = "MaxEffectVolume";
+        public static readonly string KEY_SOUND_MUTE = "IsSoundMute";
+        public static readonly string KEY_MUSIC_MUTE = "IsMusicMute";
+        public static readonly string KEY_EFFECT_MUTE = "IsEffectMute";
 
         //TODO:最大音量与实际音量不能混在一起?
         private float m_soundMaxVolume = 1f;
@@ -38,7 +37,7 @@ namespace THGame
 
         private Dictionary<SoundType, SoundPlayer> m_soundDict;
 
-        public float SoundMaxVolume
+        public float MaxSoundVolume
         {
             get { return m_soundMaxVolume; }
             set
@@ -49,7 +48,7 @@ namespace THGame
             }
         }
 
-        public float EffectMaxVolume
+        public float MaxEffectVolume
         {
             get { return m_effectMaxVolume; }
             set
@@ -59,7 +58,7 @@ namespace THGame
 
             }
         }
-        public float MusicMaxVolume
+        public float MaxMusicVolume
         {
             get { return m_musicMaxVolume; }
             set
@@ -70,7 +69,7 @@ namespace THGame
             }
         }
 
-        public bool SoundIsMute
+        public bool IsSoundMute
         {
             get { return m_soundIsMute; }
             set
@@ -80,7 +79,7 @@ namespace THGame
             }
         }
 
-        public bool MusicIsMute
+        public bool IsMusicMute
         {
             get { return m_effectIsMute; }
             set
@@ -90,7 +89,7 @@ namespace THGame
             }
         }
 
-        public bool EffectIsMute
+        public bool IsEffectMute
         {
             get { return m_musicIsMute; }
             set
@@ -112,6 +111,14 @@ namespace THGame
             }
         }
 
+        public int MaxMusicCount
+        {
+            get { return GetOrCreatePlayer(SoundType.Music).maxCount; }
+            set
+            {
+                GetOrCreatePlayer(SoundType.Music).maxCount = value;
+            }
+        }
 
         public float MusicVolume
         {
@@ -139,10 +146,19 @@ namespace THGame
         /// </summary>
         public bool MusicMute
         {
-            get { return GetOrCreatePlayer(SoundType.Music).Mute && MusicIsMute && SoundIsMute; }
+            get { return GetOrCreatePlayer(SoundType.Music).Mute && IsMusicMute && IsSoundMute; }
             set
             {
-                GetOrCreatePlayer(SoundType.Music).Mute = value && MusicIsMute && SoundIsMute;
+                GetOrCreatePlayer(SoundType.Music).Mute = value && IsMusicMute && IsSoundMute;
+            }
+        }
+
+        public int MaxEffectCount
+        {
+            get { return GetOrCreatePlayer(SoundType.Effect).maxCount; }
+            set
+            {
+                GetOrCreatePlayer(SoundType.Effect).maxCount = value;
             }
         }
 
@@ -151,10 +167,10 @@ namespace THGame
         /// </summary>
         public bool EffectMute
         {
-            get { return GetOrCreatePlayer(SoundType.Effect).Mute && EffectIsMute && SoundIsMute; }
+            get { return GetOrCreatePlayer(SoundType.Effect).Mute && IsEffectMute && IsSoundMute; }
             set
             {
-                GetOrCreatePlayer(SoundType.Effect).Mute = value && EffectIsMute && SoundIsMute;
+                GetOrCreatePlayer(SoundType.Effect).Mute = value && IsEffectMute && IsSoundMute;
             }
         }
 
@@ -174,6 +190,17 @@ namespace THGame
         {
             args = args ?? DEFAULT_MUSIC_ARGS;
             return GetOrCreatePlayer(SoundType.Music).PlayForce(new SoundData() { clip = clip }, args);
+        }
+
+        public int PlayMusic(AudioClip clip, bool isLoop, float startTime = 0f ,Action onCompleted = null)
+        {
+            var args = GetOrCreatePlayer(SoundType.Music).GetOrCreateArgs();
+            args.Reset();
+            args.isLoop = isLoop;
+            args.startTime = startTime;
+            args.onCompleted = onCompleted;
+
+            return PlayMusic(clip, args);
         }
 
         /// <summary>
@@ -292,22 +319,22 @@ namespace THGame
         {
             //新建两个播放器,音效和音乐
             var effectPlayer = GetOrCreatePlayer(SoundType.Effect);
-            effectPlayer.maxCount = maxEffectCount;
+            effectPlayer.maxCount = DEFAULT_EFFECT_COUNT;
 
 
             var musicPlayer = GetOrCreatePlayer(SoundType.Music);
-            musicPlayer.maxCount = maxMusicCount;   //音乐播放最大可播放一个
+            musicPlayer.maxCount = DEFAULT_MUSIC_COUNT;   //音乐播放最大可播放1个
 
         }
 
         private float GetRealMusicVolume(float volume)
         {
-            return (SoundIsMute || MusicIsMute) ? 0f : SoundMaxVolume * MusicMaxVolume * volume;
+            return (IsSoundMute || IsMusicMute) ? 0f : MaxSoundVolume * MaxMusicVolume * volume;
         }
 
         private float GetRealEffectVolume(float volume)
         {
-            return (SoundIsMute || EffectIsMute) ? 0f : SoundMaxVolume * EffectMaxVolume * volume;
+            return (IsSoundMute || IsEffectMute) ? 0f : MaxSoundVolume * MaxEffectVolume * volume;
         }
 
         private SoundPlayer GetSoundPlayer(SoundType type)

@@ -5,7 +5,7 @@ using Object = UnityEngine.Object;
 //全部采用异步
 namespace ASGame
 {
-    public class AssetLoaderManager : Singleton<AssetLoaderManager>
+    public class AssetLoader
     {
        
 
