@@ -44,10 +44,19 @@ namespace THGame
         public ulong delay = 0;
 
         /// <summary>
+        /// 淡入
+        /// </summary>
+        public float fadeIn = 0f;
+
+        /// <summary>
+        /// 淡出
+        /// </summary>
+        public float fadeOut = 0f;
+
+        /// <summary>
         /// 结束回调
         /// </summary>
         public Action onCompleted = null;
-
 
         /// <summary>
         /// 恢复成默认值
@@ -61,6 +70,8 @@ namespace THGame
             startTime = 0;
             endTime = -1;
             delay = 0;
+            fadeIn = 0f;
+            fadeOut = 0f;
             onCompleted = null;
         }
     }

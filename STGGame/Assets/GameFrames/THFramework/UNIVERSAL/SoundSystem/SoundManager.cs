@@ -16,7 +16,7 @@ namespace THGame
         private static readonly SoundArgs DEFAULT_MUSIC_ARGS = new SoundArgs() { isLoop = true };
         private static readonly SoundArgs DEFAULT_EFFECT_ARGS = new SoundArgs() { isLoop = false };
         private static readonly int DEFAULT_MUSIC_COUNT = 1;    //音乐播放最大可播放1个
-        private static readonly int DEFAULT_EFFECT_COUNT = 6;   //音效播放最大可播放6个
+        private static readonly int DEFAULT_EFFECT_COUNT = -1;   //音效播放最大可播放无限个
 
         public static readonly string KEY_SOUND_VOLUME = "MaxSoundVolume";
         public static readonly string KEY_MUSIC_VOLUME = "MaxMusicVolume";
@@ -158,6 +158,18 @@ namespace THGame
             args.onCompleted = onCompleted;
 
             return PlayEffect(clip, args);
+        }
+
+        /// <summary>
+        /// 停止所有音效
+        /// </summary>
+        public void StopEffects()
+        {
+            var player = GetSoundPlayer(SoundType.Effect);
+            if (player != null)
+            {
+                player.StopAll();
+            }
         }
 
         /// <summary>

@@ -6,8 +6,6 @@ namespace THGame
 {
     public class SoundPool : MonoBehaviour
     {
-        //public long stayTime = -1;
-
         private int m_disposeTimes = 0;
         private Dictionary<string, Queue<SoundController>> m_idleMap;
         

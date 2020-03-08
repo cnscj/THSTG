@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -162,19 +163,37 @@ namespace THGame
             GetAudio().Stop();
         }
 
-        public void Speed(float from,float to, float fadeTime)
+        public void Speed(float from, float to, float fadeTime)
         {
             StopFadeSpeedCoroutine();
             StartFadeSpeedCoroutine(from, to, fadeTime);
         }
 
-        public void Pause(float fadeOut = 1f)
+        public void TweenVolume(float from, float to, float fadeTime, Action onCompleted = null)
+        {
+            if (fadeTime > 0f)
+            {
+                StopFadeVolumeCoroutine();
+                StartFadeVolumeCoroutine(from, to, fadeTime, onCompleted);
+            }
+            else
+            {
+                Volume = to;
+                onCompleted?.Invoke();
+            }
+        }
+
+        public void Pause(float fadeOut = 1f, Action onCompleted = null)
         {
             StopFadeVolumeCoroutine();
 
             if (fadeOut > 0f)
             {
-                StartFadeVolumeCoroutine(Volume, 0f, fadeOut);
+                StartFadeVolumeCoroutine(Volume, 0f, fadeOut, ()=>
+                {
+                    GetAudio().Pause();
+                    onCompleted?.Invoke();
+                });
             }
             else
             {
@@ -182,13 +201,14 @@ namespace THGame
             }
         }
 
-        public void Resume(float fadeIn = 1f)
+        public void Resume(float fadeIn = 1f, Action onCompleted = null)
         {
             StopFadeVolumeCoroutine();
 
             if (fadeIn > 0f)
             {
-                StartFadeVolumeCoroutine(0f, Volume, fadeIn);
+                StartFadeVolumeCoroutine(0f, Volume, fadeIn, onCompleted);
+                GetAudio().UnPause();
             }
             else
             {
@@ -282,10 +302,11 @@ namespace THGame
             }
         }
 
-        private void StartFadeVolumeCoroutine(float from, float to, float fadeTime)
+        private void StartFadeVolumeCoroutine(float from, float to, float fadeTime, Action onCompleted)
         {
-            m_fadeVolumeCoroutine = StartCoroutine(TweenFadeVolume(from, to, fadeTime)); 
+            m_fadeVolumeCoroutine = StartCoroutine(TweenFadeVolume(from, to, fadeTime, onCompleted)); 
         }
+
         private void StopFadeVolumeCoroutine()
         {
             if (m_fadeVolumeCoroutine != null)
@@ -295,13 +316,9 @@ namespace THGame
             }
         }
 
-        private IEnumerator TweenFadeVolume(float from, float to, float fadeTime)
+        private IEnumerator TweenFadeVolume(float from, float to, float fadeTime, Action onCompleted)
         {
-            if (from < to)//淡入
-            {
-                GetAudio().UnPause();
-            }
-            
+            GetAudio().volume = from;
             float time = 0f;
             while (time <= fadeTime)
             {
@@ -309,12 +326,8 @@ namespace THGame
                 time += UnityEngine.Time.deltaTime;
                 yield return null;
             }
-            if (from > to)//淡出
-            {
-                GetAudio().Pause();
-            }
-
             GetAudio().volume = to;
+            onCompleted?.Invoke();
             m_fadeVolumeCoroutine = null;
         }
         

@@ -152,6 +152,7 @@ namespace THGame
                 pair.Value.Pause(fadeOut);
             }
         }
+
         public void Pause(float fadeOut = 0f)
         {
             foreach (var pair in m_playingSounds)
@@ -160,6 +161,7 @@ namespace THGame
                 break;
             }
         }
+
         public void PauseAll(float fadeOut = 0f)
         {
             foreach (var pair in m_playingSounds)
@@ -197,14 +199,11 @@ namespace THGame
         /// </summary>
         public void StopAll()
         {
+            m_isAbort = true;
             foreach (var pair in m_playingSounds)
             {
-                var ctrl = pair.Value.Value;
-                ctrl.Stop();
-                GetOrCreateSoundPool().Release(ctrl);
+                StopSound(pair.Key);
             }
-            m_playingSounds.Clear();
-            m_isAbort = true;
         }
 
         /// <summary>
@@ -508,14 +507,16 @@ namespace THGame
             ctrl.Time = args.startTime;
 
             ctrl.Play(data.clip, args.delay);
+            ctrl.TweenVolume(0f, ctrl.Volume, args.fadeIn);
+            
+            m_isAbort = false;
             m_playingSounds.Add(id, new KeyValuePair<SoundArgs, SoundController>(args, ctrl));
             if (!string.IsNullOrEmpty(args.tag))
             {
                 if (m_curTagCount.ContainsKey(args.tag)) m_curTagCount[args.tag]++;
                 else m_curTagCount[args.tag] = 1;
             }
-            m_isAbort = false;
-
+            
             return id;
         }
 
@@ -528,8 +529,13 @@ namespace THGame
         {
             if (m_playingSounds.TryGetValue(key, out var pair))
             {
-                ReleaseSound(pair.Value);
-                m_playingSounds.Remove(key);
+                var args = pair.Key;
+                var ctrl = pair.Value;
+                ctrl.TweenVolume(ctrl.Volume, 0f, args.fadeOut, () =>
+                {
+                    pair.Value.Stop();
+                    m_releaseSounds.Enqueue(key);
+                });
             }
         }
 
