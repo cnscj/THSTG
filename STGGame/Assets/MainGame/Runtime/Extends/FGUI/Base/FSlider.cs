@@ -3,11 +3,8 @@ using FairyGUI;
 
 namespace STGRuntime.UI
 {
-
     public class FSlider : FComponent
     {
-
-
         public new void SetText(string text)
         {
             _obj.asSlider.text = text;
@@ -49,7 +46,6 @@ namespace STGRuntime.UI
             _obj.asSlider.max = max;
         }
 
-
         public void SetPercent(double percent)
         {
             var val = percent * _obj.asSlider.value;
@@ -60,7 +56,6 @@ namespace STGRuntime.UI
         {
             return _obj.asSlider.value / _obj.asSlider.max;
         }
-
 
         public void ChangeOnClick(bool change = true)
         {

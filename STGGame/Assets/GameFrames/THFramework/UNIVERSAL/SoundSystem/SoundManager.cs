@@ -75,8 +75,8 @@ namespace THGame
             get { return m_soundMaxVolume; }
             set
             {
-                var oldMusicVolume = MusicVolume;
-                var oldEffectVolume = EffectVolume;
+                var oldMusicVolume = MusicVolume <= 0 ? 1f :MusicVolume;
+                var oldEffectVolume = EffectVolume <= 0 ? 1f : EffectVolume;
                 m_soundMaxVolume = Mathf.Clamp(value, 0f, 1f);
                 MusicVolume = oldMusicVolume;
                 EffectVolume = oldEffectVolume;
@@ -88,7 +88,7 @@ namespace THGame
             get { return m_effectMaxVolume; }
             set
             {
-                var oldEffectVolume = EffectVolume;
+                var oldEffectVolume = EffectVolume <= 0 ? 1f : EffectVolume;
                 m_effectMaxVolume = Mathf.Clamp(value, 0f, 1f);
                 EffectVolume = oldEffectVolume;
             }
@@ -98,7 +98,7 @@ namespace THGame
             get { return m_musicMaxVolume; }
             set
             {
-                var oldMusicVolume = MusicVolume;
+                var oldMusicVolume = MusicVolume <= 0 ? 1f : MusicVolume;
                 m_musicMaxVolume = Mathf.Clamp(value, 0f, 1f);
                 MusicVolume = oldMusicVolume;
             }

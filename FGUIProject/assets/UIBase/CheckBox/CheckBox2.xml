@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="33,32" extention="Button">
+  <controller name="button" pages="2,up,3,down,5,selectedDisabled" selected="0"/>
+  <displayList>
+    <graph id="n1_ihdi" name="icon" xy="0,0" size="33,32" alpha="0.5" type="rect" fillColor="#ff000000"/>
+    <richtext id="n2_ihdi" name="right" xy="3,1" size="27,29" fontSize="22" autoSize="none" text="√">
+      <gearDisplay controller="button" pages="3,5"/>
+      <relation target="n1_ihdi" sidePair="center-center,middle-middle"/>
+    </richtext>
+  </displayList>
+  <Button mode="Check"/>
+</component>

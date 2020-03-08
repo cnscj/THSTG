@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<component size="1024,576">
+<component size="1280,720">
   <displayList>
-    <loader id="n3_z7yu" name="n3" xy="0,0" size="1024,576" url="ui://0nxtd0tqz7yu8" fill="scaleFree" clearOnPublish="true"/>
-    <image id="n0_z7yu" name="n0" src="z7yu4" fileName="_Tex/Loading/loading_icon_01.png" xy="845,504" pivot="0.5,0.5" anchor="true" group="n4_z7yu"/>
-    <image id="n1_z7yu" name="n1" src="z7yu3" fileName="_Tex/Loading/loading_nowloading.png" xy="876,502" group="n4_z7yu"/>
-    <image id="n2_z7yu" name="n2" src="z7yu2" fileName="_Tex/Loading/loading_snqdz.png" xy="880,472" group="n4_z7yu"/>
-    <group id="n4_z7yu" name="n4" xy="813,472" size="195,64"/>
+    <loader id="n3_z7yu" name="n3" xy="0,0" size="1280,720" url="ui://yh76s5e0z7yu8" align="center" vAlign="middle" fill="scaleFree" clearOnPublish="true">
+      <relation target="" sidePair="width-width,height-height"/>
+    </loader>
+    <image id="n0_z7yu" name="n0" src="z7yu4" fileName="_Tex/Loading/loading_icon_01.png" xy="1090,643" pivot="0.5,0.5" anchor="true" group="n4_z7yu"/>
+    <image id="n1_z7yu" name="n1" src="z7yu3" fileName="_Tex/Loading/loading_nowloading.png" xy="1121,641" group="n4_z7yu"/>
+    <image id="n2_z7yu" name="n2" src="z7yu2" fileName="_Tex/Loading/loading_snqdz.png" xy="1125,611" group="n4_z7yu"/>
+    <group id="n4_z7yu" name="n4" xy="1058,611" size="195,64" advanced="true">
+      <relation target="" sidePair="right-right,bottom-bottom"/>
+    </group>
   </displayList>
   <transition name="show" autoPlay="true" autoPlayRepeat="-1">
     <item time="0" type="Color" target="n2_z7yu" tween="true" startValue="#ffffff" endValue="#666666" duration="24" repeat="-1" yoyo="true"/>

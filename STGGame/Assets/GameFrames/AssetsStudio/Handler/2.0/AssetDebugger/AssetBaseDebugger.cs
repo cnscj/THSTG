@@ -5,14 +5,15 @@ namespace ASGame
 {
     public abstract class AssetBaseDebugger : MonoBehaviour
     {
-        public abstract void Push(string key, string msg);
-        public abstract void Remove(string key);
-
-        public static AssetBaseDebugger CreateDebugger<T>(string name, Transform parent) where T : AssetBaseDebugger
+        public static AssetBaseDebugger CreateDebugger<T>(Transform parent, string name = "_DEBUGGER_") where T : AssetBaseDebugger
         {
             GameObject debugger = new GameObject(name);
             debugger.transform.SetParent(parent);
             return debugger.AddComponent<T>();
         }
+
+        public abstract void Retain(string key);
+        public abstract void Release(string key);
+        public abstract void Clear();
     }
 }

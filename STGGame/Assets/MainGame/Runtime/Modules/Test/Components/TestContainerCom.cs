@@ -32,7 +32,14 @@ namespace STGRuntime.UI
                     EventHelper.Dispatch(STGU3D.EventType.TEST_EVENT);
                 }
             },
-
+            new ItemData()
+            {
+                btnName = "设置",
+                btnFunc = () =>
+                {
+                    ViewManager.GetInstance().Open<SettingView>();
+                }
+            },
         };
         FList btnList;
         public TestContainerComp() : base("Test", "TestContainerComp") { }

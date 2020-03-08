@@ -5,7 +5,7 @@
 	"fontScheme":["默认字体"],
 	"fontSize":18,
 	"fontSizeScheme":["正文大小 18","标题大小 20"],
-	"publishDepEnabled":true,
+	"pivot":"default",
 	"scrollBars":{
 		"defaultDisplay":"visible",
 		"horizontal":"",

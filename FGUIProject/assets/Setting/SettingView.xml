@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1280,720">
+  <displayList>
+    <component id="n1_ihdi" name="frame" src="logx4" fileName="Window/Window1.xml" pkg="y8wff1cb" xy="194,97" size="891,525">
+      <Label title="设置"/>
+    </component>
+    <component id="n2_ihdi" name="soundVolumeSlider" src="ihdi6" fileName="Slider/Slider1/Slider1.xml" pkg="y8wff1cb" xy="437,230" size="500,10">
+      <Slider value="100" max="100"/>
+    </component>
+    <richtext id="n3_ihdi" name="n3" xy="305,224" size="77,25" fontSize="18" text="音量大小"/>
+    <richtext id="n4_ihdi" name="n4" xy="306,263" size="77,25" fontSize="18" text="音乐大小"/>
+    <component id="n5_ihdi" name="musicVolumeSlider" src="ihdi6" fileName="Slider/Slider1/Slider1.xml" pkg="y8wff1cb" xy="438,273" size="500,10">
+      <Slider value="100" max="100"/>
+    </component>
+    <richtext id="n6_ihdi" name="n6" xy="306,305" size="77,25" fontSize="18" text="音效大小"/>
+    <component id="n7_ihdi" name="effectVolumeSlider" src="ihdi6" fileName="Slider/Slider1/Slider1.xml" pkg="y8wff1cb" xy="438,315" size="500,10">
+      <Slider value="100" max="100"/>
+    </component>
+    <component id="n8_ihdi" name="applyBtn" src="po2z0" fileName="Button/Button1.xml" pkg="y8wff1cb" xy="899,542" size="160,52">
+      <Button title="应用"/>
+    </component>
+    <richtext id="n9_ihdi" name="soundVolumeText" xy="958,224" size="93,25" fontSize="18" autoSize="none" text="100%"/>
+    <richtext id="n10_ihdi" name="musicVolumeText" xy="958,264" size="93,25" fontSize="18" autoSize="none" text="100%"/>
+    <richtext id="n11_ihdi" name="effectVolumeText" xy="958,304" size="93,25" fontSize="18" autoSize="none" text="100%"/>
+    <component id="n12_ihdi" name="soundMuteChBox" src="ihdi8" fileName="CheckBox/CheckBox2.xml" pkg="y8wff1cb" xy="396,222"/>
+    <component id="n13_ihdi" name="musicMuteChBox" src="ihdi8" fileName="CheckBox/CheckBox2.xml" pkg="y8wff1cb" xy="397,262"/>
+    <component id="n14_ihdi" name="effectMuteChBox" src="ihdi8" fileName="CheckBox/CheckBox2.xml" pkg="y8wff1cb" xy="398,301"/>
+  </displayList>
+</component>

@@ -41,9 +41,9 @@ namespace ASGame
             if (m_debugger == null)
             {
 #if UNITY_EDITOR
-                m_debugger = AssetBaseDebugger.CreateDebugger<AssetInstanceDebugger>("_Debugger_", transform);
+                m_debugger = AssetBaseDebugger.CreateDebugger<AssetInstanceDebugger>(transform);
 #else
-                m_debugger = AssetBaseDebugger.CreateDebugger<AssetNullDebugger>("_Debugger_", transform);
+                m_debugger = AssetBaseDebugger.CreateDebugger<AssetNullDebugger>(transform);
 #endif
             }
 

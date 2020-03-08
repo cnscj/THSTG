@@ -1,7 +1,7 @@
 {
-	"defaultResolution":"1280,720",
-	"designResolutionX":1024,
-	"designResolutionY":576,
+	"designResolutionX":1280,
+	"designResolutionY":720,
+	"devices":[],
 	"scaleMode":"ScaleWithScreenSize",
 	"screenMathMode":"MatchWidthOrHeight"
 }

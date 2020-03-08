@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="50,10" extention="Slider">
+  <displayList>
+    <graph id="n0_ihdi" name="n0" xy="0,0" size="50,10" type="rect" lineColor="#ffa0a0a0" fillColor="#fff0f0f0">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <graph id="n1_ihdi" name="bar" xy="5,3" size="40,4" type="rect" lineSize="0" fillColor="#ff3399ff">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <component id="n2_ihdi" name="grip" src="ihdi5" fileName="Slider/Slider1/Slider1_grip.xml" xy="40,-4">
+      <relation target="n1_ihdi" sidePair="right-right"/>
+    </component>
+  </displayList>
+  <Slider/>
+</component>

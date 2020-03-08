@@ -9,6 +9,7 @@ namespace STGRuntime
             MVCManager.GetInstance().AddController<TestController>();
             MVCManager.GetInstance().AddController<MainUIController>();
             MVCManager.GetInstance().AddController<StageController>();
+            MVCManager.GetInstance().AddController<SettingController>();
         }
     }
 

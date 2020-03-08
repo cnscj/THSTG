@@ -6,6 +6,7 @@
     <image id="z7yu4" name="loading_icon_01.png" path="/_Tex/Loading/" exported="true"/>
     <image id="z7yu3" name="loading_nowloading.png" path="/_Tex/Loading/" exported="true"/>
     <image id="z7yu2" name="loading_snqdz.png" path="/_Tex/Loading/" exported="true"/>
+    <image id="z7yu8" name="loading_th08_logo.jpg" path="/_Tex/Loading/"/>
   </resources>
   <publish name="UIPublic"/>
 </packageDescription>
