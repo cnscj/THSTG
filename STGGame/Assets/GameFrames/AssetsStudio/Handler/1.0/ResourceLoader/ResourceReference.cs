@@ -13,13 +13,13 @@ namespace ASGame
 
         public ResourceLoadHandler<T> LoadAsnyc<T>() where T : Object
         {
-            return ResourceLoader.GetInstance().LoadFromFileAsync<T>(m_args);
+            return ResourceXLoader.GetInstance().LoadFromFileAsync<T>(m_args);
         }
 
         public T Load<T>() where T: Object
         {
 
-            return ResourceLoader.GetInstance().LoadFromFile<T>(m_args);
+            return ResourceXLoader.GetInstance().LoadFromFile<T>(m_args);
         }
     }
 

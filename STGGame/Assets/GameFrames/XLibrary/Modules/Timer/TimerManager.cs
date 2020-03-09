@@ -12,35 +12,143 @@ namespace XLibGame
         private int m_id = 0;
         private SortedDictionary<int, Coroutine> m_coroutines = new SortedDictionary<int, Coroutine>();
 
-        public void UnscheduleAll()
+        #region 针对每一帧执行和下一帧执行的优化
+        class TimerNode
         {
-            foreach (var kvs in m_coroutines)
+            public int id = -1;
+            public Action callback;
+            public bool isDead = false;
+
+            public void Trigger()
             {
-                StopCoroutine(kvs.Value);
+                callback.Invoke();
             }
-            m_coroutines.Clear();
-            m_id = 0;
+
+            public void Reset()
+            {
+                id = -1;
+                callback = null;
+                isDead = false;
+            }
         }
 
-        public int Schedule(Action action, float interval, int times = -1)
+        const int MAX_TIMER_NODE_POOL_SIZE = 20;
+        Stack<TimerNode> m_timerNodePool = new Stack<TimerNode>();
+        Dictionary<int, TimerNode> m_eachFrameTimers = new Dictionary<int, TimerNode>();
+        Dictionary<int, TimerNode> m_nextFrameTimers = new Dictionary<int, TimerNode>();
+        List<TimerNode> m_nodeHelpList = new List<TimerNode>();
+        #endregion
+
+        #region 针对每一帧执行和下一帧执行的优化
+        void Update()
         {
-            int id = m_id++;
+            CheckTimers(m_eachFrameTimers, false);
+            CheckTimers(m_nextFrameTimers, true);
+        }
+
+        void CheckTimers(Dictionary<int, TimerNode> dict, bool isOnce)
+        {
+            if (dict.Count > 0)
+            {
+                // Trigger()的时候可能会添加新的定时器，影响迭代器，所以遍历部分独立出去
+                m_nodeHelpList.Clear();
+                foreach (var kvs in dict)
+                {
+                    m_nodeHelpList.Add(kvs.Value);
+                }
+
+                foreach (var tn in m_nodeHelpList)
+                {
+                    if (!tn.isDead)
+                    {
+                        tn.Trigger();
+                        if (isOnce)
+                        {
+                            tn.isDead = true;  //只用一次
+                        }
+                    }
+
+                    if (tn.isDead)
+                    {
+                        dict.Remove(tn.id);
+                        ReturnTimerNode(tn);
+                    }
+                }
+                m_nodeHelpList.Clear();
+            }
+        }
+
+        internal int ScheduleNextFrame(Action action)
+        {
+            int id = GetNewTimerId();
+            TimerNode tn = GetTimerNode(id, action);
+            m_nextFrameTimers.Add(id, tn);
+            return id;
+        }
+
+        internal int ScheduleEachFrame(Action action)
+        {
+            int id = GetNewTimerId();
+            TimerNode tn = GetTimerNode(id, action);
+            m_eachFrameTimers.Add(id, tn);
+            return id;
+        }
+
+        TimerNode GetTimerNode(int id, Action action)
+        {
+            TimerNode tn;
+            if (m_timerNodePool.Count > 0)
+            {
+                tn = m_timerNodePool.Pop();
+            }
+            else
+            {
+                tn = new TimerNode();
+            }
+            tn.id = id;
+            tn.callback = action;
+            return tn;
+        }
+
+        void ReturnTimerNode(TimerNode tn)
+        {
+            if (tn == null) return;
+
+            tn.Reset();
+
+            if (m_timerNodePool.Count < MAX_TIMER_NODE_POOL_SIZE)
+            {
+                if (m_timerNodePool.Count > 0 && m_timerNodePool.Peek() == tn)
+                    return;
+                m_timerNodePool.Push(tn);
+            }
+        }
+        #endregion
+
+
+        int GetNewTimerId()
+        {
+            return m_id++;
+        }
+
+        internal int Schedule(Action action, float interval, int times = -1)
+        {
+            //过多的协程比Update还要耗性能
+            #region 针对每一帧执行和下一帧执行的优化
+            if (interval < 0.001f && times <= 0)
+                return ScheduleEachFrame(action);
+
+            if (interval < 0.0167f && times == 1)
+                return ScheduleNextFrame(action);
+            #endregion
+
+            int id = GetNewTimerId();
             IEnumerator co = CreateCoroutine(id, action, interval, times);
             m_coroutines.Add(id, StartCoroutine(co));
             return id;
         }
 
-        public int ScheduleNextFrame(Action action)
-        {
-            return Schedule(action, 0f, 1);
-        }
-
-        public int ScheduleEachFrame(Action action)
-        {
-            return Schedule(action, 0f, -1);
-        }
-
-        public int ScheduleOnce(Action action, float interval)
+        internal int ScheduleOnce(Action action, float interval)
         {
             return Schedule(action, interval, 1);
         }
@@ -64,14 +172,50 @@ namespace XLibGame
             return timerId;
         }
 
-        public void Unschedule(int id)
+        internal void Unschedule(int id)
         {
             if (m_coroutines.ContainsKey(id))
             {
                 StopCoroutine(m_coroutines[id]);
                 m_coroutines.Remove(id);
             }
+
+            if (m_eachFrameTimers.ContainsKey(id))
+            {
+                m_eachFrameTimers[id].isDead = true;
+            }
+
+            if (m_nextFrameTimers.ContainsKey(id))
+            {
+                m_nextFrameTimers[id].isDead = true;
+            }
         }
+
+        internal void UnscheduleAll()
+        {
+            foreach (var kvs in m_coroutines)
+            {
+                StopCoroutine(kvs.Value);
+            }
+            m_coroutines.Clear();
+
+            foreach (var kvs in m_eachFrameTimers)
+            {
+                kvs.Value.Reset();
+            }
+            m_eachFrameTimers.Clear();
+
+            foreach (var kvs in m_nextFrameTimers)
+            {
+                kvs.Value.Reset();
+            }
+            m_nextFrameTimers.Clear();
+
+            m_nodeHelpList.Clear();
+
+            m_id = 0;
+        }
+
 
         IEnumerator CreateCoroutine(int id, Action action, float interval, int times)
         {
@@ -99,5 +243,5 @@ namespace XLibGame
             action = null;
         }
     }
-    
+
 }
