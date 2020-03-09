@@ -8,7 +8,7 @@ namespace STGRuntime
     {
         public static void InitAwake()
         {
-            ResourceXLoader.GetInstance().loadMode = ResourceLoadMode.Editor;      //加载模式
+            ResourceLoader.GetInstance().loadMode = ResourceLoadMode.Editor;      //加载模式
         }
 
         public static AssetManager GetManager()

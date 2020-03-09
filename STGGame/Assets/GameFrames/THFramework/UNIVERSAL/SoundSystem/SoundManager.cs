@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
-using XLibGame;
 using XLibrary.Package;
 
 namespace THGame
@@ -58,16 +56,24 @@ namespace THGame
             set { GetOrCreatePlayer(SoundType.Effect).Mute = m_effectIsMute || m_soundIsMute || value; }
         }
 
+        public float SoundVolume
+        {
+            get { return m_soundMaxVolume; }
+            set
+            {
+                var oldMusicVolume = MusicVolume <= 0 ? 1f : MusicVolume;
+                var oldEffectVolume = EffectVolume <= 0 ? 1f : EffectVolume;
+                m_soundMaxVolume = Mathf.Clamp(value, 0f, 1f);
+                MusicVolume = oldMusicVolume;
+                EffectVolume = oldEffectVolume;
+            }
+        }
+
         public float MaxSoundVolume
         {
             get { return AudioListener.volume; }
             set
             {
-                //var oldMusicVolume = MusicVolume <= 0 ? 1f :MusicVolume;
-                //var oldEffectVolume = EffectVolume <= 0 ? 1f : EffectVolume;
-                //m_soundMaxVolume = Mathf.Clamp(value, 0f, 1f);
-                //MusicVolume = oldMusicVolume;
-                //EffectVolume = oldEffectVolume;
                 AudioListener.volume = value;
             }
         }
@@ -82,6 +88,7 @@ namespace THGame
                 EffectVolume = oldEffectVolume;
             }
         }
+
         public float MaxMusicVolume
         {
             get { return m_musicMaxVolume; }
@@ -139,6 +146,7 @@ namespace THGame
             args = args ?? DEFAULT_EFFECT_ARGS;
             return GetOrCreatePlayer(SoundType.Effect).Play(new SoundData() { clip = clip }, args);
         }
+
         public int PlayEffect(AudioClip clip, string tag, Action onCompleted = null)
         {
             var args = GetOrCreatePlayer(SoundType.Effect).GetOrCreateArgs();
@@ -298,6 +306,7 @@ namespace THGame
             PlayerPrefs.SetInt(KEY_MUSIC_VOLUME, IsMusicMute ? 1 : 0);
             PlayerPrefs.SetInt(KEY_EFFECT_MUTE, IsEffectMute ? 1 : 0);
         }
+
         ///
         private void Awake()
         {

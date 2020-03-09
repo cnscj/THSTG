@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace THGame
+﻿namespace THGame
 {
     [System.Serializable]
     public class SoundCommand
