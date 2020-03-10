@@ -6,6 +6,15 @@ namespace STGRuntime.UI
 
     public class FButton : FComponent
     {
+        public float GetSoundVolumeScale()
+        {
+            return _obj.asButton.soundVolumeScale;
+        }
+
+        public void SetSoundVolumeScale(float volume)
+        {
+            _obj.asButton.soundVolumeScale = volume;
+        }
 
         public void SetIcon(string url)
         {

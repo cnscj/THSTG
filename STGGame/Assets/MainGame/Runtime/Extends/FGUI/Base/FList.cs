@@ -10,13 +10,11 @@ namespace STGRuntime.UI
         protected List<object> _dataProvider = new List<object>();
         protected Dictionary<GObject,FComponent> _dataTemplate = new Dictionary<GObject, FComponent>();
 
-        protected Type _class = typeof(FComponent);
-        protected object _classArgs = null;
-
         public delegate string ItemProvideFunc(object data, int index);
-        public delegate void ItemStateFunc0(int index, FComponent comp);
-        public delegate void ItemStateFunc1(int index, FComponent comp, object data);
-        
+        public delegate void ItemStateFuncT0(int index, object data, FComponent comp);
+        public delegate void ItemStateFuncT1<T1>(int index, T1 data, FComponent comp);
+        public delegate void ItemStateFuncT2<T1,T2>(int index, T1 data, T2 comp) where T1 : new() where T2: FComponent, new();
+
 
         // 设置虚拟列表
         public void SetVirtual()
@@ -67,11 +65,6 @@ namespace STGRuntime.UI
         {
             _obj.asList.itemRenderer = func;
         }
-        public void SetClass(Type cls, object clsArgs = null)
-        {
-            _class = cls;
-            _classArgs = clsArgs;
-        }
 
         // 设置多样式虚拟列表
         public void ItemProvider(ItemProvideFunc func)
@@ -82,35 +75,43 @@ namespace STGRuntime.UI
             });
         }
 
-        public void SetState(ItemStateFunc0 func)
+        public void SetState<T1,T2>(ItemStateFuncT2<T1,T2> func) where T1 : new() where T2 : FComponent, new()
         {
             _obj.asList.itemRenderer = new ListItemRenderer((index,obj) =>
             {
                 FComponent fComp = null;
                 if (!_dataTemplate.TryGetValue(obj, out fComp))
                 {
-                    System.Reflection.Assembly asm = System.Reflection.Assembly.GetExecutingAssembly();
-                    fComp = asm.CreateInstance(_class.FullName) as FComponent;
-                    fComp.InitWithObj(obj);
+                    fComp = FComponent.Create<T2>(obj);
                     _dataTemplate[obj] = fComp;
                 }
-                func( index, fComp);
+                func?.Invoke(index, (T1)_dataProvider[index], (T2)fComp);
             });
         }
-
-        public void SetState(ItemStateFunc1 func)
+        public void SetState<T1>(ItemStateFuncT1<T1> func)
         {
             _obj.asList.itemRenderer = new ListItemRenderer((index, obj) =>
             {
                 FComponent fComp = null;
                 if (!_dataTemplate.TryGetValue(obj, out fComp))
                 {
-                    System.Reflection.Assembly asm = System.Reflection.Assembly.GetExecutingAssembly();
-                    fComp = asm.CreateInstance(_class.FullName) as FComponent;
-                    fComp.InitWithObj(obj);
+                    fComp = FComponent.Create(obj);
                     _dataTemplate[obj] = fComp;
                 }
-                func(index, fComp, _dataProvider[index]);
+                func?.Invoke(index, (T1)_dataProvider[index], fComp);
+            });
+        }
+        public void SetState(ItemStateFuncT0 func)
+        {
+            _obj.asList.itemRenderer = new ListItemRenderer((index, obj) =>
+            {
+                FComponent fComp = null;
+                if (!_dataTemplate.TryGetValue(obj, out fComp))
+                {
+                    fComp = FComponent.Create(obj);
+                    _dataTemplate[obj] = fComp;
+                }
+                func?.Invoke(index, _dataProvider[index], fComp);
             });
         }
 
@@ -123,8 +124,7 @@ namespace STGRuntime.UI
         {
             if (array != null)
             {
-                List<object> list = array.ConvertAll(s => (object)s);
-                _dataProvider = list;
+                _dataProvider = array.ConvertAll(s => (object)s);
             }
             else
             {
@@ -133,9 +133,9 @@ namespace STGRuntime.UI
             SetNumItems(_dataProvider.Count);
         }
 
-        public List<object> GetDataProvider()
+        public List<T> GetDataProvider<T>() where T : new()
         {
-            return _dataProvider;
+            return _dataProvider.ConvertAll(s => (T)s);
         }
 
         //刷新列表

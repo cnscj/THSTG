@@ -27,6 +27,11 @@ namespace STGRuntime.UI
             return fObj;
         }
 
+        public string GetName()
+        {
+            return _obj.name;
+        }
+
         public FComponent GetParent()
         {
             var obj = _obj.parent;

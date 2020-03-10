@@ -130,10 +130,6 @@ namespace STGRuntime.UI
             return _args;
         }
 
-        public string GetName()
-        {
-            return GetType().ToString();
-        }
         //
         protected virtual void OnInitUI()
         {

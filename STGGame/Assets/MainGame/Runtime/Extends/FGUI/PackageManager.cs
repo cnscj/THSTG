@@ -106,13 +106,11 @@ namespace STGRuntime
                         packageInfo.accessTimestamp = Time.realtimeSinceStartup;
                         m_packageMap.Add(package.name, packageInfo);
 
-                        if (m_onAddedCallback != null)
-                        {
-                            m_onAddedCallback(packageInfo);
-                        }
+                        m_onAddedCallback?.Invoke(packageInfo);
                         Debug.Log(string.Format("[PackageManager]包 {0} 已被成功加载", packageName));
                     }
-                }else
+                }
+                else
                 {
                     Debug.LogError(string.Format("[PackageManager]没有Loader加载器函数,请先通过SetLoader设置"));
                 }

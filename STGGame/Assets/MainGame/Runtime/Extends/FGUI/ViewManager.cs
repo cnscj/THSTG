@@ -65,10 +65,7 @@ namespace STGRuntime
 
                     m_viewsMap[type] = viewInfo;
 
-                    if (m_onCreated != null)
-                    {
-                        m_onCreated(viewInfo);
-                    }
+                    m_onCreated?.Invoke(viewInfo);
                 });
             }
         }

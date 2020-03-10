@@ -7,8 +7,14 @@ namespace STGRuntime.UI
 
     public class FComponent : FObject
     {
+#if DEBUG
         private FGraph __graph;
+#endif
         private FScrollPane __scrollPane;
+
+        private Dictionary<string, FComponent> __children;
+        private Dictionary<string, FController> __controllers;
+        private Dictionary<string, FTransition> __transitions;
 
         public static T Create<T>(GObject obj) where T : FComponent, new()
         {
@@ -32,9 +38,15 @@ namespace STGRuntime.UI
 
         public T GetChild<T>(string name) where T : FComponent, new()
         {
-            GObject obj = this._obj.asCom.GetChild(name);
-            return FComponent.Create<T>(obj);
+            __children = __children ?? new Dictionary<string, FComponent>();
+            if (!__children.TryGetValue(name, out FComponent fComp))
+            {
+                GObject obj = this._obj.asCom.GetChild(name);
+                fComp = FComponent.Create<T>(obj);
+            }
+            return fComp as T;
         }
+
         public FComponent GetChild(string name)
         {
             return GetChild<FComponent>(name);
@@ -77,24 +89,32 @@ namespace STGRuntime.UI
         public virtual void AddChild(FComponent comp)
         {
             _obj.asCom.AddChild(comp.GetObject());
+            __children = __children ?? new Dictionary<string, FComponent>();
+            __children[comp.GetName()] = comp;
         }
         public virtual void AddChildAt(FComponent comp, int idx)
         {
             _obj.asCom.AddChildAt(comp.GetObject(), idx);
+            __children = __children ?? new Dictionary<string, FComponent>();
+            __children[comp.GetName()] = comp;
         }
 
-        public virtual void RemoveChild(FComponent comp,bool isDisposed = false)
+        public virtual void RemoveChild(FComponent comp, bool isDisposed = false)
         {
             _obj.asCom.RemoveChild(comp.GetObject(), isDisposed);
+            __children = __children ?? new Dictionary<string, FComponent>();
+            __children.Remove(comp.GetName());
         }
         public virtual void RemoveChildren()
         {
             _obj.asCom.RemoveChildren();
+            __children?.Clear();
         }
 
         public virtual void RemoveAllChildren(bool isDisposed = false)
         {
             _obj.asCom.RemoveChildren(0, -1, isDisposed);
+            __children?.Clear();
         }
         public virtual void RemoveFromParent()
         {
@@ -116,24 +136,33 @@ namespace STGRuntime.UI
             return _obj.asCom.GetChildIndex(child.GetObject());
         }
 
-
-
         // controller
         public FController GetController(string name)
         {
-            Controller ctrl = _obj.asCom.GetController(name);
-            return new FController().InitWithObj(ctrl) as FController;
+            __controllers = __controllers ?? new Dictionary<string, FController>();
+            if (!__controllers.TryGetValue(name, out FController fCtrl))
+            {
+                Controller ctrl = _obj.asCom.GetController(name);
+                fCtrl = FController.Create(ctrl);
+            }
+            return fCtrl;
         }
 
         public FTransition GetTransition(string name)
         {
-            Transition trans = _obj.asCom.GetTransition(name);
-            return new FTransition().InitWithObj(trans) as FTransition;
+            __transitions = __transitions ?? new Dictionary<string, FTransition>();
+            if (!__transitions.TryGetValue(name, out FTransition fTrans))
+            {
+                Transition trans = _obj.asCom.GetTransition(name);
+                fTrans = FTransition.Create(trans);
+            }
+            return fTrans;
+
         }
         public FScrollPane GetScrollPane()
         {
             var obj = _obj.asCom.scrollPane;
-            __scrollPane = (obj != null) ? (__scrollPane != null ? __scrollPane.InitWithObj(obj) as FScrollPane : new FScrollPane().InitWithObj(obj) as FScrollPane) : null;
+            __scrollPane = (obj != null) ? (__scrollPane != null ? __scrollPane.InitWithObj(obj) as FScrollPane : FScrollPane.Create(obj)) : null;
             return __scrollPane;
         }
 

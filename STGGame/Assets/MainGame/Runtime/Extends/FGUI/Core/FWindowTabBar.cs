@@ -89,7 +89,7 @@ namespace STGRuntime.UI
             {
                 _barList.SetVirtual();
 
-                _barList.SetState((index, comp, data) =>
+                _barList.SetState((index, data, comp) =>
                 {
                     var viewParams = data as ViewParams;
                     var title = comp.GetChild<FRichText>("title");

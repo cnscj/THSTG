@@ -5,6 +5,15 @@ namespace STGRuntime.UI
 
     public class FController : Wrapper<Controller>
     {
+        public static FController Create(Controller obj)
+        {
+            if (obj != null)
+            {
+               return new FController().InitWithObj(obj) as FController;
+            }
+            return null;
+        }
+
         public void SetSelectedIndex(int index)
         {
             _obj.selectedIndex = index;

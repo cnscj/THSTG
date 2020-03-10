@@ -47,15 +47,10 @@ namespace STGRuntime.UI
         {
             btnList = GetChild<FList>("btnList");
             btnList.SetVirtual();
-            btnList.SetClass(typeof(FButton));
-            btnList.SetState((index,comp,data) =>
+            btnList.SetState<ItemData,FButton>((index, data, comp) =>
             {
-                var item = data as ItemData;
-                var btn = comp as FButton;
-                comp.SetText(item.btnName);
-                comp.OnClick(item.btnFunc);
-
-
+                comp.SetText(data.btnName);
+                comp.OnClick(data.btnFunc);
             });
             
         }

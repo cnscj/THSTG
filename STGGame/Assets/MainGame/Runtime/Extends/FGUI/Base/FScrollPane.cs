@@ -8,6 +8,15 @@ namespace STGRuntime.UI
         private FComponent __header;
         private FComponent __footer;
 
+        public static FScrollPane Create(ScrollPane obj)
+        {
+            if (obj != null)
+            {
+                return new FScrollPane().InitWithObj(obj) as FScrollPane;
+            }
+            return null;
+        }
+
         public FComponent GetHeader()
         {
             var obj = _obj.header;
