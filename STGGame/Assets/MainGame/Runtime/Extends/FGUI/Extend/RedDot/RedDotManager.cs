@@ -16,19 +16,13 @@ namespace STGRuntime.UI
 
         }
 
-        public void Post(int id)
+        public void SetStatus(bool isShow, params string[] args)
         {
 
         }
 
-        public void Update(RedDotParams redDotParams, bool isShow)
+        public bool GetStatus(params string[] args)
         {
-
-        }
-
-        public bool IsShow(RedDotParams redDotParams)
-        {
-
             return false;
         }
     }
