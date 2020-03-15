@@ -1,9 +1,14 @@
-﻿namespace ASGame
+﻿using Object = UnityEngine.Object;
+namespace ASGame
 {
-    public class AssetLoadResult<T>
+    public class AssetLoadResult
     {
-        public T asset;
+        public Object asset;
         public bool isDone;
-        public int status;
+
+        public T GetAsset<T>() where T : Object
+        {
+            return asset as T;
+        }
     }
 }

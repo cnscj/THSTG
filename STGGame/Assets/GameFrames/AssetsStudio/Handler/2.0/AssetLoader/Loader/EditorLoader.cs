@@ -1,24 +1,21 @@
 ﻿using System;
+using System.Collections;
 using UnityEditor;
-
-namespace ASGame
+using ASGame;
+using Object = UnityEngine.Object;
+namespace ASEditor
 {
-    public class EditorLoader : BaseLoader
+    public class EditorLoader : BaseNextframeLoader
     {
-        public override void LoadAtPath<T>(string path, Action<AssetLoadResult<T>> result)
+        protected override IEnumerator OnLoadAsset(AssetLoadHandler handler)
         {
-            T obj = AssetDatabase.LoadAssetAtPath<T>(path);
-            result?.Invoke(new AssetLoadResult<T>()
+            Object obj = AssetDatabase.LoadAssetAtPath<Object>(handler.assetPath);
+            handler.onCallback?.Invoke(new AssetLoadResult()
             {
                 asset = obj,
                 isDone = true,
-                status = LoadStatus.LOAD_SUCCESS
             });
-        }
-
-        public override void Unload(string path)
-        {
-            
+            return null;
         }
     }
 }

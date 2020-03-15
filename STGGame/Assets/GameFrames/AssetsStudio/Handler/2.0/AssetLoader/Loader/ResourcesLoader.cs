@@ -2,20 +2,26 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Object = UnityEngine.Object;
+using IEnumerator = System.Collections.IEnumerator;
 namespace ASGame
 {
-    public class ResourcesLoader : BaseLoader
+    public class ResourcesLoader : BaseCoroutineLoader
     {
-        public override void LoadAtPath<T>(string path, Action<AssetLoadResult<T>> result)
+        protected override IEnumerator OnLoadAsset(AssetLoadHandler handler)
         {
-            AsyncOperation request = Resources.LoadAsync<T>(path);
-            
-        }
+            string assetPath = handler.assetPath;
+            var request = Resources.LoadAsync(assetPath);
+            yield return request;
 
-        public override void Unload(string path)
-        {
-            throw new NotImplementedException();
+            if (handler.onCallback != null)
+            {
+                handler.onCallback.Invoke(new AssetLoadResult()
+                {
+                    asset = request.asset,
+                    isDone = request.isDone,
+                });
+            }
         }
     }
 }

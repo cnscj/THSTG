@@ -7,13 +7,38 @@ namespace ASGame
 {
     public abstract class BaseLoader : MonoBehaviour
     {
-        public abstract void LoadAtPath<T>(string path, Action<AssetLoadResult<T>> result) where T : Object;
-        public abstract void Unload(string path);
+        private static int s_id;
+        private static Queue<AssetLoadHandler> s_availableHandlers = new Queue<AssetLoadHandler>();
 
-        private Dictionary<string, BaseLoader> _readyList;          //预备加载的列表
-        private Dictionary<string, BaseLoader> _loadingList;        //正在加载的列表
-        private Dictionary<string, BaseLoader> _loadedList;         //加载完成的列表
-        private Dictionary<string, BaseLoader> _unloadList;         //准备卸载的列表
+        protected static int GetNewHandlerId(){return ++s_id;}
+
+        public abstract AssetLoadHandler StartLoad(string path);
+        public abstract void StopLoad(AssetLoadHandler handler);
+        
+        
+        protected AssetLoadHandler GetOrCreateHandler()
+        {
+            if (s_availableHandlers.Count <= 0 )
+            {
+                var newHandler = new AssetLoadHandler();
+                s_availableHandlers.Enqueue(newHandler);
+            }
+            AssetLoadHandler handler = s_availableHandlers.Dequeue();
+            handler.id = GetNewHandlerId();
+
+            return handler;
+        }
+        protected void RecycleHandler(AssetLoadHandler handler)
+        {
+            if (handler != null)
+            {
+                s_availableHandlers.Enqueue(handler);
+                handler.id = 0;
+                handler.loader = null;
+                handler.assetPath = null;
+                handler.onCallback = null;
+            }
+        }
     }
 }
 
