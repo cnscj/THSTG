@@ -6,9 +6,9 @@ namespace ASGame
     public class AssetLoadHandler
     {
         public int id;
+        public string assetPath;
         public BaseLoader loader;
 
-        public string assetPath;
         public AssetLoadCallback onCallback;
 
     }

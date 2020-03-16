@@ -5,9 +5,12 @@ using UnityEngine;
 
 namespace ASGame
 {
-    //public class BinarylLoader : BaseLoader
-    //{
- 
-    //}
+    public class BinarylLoader : BaseCoroutineLoader
+    {
+        protected override IEnumerator OnLoadAsset(AssetLoadHandler handler)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
 

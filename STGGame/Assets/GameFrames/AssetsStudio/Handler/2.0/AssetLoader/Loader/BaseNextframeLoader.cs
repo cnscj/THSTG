@@ -7,14 +7,14 @@ namespace ASGame
 {
     public abstract class BaseNextframeLoader : BaseLoader
     {
-        LinkedList<AssetLoadHandler> m_loadQueue = new LinkedList<AssetLoadHandler>();
+        LinkedList<KeyValuePair<int, AssetLoadHandler>> m_loadQueue = new LinkedList<KeyValuePair<int, AssetLoadHandler>>();
         public override AssetLoadHandler StartLoad(string path)
         {
-            var handler = GetOrCreateHandler();
+            var handler = AssetLoadHandlerManager.GetInstance().GetOrCreateHandler();
             handler.loader = this;
             handler.assetPath = path;
 
-            m_loadQueue.AddLast(handler);
+            m_loadQueue.AddLast(new KeyValuePair<int, AssetLoadHandler>(handler.id, handler));
             return handler;
         }
 
@@ -23,25 +23,34 @@ namespace ASGame
             if (handler == null)
                 return;
 
-            foreach (var itHandler in m_loadQueue)
+            foreach (var itPair in m_loadQueue)
             {
-                if (itHandler == handler)
+                if (itPair.Key == handler.id)
                 {
-                    m_loadQueue.Remove(itHandler);
-                    RecycleHandler(itHandler);
+                    m_loadQueue.Remove(itPair);
+                    AssetLoadHandlerManager.GetInstance().RecycleHandler(itPair.Value);
                 }
             }
         }
 
+        public override void Clear()
+        {
+            foreach(var itPair in m_loadQueue)
+            {
+                AssetLoadHandlerManager.GetInstance().RecycleHandler(itPair.Value);
+            }
+            m_loadQueue.Clear();
+        }
+
         private void Update()
         {
-            while (m_loadQueue.Count >0)
+            while (m_loadQueue.Count > 0)
             {
-                var itHandler = m_loadQueue.First.Value;
-                OnLoadAsset(itHandler);
+                var itPair = m_loadQueue.First.Value;
+                OnLoadAsset(itPair.Value);
                 m_loadQueue.RemoveFirst();
 
-                RecycleHandler(itHandler);
+                AssetLoadHandlerManager.GetInstance().RecycleHandler(itPair.Value);
             }
         }
 

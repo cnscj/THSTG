@@ -15,7 +15,7 @@ namespace ASEditor
                 asset = obj,
                 isDone = true,
             });
-            return null;
+            yield break;
         }
     }
 }
