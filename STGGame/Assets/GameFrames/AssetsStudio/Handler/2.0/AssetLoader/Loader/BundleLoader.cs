@@ -9,7 +9,75 @@ namespace ASGame
 {
     public class BundleLoader : BaseCoroutineLoader
     {
+        public class BundleObject
+        {
+            public string hashName;                                            //hash标识符
+            public int refCount;                                               //引用计数
+
+            public int dependLoadingCount;                                     //依赖计数
+            public List<BundleObject> depends = new List<BundleObject>();      //依赖项
+        }
+
         //TODO:AssetBundler的引用计数
+        private Dictionary<string, string[]> m_dependsDataList = new Dictionary<string, string[]>();
+        private Dictionary<string, BundleLoader> m_loadedMap = new Dictionary<string, BundleLoader>();  //已经加载完成的
+        private Queue<BundleObject> m_unloadList = new Queue<BundleObject>();                           //释放队列
+
+        /// <summary>
+        /// 加载全局依赖文件
+        /// </summary>
+        /// <param name="mainfestPath"></param>
+        /// <param name="bundleSuffix"></param>
+        public bool LoadMainfest(string mainfestPath, string bundleSuffix = ".ab")
+        {
+            if (string.IsNullOrEmpty(mainfestPath))
+                return false;
+            
+            m_dependsDataList.Clear();
+            AssetBundle ab = AssetBundle.LoadFromFile(mainfestPath);
+
+            if (ab == null)
+            {
+                Debug.LogError(string.Format("LoadMainfest ab NULL error !"));
+                return false;
+            }
+
+            AssetBundleManifest mainfest = ab.LoadAsset("AssetBundleManifest") as AssetBundleManifest;
+            if (mainfest == null)
+            {
+                Debug.LogError(string.Format("LoadMainfest NULL error !"));
+                return false;
+            }
+
+            foreach (string assetName in mainfest.GetAllAssetBundles())
+            {
+                string hashName = assetName.Replace(bundleSuffix, "");
+                string[] dps = mainfest.GetAllDependencies(assetName);
+                for (int i = 0; i < dps.Length; i++)
+                {
+                    dps[i] = dps[i].Replace(bundleSuffix, "");
+                }
+                m_dependsDataList.Add(hashName, dps);
+            }
+
+            ab.Unload(true);
+            Debug.Log("AssetBundleLoadMgr dependsCount=" + m_dependsDataList.Count);
+            return true;
+        }
+
+        protected void Update()
+        {
+            UpdateUnload();
+        }
+
+        protected void UpdateUnload()
+        {
+            while (m_unloadList.Count > 0)
+            {
+
+            }
+
+        }
 
         protected override IEnumerator OnLoadAsset(AssetLoadHandler handler)
         {
