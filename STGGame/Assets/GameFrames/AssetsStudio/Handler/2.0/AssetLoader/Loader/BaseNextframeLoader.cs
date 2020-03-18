@@ -8,17 +8,14 @@ namespace ASGame
     public abstract class BaseNextframeLoader : BaseLoader
     {
         LinkedList<KeyValuePair<int, AssetLoadHandler>> m_loadQueue = new LinkedList<KeyValuePair<int, AssetLoadHandler>>();
-        public override AssetLoadHandler StartLoad(string path)
+        protected override void OnStartLoad(AssetLoadHandler handler)
         {
-            var handler = AssetLoadHandlerManager.GetInstance().GetOrCreateHandler();
             handler.loader = this;
-            handler.assetPath = path;
 
             m_loadQueue.AddLast(new KeyValuePair<int, AssetLoadHandler>(handler.id, handler));
-            return handler;
         }
 
-        public override void StopLoad(AssetLoadHandler handler)
+        protected override void OnStopLoad(AssetLoadHandler handler)
         {
             if (handler == null)
                 return;
@@ -33,7 +30,7 @@ namespace ASGame
             }
         }
 
-        public override void Clear()
+        protected override void OnClear()
         {
             foreach(var itPair in m_loadQueue)
             {
@@ -42,7 +39,7 @@ namespace ASGame
             m_loadQueue.Clear();
         }
 
-        private void Update()
+        protected override void OnUpdate()
         {
             while (m_loadQueue.Count > 0)
             {
@@ -52,6 +49,11 @@ namespace ASGame
 
                 AssetLoadHandlerManager.GetInstance().RecycleHandler(itPair.Value);
             }
+        }
+
+        protected override int OnLoadingCount()
+        {
+            return m_loadQueue.Count;
         }
 
         protected abstract IEnumerator OnLoadAsset(AssetLoadHandler handler);

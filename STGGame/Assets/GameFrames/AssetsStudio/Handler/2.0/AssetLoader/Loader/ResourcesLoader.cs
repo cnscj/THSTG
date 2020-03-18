@@ -10,7 +10,7 @@ namespace ASGame
     {
         protected override IEnumerator OnLoadAsset(AssetLoadHandler handler)
         {
-            string assetPath = handler.assetPath;
+            string assetPath = handler.path;
             var request = Resources.LoadAsync(assetPath);
             yield return request;
 

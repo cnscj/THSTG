@@ -7,6 +7,7 @@ using IEnumerator = System.Collections.IEnumerator;
 
 namespace ASGame
 {
+    //TODO:要非常注意循环依赖的问题
     public class BundleLoader : BaseCoroutineLoader
     {
         public class BundleObject
@@ -65,7 +66,7 @@ namespace ASGame
             return true;
         }
 
-        protected void Update()
+        protected override void OnUpdate()
         {
             UpdateUnload();
         }
@@ -76,12 +77,11 @@ namespace ASGame
             {
 
             }
-
         }
 
         protected override IEnumerator OnLoadAsset(AssetLoadHandler handler)
         {
-            string[] pathPairs = handler.assetPath.Split('|');
+            string[] pathPairs = handler.path.Split('|');
             string assetPath = pathPairs[0];
             string assetName = pathPairs[1];
             var request = AssetBundle.LoadFromFileAsync(assetPath);

@@ -8,19 +8,15 @@ namespace ASGame
     {
         private Dictionary<int, KeyValuePair<AssetLoadHandler, Coroutine>> m_loadCoroutines = new Dictionary<int, KeyValuePair<AssetLoadHandler, Coroutine>>();
 
-        public override AssetLoadHandler StartLoad(string path)
+        protected override void OnStartLoad(AssetLoadHandler handler)
         {
-            var handler = AssetLoadHandlerManager.GetInstance().GetOrCreateHandler();
             handler.loader = this;
-            handler.assetPath = path;
 
             var coroutine = StartCoroutine(LoadAsset(handler));
             m_loadCoroutines[handler.id] = new KeyValuePair<AssetLoadHandler, Coroutine>(handler, coroutine);
-
-            return handler;
         }
 
-        public override void StopLoad(AssetLoadHandler handler)
+        protected override void OnStopLoad(AssetLoadHandler handler)
         {
             if (handler == null)
                 return;
@@ -34,7 +30,7 @@ namespace ASGame
             }
         }
 
-        public override void Clear()
+        protected override void OnClear()
         {
             foreach(var mapPair in m_loadCoroutines)
             {
@@ -53,6 +49,11 @@ namespace ASGame
                 m_loadCoroutines.Remove(handler.id);
             }
             AssetLoadHandlerManager.GetInstance().RecycleHandler(handler);
+        }
+
+        protected override int OnLoadingCount()
+        {
+            return m_loadCoroutines.Count;
         }
 
         protected abstract IEnumerator OnLoadAsset(AssetLoadHandler handler);
