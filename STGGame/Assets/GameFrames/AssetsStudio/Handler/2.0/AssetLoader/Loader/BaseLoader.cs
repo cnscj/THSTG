@@ -54,7 +54,7 @@ namespace ASGame
 
         protected void Update()
         {
-            UpdatePrepare();
+            UpdateWait();
             OnUpdate();
         }
 
@@ -67,7 +67,7 @@ namespace ASGame
             return m_waitQueue;
         }
 
-        protected void UpdatePrepare()
+        protected void UpdateWait()
         {
             if (m_waitQueue != null)
             {

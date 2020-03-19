@@ -21,8 +21,9 @@ namespace ASGame
 
         //TODO:AssetBundler的引用计数
         private Dictionary<string, string[]> m_dependsDataList = new Dictionary<string, string[]>();
-        private Dictionary<string, BundleLoader> m_loadedMap = new Dictionary<string, BundleLoader>();  //已经加载完成的
-        private Queue<BundleObject> m_unloadList = new Queue<BundleObject>();                           //释放队列
+        private Dictionary<string, BundleLoader> m_bundlesMap = new Dictionary<string, BundleLoader>();     //已经加载完成的
+
+        private Queue<BundleObject> m_unloadList = new Queue<BundleObject>();                               //释放队列
 
         /// <summary>
         /// 加载全局依赖文件

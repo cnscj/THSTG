@@ -6,7 +6,7 @@ namespace ASGame
 {
     public abstract class BaseCoroutineLoader : BaseLoader
     {
-        private Dictionary<int, KeyValuePair<AssetLoadHandler, Coroutine>> m_loadCoroutines = new Dictionary<int, KeyValuePair<AssetLoadHandler, Coroutine>>();
+        private Dictionary<int, KeyValuePair<AssetLoadHandler, Coroutine>> m_loadCoroutines = new Dictionary<int, KeyValuePair<AssetLoadHandler, Coroutine>>();  //正在加载的队列
 
         protected override void OnStartLoad(AssetLoadHandler handler)
         {
