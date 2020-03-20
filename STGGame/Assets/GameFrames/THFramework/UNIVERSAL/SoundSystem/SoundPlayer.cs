@@ -7,7 +7,7 @@ namespace THGame
     public class SoundPlayer : MonoBehaviour
     {
         private static readonly SoundArgs DEFAULT_ARGS = new SoundArgs();
-        public int maxCount = 6;               //最大同时播放个数,-1无限制
+        public int maxCount = -1;               //最大同时播放个数,-1无限制
 
         private float m_volume = 1f;
         private bool m_mute = false;

@@ -16,11 +16,7 @@ namespace ASGame
 
             if (handler.onCallback != null)
             {
-                handler.onCallback.Invoke(new AssetLoadResult()
-                {
-                    asset = request.asset,
-                    isDone = request.isDone,
-                });
+                handler.onCallback.Invoke(new AssetLoadResult(request.asset, request.isDone));
             }
         }
     }

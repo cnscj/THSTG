@@ -10,11 +10,7 @@ namespace ASEditor
         protected override IEnumerator OnLoadAsset(AssetLoadHandler handler)
         {
             Object obj = AssetDatabase.LoadAssetAtPath<Object>(handler.path);
-            handler.onCallback?.Invoke(new AssetLoadResult()
-            {
-                asset = obj,
-                isDone = true,
-            });
+            handler.onCallback?.Invoke(new AssetLoadResult(obj, true));
             yield break;
         }
     }

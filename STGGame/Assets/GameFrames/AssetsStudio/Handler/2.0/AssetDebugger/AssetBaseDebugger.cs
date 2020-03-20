@@ -12,8 +12,8 @@ namespace ASGame
             return debugger.AddComponent<T>();
         }
 
-        public abstract void Retain(string key);
-        public abstract void Release(string key);
+        public abstract void Add(string key);
+        public abstract void Remove(string key);
         public abstract void Clear();
     }
 }

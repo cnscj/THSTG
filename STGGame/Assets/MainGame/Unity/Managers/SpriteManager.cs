@@ -36,13 +36,13 @@ namespace STGU3D
 
             if (usePool)
             {
-                if (!GameObjectPoolManager.GetInstance().HasGameObjectPool(viewCode))
+                if (!GameObjectPoolService.GetInstance().HasGameObjectPool(viewCode))
                 {
                     var prefab = AssetManager.GetInstance().LoadSprite(viewCode);
-                    GameObjectPoolManager.GetInstance().NewGameObjectPool(viewCode, prefab, maxCount);
+                    GameObjectPoolService.GetInstance().NewGameObjectPool(viewCode, prefab, maxCount);
                     
                 }
-                prefabInstance = GameObjectPoolManager.GetInstance().GetOrCreateGameObject(viewCode);
+                prefabInstance = GameObjectPoolService.GetInstance().GetOrCreateGameObject(viewCode);
             }
             else
             {

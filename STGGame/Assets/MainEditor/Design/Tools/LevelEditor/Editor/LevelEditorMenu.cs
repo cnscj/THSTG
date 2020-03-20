@@ -1,8 +1,8 @@
 ﻿using System.IO;
+using ASEditor;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using XLibEditor;
 using XLibrary;
 
 namespace STGEditor

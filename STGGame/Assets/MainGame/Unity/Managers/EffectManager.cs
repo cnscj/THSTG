@@ -19,11 +19,11 @@ namespace STGU3D
         /// <param name="onComplete"></param>
         public void PlayOnce(string code, GameObject hangNode, Vector3 position, Action onCompleted = null)
         {
-            var pool = GameObjectPoolManager.GetInstance().GetGameObjectPool(code);
+            var pool = GameObjectPoolService.GetInstance().GetGameObjectPool(code);
             if (pool == null)
             {
                 GameObject prefab = AssetManager.GetInstance().LoadEffect(code);
-                pool = GameObjectPoolManager.GetInstance().NewGameObjectPool(code, prefab,10);
+                pool = GameObjectPoolService.GetInstance().NewGameObjectPool(code, prefab,10);
             }
             var fxGO = pool.GetOrCreate();
             if (fxGO)
@@ -39,7 +39,7 @@ namespace STGU3D
                     fxLenMono.onCompleted = () =>
                     {
                         onCompleted?.Invoke();
-                        GameObjectPoolManager.GetInstance().ReleaseGameObject(fxGO);
+                        GameObjectPoolService.GetInstance().ReleaseGameObject(fxGO);
                     };
                 }
             }

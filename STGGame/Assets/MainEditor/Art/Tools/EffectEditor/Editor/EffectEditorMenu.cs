@@ -1,10 +1,10 @@
 ﻿using System.IO;
-using XLibEditor;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using XLibrary;
 using STGGame.Editor;
+using ASEditor;
 
 namespace STGEditor
 {

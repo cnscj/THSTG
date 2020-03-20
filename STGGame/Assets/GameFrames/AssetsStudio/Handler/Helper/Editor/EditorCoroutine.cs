@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
-namespace XLibEditor
+namespace ASEditor
 {
     /// <summary>
     /// UnityEditor下模拟协程

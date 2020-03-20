@@ -83,7 +83,7 @@ namespace STGU3D
             {
                 foreach (var showGO in showGOs)
                 {
-                    var goPoolMgr = GameObjectPoolManager.GetInstance();
+                    var goPoolMgr = GameObjectPoolService.GetInstance();
                     goPoolMgr?.ReleaseGameObject(showGO);
                 }
                 showGOs.Clear();

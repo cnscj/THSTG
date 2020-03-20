@@ -40,7 +40,41 @@ namespace XLibrary
 			Directory.Delete(path, recursive);
 		}
 
-		public static bool CheckNullFolder(string path)
+        public static bool CopyDirectory(string srcPath, string desPath, bool overwriteexisting = true)
+        {
+            bool ret = false;
+            try
+            {
+                srcPath = srcPath.EndsWith(@"\") ? srcPath : srcPath + @"\";
+                desPath = desPath.EndsWith(@"\") ? desPath : desPath + @"\";
+
+                if (Directory.Exists(srcPath))
+                {
+                    if (Directory.Exists(desPath) == false)
+                        Directory.CreateDirectory(desPath);
+
+                    foreach (string fls in Directory.GetFiles(srcPath))
+                    {
+                        FileInfo flinfo = new FileInfo(fls);
+                        flinfo.CopyTo(desPath + flinfo.Name, overwriteexisting);
+                    }
+                    foreach (string drs in Directory.GetDirectories(srcPath))
+                    {
+                        DirectoryInfo drinfo = new DirectoryInfo(drs);
+                        if (CopyDirectory(drs, desPath + drinfo.Name, overwriteexisting) == false)
+                            ret = false;
+                    }
+                }
+                ret = true;
+            }
+            catch
+            {
+                ret = false;
+            }
+            return ret;
+        }
+
+        public static bool CheckNullFolder(string path)
 		{
 			if (!Exists(path))
 				return true;

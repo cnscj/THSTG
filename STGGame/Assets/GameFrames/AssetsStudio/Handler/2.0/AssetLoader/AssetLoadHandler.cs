@@ -12,5 +12,14 @@ namespace ASGame
 
         public AssetLoadCallback onCallback;
 
+        public void Reset()
+        {
+            id = 0;
+            status = 0;
+            loader = null;
+            path = null;
+
+            onCallback = null;
+        }
     }
 }

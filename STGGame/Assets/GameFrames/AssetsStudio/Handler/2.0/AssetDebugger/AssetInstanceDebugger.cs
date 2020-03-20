@@ -6,7 +6,7 @@ namespace ASGame
     public class AssetInstanceDebugger : AssetBaseDebugger
     {
         Dictionary<string, AssetDebugBundleObject> m_resGameObj = new Dictionary<string, AssetDebugBundleObject>();
-        public override void Retain(string key)
+        public override void Add(string key)
         {
             AssetDebugBundleObject bundleObj = null;
             if (!m_resGameObj.TryGetValue(key,out bundleObj))
@@ -17,7 +17,7 @@ namespace ASGame
             bundleObj.refCount++;
         }
 
-        public override void Release(string key)
+        public override void Remove(string key)
         {
             AssetDebugBundleObject bundleObj = null;
             if (!m_resGameObj.TryGetValue(key, out bundleObj))

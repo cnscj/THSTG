@@ -1,20 +1,22 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Object = UnityEngine.Object;
 namespace XLibGame
 {
     public class GameObjectPool : MonoBehaviour
     {
-        public enum ReleaseOperate
+        public enum ActiveOperate
         {
-            Active,         //失活
+            Enabled,        //失活
             Sight,          //视野
+            Custom,         //自定义
         }
         /// <summary>
         /// 所属对象池管理器
         /// </summary>
-        public BaseGameObjectPoolManager mgrObj;
+        public GameObjectPoolManager mgrObj;
         /// <summary>
         /// 每个对象池的名称，当唯一id
         /// </summary>
@@ -44,7 +46,8 @@ namespace XLibGame
         /// <summary>
         ///释放模式
         /// </summary>
-        public ReleaseOperate releaseOperate = ReleaseOperate.Active;
+        public ActiveOperate activeOperate = ActiveOperate.Enabled;
+        public Action<GameObject, bool> activeCustomFunc;
 
         /// <summary>
         /// 队列，存放对象池中没有用到的对象，即可分配对象
@@ -69,13 +72,13 @@ namespace XLibGame
         {
             m_startTick = Time.realtimeSinceStartup;
 
-            bool isPoolObj = false;
+            bool isAlreadyInPool = false;
             GameObject returnObj;
             if (m_queue.Count > 0)
             {
                 //池中有待分配对象
                 returnObj = (GameObject)m_queue.Dequeue();
-                isPoolObj = true;
+                isAlreadyInPool = true;
             }
             else
             {
@@ -100,26 +103,28 @@ namespace XLibGame
                 info.lifetime = lifetime;
             }
 
-            switch (releaseOperate)
+            switch (activeOperate)
             {
-                case ReleaseOperate.Active:
+                case ActiveOperate.Enabled:
                     returnObj.SetActive(true);
                     break;
-                case ReleaseOperate.Sight:
-                {
-                    if (isPoolObj)
+                case ActiveOperate.Sight:
                     {
-                        var position = returnObj.transform.position;
-                        position.z -= -1000f;
-                        returnObj.transform.position = position;
+                        if (isAlreadyInPool)
+                        {
+                            var position = returnObj.transform.position;
+                            position.z -= -1000f;
+                            returnObj.transform.position = position;
+                        }
+                        else
+                        {
+                            returnObj.SetActive(true);
+                        }
                     }
-                    else
-                    {
-                        returnObj.SetActive(true);
-                    }
-            }
-                break;
-
+                    break;
+                case ActiveOperate.Custom:
+                    activeCustomFunc?.Invoke(returnObj,true);
+                    break;
             }
             return returnObj;
         }
@@ -161,17 +166,21 @@ namespace XLibGame
             m_totalCount = Mathf.Max(m_totalCount, m_queue.Count);
 
             obj.transform.SetParent(transform, false); //不改变Transform
-            switch (releaseOperate)
+            switch (activeOperate)
             {
-                case ReleaseOperate.Active:
+                case ActiveOperate.Enabled:
                     obj.SetActive(false);
                     break;
-                case ReleaseOperate.Sight:
-                    var position = obj.transform.position;
-                    position.z += -1000f;
-                    obj.transform.position = position;
+                case ActiveOperate.Sight:
+                    {
+                        var position = obj.transform.position;
+                        position.z += -1000f;
+                        obj.transform.position = position;
+                    }
                     break;
-
+                case ActiveOperate.Custom:
+                    activeCustomFunc?.Invoke(obj, false);
+                    break;
             }
             
         }

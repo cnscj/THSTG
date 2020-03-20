@@ -76,7 +76,8 @@ namespace ASGame
         {
             while (m_unloadList.Count > 0)
             {
-
+                //TODO:卸载队列,如果引用已经没有了,会被送往这里卸载,
+                //但由可能在同一帧时,卸载前又有加载
             }
         }
 
@@ -112,11 +113,7 @@ namespace ASGame
                     }
                 }
 
-                handler.onCallback.Invoke(new AssetLoadResult()
-                {
-                    asset = asset,
-                    isDone = isDone,
-                });
+                handler.onCallback.Invoke(new AssetLoadResult(asset, isDone));
             }
         }
     }

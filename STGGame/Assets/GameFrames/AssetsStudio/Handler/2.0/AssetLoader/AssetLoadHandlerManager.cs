@@ -48,10 +48,7 @@ namespace ASGame
                 {
                     m_handlerMaps.Remove(handler.id);
                     m_availableHandlers.Enqueue(handler);
-                    handler.id = 0;
-                    handler.loader = null;
-                    handler.assetPath = null;
-                    handler.onCallback = null;
+                    handler.Reset();
                 }
             }
         }

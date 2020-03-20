@@ -6,12 +6,12 @@ namespace ASGame
     //这个什么都不干
     public class AssetNullDebugger : AssetBaseDebugger
     {
-        public override void Release(string key)
+        public override void Add(string key)
         {
             
         }
 
-        public override void Retain(string key)
+        public override void Remove(string key)
         {
             
         }

@@ -4,7 +4,7 @@ using System.IO;
 using System;
 using System.Linq;
 
-namespace XLibEditor
+namespace ASEditor
 {
     public static class EditorHelper
     {
