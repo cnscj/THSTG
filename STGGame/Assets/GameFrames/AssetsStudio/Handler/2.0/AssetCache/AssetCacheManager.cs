@@ -6,8 +6,8 @@ using XLibrary.Package;
 using Object = UnityEngine.Object;
 namespace ASGame
 {
-    public class AssetBaseCache : MonoBehaviour
+    public abstract class AssetCacheManager<T> : MonoSingleton<T> where T: MonoBehaviour
     {
-       
+      
     }
 }
