@@ -3,8 +3,8 @@ using System.Collections;
 
 namespace ASGame
 {
-
-    public abstract class AssetBaseManager : MonoBehaviour
+    //bundle管理器
+    public class BundleManager : BaseManager
     {
         
     }

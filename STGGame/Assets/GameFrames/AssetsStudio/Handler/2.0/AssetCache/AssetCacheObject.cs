@@ -2,24 +2,22 @@
 using UnityEngine;
 using System.Linq;
 using Object = UnityEngine.Object;
-using XLibrary.Package;
 
 namespace ASGame
 {
     //缓冲数据信息
-    public class AssetCacheObject
+    public class AssetCacheObject : BaseAssetRef
     {
-        public float stayTime = 30f;      //0引用最长驻留时间
+        public readonly Object cacheObj;        //缓冲物体
+        public readonly string cacheName;       //缓冲数据名称
+        public float stayTime = -1f;            //0引用最长驻留时间s
 
-        private Object m_cacheObj;     //缓冲物体
-        private string m_cacheName;    //缓冲数据名称
-        private float m_startTick;     //进入缓冲区时间
-        private int m_refCount;        //引用次数
+        private float m_startTick;              //进入缓冲区时间
 
         public AssetCacheObject(string name, Object obj)
         {
-            m_cacheName = name;
-            m_cacheObj = obj;
+            cacheName = name;
+            cacheObj = obj;
         }
 
         //刷新进入缓冲区时间
@@ -30,11 +28,25 @@ namespace ASGame
 
         public bool CheckRemove()
         {
-            if (m_startTick + stayTime <= Time.realtimeSinceStartup)
+            if (stayTime > 0 && RefCount() <= 0)
             {
-                return true;
+                if (m_startTick + stayTime <= Time.realtimeSinceStartup)
+                {
+                    return true;
+                }
             }
+
             return false;
+        }
+
+        public T GetObject<T>() where T : Object
+        {
+            return cacheObj as T;
+        }
+
+        protected override void OnRelease()
+        {
+
         }
     }
 

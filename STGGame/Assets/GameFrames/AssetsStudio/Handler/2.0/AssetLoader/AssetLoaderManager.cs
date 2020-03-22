@@ -45,21 +45,25 @@ namespace ASGame
             }
         }
 
+        private BundleLoader GetOrCreateBundleLoader()
+        {
+            m_bundleLoader = m_bundleLoader ?? CreateLoader<BundleLoader>();
+            return m_bundleLoader as BundleLoader;
+        }
+
         private BaseLoader GetOrCreateLoader<T>(string path)
         {
             //根据类型判断
             if (typeof(T) == typeof(AssetBundle))
             {
-                m_bundleLoader = m_bundleLoader ?? CreateLoader<BundleLoader>();
-                return m_bundleLoader;
+                return GetOrCreateBundleLoader();
             }
             else
             {
                 //如果是复合路径,则使用Bundle加载器
                 if (path.IndexOf('|') >= 0)
                 {
-                    m_bundleLoader = m_bundleLoader ?? CreateLoader<BundleLoader>();
-                    return m_bundleLoader;
+                    return GetOrCreateBundleLoader();
                 }
                 else
                 {

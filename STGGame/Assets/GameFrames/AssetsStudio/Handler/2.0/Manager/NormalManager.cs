@@ -5,7 +5,7 @@ using System.Collections;
 namespace ASGame
 {
 
-    public class AssetNormalManager : AssetBaseManager
+    public class NormalManager : BaseManager
     {
         
     }
