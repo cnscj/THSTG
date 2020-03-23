@@ -5,31 +5,40 @@ namespace THGame
 {
     public class SoundPool : MonoBehaviour
     {
+        public class PoolInfo
+        {
+            public float stayTime;
+            public Queue<SoundController> idleQueue = new Queue<SoundController>();
+
+            public int curMaxCount;
+            public float updateTick;
+        }
+
         private int m_disposeTimes = 0;
-        private Dictionary<string, Queue<SoundController>> m_idleMap;
+        private Dictionary<string, PoolInfo> m_poolMap = new Dictionary<string, PoolInfo>();
+        private Queue<string> m_releaseList = new Queue<string>();
         
         public SoundController GetOrCreate(string key,float lifeTime = 0f)
         {
-            Queue<SoundController> queue = null;
+            PoolInfo poolInfo = null;
             SoundController ctrl = null;
             GameObject ctrlGobj = null;
-            m_idleMap = m_idleMap ?? new Dictionary<string, Queue<SoundController>>();
-            if (!m_idleMap.TryGetValue(key, out queue))
+            if (!m_poolMap.TryGetValue(key, out poolInfo))
             {
-                queue = new Queue<SoundController>();
-                m_idleMap.Add(key, queue);
+                poolInfo = new PoolInfo();
+                m_poolMap.Add(key, poolInfo);
             }
 
-            if (queue.Count <= 0)
+            if (poolInfo.idleQueue.Count <= 0)
             {
                 ctrlGobj = new GameObject();
                 ctrl = ctrlGobj.AddComponent<SoundController>();
                 ctrlGobj.transform.SetParent(transform);
 
-                queue.Enqueue(ctrl);
+                poolInfo.idleQueue.Enqueue(ctrl);
             }
       
-            ctrl = queue.Dequeue();
+            ctrl = poolInfo.idleQueue.Dequeue();
             ctrlGobj = ctrl.gameObject;
             var poolObj = ctrlGobj.GetComponent<SoundPoolObject>();
             if (poolObj == null)
@@ -42,6 +51,8 @@ namespace THGame
             poolObj.key = key;
 
             ctrlGobj.SetActive(true);
+
+            UpdatePoolInfo(key);
 
             return ctrl;
         }
@@ -75,18 +86,21 @@ namespace THGame
                     else
                     {
                         string key = poolObj.key;
-                        Queue<SoundController> queue = null;
-                        if (!m_idleMap.TryGetValue(key, out queue))
+                        PoolInfo poolInfo = null;
+                        if (!m_poolMap.TryGetValue(key, out poolInfo))
                         {
-                            queue = new Queue<SoundController>();
-                            m_idleMap.Add(key, queue);
+                            poolInfo = new PoolInfo();
+                            m_poolMap.Add(key, poolInfo);
                         }
-                        queue.Enqueue(soundCtrl);
+                        poolInfo.idleQueue.Enqueue(soundCtrl);
 
                         gobj.transform.SetParent(transform);
                         gobj.SetActive(false);
+
+                        UpdatePoolInfo(key);
                     }
-                }else
+                }
+                else
                 {
                     Destroy(gobj);
                     return;
@@ -108,18 +122,63 @@ namespace THGame
 
         public void Dispose()
         {
-            if (m_idleMap != null)
+            foreach(var pair in m_poolMap)
             {
-                foreach(var pair in m_idleMap)
+                var idleQueue = pair.Value.idleQueue;
+                foreach (var ctrl in idleQueue)
                 {
-                    foreach(var ctrl in pair.Value)
+                    Object.Destroy(ctrl.gameObject);
+                }
+            }
+            m_poolMap.Clear();
+            m_disposeTimes++;
+        }
+
+        private void UpdatePoolInfo(string poolName)
+        {
+            if (m_poolMap.TryGetValue(poolName,out var poolInfo))
+            {
+                poolInfo.updateTick = Time.realtimeSinceStartup;
+                poolInfo.curMaxCount = Mathf.Max(poolInfo.curMaxCount, poolInfo.idleQueue.Count);
+            }
+        }
+
+        private void Update()
+        {
+            foreach (var pair in m_poolMap)
+            {
+
+                var poolInfo = pair.Value;
+                if (poolInfo.stayTime > 0f)
+                {
+                    if (poolInfo.idleQueue.Count >= poolInfo.curMaxCount)
+                    {
+                        if (poolInfo.updateTick + poolInfo.stayTime <= Time.realtimeSinceStartup)
+                        {
+                            var poolKey = pair.Key;
+                            m_releaseList.Enqueue(poolKey);
+                        }
+                    }
+                    else
+                    {
+                        poolInfo.updateTick = Time.realtimeSinceStartup;
+                    }
+
+                }
+            }
+            while(m_releaseList.Count > 0 )
+            {
+                var poolKey = m_releaseList.Dequeue();
+                if (m_poolMap.TryGetValue(poolKey,out var poolInfo))
+                {
+                    var idleQueue = poolInfo.idleQueue;
+                    foreach (var ctrl in idleQueue)
                     {
                         Object.Destroy(ctrl.gameObject);
                     }
                 }
-            }
-            m_idleMap.Clear();
-            m_disposeTimes++;
+                m_poolMap.Remove(poolKey);
+            } 
         }
     }
 }

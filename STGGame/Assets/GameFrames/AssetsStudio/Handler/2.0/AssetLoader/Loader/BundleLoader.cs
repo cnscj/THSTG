@@ -81,6 +81,7 @@ namespace ASGame
             }
         }
 
+        //TODO:需要加载其他的依赖,最后才能返回回调
         protected override IEnumerator OnLoadAsset(AssetLoadHandler handler)
         {
             string[] pathPairs = handler.path.Split('|');

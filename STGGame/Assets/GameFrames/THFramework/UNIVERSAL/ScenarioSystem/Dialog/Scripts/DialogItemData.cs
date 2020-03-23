@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace THGame
 {
+    //TODO:需要考虑多语言的支持
     /// <summary>
     /// 对话项内容
     /// </summary>

@@ -8,7 +8,7 @@ namespace STGRuntime.UI
     public class RedDotNode
     {
         public string name;
-        public Action action;
+        public Action callback;
         public Dictionary<string, RedDotNode> nodes;
     }
 }
