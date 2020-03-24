@@ -7,7 +7,7 @@ using XLibrary.Package;
 
 namespace XLibGame
 {
-    public class TimerManager : MonoSingleton<TimerManager>
+    public class Timer : MonoSingleton<Timer>
     {
         private int m_id = 0;
         private SortedDictionary<int, Coroutine> m_coroutines = new SortedDictionary<int, Coroutine>();

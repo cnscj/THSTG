@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Entitas;
 using UnityEngine;
-using XLibGame;
+using THGame;
 
 namespace STGU3D
 {

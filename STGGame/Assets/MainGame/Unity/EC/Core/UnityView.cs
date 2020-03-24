@@ -113,7 +113,7 @@ namespace STGU3D
 
             entity = ent;
 
-            TimerManager.GetInstance().ScheduleNextFrame(InitView);
+            Timer.GetInstance().ScheduleNextFrame(InitView);
 
             return this;
         }

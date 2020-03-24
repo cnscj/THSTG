@@ -7,7 +7,7 @@ namespace ASGame
     //图集资源管理器
     public class AltasManager : BaseManager<AltasManager>
     {
-        private AtlasPackager m_atlasPackager;
+        private AtlasPackager m_atlasPackager;              //图集打包机
     }
 
 }

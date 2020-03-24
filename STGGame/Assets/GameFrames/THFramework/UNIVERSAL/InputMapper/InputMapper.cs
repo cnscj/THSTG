@@ -8,7 +8,7 @@ using XLibrary;
 using UnityEditor;
 #endif
 
-namespace XLibGame
+namespace THGame
 {
     public class InputMapper : MonoSingleton<InputMapper>
     {
@@ -27,13 +27,15 @@ namespace XLibGame
             Down = 2 ^ 2,
         }
         public List<KeyPair> keyList = new List<KeyPair>();
-        public Dictionary<int, short> keyStatus = new Dictionary<int, short>();                         //按键状态
+
+        private Dictionary<int, short> m_keyStatus = new Dictionary<int, short>();                         //按键状态
+        private Dictionary<int, bool> m_keyResult = new Dictionary<int, bool>();
 
         public bool IsAtBehaviour(int behaviour)
         {
-            if (keyStatus.ContainsKey(behaviour))
+            if (m_keyStatus.ContainsKey(behaviour))
             {
-                short status = keyStatus[behaviour];
+                short status = m_keyStatus[behaviour];
                 return ((status & (int)EKeyStatus.At) > 0);
             }
             return false;
@@ -41,9 +43,9 @@ namespace XLibGame
 
         public bool IsBehaving(int behaviour)
         {
-            if (keyStatus.ContainsKey(behaviour))
+            if (m_keyStatus.ContainsKey(behaviour))
             {
-                short status = keyStatus[behaviour];
+                short status = m_keyStatus[behaviour];
                 return ((status & (int)EKeyStatus.Down) > 0);
             }
             return false;
@@ -51,9 +53,9 @@ namespace XLibGame
 
         public bool IsBehaved(int behaviour)
         {
-            if (keyStatus.ContainsKey(behaviour))
+            if (m_keyStatus.ContainsKey(behaviour))
             {
-                short status = keyStatus[behaviour];
+                short status = m_keyStatus[behaviour];
                 return ((status & (int)EKeyStatus.Up) > 0);
             }
             return false;
@@ -68,7 +70,6 @@ namespace XLibGame
                 if (pair.keycodes.Contains(code))
                 {
                     return true;
-
                 }
             }
             return false;
@@ -112,7 +113,7 @@ namespace XLibGame
             return true;
         }
 
-        public void UnBindKey(int behaviour, KeyCode code)
+        public void UnbindKey(int behaviour, KeyCode code)
         {
             foreach (var pair in keyList)
             {
@@ -126,7 +127,7 @@ namespace XLibGame
             }
         }
 
-        public void UnBindKeys(int behaviour)
+        public void UnbindKeys(int behaviour)
         {
             foreach (var pair in keyList)
             {
@@ -142,28 +143,23 @@ namespace XLibGame
             keyList.Clear();
         }
 
-        protected void Awake()
-        {
-
-        }
-
         protected void Update()
         {
             //把所有的按键记录到输入组件中
             foreach (var keyPair in keyList)
             {
                 short status = 0x0;
-                bool []rets = new bool[3];
+                for (int i = 0; i < 3; i++) m_keyResult[i] = false;
                 foreach (var keyCode in keyPair.keycodes)
                 {
-                    rets[0] = rets[0] | Input.GetKey(keyCode);
-                    rets[1] = rets[1] | Input.GetKeyDown(keyCode);
-                    rets[2] = rets[2] | Input.GetKeyUp(keyCode);
+                    m_keyResult[0] = m_keyResult[0] | Input.GetKey(keyCode);
+                    m_keyResult[1] = m_keyResult[1] | Input.GetKeyDown(keyCode);
+                    m_keyResult[2] = m_keyResult[2] | Input.GetKeyUp(keyCode);
                 }
-                status = rets[0] ? (short)(status | ((int)EKeyStatus.At)): status;
-                status = rets[1] ? (short)(status | ((int)EKeyStatus.Down)) : status;
-                status = rets[2] ? (short)(status | ((int)EKeyStatus.Up)) : status;
-                keyStatus[keyPair.behaviour] = status;
+                status = m_keyResult[0] ? (short)(status | ((int)EKeyStatus.At)): status;
+                status = m_keyResult[1] ? (short)(status | ((int)EKeyStatus.Down)) : status;
+                status = m_keyResult[2] ? (short)(status | ((int)EKeyStatus.Up)) : status;
+                m_keyStatus[keyPair.behaviour] = status;
             }
         }
 

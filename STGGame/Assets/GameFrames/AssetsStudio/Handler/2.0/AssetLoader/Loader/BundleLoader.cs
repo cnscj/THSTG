@@ -4,19 +4,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
 using IEnumerator = System.Collections.IEnumerator;
+using XLibGame;
+using System.IO;
 
 namespace ASGame
 {
     //TODO:要非常注意循环依赖的问题
     public class BundleLoader : BaseCoroutineLoader
     {
-        public class BundleObject
+        public class BundleObject : BaseRef
         {
             public string hashName;                                            //hash标识符
-            public int refCount;                                               //引用计数
 
-            public int dependLoadingCount;                                     //依赖计数
             public List<BundleObject> depends = new List<BundleObject>();      //依赖项
+
+            protected override void OnRelease()
+            {
+                //TODO:递归向上释放
+            }
         }
 
         //TODO:AssetBundler的引用计数
@@ -29,8 +34,7 @@ namespace ASGame
         /// 加载全局依赖文件
         /// </summary>
         /// <param name="mainfestPath"></param>
-        /// <param name="bundleSuffix"></param>
-        public bool LoadMainfest(string mainfestPath, string bundleSuffix = ".ab")
+        public bool LoadMainfest(string mainfestPath)
         {
             if (string.IsNullOrEmpty(mainfestPath))
                 return false;
@@ -53,11 +57,11 @@ namespace ASGame
 
             foreach (string assetName in mainfest.GetAllAssetBundles())
             {
-                string hashName = assetName.Replace(bundleSuffix, "");
+                string hashName = Path.GetFileNameWithoutExtension(assetName);
                 string[] dps = mainfest.GetAllDependencies(assetName);
                 for (int i = 0; i < dps.Length; i++)
                 {
-                    dps[i] = dps[i].Replace(bundleSuffix, "");
+                    dps[i] = Path.GetFileNameWithoutExtension(dps[i]);
                 }
                 m_dependsDataList.Add(hashName, dps);
             }

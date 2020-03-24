@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace THGame
 {
+    //TODO:混音器设置,在水区域,效果不同,和慢放效果
     public class SoundPlayer : MonoBehaviour
     {
         private static readonly SoundArgs DEFAULT_ARGS = new SoundArgs();

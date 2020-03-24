@@ -6,35 +6,35 @@ namespace STGRuntime
 
     public static class TimerHelper
     {
-        private static TimerManager GetManager()
+        private static Timer GetTimer()
         {
-            return TimerManager.GetInstance();
+            return Timer.GetInstance();
         }
 
 
         public static int Schedule(Action action, float interval, int times = 0)
         {
-            return GetManager().Schedule(action, interval, times);
+            return GetTimer().Schedule(action, interval, times);
         }
 
         public static int ScheduleNextFrame(Action action)
         {
-            return GetManager().ScheduleNextFrame(action);
+            return GetTimer().ScheduleNextFrame(action);
         }
 
         public static int ScheduleEachFrame(Action action)
         {
-            return GetManager().ScheduleEachFrame(action);
+            return GetTimer().ScheduleEachFrame(action);
         }
 
         public static int ScheduleOnce(Action action, float interval)
         {
-            return GetManager().ScheduleOnce(action, interval);
+            return GetTimer().ScheduleOnce(action, interval);
         }
 
         public static void Unschedule(int id)
         {
-            GetManager().Unschedule(id);
+            GetTimer().Unschedule(id);
         }
     }
 }

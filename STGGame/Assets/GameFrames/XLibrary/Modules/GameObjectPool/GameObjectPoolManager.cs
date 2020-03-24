@@ -5,7 +5,7 @@ using XLibrary.Package;
 
 namespace XLibGame
 {
-    public class GameObjectPoolManager : MonoBehaviour
+    public class GameObjectPoolManager : MonoSingleton<GameObjectPoolManager>
     {
         /// <summary>
         /// 存放所有的对象池
