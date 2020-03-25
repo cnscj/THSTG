@@ -12,7 +12,7 @@ namespace ASGame
         {
             handler.loader = this;
 
-            var coroutine = StartCoroutine(LoadAsset(handler));
+            var coroutine = StartCoroutine(LoadAssetCoroutine(handler));
             m_loadCoroutines[handler.id] = new KeyValuePair<AssetLoadHandler, Coroutine>(handler, coroutine);
         }
 
@@ -29,6 +29,10 @@ namespace ASGame
                 m_loadCoroutines.Remove(handler.id);
             }
         }
+        protected override void OnLoadCompleted(AssetLoadHandler handler)
+        {
+            m_loadCoroutines.Remove(handler.id);
+        }
 
         protected override void OnClear()
         {
@@ -41,14 +45,9 @@ namespace ASGame
             m_loadCoroutines.Clear();
         }
 
-        private IEnumerator LoadAsset(AssetLoadHandler handler)
+        private IEnumerator LoadAssetCoroutine(AssetLoadHandler handler)
         {
             yield return OnLoadAsset(handler);
-            if (!m_loadCoroutines.ContainsKey(handler.id))
-            {
-                m_loadCoroutines.Remove(handler.id);
-            }
-            AssetLoadHandlerManager.GetInstance().RecycleHandler(handler);
         }
 
         protected override int OnLoadingCount()

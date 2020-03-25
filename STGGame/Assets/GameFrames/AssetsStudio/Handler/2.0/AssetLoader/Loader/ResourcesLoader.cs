@@ -14,10 +14,7 @@ namespace ASGame
             var request = Resources.LoadAsync(assetPath);
             yield return request;
 
-            if (handler.onCallback != null)
-            {
-                handler.onCallback.Invoke(new AssetLoadResult(request.asset, request.isDone));
-            }
+            handler.onCallback?.Invoke(new AssetLoadResult(request.asset, request.isDone));
         }
     }
 }

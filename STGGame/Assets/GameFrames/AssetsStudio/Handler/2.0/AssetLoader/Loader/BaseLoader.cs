@@ -6,8 +6,15 @@ namespace ASGame
 {
     public abstract class BaseLoader : MonoBehaviour
     {
-        public int maxLoadingCount = -1;                            //最大加载资源个数
+        public int maxLoadingCount = -1;                            //最大同时加载资源个数
+        private LinkedList<AssetLoadHandler> m_preloadQueue;        //预加载队列
         private LinkedList<AssetLoadHandler> m_waitQueue;           //准备队列
+        private LinkedList<KeyValuePair<AssetLoadHandler, AssetLoadResult>> m_finishQueue;         //完成队列
+
+        public void Preload(string []path)
+        {
+
+        }
 
         public AssetLoadHandler StartLoad(string path)
         {
@@ -44,7 +51,12 @@ namespace ASGame
             {
                 OnStopLoad(handler);
             }
+        }
 
+        public void FinishHandler(AssetLoadHandler handler, AssetLoadResult result)
+        {
+            m_finishQueue = m_finishQueue ?? new LinkedList<KeyValuePair<AssetLoadHandler, AssetLoadResult>>();
+            m_finishQueue.AddLast(new KeyValuePair<AssetLoadHandler, AssetLoadResult>(handler, result));
         }
 
         public void Clear()
@@ -52,19 +64,35 @@ namespace ASGame
             OnClear();
         }
 
+        public int GetLoadingCount()
+        {
+            return OnLoadingCount();
+        }
+
         protected void Update()
         {
+            UpdatePreload();
             UpdateWait();
             OnUpdate();
+            UpdateFinish();
         }
 
         protected LinkedList<AssetLoadHandler> GetWaitQueue()
         {
-            if (m_waitQueue == null)
-            {
-                m_waitQueue = new LinkedList<AssetLoadHandler>();
-            }
+            m_waitQueue = m_waitQueue ?? new LinkedList<AssetLoadHandler>();
             return m_waitQueue;
+        }
+
+        protected void UpdatePreload()
+        {
+            if (m_preloadQueue != null)
+            {
+                //加载队列空闲时,启动预加载
+                if (OnLoadingCount() <= 0)
+                {
+
+                }
+            }
         }
 
         protected void UpdateWait()
@@ -80,6 +108,25 @@ namespace ASGame
             }
         }
 
+        protected void UpdateFinish()
+        {
+            if (m_finishQueue != null)
+            {
+                while(m_finishQueue.Count > 0)
+                {
+                    var pair = m_finishQueue.First.Value;
+                    var handler = pair.Key;
+                    var result = pair.Value;
+                    
+                    handler.onCallback?.Invoke(result);
+
+                    OnLoadCompleted(handler);
+                    AssetLoadHandlerManager.GetInstance().RecycleHandler(handler);
+                    m_finishQueue.RemoveFirst();
+                }
+            }
+        }
+
         private void StartWithHandler(AssetLoadHandler handler)
         {
             handler.status = AssetLoadStatus.LOAD_LOADING;
@@ -90,6 +137,7 @@ namespace ASGame
         protected abstract int OnLoadingCount();
         protected abstract void OnStartLoad(AssetLoadHandler handler);
         protected abstract void OnStopLoad(AssetLoadHandler handler);
+        protected virtual void OnLoadCompleted(AssetLoadHandler handler) { }
         protected abstract void OnClear();
     }
 }

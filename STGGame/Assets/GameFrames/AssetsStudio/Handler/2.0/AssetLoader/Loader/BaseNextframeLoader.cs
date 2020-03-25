@@ -8,7 +8,8 @@ namespace ASGame
     public abstract class BaseNextframeLoader : BaseLoader
     {
         LinkedList<KeyValuePair<int, AssetLoadHandler>> m_readyQueue = new LinkedList<KeyValuePair<int, AssetLoadHandler>>();      //准备队列
-        LinkedList<KeyValuePair<int, AssetLoadHandler>> m_loadQueue = new LinkedList<KeyValuePair<int, AssetLoadHandler>>();        //加载队列
+        Dictionary<int, AssetLoadHandler> m_loadQueue = new Dictionary<int, AssetLoadHandler>();       //加载队列
+        Queue<int> m_removeQueue = new Queue<int>();
 
         protected override int OnLoadingCount()
         {
@@ -30,6 +31,11 @@ namespace ASGame
             RemoveHandler(handler);
         }
 
+        protected override void OnLoadCompleted(AssetLoadHandler handler)
+        {
+            m_loadQueue.Remove(handler.id);
+        }
+
         protected override void OnClear()
         {
             ClearHandlers();
@@ -39,6 +45,7 @@ namespace ASGame
         {
             UpdateReady();
             UpdateLoading();
+            UpdateRemove();
         }
 
         private void UpdateReady()
@@ -51,7 +58,7 @@ namespace ASGame
                 OnLoadAsset(itPair.Value);
 
                 m_readyQueue.RemoveFirst();
-                m_loadQueue.AddLast(itPair);
+                m_loadQueue.Add(itPair.Key, itPair.Value);
 
                 AssetLoadHandlerManager.GetInstance().RecycleHandler(itPair.Value);
             }
@@ -63,10 +70,21 @@ namespace ASGame
             {
                 if (IsCompleted(handlerPair.Value))
                 {
-                    m_loadQueue.Remove(handlerPair);
+                    //TODO:
+                    m_removeQueue.Enqueue(handlerPair.Key);
                 }
             }
         }
+
+        private void UpdateRemove()
+        {
+            while(m_removeQueue.Count > 0)
+            {
+                var id = m_removeQueue.Dequeue();
+                m_loadQueue.Remove(id);
+            }
+        }
+
         private void ClearHandlers()
         {
             foreach (var itPair in m_readyQueue)
@@ -95,16 +113,7 @@ namespace ASGame
                 }
             }
 
-            for (LinkedListNode<KeyValuePair<int, AssetLoadHandler>> iterNode = m_loadQueue.Last; iterNode != null; iterNode = iterNode.Previous)
-            {
-                var itPair = iterNode.Value;
-                if (itPair.Key == handler.id)
-                {
-                    m_loadQueue.Remove(itPair);
-                    AssetLoadHandlerManager.GetInstance().RecycleHandler(itPair.Value);
-                    break;
-                }
-            }
+            m_loadQueue.Remove(handler.id);
         }
 
         protected virtual bool IsCompleted(AssetLoadHandler handler){ return true; }
