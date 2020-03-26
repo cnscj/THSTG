@@ -15,6 +15,7 @@ namespace ASGame
             yield return request;
 
             handler.onCallback?.Invoke(new AssetLoadResult(request.asset, request.isDone));
+            FinishHandler(handler);
         }
     }
 }

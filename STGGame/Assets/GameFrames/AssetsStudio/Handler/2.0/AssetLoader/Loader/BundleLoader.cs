@@ -119,8 +119,10 @@ namespace ASGame
                 }
 
                 handler.onCallback?.Invoke(new AssetLoadResult(asset, isDone));
+                FinishHandler(handler);
             }
         }
+
     }
 }
 

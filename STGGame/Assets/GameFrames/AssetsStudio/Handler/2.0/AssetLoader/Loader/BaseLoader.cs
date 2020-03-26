@@ -7,15 +7,9 @@ namespace ASGame
     public abstract class BaseLoader : MonoBehaviour
     {
         public int maxLoadingCount = -1;                            //最大同时加载资源个数
-        private LinkedList<AssetLoadHandler> m_preloadQueue;        //预加载队列
         private LinkedList<AssetLoadHandler> m_waitQueue;           //准备队列
-        private LinkedList<KeyValuePair<AssetLoadHandler, AssetLoadResult>> m_finishQueue;         //完成队列
-
-        public void Preload(string []path)
-        {
-
-        }
-
+        private LinkedList<AssetLoadHandler> m_finishQueue;         //完成队列
+    
         public AssetLoadHandler StartLoad(string path)
         {
             var handler = AssetLoadHandlerManager.GetInstance().GetOrCreateHandler();
@@ -53,10 +47,10 @@ namespace ASGame
             }
         }
 
-        public void FinishHandler(AssetLoadHandler handler, AssetLoadResult result)
+        public void FinishHandler(AssetLoadHandler handler)
         {
-            m_finishQueue = m_finishQueue ?? new LinkedList<KeyValuePair<AssetLoadHandler, AssetLoadResult>>();
-            m_finishQueue.AddLast(new KeyValuePair<AssetLoadHandler, AssetLoadResult>(handler, result));
+            m_finishQueue = m_finishQueue ?? new LinkedList<AssetLoadHandler>();
+            m_finishQueue.AddLast(handler);
         }
 
         public void Clear()
@@ -71,28 +65,15 @@ namespace ASGame
 
         protected void Update()
         {
-            UpdatePreload();
             UpdateWait();
             OnUpdate();
-            UpdateFinish();
+            UpdateCompleted();
         }
 
         protected LinkedList<AssetLoadHandler> GetWaitQueue()
         {
             m_waitQueue = m_waitQueue ?? new LinkedList<AssetLoadHandler>();
             return m_waitQueue;
-        }
-
-        protected void UpdatePreload()
-        {
-            if (m_preloadQueue != null)
-            {
-                //加载队列空闲时,启动预加载
-                if (OnLoadingCount() <= 0)
-                {
-
-                }
-            }
         }
 
         protected void UpdateWait()
@@ -108,17 +89,13 @@ namespace ASGame
             }
         }
 
-        protected void UpdateFinish()
+        protected void UpdateCompleted()
         {
             if (m_finishQueue != null)
             {
                 while(m_finishQueue.Count > 0)
                 {
-                    var pair = m_finishQueue.First.Value;
-                    var handler = pair.Key;
-                    var result = pair.Value;
-                    
-                    handler.onCallback?.Invoke(result);
+                    var handler = m_finishQueue.First.Value;
 
                     OnLoadCompleted(handler);
                     AssetLoadHandlerManager.GetInstance().RecycleHandler(handler);
@@ -137,7 +114,7 @@ namespace ASGame
         protected abstract int OnLoadingCount();
         protected abstract void OnStartLoad(AssetLoadHandler handler);
         protected abstract void OnStopLoad(AssetLoadHandler handler);
-        protected virtual void OnLoadCompleted(AssetLoadHandler handler) { }
+        protected abstract void OnLoadCompleted(AssetLoadHandler handler);
         protected abstract void OnClear();
     }
 }

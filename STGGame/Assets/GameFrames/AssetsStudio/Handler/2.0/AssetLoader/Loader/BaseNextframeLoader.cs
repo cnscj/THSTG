@@ -9,7 +9,6 @@ namespace ASGame
     {
         LinkedList<KeyValuePair<int, AssetLoadHandler>> m_readyQueue = new LinkedList<KeyValuePair<int, AssetLoadHandler>>();      //准备队列
         Dictionary<int, AssetLoadHandler> m_loadQueue = new Dictionary<int, AssetLoadHandler>();       //加载队列
-        Queue<int> m_removeQueue = new Queue<int>();
 
         protected override int OnLoadingCount()
         {
@@ -45,7 +44,6 @@ namespace ASGame
         {
             UpdateReady();
             UpdateLoading();
-            UpdateRemove();
         }
 
         private void UpdateReady()
@@ -70,18 +68,9 @@ namespace ASGame
             {
                 if (IsCompleted(handlerPair.Value))
                 {
-                    //TODO:
-                    m_removeQueue.Enqueue(handlerPair.Key);
+                    //这里只需要重写OnLoadCompleted执行回调就好了
+                    FinishHandler(handlerPair.Value);
                 }
-            }
-        }
-
-        private void UpdateRemove()
-        {
-            while(m_removeQueue.Count > 0)
-            {
-                var id = m_removeQueue.Dequeue();
-                m_loadQueue.Remove(id);
             }
         }
 

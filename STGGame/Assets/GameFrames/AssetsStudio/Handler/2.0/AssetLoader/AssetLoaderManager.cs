@@ -10,15 +10,9 @@ namespace ASGame
     {
         private BaseLoader m_editorOrResLoader;
         private BaseLoader m_bundleLoader;
-        private LinkedList<string> m_preloadQueue;                      //预加载队列
         public bool LoadBundleMainfest(string mainfestPath)
         {
             return GetOrCreateBundleLoader().LoadMainfest(mainfestPath);
-        }
-
-        public void PreloadAsset(string[] path)
-        {
-
         }
 
         public int LoadAsset<T>(string path, Action<T> onSuccess = null, Action<int> onFailed = null) where T : Object

@@ -5,9 +5,10 @@ using System.Collections.Generic;
 namespace ASGame
 {
     //图集资源管理器
-    public class AltasManager : BaseManager<AltasManager>
+    public class TextureManager : BaseManager<TextureManager>
     {
-        private AtlasPackager m_atlasPackager;              //图集打包机
+        private TexturePackager m_texturePackager;              //纹理打包机
+
     }
 
 }

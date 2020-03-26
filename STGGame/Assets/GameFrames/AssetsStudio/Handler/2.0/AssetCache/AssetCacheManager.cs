@@ -11,11 +11,11 @@ namespace ASGame
         private static readonly string DEFAULT_CACHE = "DefaultCache";
         private Dictionary<string, AssetBaseCache> m_cachesMap = new Dictionary<string, AssetBaseCache>();
 
-        public AssetBaseCache GetOrCreateCache(string cacheName)
+        public AssetBaseCache GetOrCreateCache<T>(string cacheName) where T : AssetBaseCache
         {
             if (!m_cachesMap.ContainsKey(cacheName))
             {
-                AssetBaseCache cache = AssetBaseCache.Create<AssetBaseCache>(cacheName, transform);
+                AssetBaseCache cache = AssetBaseCache.Create<T>(cacheName, transform);
                 m_cachesMap.Add(cacheName, cache);
             }
             return m_cachesMap[cacheName];
@@ -23,7 +23,12 @@ namespace ASGame
 
         public AssetBaseCache AddCache(string cacheName)
         {
-            return GetOrCreateCache(cacheName);
+            return GetOrCreateCache<AssetCommonCache>(cacheName);
+        }
+
+        public AssetBaseCache AddCache<T>(string cacheName) where T : AssetBaseCache
+        {
+            return GetOrCreateCache<T>(cacheName);
         }
 
         public AssetBaseCache GetCache(string cacheName)
@@ -54,7 +59,7 @@ namespace ASGame
 
         public void AddObject(string objKey, Object obj, bool isReplace = false)
         {
-            var cache = GetOrCreateCache(DEFAULT_CACHE);
+            var cache = GetOrCreateCache<AssetCommonCache>(DEFAULT_CACHE);
             cache.Add(objKey, obj, isReplace);
         }
 

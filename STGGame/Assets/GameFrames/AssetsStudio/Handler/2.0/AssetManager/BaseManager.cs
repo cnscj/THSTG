@@ -9,6 +9,11 @@ namespace ASGame
 
     public abstract class BaseManager<M> : MonoSingleton<M> where M : MonoBehaviour
     {
+        public virtual void Preload(string path)
+        {
+
+        }
+
         //通用函数
         protected virtual void DoLoadAsset<T>(string path, Action<T> onSuccess = null, Action<int> onFailed = null)
         {
