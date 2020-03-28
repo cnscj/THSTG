@@ -21,7 +21,7 @@ namespace ASEditor
         protected string destFolder;
         protected Dictionary<string, FileInfo> _checkMap = new Dictionary<string, FileInfo>();
 
-        public void DO()
+        public virtual void Do()
         {
             OnStart();
 

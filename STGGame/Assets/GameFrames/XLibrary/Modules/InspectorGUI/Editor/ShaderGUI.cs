@@ -7,6 +7,8 @@ namespace XLibEditor
 {
 	public class ShaderGUI<T> : UnityEditor.ShaderGUI
     {
+        public static readonly string defauleGroup = "_default";
+
         protected MaterialEditor m_editor;
         protected MaterialProperty[] m_props;
         protected Material m_material;

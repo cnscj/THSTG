@@ -1,13 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using XLibrary.Package;
 
 namespace ASEditor
 {
-    public abstract class AssetBaseBuilder
+    //各资源同步逻辑不通
+    public abstract class AsseBasetSyncer
     {
-        public abstract void Do();
 
     }
+
 }

@@ -33,9 +33,9 @@ namespace ASEditor
             GUILayout.Label("程序集路径配置:");
             foreach (var infos in AssembliesToolsConfig.GetInstance().buildPathList)
             {
-                GUIUtil.ShowPathBar("源资源路径", ref infos.srcPath);
-                GUIUtil.ShowPathBar("临时导出路径", ref infos.buildPath);
-                GUIUtil.ShowPathBar("映射路径", ref infos.projectPath);
+                GUILayoutEx.ShowPathBar("源资源路径", ref infos.srcPath);
+                GUILayoutEx.ShowPathBar("临时导出路径", ref infos.buildPath);
+                GUILayoutEx.ShowPathBar("映射路径", ref infos.projectPath);
                 if (GUILayout.Button("移除"))
                 {
                     AssembliesToolsConfig.GetInstance().buildPathList.Remove(infos);

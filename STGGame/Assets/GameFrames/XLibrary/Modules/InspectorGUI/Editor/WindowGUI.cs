@@ -7,6 +7,8 @@ namespace XLibEditor
 {
 	public class WindowGUI<T> : EditorWindow where T : EditorWindow
     {
+        public static readonly string defauleGroup = "_default";
+
         protected List<SerializedObject> m_serializedObjectList = new List<SerializedObject>();   //序列化对象列表
         protected Dictionary<string, List<KeyValuePair<string, SerializedProperty>>> m_propsMaps = new Dictionary<string, List<KeyValuePair<string, SerializedProperty>>>();
 
