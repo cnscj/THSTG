@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
+using ASGame;
 using UnityEditor;
 using XLibrary;
 using XLibrary.Package;
@@ -18,52 +20,30 @@ namespace ASEditor
             public string path;
             public string md5;
         }
-        protected string destFolder;
-        protected Dictionary<string, FileInfo> _checkMap = new Dictionary<string, FileInfo>();
+        protected string _progresersName;
+        protected Dictionary<string, FileInfo> _assetMap = new Dictionary<string, FileInfo>();
+        protected HashSet<string> _checkSet = new HashSet<string>();
+        private string __outputPath;
+
+        public AssetBaseProcesser(string name)
+        {
+            _progresersName = name;
+        }
 
         public virtual void Do()
         {
-            OnStart();
+            DoStart();  //用于处理公共资源
 
-            string[] checkFiles = OnFiles();
-            if (checkFiles == null || checkFiles.Length < 0)
-                return;
+            DoAssets();
 
-            List<FileInfo> procressList = new List<FileInfo>();
-            foreach (var file in checkFiles)
-            {
-                string realPath = XFileTools.GetFileRelativePath(file);
-
-                if (_checkMap.ContainsKey(realPath))
-                    continue;
-
-                string md5 = OnMd5(realPath);
-
-                //判断Md5
-
-                FileInfo fileInfo = new FileInfo();
-                fileInfo.path = realPath;
-                fileInfo.md5 = md5;
-
-                _checkMap.Add(realPath, fileInfo);
-
-            }
-
-            foreach (var doFileInfo in procressList)
-            {
-                var realPath = doFileInfo.path;
-                OnOnce(realPath);
-
-                //保存MD5
-
-
-            }
-
-            OnEnd();
+            DoEnd();
         }
         ////////////
         protected string GetFilesMd5(string[] filesPath)
         {
+            if (filesPath == null || filesPath.Length <= 0)
+                return "";
+
             //遍历文件夹,遍历所有文件Md5
             SortedDictionary<string, string> md5Map = new SortedDictionary<string, string>();
             foreach (var filePath in filesPath)
@@ -81,8 +61,9 @@ namespace ASEditor
                 stringBuilder.Append(pair.Key);
                 stringBuilder.Append("|");
             }
+            stringBuilder = stringBuilder.Remove(stringBuilder.Length - 1, 1);
 
-            string finalMd5 = XStringTools.StringToMD5(stringBuilder.ToString());
+            string finalMd5 = stringBuilder.ToString();
             return finalMd5;
         }
 
@@ -121,6 +102,143 @@ namespace ASEditor
             return GetFilesMd5(new string[] { filePath });
         }
 
+        protected string GetSaveFolderPath()
+        {
+            __outputPath = __outputPath ?? AssetProcesserConfiger.GetInstance().GetProcessSaveFolderPath(_progresersName);
+            return __outputPath;
+        }
+
+        /////////////
+        private string LoadMd5File(string srcPath)
+        {
+            string md5SavePath = AssetProcesserConfiger.GetInstance().GetMd5SavePath(_progresersName, srcPath);
+            string md5 = "";
+            if (XFileTools.Exists(md5SavePath))
+            {
+                md5 = File.ReadAllText(md5SavePath);
+            }
+            return md5;
+        }
+
+        private bool SaveMd5File(string srcPath, string md5)
+        {
+            if (string.IsNullOrEmpty(srcPath))
+                return false;
+
+            md5 = md5 ?? "";
+            string md5SavePath = AssetProcesserConfiger.GetInstance().GetMd5SavePath(_progresersName, srcPath);
+            string md5ParentPath = Path.GetDirectoryName(md5SavePath);
+            if (!XFolderTools.Exists(md5ParentPath))
+            {
+                XFolderTools.CreateDirectory(md5ParentPath);
+            }
+            File.WriteAllText(md5SavePath, md5);
+            return true;
+        }
+        private void DoStart()
+        {
+            string processFolderPath = AssetProcesserConfiger.GetInstance().GetProcessFloderPath();
+            if (!XFolderTools.Exists(processFolderPath))
+            {
+                XFolderTools.CreateDirectory(processFolderPath);
+            }
+
+            OnStart();
+        }
+        private void DoAssets()
+        {
+            string[] checkFiles = OnFiles();
+            if (checkFiles == null || checkFiles.Length < 0)
+                return;
+
+            List<FileInfo> procressList = new List<FileInfo>();
+            foreach (var file in checkFiles)
+            {
+                string realPath = XFileTools.GetFileRelativePath(file); //路径单做Key,有的资源可能名字相同
+
+                if (_assetMap.ContainsKey(realPath))
+                    continue;
+
+                string recordedMd5 = LoadMd5File(realPath);
+                string nowMd5 = OnMd5(realPath);
+
+                //判断Md5,不区分大小写
+                if (string.Compare(recordedMd5, nowMd5, true) == 0)
+                    continue;
+
+                FileInfo fileInfo = new FileInfo();
+                fileInfo.path = realPath;
+                fileInfo.md5 = nowMd5;
+
+                _assetMap.Add(realPath, fileInfo);
+
+                //检测可key
+                string checkKey = Path.GetFileNameWithoutExtension(realPath).ToLower();
+                if (!_checkSet.Contains(checkKey))
+                    _checkSet.Add(checkKey);
+            }
+
+            foreach (var doFileInfo in procressList)
+            {
+                var realPath = doFileInfo.path;
+                OnOnce(realPath,GetSaveFolderPath());
+
+                //保存MD5
+                if (_assetMap.TryGetValue(realPath, out var fileInfo))
+                {
+                    SaveMd5File(realPath, fileInfo.md5);
+                }
+            }
+        }
+        private void DoEnd()
+        {
+            //处理无效的MD5文件
+            string md5FolderPath = AssetProcesserConfiger.GetInstance().GetMd5SaveFolderPath(_progresersName);
+            bool isUseGUID = AssetProcesserConfiger.GetInstance().useGUID4SaveMd5Name;
+
+            XFolderTools.TraverseFiles(md5FolderPath, (fullPath) =>
+            {
+                string fileNameNotEx = Path.GetFileNameWithoutExtension(fullPath);
+                if (isUseGUID)
+                {
+                    string srcPath = AssetDatabase.GUIDToAssetPath(fileNameNotEx);
+                    if (string.IsNullOrEmpty(srcPath) || !_assetMap.ContainsKey(srcPath.ToLower()))
+                    {
+                        XFileTools.Delete(fullPath);
+                    }
+                }
+                else
+                {
+                    if (!_checkSet.Contains(fileNameNotEx))
+                    {
+                        XFileTools.Delete(fullPath);
+                    }
+                }
+            });
+
+            //处理无效输出文件
+            string outputFolderPath = AssetProcesserConfiger.GetInstance().GetProcessSaveFolderPath(_progresersName);
+            XFolderTools.TraverseFolder(outputFolderPath, (fullPath) =>
+            {
+                string fileNameNotEx = Path.GetFileNameWithoutExtension(fullPath);
+                if (!_checkSet.Contains(fileNameNotEx))
+                {
+                    XFolderTools.DeleteDirectory(fullPath, true);
+                }
+            }, true);
+            XFolderTools.TraverseFiles(outputFolderPath, (fullPath) =>
+            {
+                string fileNameNotEx = Path.GetFileNameWithoutExtension(fullPath);
+                //但凡在名字上有点关系都移除
+                if (!_checkSet.Contains(fileNameNotEx))
+                {
+                    XFileTools.Delete(fullPath);
+                }
+
+            }, true);
+
+            OnEnd();
+        }
 
         ////////////
         protected virtual void OnStart()
@@ -133,19 +251,15 @@ namespace ASEditor
 
         }
 
+        protected virtual string OnMd5(string srcFilePath)
+        {
+            return GetFileMd5(srcFilePath);
+        }
+
         protected abstract string[] OnFiles();
 
-        protected abstract void OnOnce(string filePath);
+        protected abstract void OnOnce(string outputFolderPath, string srcFilePath);
 
-        protected string OnMd5(string filePath)
-        {
-            return GetFileMd5(filePath);
-        }
-
-        protected virtual void OnProgress()
-        {
-
-        }
     }
 
 }

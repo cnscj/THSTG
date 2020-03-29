@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using XLibrary;
 
 namespace ASGame
 {
-    public static class AssetUtil
+    public static class AssetRuntimeUtil
     {
         public enum AssetPathType
         {
@@ -12,6 +13,14 @@ namespace ASGame
             Local,
             Url,
             AssetBundle,
+        }
+
+        public static void TryCreateFolder(string path)
+        {
+            if (!XFolderTools.Exists(path))
+            {
+                XFolderTools.CreateDirectory(path);
+            }
         }
 
         public static AssetPathType GetAssetPathType(string path)

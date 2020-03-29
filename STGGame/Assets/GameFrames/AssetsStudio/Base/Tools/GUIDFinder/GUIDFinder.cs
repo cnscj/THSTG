@@ -37,8 +37,7 @@ namespace ASGame
     
             if (m_gridDict.ContainsKey(m_selectedAssetPath))
             {
-                m_scrollPosition = GUILayout.BeginScrollView(
-                    m_scrollPosition, GUILayout.Width(700), GUILayout.Height(500));
+                m_scrollPosition = GUILayout.BeginScrollView(m_scrollPosition, GUILayout.Width(700), GUILayout.Height(500));
                 foreach (string filePath in m_gridDict[m_selectedAssetPath])
                 {
                     if (GUILayout.Button(filePath))
@@ -60,41 +59,18 @@ namespace ASGame
             m_gridDict.Clear();
             string assetDir = Application.dataPath;
 
-            //var withoutExtensions = new List<string>() { ".prefab", ".unity", ".mat", ".asset", "controller", ".playable" };
-            //string[] files = Directory.GetFiles(assetDir, "*.*", SearchOption.AllDirectories)
-            //        .Where(s => withoutExtensions.Contains(Path.GetExtension(s).ToLower()))
-            //        .ToArray();
+            var withoutExtensions = new List<string>() { ".prefab", ".unity", ".mat", ".asset", ".controller", ".playable" };
+            string[] files = Directory.GetFiles(assetDir, "*.*", SearchOption.AllDirectories)
+                    .Where(s => withoutExtensions.Contains(Path.GetExtension(s).ToLower()))
+                    .ToArray();
 
-            //int startIndex = 0;
-            //EditorApplication.update = delegate ()
-            //{
-            //    string file = files[startIndex];
-            //    bool isCancel = EditorUtility.DisplayCancelableProgressBar("匹配资源中", file, (float)startIndex / (float)files.Length);
-
-            //    string relativePath = XFileTools.GetFileRelativePath(file);
-            //    string[] dps = AssetDatabase.GetDependencies(relativePath);
-            //    foreach (string path in dps)
-            //    {
-            //        if (!m_gridDict.ContainsKey(path))
-            //        {
-            //            m_gridDict.Add(path, new ArrayList());
-            //        }
-            //        ArrayList existFiles = m_gridDict[path];
-            //        existFiles.Add(relativePath);
-            //    }
-
-            //    startIndex++;
-            //    if (isCancel || startIndex >= files.Length)
-            //    {
-            //        EditorUtility.ClearProgressBar();
-            //        EditorApplication.update = null;
-            //        startIndex = 0;
-            //    }
-            //};
-
-            XFolderTools.TraverseFiles(assetDir, (fullPath) =>
+            int startIndex = 0;
+            EditorApplication.update = delegate ()
             {
-                string relativePath = XFileTools.GetFileRelativePath(fullPath);
+                string file = files[startIndex];
+                bool isCancel = EditorUtility.DisplayCancelableProgressBar("匹配资源中", file, (float)startIndex / (float)files.Length);
+
+                string relativePath = XFileTools.GetFileRelativePath(file);
                 string[] dps = AssetDatabase.GetDependencies(relativePath);
                 foreach (string path in dps)
                 {
@@ -105,7 +81,15 @@ namespace ASGame
                     ArrayList existFiles = m_gridDict[path];
                     existFiles.Add(relativePath);
                 }
-            }, true);
+
+                startIndex++;
+                if (isCancel || startIndex >= files.Length)
+                {
+                    EditorUtility.ClearProgressBar();
+                    EditorApplication.update = null;
+                    startIndex = 0;
+                }
+            };
         }
 
         [MenuItem("Assets/Find References In Project", true)]
