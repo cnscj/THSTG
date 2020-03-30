@@ -147,46 +147,47 @@ namespace ASEditor
         }
         private void DoAssets()
         {
-            string[] checkFiles = OnFiles();
-            if (checkFiles == null || checkFiles.Length < 0)
+            string[] assetFiles = OnFiles();
+            if (assetFiles == null || assetFiles.Length < 0)
                 return;
 
             List<FileInfo> procressList = new List<FileInfo>();
-            foreach (var file in checkFiles)
+            foreach (var file in assetFiles)
             {
-                string realPath = XFileTools.GetFileRelativePath(file); //路径单做Key,有的资源可能名字相同
+                string realPath = XFileTools.GetFileRelativePath(file); //路径做Key,有的资源可能名字相同
+                string realPathLow = realPath.ToLower();
 
-                if (_assetMap.ContainsKey(realPath))
+                if (_assetMap.ContainsKey(realPathLow))
                     continue;
 
-                string recordedMd5 = LoadMd5File(realPath);
-                string nowMd5 = OnMd5(realPath);
+                string recordedMd5 = LoadMd5File(realPathLow);
+                string nowMd5 = OnMd5(realPathLow);
+
+                //检测可key,这么不能区分同名不同路径的情况
+                string checkKey = Path.GetFileNameWithoutExtension(realPathLow).ToLower();
+                if (!_checkSet.Contains(checkKey))
+                    _checkSet.Add(checkKey);
 
                 //判断Md5,不区分大小写
                 if (string.Compare(recordedMd5, nowMd5, true) == 0)
                     continue;
 
                 FileInfo fileInfo = new FileInfo();
-                fileInfo.path = realPath;
+                fileInfo.path = realPathLow;
                 fileInfo.md5 = nowMd5;
 
-                _assetMap.Add(realPath, fileInfo);
-
-                //检测可key
-                string checkKey = Path.GetFileNameWithoutExtension(realPath).ToLower();
-                if (!_checkSet.Contains(checkKey))
-                    _checkSet.Add(checkKey);
+                _assetMap.Add(realPathLow, fileInfo);
             }
 
             foreach (var doFileInfo in procressList)
             {
-                var realPath = doFileInfo.path;
-                OnOnce(realPath,GetSaveFolderPath());
+                var realPathLow = doFileInfo.path;
+                OnOnce(realPathLow, GetSaveFolderPath());
 
                 //保存MD5
-                if (_assetMap.TryGetValue(realPath, out var fileInfo))
+                if (_assetMap.TryGetValue(realPathLow, out var fileInfo))
                 {
-                    SaveMd5File(realPath, fileInfo.md5);
+                    SaveMd5File(realPathLow, fileInfo.md5);
                 }
             }
         }
@@ -198,11 +199,13 @@ namespace ASEditor
 
             XFolderTools.TraverseFiles(md5FolderPath, (fullPath) =>
             {
-                string fileNameNotEx = Path.GetFileNameWithoutExtension(fullPath);
+                string fileNameNotEx = Path.GetFileNameWithoutExtension(fullPath).ToLower();
                 if (isUseGUID)
                 {
                     string srcPath = AssetDatabase.GUIDToAssetPath(fileNameNotEx);
-                    if (string.IsNullOrEmpty(srcPath) || !_assetMap.ContainsKey(srcPath.ToLower()))
+                    string realPath = XFileTools.GetFileRelativePath(srcPath); //路径做Key,有的资源可能名字相同
+                    string realPathLow = realPath.ToLower();
+                    if (string.IsNullOrEmpty(srcPath) || !_assetMap.ContainsKey(realPathLow))
                     {
                         XFileTools.Delete(fullPath);
                     }
@@ -220,7 +223,7 @@ namespace ASEditor
             string outputFolderPath = AssetProcesserConfiger.GetInstance().GetProcessSaveFolderPath(_progresersName);
             XFolderTools.TraverseFolder(outputFolderPath, (fullPath) =>
             {
-                string fileNameNotEx = Path.GetFileNameWithoutExtension(fullPath);
+                string fileNameNotEx = Path.GetFileNameWithoutExtension(fullPath).ToLower();
                 if (!_checkSet.Contains(fileNameNotEx))
                 {
                     XFolderTools.DeleteDirectory(fullPath, true);
@@ -228,7 +231,7 @@ namespace ASEditor
             }, true);
             XFolderTools.TraverseFiles(outputFolderPath, (fullPath) =>
             {
-                string fileNameNotEx = Path.GetFileNameWithoutExtension(fullPath);
+                string fileNameNotEx = Path.GetFileNameWithoutExtension(fullPath).ToLower();
                 //但凡在名字上有点关系都移除
                 if (!_checkSet.Contains(fileNameNotEx))
                 {
@@ -241,25 +244,14 @@ namespace ASEditor
         }
 
         ////////////
-        protected virtual void OnStart()
-        {
-
-        }
-
-        protected virtual void OnEnd()
-        {
-
-        }
-
+        protected virtual void OnStart(){}
+        protected virtual void OnEnd(){}
         protected virtual string OnMd5(string srcFilePath)
         {
             return GetFileMd5(srcFilePath);
         }
-
         protected abstract string[] OnFiles();
-
         protected abstract void OnOnce(string outputFolderPath, string srcFilePath);
-
     }
 
 }

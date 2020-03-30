@@ -10,7 +10,7 @@ namespace ASEditor
     public class AssetProcesserConfiger : ConfigObject<AssetProcesserConfiger>
     {
         public static readonly string DEFAULT_OUTPUT_FOLDER_PATH = "Assets/ASOutput";
-        public static readonly string DEFAULT_MD5_FOLDER_NAME = "Md5Cache";
+        public static readonly string DEFAULT_MD5_FOLDER_NAME = "Md5";
         public static readonly string DEFAULT_PROCESS_FOLDER_NAME = "Process";
 
         public string outputFolderPath = DEFAULT_OUTPUT_FOLDER_PATH;
@@ -46,8 +46,6 @@ namespace ASEditor
         public string GetMd5SavePath(string progressName, string srcFilePath)
         {
             string outputName = Path.GetFileNameWithoutExtension(srcFilePath);
-            string md5FolderPath = GetMd5FloderPath();
-
             string md5SaveParentPath = GetMd5SaveFolderPath(progressName);
             string md5SaveName = outputName;
 

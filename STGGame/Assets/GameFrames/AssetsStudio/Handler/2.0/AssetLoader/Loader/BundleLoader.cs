@@ -10,6 +10,7 @@ using System.IO;
 namespace ASGame
 {
     //TODO:要非常注意循环依赖的问题
+    //加载依赖应该返回依赖信息,包括哪些依赖文件加载失败
     public class BundleLoader : BaseCoroutineLoader
     {
         public class BundleObject : BaseRef
@@ -17,6 +18,7 @@ namespace ASGame
             public string hashName;                                            //hash标识符
 
             public List<BundleObject> depends = new List<BundleObject>();      //依赖项
+
 
             protected override void OnRelease()
             {
