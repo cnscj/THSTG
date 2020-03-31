@@ -9,6 +9,7 @@ namespace ASGame
         public int status;
         public string path;
         public BaseLoader loader;
+        public AssetLoadHandler[] dependencies;
 
         public AssetLoadCallback onCallback;
 

@@ -16,9 +16,7 @@ namespace ASGame
         public class BundleObject : BaseRef
         {
             public string hashName;                                            //hash标识符
-
             public List<BundleObject> depends = new List<BundleObject>();      //依赖项
-
 
             protected override void OnRelease()
             {
