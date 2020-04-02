@@ -10,9 +10,10 @@ namespace ASEditor
     {
         //需要进行一次全局依赖Share打包
         private LinkedList<KeyValuePair<string, List<AssetBundleBuild>>> m_builderList = new LinkedList<KeyValuePair<string, List<AssetBundleBuild>>>();
-        private Dictionary<string,int> m_refCounts = new Dictionary<string,int>();
-        private Dictionary<string,List<string>> m_shareMap = new Dictionary<string, List<string>>();
-        private List<AssetBundleBuild> m_builds = new List<AssetBundleBuild>();
+
+        private Dictionary<string, List<string>> m_shareMap = new Dictionary<string, List<string>>();
+        private Dictionary<string, List<AssetBundleBuild>> m_bundleBuilds = new Dictionary<string, List<AssetBundleBuild>>();
+        private Dictionary<string, int> m_refCounts = new Dictionary<string, int>();
 
         public void AddIntoShareMap(string builderName, string[] assetPaths)
         {
@@ -27,12 +28,20 @@ namespace ASEditor
 
         public void AddIntoBuildMap(string builderName, List<AssetBundleBuild> buildList)
         {
-
+            if (!m_bundleBuilds.ContainsKey(builderName))
+            {
+                m_bundleBuilds.Add(builderName,buildList);
+            }
         }
 
         public AssetBundleBuild[] GetBuildsArray()
         {
-            return m_builds.ToArray();
+            List<AssetBundleBuild> buildList = new List<AssetBundleBuild>();
+            foreach(var list in m_bundleBuilds.Values)
+            {
+                buildList.AddRange(list);
+            }
+            return buildList.ToArray();
         }
 
         public void Do()
@@ -44,7 +53,10 @@ namespace ASEditor
 
         public void Clear()
         {
-            m_builds.Clear();
+            m_builderList.Clear();
+
+            m_shareMap.Clear();
+            m_bundleBuilds.Clear();
         }
 
         private void Build()
@@ -71,7 +83,21 @@ namespace ASEditor
 
         private void Build4Share()
         {
+            foreach(var kv in m_shareMap)
+            {
+                foreach(var assetPath in kv.Value)
+                {
+                    CollectDependencies(assetPath);
+                }
+            }
 
+            foreach(var refKV in m_refCounts)
+            {
+                if (refKV.Value > 1)
+                {
+
+                }
+            }
         }
 
         private void BuildAll()
@@ -93,11 +119,11 @@ namespace ASEditor
             BuildPipeline.BuildAssetBundles(buildExportPath, GetBuildsArray(), bundleOptions, buildPlatform);//TODO:
         }
 
-
         private void BuildAfter()
         {
 
         }
+
         private void CollectDependencies(string assetPath)
         {
             string[] dps = AssetDatabase.GetDependencies(assetPath);
