@@ -18,6 +18,11 @@ namespace ASEditor
             _builderName = name;
         }
 
+        public string GetName()
+        {
+            return _builderName;
+        }
+
         public void Do()
         {
             DoStart();
