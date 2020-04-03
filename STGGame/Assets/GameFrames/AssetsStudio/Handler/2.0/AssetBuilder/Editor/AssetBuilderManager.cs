@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using XLibrary;
 using XLibrary.Package;
 
 namespace ASEditor
@@ -16,7 +17,8 @@ namespace ASEditor
 
         private Dictionary<string, List<string>> m_shareMap = new Dictionary<string, List<string>>();
         private Dictionary<string, List<AssetBundleBuild>> m_bundleBuilds = new Dictionary<string, List<AssetBundleBuild>>();
-        private Dictionary<string, int> m_refCounts = new Dictionary<string, int>();
+
+        private List<KeyValuePair<string, string>> m_buildList = new List<KeyValuePair<string, string>>();
 
         public void AddIntoShareMap(string builderName, string[] assetPaths)
         {
@@ -37,10 +39,20 @@ namespace ASEditor
             }
         }
 
+        public void AddIntoBuildList(string assetPath, string builderName)
+        {
+        }
 
-        public void Do()
+
+        public void Do(AssetBaseBuilder []builders = null)
         {
             Clear();
+
+
+            if (builders != null && builders.Length > 0)
+            {
+                m_builderCustomList.AddRange(builders);
+            }
 
             Build();
         }
@@ -132,21 +144,57 @@ namespace ASEditor
 
         private void Build4Share()
         {
+            Dictionary<string, int> refCounts = new Dictionary<string, int>();
             foreach(var kv in m_shareMap)
             {
                 foreach(var assetPath in kv.Value)
                 {
-                    CollectDependencies(assetPath);
+                    string[] dps = AssetDatabase.GetDependencies(assetPath);
+                    foreach (var dp in dps)
+                    {
+                        if (refCounts.TryGetValue(dp, out var refCount))
+                        {
+                            refCounts[dp] = refCount + 1;
+                        }
+                        else
+                        {
+                            refCounts.Add(dp, 1);
+                        }
+                    }
                 }
             }
 
-            foreach(var refKV in m_refCounts)
+            Dictionary<string, List<string>> assetNamesMap = new Dictionary<string, List<string>>();
+            foreach(var refKV in refCounts)
             {
                 if (refKV.Value > 1)
                 {
-
+                    //全部打到Share里去
+                    string shareBundleName = AssetBuildConfiger.GetInstance().GetBuildBundleShareName(refKV.Key);
+                    if (!string.IsNullOrEmpty(shareBundleName))
+                    {
+                        List<string> assetList = null;
+                        if (!assetNamesMap.TryGetValue(shareBundleName, out assetList))
+                        {
+                            assetList = new List<string>();
+                            assetNamesMap.Add(shareBundleName, assetList);
+                        }
+                        assetList.Add(refKV.Key);
+                    }
                 }
             }
+
+
+            List<AssetBundleBuild> shareBuildList = new List<AssetBundleBuild>();
+            foreach(var kv in assetNamesMap)
+            {
+                AssetBundleBuild build = new AssetBundleBuild();
+                build.assetBundleName = kv.Key;
+                build.assetNames = kv.Value.ToArray();
+
+                shareBuildList.Add(build);
+            }
+            m_bundleBuilds.Add("Share", shareBuildList);
         }
 
         private void BuildAll()
@@ -182,21 +230,6 @@ namespace ASEditor
             return buildList.ToArray();
         }
 
-        private void CollectDependencies(string assetPath)
-        {
-            string[] dps = AssetDatabase.GetDependencies(assetPath);
-            foreach (var dp in dps)
-            {
-                if (m_refCounts.TryGetValue(dp, out var refCount))
-                {
-                    m_refCounts[dp] = refCount + 1;
-                }
-                else
-                {
-                    m_refCounts.Add(dp, 1);
-                }
-            }
-        }
     }
 
 }

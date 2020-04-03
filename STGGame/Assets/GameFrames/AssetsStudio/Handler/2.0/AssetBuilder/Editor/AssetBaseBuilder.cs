@@ -23,6 +23,19 @@ namespace ASEditor
             return _builderName;
         }
 
+        public AssetBundleBuild []GetBuilds()
+        {
+            return null;
+        }
+        public void Build()
+        {
+            var array = GetBuilds();
+            if (array != null && array.Length > 0)
+            {
+                //TODO:
+            }
+        }
+
         public void Do()
         {
             DoStart();

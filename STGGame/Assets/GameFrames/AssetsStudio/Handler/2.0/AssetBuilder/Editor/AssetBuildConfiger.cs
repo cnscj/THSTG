@@ -77,5 +77,17 @@ namespace ASEditor
             string bundleName = Path.Combine(buildFolderPath, bundleFileName);
             return bundleName.ToLower();
         }
+
+        public string GetBuildBundleShareName(string assetPath)
+        {
+            assetPath = XFileTools.GetFileRelativePath(assetPath);
+            string newBundleSuffix = string.IsNullOrEmpty(bundleSuffix) ? DEFAULT_BUILD_SUFFFIX : bundleSuffix;
+            string assetNameLow = Path.GetFileNameWithoutExtension(assetPath).ToLower();
+            string assetParentPath = Path.GetDirectoryName(assetPath).ToLower();
+            string relaPath = assetParentPath.Replace("assets/", "");
+            string flatPath = relaPath.Replace("/", "_");
+            string bundleName = string.Format("{0}_{1}{2}", flatPath, assetNameLow, newBundleSuffix);
+            return bundleName;
+        }
     }
 }
