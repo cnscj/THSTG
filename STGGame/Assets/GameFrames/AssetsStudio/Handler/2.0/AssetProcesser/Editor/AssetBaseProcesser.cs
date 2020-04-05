@@ -30,7 +30,7 @@ namespace ASEditor
             _progresersName = name;
         }
 
-        public virtual void Do()
+        public virtual void Deal()
         {
             DoStart();  //用于处理公共资源
 
@@ -248,6 +248,7 @@ namespace ASEditor
         protected virtual void OnEnd(){}
         protected virtual string OnMd5(string srcFilePath)
         {
+            //增量打包原则:如果只是引用的资源发生修改,但是引用资源的GUID没变,可以不用再次处理,保持引用正确即可
             return GetFileMd5(srcFilePath);
         }
         protected abstract string[] OnFiles();

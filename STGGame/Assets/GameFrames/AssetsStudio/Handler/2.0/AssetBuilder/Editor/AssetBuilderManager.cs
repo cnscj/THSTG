@@ -18,9 +18,7 @@ namespace ASEditor
         private Dictionary<string, List<string>> m_shareMap = new Dictionary<string, List<string>>();
         private Dictionary<string, List<AssetBundleBuild>> m_bundleBuilds = new Dictionary<string, List<AssetBundleBuild>>();
 
-        private List<KeyValuePair<string, string>> m_buildList = new List<KeyValuePair<string, string>>();
-
-        public void AddIntoShareMap(string builderName, string[] assetPaths)
+        public void AddIntoShareMap(string builderName, List<string> assetPaths)
         {
             List<string> assetList = null;
             if (!m_shareMap.TryGetValue(builderName, out assetList))
@@ -39,21 +37,14 @@ namespace ASEditor
             }
         }
 
-        public void AddIntoBuildList(string assetPath, string builderName)
-        {
-        }
-
-
         public void Do(AssetBaseBuilder []builders = null)
         {
             Clear();
-
 
             if (builders != null && builders.Length > 0)
             {
                 m_builderCustomList.AddRange(builders);
             }
-
             Build();
         }
 
@@ -76,10 +67,10 @@ namespace ASEditor
         private void BuildBefore()
         {
             //
-            var commonItem = AssetBuildConfiger.GetInstance().buildItemList;
-            if (commonItem != null && commonItem.Count > 0)
+            var commonItems = AssetBuildConfiger.GetInstance().buildItemList;
+            if (commonItems != null && commonItems.Count > 0)
             {
-                foreach (var item in commonItem)
+                foreach (var item in commonItems)
                 {
                     if (!string.IsNullOrEmpty(item.builderName))
                     {
@@ -129,7 +120,7 @@ namespace ASEditor
         {
             foreach(var builder in m_builderCommonList)
             {
-                builder.Do();
+                builder.Deal();
             }
         }
 
@@ -137,7 +128,7 @@ namespace ASEditor
         {
             foreach (var builder in m_builderCustomList)
             {
-                builder.Do();
+                builder.Deal();
             }
 
         }
@@ -194,7 +185,7 @@ namespace ASEditor
 
                 shareBuildList.Add(build);
             }
-            m_bundleBuilds.Add("Share", shareBuildList);
+            m_bundleBuilds.Add("GloabalShare", shareBuildList);
         }
 
         private void BuildAll()
@@ -212,7 +203,7 @@ namespace ASEditor
 
             var buildExportPath = AssetBuildConfiger.GetInstance().GetExportFolderPath();
             var buildPlatform = AssetBuildConfiger.GetInstance().GetBuildType();
-            BuildPipeline.BuildAssetBundles(buildExportPath, GetBuildsArray(), bundleOptions, buildPlatform);//TODO:
+            BuildPipeline.BuildAssetBundles(buildExportPath, GetBuildsArray(), bundleOptions, buildPlatform);
         }
 
         private void BuildAfter()

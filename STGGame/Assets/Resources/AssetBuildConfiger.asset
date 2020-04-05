@@ -16,4 +16,12 @@ MonoBehaviour:
   exportFolder: Assets/AssetBundles
   bundleSuffix: .unity3d
   isClearAfterBuilded: 1
-  buildItemList: []
+  buildItemList:
+  - builderName: 
+    buildSrcPath: 
+    buildSuffix: 
+    commonPrefixBuildOne: 0
+  - builderName: 
+    buildSrcPath: 
+    buildSuffix: 
+    commonPrefixBuildOne: 0

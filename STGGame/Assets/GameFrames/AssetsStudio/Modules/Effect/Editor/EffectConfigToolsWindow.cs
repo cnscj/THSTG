@@ -9,19 +9,11 @@ namespace ASEditor
         {
             ShowWindow("特效配置");
         }
-        protected override void OnObjs()
+
+        protected override void OnInit()
         {
             AddObject(EffectToolsConfig.GetInstance());
-        }
-
-        protected override void OnProps()
-        {
-            AddProperty("defaultShader", "Normal", "默认Shader");
-        }
-
-        protected override void OnShow()
-        {
-            ShowPropertys("Normal");
+            AddProperty("defaultShader", "默认Shader");
         }
     }
 }

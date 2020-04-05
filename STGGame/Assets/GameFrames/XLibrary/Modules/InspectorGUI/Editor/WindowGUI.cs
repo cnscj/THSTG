@@ -47,32 +47,21 @@ namespace XLibEditor
 
         }
 
-        protected virtual void OnObjs()
-        {
-
-        }
-
-        protected virtual void OnProps()
-        {
-
-        }
-
         protected virtual void OnShow()
         {
-            
+            ShowPropertys();
         }
 
 		void OnEnable()
 		{
             //使用当前类初始化
             Clear();
-            AddObject(this);
-            OnObjs();
-            OnProps();
-            OnInit();
 
+            AddObject(this);
+
+            OnInit();
         }
-        protected SerializedObject AddObject(Object obj, string name = null)
+        protected SerializedObject AddObject(Object obj)
         {
             SerializedObject serializedObject = new SerializedObject(obj);
             if (serializedObject != null)
@@ -92,20 +81,6 @@ namespace XLibEditor
             return null;
         }
 
-
-        protected SerializedProperty FindProperty(string property)
-        {
-            foreach(var serializedObject in m_serializedObjectList.Values)
-            {
-                SerializedProperty prop = serializedObject.FindProperty(property);
-                if (prop != null)
-                {
-                    return prop;
-                }
-            }
-            return null;
-        }
-
         protected SerializedProperty GetProperty(string name, string group = null)
         {
             group = string.IsNullOrEmpty(group) ? DEFAULT_GROUP_NAME : group;
@@ -114,7 +89,6 @@ namespace XLibEditor
             {
                 foreach (var pair in list)
                 {
-
                     if (pair.Key == name)
                     {
                         return pair.Value;
@@ -126,14 +100,27 @@ namespace XLibEditor
 
         protected SerializedProperty AddProperty(string property, string name = null ,string group = null)
         {
-            SerializedProperty prop = FindProperty(property);
-            if (prop != null)
+            SerializedProperty prop = GetProperty(name, group);
+            if (prop == null)
             {
-                group = string.IsNullOrEmpty(group) ? DEFAULT_GROUP_NAME : group;
-                name = string.IsNullOrEmpty(group) ? property : name;
-                KeyValuePair<string, SerializedProperty> pair = new KeyValuePair<string, SerializedProperty>(name, prop);
-                var list = GetOrCreateList(group);
-                list.Add(pair);
+                foreach (var serializedObject in m_serializedObjectList.Values)
+                {
+                    prop = serializedObject.FindProperty(property);
+                    if (prop != null)
+                    {
+                        break;
+                    }
+                }
+
+                if (prop != null)
+                {
+                    group = string.IsNullOrEmpty(group) ? DEFAULT_GROUP_NAME : group;
+                    name = string.IsNullOrEmpty(group) ? prop.displayName : name;
+
+                    KeyValuePair<string, SerializedProperty> pair = new KeyValuePair<string, SerializedProperty>(name, prop);
+                    var list = GetOrCreateList(group);
+                    list.Add(pair);
+                }
             }
             return prop;
         }

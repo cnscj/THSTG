@@ -9,18 +9,14 @@ namespace ASEditor
         {
             ShowWindow("资源后处理配置");
         }
-        protected override void OnObjs()
+
+        protected override void OnInit()
         {
             AddObject(ResourceProcesserConfig.GetInstance());
-        }
+            AddProperty("isUseADL", "是否动画按需加载", "Normal");
 
-        protected override void OnProps()
-        {
-
-            AddProperty("isUseADL", "Normal", "是否动画按需加载");
-
-            AddProperty("effectisUseNodeLevel", "Effect", "是否使用特效节点分级");
-            AddProperty("effectIsUseCalculateFxLength", "Effect", "是否计算特效的时长");
+            AddProperty("effectisUseNodeLevel", "是否使用特效节点分级", "Effect");
+            AddProperty("effectIsUseCalculateFxLength", "是否计算特效的时长", "Effect");
 
         }
 

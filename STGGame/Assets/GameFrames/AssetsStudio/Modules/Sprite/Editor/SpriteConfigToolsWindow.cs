@@ -11,25 +11,16 @@ namespace ASEditor
         {
             ShowWindow("精灵配置");
         }
-        protected override void OnObjs()
+
+        protected override void OnInit()
         {
             AddObject(SpriteToolsConfig.GetInstance());
+
+            AddProperty("defaultShader", "默认Shader");
+            AddProperty("defaultFrameRate","默认动画帧率");
+            AddProperty("defaultStateList", "默认动作列表");
+            AddProperty("loopStateList", "循环动作列表");
         }
-
-        protected override void OnProps()
-        {
-            AddProperty("defaultShader", "Normal", "默认Shader");
-            AddProperty("defaultFrameRate", "Normal", "默认动画帧率");
-            AddProperty("defaultStateList", "Normal", "默认动作列表");
-            AddProperty("loopStateList", "Normal", "循环动作列表");
-        }
-
-        protected override void OnShow()
-        {
-            ShowPropertys("Normal");
-        }
-
-
         
     }
 }

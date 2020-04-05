@@ -12,19 +12,14 @@ namespace ASEditor
         {
             ShowWindow("程序集配置");
         }
-        protected override void OnObjs()
+        protected override void OnInit()
         {
             AddObject(AssembliesToolsConfig.GetInstance());
         }
 
-        protected override void OnProps()
-        {
-           
-        }
-
         protected override void OnShow()
         {
-            ShowPropertys("Normal");
+            ShowPropertys();
             ShowPathList();
         }
 

@@ -12,14 +12,9 @@ namespace ASEditor
         {
             ShowWindow("资源配置");
         }
-        protected override void OnObjs()
+        protected override void OnInit()
         {
-            var obj = AddObject(ResourceConfig.GetInstance());
-        }
-
-        protected override void OnProps()
-        {
-            
+            AddObject(ResourceConfig.GetInstance());
         }
 
         protected override void OnShow()
