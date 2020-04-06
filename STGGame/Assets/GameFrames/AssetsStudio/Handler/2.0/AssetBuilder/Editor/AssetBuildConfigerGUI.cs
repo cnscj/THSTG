@@ -9,7 +9,7 @@ namespace ASEditor
 {
     public class AssetBuildConfigerGUI : WindowGUI<AssetBuildConfigerGUI>
     {
-        ReorderableList reorderableList;
+        private ReorderableList m_itemSortedList;
 
         [MenuItem("AssetsStudio/资源打包配置2", false, 3)]
         static void ShowWnd()
@@ -22,11 +22,11 @@ namespace ASEditor
             var cfgObj = AddObject(AssetBuildConfiger.GetInstance());
             var prop = AddProperty("buildItemList");
 
-            reorderableList = new ReorderableList(cfgObj, prop, true, true, true, true);
-            reorderableList.elementHeight = 30;//设置单个元素的高度
+            m_itemSortedList = new ReorderableList(cfgObj, prop, true, true, true, true);
+            m_itemSortedList.elementHeight = 90;//设置单个元素的高度
 
             //绘制单个元素
-            reorderableList.drawElementCallback = (rect, index, isActive, isFocused) => 
+            m_itemSortedList.drawElementCallback = (rect, index, isActive, isFocused) => 
             {
                 var element = prop.GetArrayElementAtIndex(index);
                 rect.height -= 4;
@@ -35,13 +35,13 @@ namespace ASEditor
             };
 
             //背景色
-            reorderableList.drawElementBackgroundCallback = (rect, index, isActive, isFocused) => 
+            m_itemSortedList.drawElementBackgroundCallback = (rect, index, isActive, isFocused) => 
             {
                 GUI.backgroundColor = Color.yellow;
             };
 
             //头部
-            reorderableList.drawHeaderCallback = (rect) => EditorGUI.LabelField(rect, "常规打包项");
+            m_itemSortedList.drawHeaderCallback = (rect) => EditorGUI.LabelField(rect, "常规打包项");
         }
 
         protected override void OnShow()
@@ -51,11 +51,14 @@ namespace ASEditor
             //标题
             GUILayout.Space(10);
             GUILayout.Label("打包配置",new GUIStyle(GUI.skin.label) { fontSize = 24, alignment = TextAnchor.MiddleCenter });
+            if (GUILayout.Button("打包")) { AssetBuilderManager.GetInstance().Build(); }
 
             AssetBuildConfiger.GetInstance().targetType = (AssetBuildConfiger.BuildPlatform)EditorGUILayout.EnumPopup("当前平台", AssetBuildConfiger.GetInstance().targetType);
-            AssetBuildConfiger.GetInstance().exportFolder = EditorGUILayout.TextField("输出目录", AssetBuildConfiger.GetInstance().exportFolder);
+            AssetBuildConfiger.GetInstance().exportFolder = GUILayoutEx.ShowPathBar("输出目录", AssetBuildConfiger.GetInstance().exportFolder);
             AssetBuildConfiger.GetInstance().bundleSuffix = EditorGUILayout.TextField("输出后缀", AssetBuildConfiger.GetInstance().bundleSuffix);
-            reorderableList.DoLayoutList();
+            AssetBuildConfiger.GetInstance().isCombinePlatformName = EditorGUILayout.Toggle("输出目录拼接平台名称", AssetBuildConfiger.GetInstance().isCombinePlatformName);
+
+            m_itemSortedList.DoLayoutList();
 
             GUILayout.EndVertical();
         }

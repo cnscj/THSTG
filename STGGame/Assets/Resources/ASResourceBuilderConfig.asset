@@ -18,7 +18,7 @@ MonoBehaviour:
   isUseLower: 1
   shareBundleName: share.ab
   exportFolder: Assets/StreamingAssets/ABRes
-  isClearAfterBuilded: 0
+  isClearAfterBuilded: 1
   bundleIsUseFullPath: 0
   buildInfoList:
   - srcName: Atlas

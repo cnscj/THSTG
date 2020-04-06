@@ -24,11 +24,30 @@ namespace ASEditor
 
             return files;
         }
-        protected override string OnName(string assetPath)
+        protected override string OnBundleName(string assetPath)
         {
-            string assetFileName = Path.GetFileName(assetPath);
-            string assetBundleName = AssetBuildConfiger.GetInstance().GetBuildBundleName(_builderName, assetFileName, buildItem.commonPrefixBuildOne);
-            return assetBundleName;
+            if (string.IsNullOrEmpty(buildItem.bundleNameFormat))
+            {
+                string assetFileName = Path.GetFileName(assetPath);
+                string assetBundleName = AssetBuildConfiger.GetInstance().GetBuildBundleName(_builderName, assetFileName, buildItem.commonPrefixBuildOne);
+                return assetBundleName;
+            }
+            else
+            {
+                string assetRootPath = Path.GetDirectoryName(assetPath);
+                string assetName = Path.GetFileName(assetPath);
+                string assetNameNotEx = Path.GetFileNameWithoutExtension(assetPath);
+                string buildName = GetName();
+
+                string nameFormat = buildItem.bundleNameFormat;
+                nameFormat = nameFormat.Replace("{assetRootPath}", assetRootPath);
+                nameFormat = nameFormat.Replace("{assetNameNotEx}", assetNameNotEx);
+                nameFormat = nameFormat.Replace("{assetName}", assetName);
+                nameFormat = nameFormat.Replace("{buildName}", buildName);
+
+                return nameFormat;
+            }
+
         }
 
     }

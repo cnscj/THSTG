@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 using XLibrary;
@@ -25,5 +26,20 @@ namespace ASEditor
             return _builderInfo.priority;
         }
         public abstract AssetCustomBuilderInfo OnInit();
+        protected virtual string OnName(string assetPath)
+        {
+            string fileNameNotEx = Path.GetFileNameWithoutExtension(assetPath);
+            return fileNameNotEx;
+        }
+
+        protected override string OnBundleName(string assetPath)
+        {
+            string assetFileName = OnName(assetPath);
+            string assetBundleName = AssetBuildConfiger.GetInstance().GetBuildBundleName(_builderName, assetFileName, false);
+            return assetBundleName;
+        }
+
+
+
     }
 }

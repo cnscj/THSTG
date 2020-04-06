@@ -25,7 +25,7 @@ namespace ASEditor
         }
         protected void ShowModulePath()
         {
-            GUILayoutEx.ShowPathBar("工具模块路径", ref ResourceConfig.GetInstance().resModulePath);
+            ResourceConfig.GetInstance().resModulePath = GUILayoutEx.ShowPathBar("工具模块路径", ResourceConfig.GetInstance().resModulePath);
         }
 
         protected void ShowPathList()
@@ -34,7 +34,7 @@ namespace ASEditor
             foreach (var infos in ResourceConfig.GetInstance().resPathList)
             {
                 infos.key = EditorGUILayout.TextField("资源名(Key)", infos.key);
-                GUILayoutEx.ShowPathBar("源资源路径", ref infos.srcPath);
+                infos.srcPath = GUILayoutEx.ShowPathBar("源资源路径", infos.srcPath);
 
                 if (GUILayout.Button("移除"))
                 {

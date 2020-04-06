@@ -7,20 +7,21 @@ namespace XLibEditor
     public static class GUILayoutEx
     {
         //路径条
-        public static void ShowPathBar(string text, ref string path, string desc = "Source Folder Path")
+        public static string ShowPathBar(string label, string text, string desc = "Source Folder Path")
         {
             EditorGUILayout.BeginHorizontal();
-            path = EditorGUILayout.TextField(text, path);
+            string path = EditorGUILayout.TextField(label, text);
             if (GUILayout.Button("浏览"))
             {
-                var selectedFolderPath = EditorUtility.SaveFolderPanel(desc, "Assets", "Sprites");
-                if (selectedFolderPath != "")
+                var selectedFolderPath = EditorUtility.SaveFolderPanel(desc, "Assets", "");
+                if (selectedFolderPath != null)
                 {
                     path = XFileTools.GetFileRelativePath(selectedFolderPath);
                 }
             }
 
             EditorGUILayout.EndHorizontal();
+            return path;
         }
     }
 }

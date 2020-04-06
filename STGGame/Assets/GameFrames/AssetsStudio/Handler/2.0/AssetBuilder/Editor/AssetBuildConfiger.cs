@@ -26,7 +26,7 @@ namespace ASEditor
         public BuildPlatform targetType = BuildPlatform.Auto;
         public string exportFolder = DEFAULT_EXPORT_PATH;
         public string bundleSuffix = DEFAULT_BUILD_SUFFFIX;
-        public bool isClearAfterBuilded = true;
+        public bool isCombinePlatformName = true;
 
         public List<AssetCommonBuildItem> buildItemList = new List<AssetCommonBuildItem>();
 
@@ -51,16 +51,19 @@ namespace ASEditor
         public string GetExportFolderPath()
         {
             string newExportFolder = string.IsNullOrEmpty(exportFolder) ? DEFAULT_EXPORT_PATH : exportFolder;
-            string buildPlatformStr = Enum.GetName(typeof(ResourceBuilderConfig.BuildPlatform), ResourceBuilderConfig.GetInstance().targetType);
-            string retExportPath = Path.Combine(newExportFolder, buildPlatformStr);
-            return retExportPath;
+            string retExportPath = newExportFolder;
+            if (isCombinePlatformName)
+            {
+                string buildPlatformStr = Enum.GetName(typeof(BuildPlatform), targetType);
+                retExportPath = Path.Combine(newExportFolder, buildPlatformStr);
+            }
+            return XPathTools.NormalizePath(retExportPath);
         }
 
         public string GetBuildFolderPath(string builderName)
         {
-            string newExportFolder = string.IsNullOrEmpty(exportFolder) ? DEFAULT_EXPORT_PATH : exportFolder;
-            string newExportFolderPath = Path.Combine(newExportFolder, builderName);
-            return newExportFolderPath.ToLower();
+            string newExportFolderPath = Path.Combine("", builderName);
+            return XPathTools.NormalizePath(newExportFolderPath).ToLower();
         }
 
         public string GetBuildBundleName(string builderName, string assetPath, bool isCommonKey = false)

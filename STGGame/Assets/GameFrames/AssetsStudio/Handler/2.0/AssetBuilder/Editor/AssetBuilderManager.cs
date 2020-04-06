@@ -37,7 +37,7 @@ namespace ASEditor
             }
         }
 
-        public void Do(AssetBaseBuilder []builders = null)
+        public void Build(AssetBaseBuilder []builders = null)
         {
             Clear();
 
@@ -72,11 +72,14 @@ namespace ASEditor
             {
                 foreach (var item in commonItems)
                 {
-                    if (!string.IsNullOrEmpty(item.builderName))
-                    {
-                        AssetBaseBuilder builder = new AssetCommonBuilder(item);
-                        m_builderCommonList.Add(builder);
-                    }
+                    if (!item.isEnabled)
+                        continue;
+
+                    if (string.IsNullOrEmpty(item.builderName))
+                        continue;
+
+                    AssetBaseBuilder builder = new AssetCommonBuilder(item);
+                    m_builderCommonList.Add(builder);
                 }
             }
 
@@ -203,12 +206,16 @@ namespace ASEditor
 
             var buildExportPath = AssetBuildConfiger.GetInstance().GetExportFolderPath();
             var buildPlatform = AssetBuildConfiger.GetInstance().GetBuildType();
+
+            if (!XFolderTools.Exists(buildExportPath))
+                XFolderTools.CreateDirectory(buildExportPath);
+
             BuildPipeline.BuildAssetBundles(buildExportPath, GetBuildsArray(), bundleOptions, buildPlatform);
         }
 
         private void BuildAfter()
         {
-
+            AssetDatabase.Refresh();
         }
 
         private AssetBundleBuild[] GetBuildsArray()

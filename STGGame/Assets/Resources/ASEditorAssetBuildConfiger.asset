@@ -10,18 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0886ba1efcee1482bba8599101042899, type: 3}
-  m_Name: AssetBuildConfiger
+  m_Name: ASEditorAssetBuildConfiger
   m_EditorClassIdentifier: 
   targetType: 0
   exportFolder: Assets/AssetBundles
   bundleSuffix: .unity3d
-  isClearAfterBuilded: 1
+  isCombinePlatformName: 1
   buildItemList:
-  - builderName: 
-    buildSrcPath: 
-    buildSuffix: 
-    commonPrefixBuildOne: 0
-  - builderName: 
-    buildSrcPath: 
-    buildSuffix: 
+  - isEnabled: 1
+    builderName: text2
+    buildSrcPath: F:/133.[Unity]TouHou STG/STGGame/Assets/MainGame/ZCustom_Test/BundleTest/Res/Common
+    buildSuffix: '*.prefab'
+    bundleNameFormat: 
     commonPrefixBuildOne: 0

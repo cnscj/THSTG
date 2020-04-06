@@ -66,7 +66,7 @@ namespace ASGame
                 else
                 {
 #if UNITY_EDITOR
-                    m_editorOrResLoader = m_editorOrResLoader ?? CreateLoader<ASEditor.EditorLoader>();
+                    m_editorOrResLoader = m_editorOrResLoader ?? CreateLoader<EditorLoader>();
                     return m_editorOrResLoader;
 #else
                     m_editorOrResLoader = m_editorOrResLoader ?? CreateLoader<ResourcesLoader>();

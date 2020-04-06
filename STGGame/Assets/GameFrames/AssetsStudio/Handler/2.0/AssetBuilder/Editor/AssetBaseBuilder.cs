@@ -45,6 +45,10 @@ namespace ASEditor
 
                 var buildExportPath = AssetBuildConfiger.GetInstance().GetExportFolderPath();
                 var buildPlatform = AssetBuildConfiger.GetInstance().GetBuildType();
+
+                if (!XFolderTools.Exists(buildExportPath))
+                    XFolderTools.CreateDirectory(buildExportPath);
+
                 BuildPipeline.BuildAssetBundles(buildExportPath, list.ToArray(), bundleOptions, buildPlatform);
             }
         }
@@ -92,7 +96,7 @@ namespace ASEditor
                 if (fileMap.ContainsKey(realPathLow))
                     continue;
 
-                string bundleName = OnName(realPathLow);
+                string bundleName = OnBundleName(realPathLow);
                 if (string.IsNullOrEmpty(bundleName))
                     continue;
 
@@ -131,7 +135,6 @@ namespace ASEditor
         protected virtual void OnStart() { }
         protected virtual void OnEnd() { }
         protected abstract string[] OnFiles();
-        protected abstract string OnName(string assetPath);
-
+        protected abstract string OnBundleName(string assetPath);
     }
 }
