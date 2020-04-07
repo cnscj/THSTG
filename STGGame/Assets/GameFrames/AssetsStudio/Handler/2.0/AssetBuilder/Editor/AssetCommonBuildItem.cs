@@ -11,7 +11,7 @@ namespace ASEditor
         public string builderName;
         public string buildSrcPath;
         public string buildSuffix = "*.*";
-        public string bundleNameFormat;
+        public string bundleNameFormat = "{buildName}/{assetNameNotEx}.ab";
         public bool commonPrefixBuildOne = false;        //相同前缀打成一个
 
 

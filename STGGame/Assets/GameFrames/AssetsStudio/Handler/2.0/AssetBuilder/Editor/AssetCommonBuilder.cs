@@ -37,14 +37,17 @@ namespace ASEditor
                 string assetRootPath = Path.GetDirectoryName(assetPath);
                 string assetName = Path.GetFileName(assetPath);
                 string assetNameNotEx = Path.GetFileNameWithoutExtension(assetPath);
+                string assetKey = XStringTools.SplitPathKey(assetPath);
                 string buildName = GetName();
 
                 string nameFormat = buildItem.bundleNameFormat;
                 nameFormat = nameFormat.Replace("{assetRootPath}", assetRootPath);
                 nameFormat = nameFormat.Replace("{assetNameNotEx}", assetNameNotEx);
                 nameFormat = nameFormat.Replace("{assetName}", assetName);
+                nameFormat = nameFormat.Replace("{assetKey}", assetKey);
                 nameFormat = nameFormat.Replace("{buildName}", buildName);
 
+                nameFormat = nameFormat.ToLower();
                 return nameFormat;
             }
 

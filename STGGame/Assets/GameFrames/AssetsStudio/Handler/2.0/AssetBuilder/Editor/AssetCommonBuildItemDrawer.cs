@@ -20,13 +20,14 @@ namespace ASEditor
                 nameProperty.stringValue = EditorGUI.TextField(new Rect(position)
                 {
                     y = position.y + 0 * EditorGUIUtility.singleLineHeight,
-                    width = Math.Max(0, position.width - 200),
+                    width = Math.Max(0, position.width - 60),
                 },"资源名", nameProperty.stringValue);
 
+                EditorGUIUtility.labelWidth = 30;
                 SerializedProperty enabledProperty = property.FindPropertyRelative("isEnabled");
                 enabledProperty.boolValue = EditorGUI.Toggle(new Rect(position)
                 {
-                    x = EditorGUIUtility.currentViewWidth - 200,
+                    x = EditorGUIUtility.currentViewWidth - 60,
                     y = position.y + 0 * EditorGUIUtility.singleLineHeight,
                 }, "启用", enabledProperty.boolValue);
 
@@ -42,7 +43,14 @@ namespace ASEditor
                     y = position.y + 1 * EditorGUIUtility.singleLineHeight + 155,
                     width = 100,
                 });
-                if (GUILayout.Button("浏览")) { srcPathProperty.stringValue = EditorUtility.SaveFolderPanel("Source Folder Path", "Assets", ""); }
+                if (GUILayout.Button("浏览"))
+                {
+                    var selectedPath = EditorUtility.SaveFolderPanel("Source Folder Path", "Assets", "");
+                    if (string.IsNullOrEmpty(selectedPath))
+                    {
+                        srcPathProperty.stringValue = selectedPath;
+                    }
+                }
                 GUILayout.EndArea();
 
                 SerializedProperty suffixProperty = property.FindPropertyRelative("buildSuffix");
@@ -57,11 +65,11 @@ namespace ASEditor
                     y = position.y + 3 * EditorGUIUtility.singleLineHeight
                 }, "包名(含格式化)", bundleFormatNameProperty.stringValue);
 
-                SerializedProperty prefixBuildOneProperty = property.FindPropertyRelative("commonPrefixBuildOne");
-                prefixBuildOneProperty.boolValue = EditorGUI.Toggle(new Rect(position)
-                {
-                    y = position.y + 4 * EditorGUIUtility.singleLineHeight
-                },"取相同前缀", prefixBuildOneProperty.boolValue);
+                //SerializedProperty prefixBuildOneProperty = property.FindPropertyRelative("commonPrefixBuildOne");
+                //prefixBuildOneProperty.boolValue = EditorGUI.Toggle(new Rect(position)
+                //{
+                //    y = position.y + 4 * EditorGUIUtility.singleLineHeight
+                //},"取相同前缀", prefixBuildOneProperty.boolValue);
             }
         }
     }

@@ -19,7 +19,7 @@ MonoBehaviour:
   buildItemList:
   - isEnabled: 1
     builderName: text2
-    buildSrcPath: F:/133.[Unity]TouHou STG/STGGame/Assets/MainGame/ZCustom_Test/BundleTest/Res/Common
+    buildSrcPath: 
     buildSuffix: '*.prefab'
-    bundleNameFormat: 
+    bundleNameFormat: '{buildName}/{assetNameNotEx}.unity3d'
     commonPrefixBuildOne: 0
