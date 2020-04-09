@@ -59,11 +59,17 @@ namespace ASEditor
                     y = position.y + 2 * EditorGUIUtility.singleLineHeight
                 },"搜索后缀", suffixProperty.stringValue);
 
-                SerializedProperty bundleFormatNameProperty = property.FindPropertyRelative("bundleNameFormat");
-                bundleFormatNameProperty.stringValue = EditorGUI.TextField(new Rect(position)
+                SerializedProperty assetBundleFormatNameProperty = property.FindPropertyRelative("assetBundleNameFormat");
+                assetBundleFormatNameProperty.stringValue = EditorGUI.TextField(new Rect(position)
                 {
                     y = position.y + 3 * EditorGUIUtility.singleLineHeight
-                }, "包名(含格式化)", bundleFormatNameProperty.stringValue);
+                }, "资源包名(含格式化)", assetBundleFormatNameProperty.stringValue);
+
+                SerializedProperty shareBundleNameFormat = property.FindPropertyRelative("shareBundleNameFormat");
+                shareBundleNameFormat.stringValue = EditorGUI.TextField(new Rect(position)
+                {
+                    y = position.y + 4 * EditorGUIUtility.singleLineHeight
+                }, "公共包名(含格式化)", shareBundleNameFormat.stringValue);
 
                 //SerializedProperty prefixBuildOneProperty = property.FindPropertyRelative("commonPrefixBuildOne");
                 //prefixBuildOneProperty.boolValue = EditorGUI.Toggle(new Rect(position)

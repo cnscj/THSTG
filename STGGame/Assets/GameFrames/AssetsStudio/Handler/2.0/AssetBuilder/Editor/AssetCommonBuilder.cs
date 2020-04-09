@@ -26,7 +26,7 @@ namespace ASEditor
         }
         protected override string OnBundleName(string assetPath)
         {
-            if (string.IsNullOrEmpty(buildItem.bundleNameFormat))
+            if (string.IsNullOrEmpty(buildItem.assetBundleNameFormat))
             {
                 string assetFileName = Path.GetFileName(assetPath);
                 string assetBundleName = AssetBuildConfiger.GetInstance().GetBuildBundleName(_builderName, assetFileName, buildItem.commonPrefixBuildOne);
@@ -37,7 +37,7 @@ namespace ASEditor
                 
                 string buildName = GetName();
 
-                string nameFormat = buildItem.bundleNameFormat;
+                string nameFormat = buildItem.assetBundleNameFormat;
                 nameFormat = AssetBuildConfiger.GetInstance().GetFormatBundleName(nameFormat, assetPath);
                 nameFormat = nameFormat.Replace("{buildName}", buildName);
 
