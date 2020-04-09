@@ -13,7 +13,7 @@ namespace ASEditor
     {
         public static readonly string DEFAULT_EXPORT_PATH = "Assets/AssetBundles";
         public static readonly string DEFAULT_BUILD_SUFFFIX = ".unity3d";
-
+        public static readonly string DEFAULT_BUILD_SHARE_BUNDLE_NAME = "share/{assetFlatPath}{assetNameNotEx}.unity3d";
         public enum BuildPlatform
         {
             Auto,
@@ -26,6 +26,7 @@ namespace ASEditor
         public BuildPlatform targetType = BuildPlatform.Auto;
         public string exportFolder = DEFAULT_EXPORT_PATH;
         public string bundleSuffix = DEFAULT_BUILD_SUFFFIX;
+        public string shareBundleName = DEFAULT_BUILD_SHARE_BUNDLE_NAME;
         public bool isCombinePlatformName = true;
 
         public List<AssetCommonBuildItem> buildItemList = new List<AssetCommonBuildItem>();
@@ -90,7 +91,45 @@ namespace ASEditor
             string relaPath = assetParentPath.Replace("assets/", "");
             string flatPath = relaPath.Replace("/", "_");
             string bundleName = string.Format("{0}_{1}{2}", flatPath, assetNameLow, newBundleSuffix);
-            return bundleName;
+            return bundleName.ToLower();
+        }
+
+        public string GetFlatPath(string assetPath)
+        {
+            assetPath = XFileTools.GetFileRelativePath(assetPath);
+            string assetParentPath = Path.GetDirectoryName(assetPath).ToLower();
+            string relaPath = assetParentPath.Replace("assets", "");
+            string flatPath = relaPath.Replace("/", "_");
+            if (!string.IsNullOrEmpty(flatPath))
+            {
+                string newFlatPath = flatPath.Remove(0, 1);
+                newFlatPath = string.Format("{0}_", flatPath);
+                return newFlatPath.ToLower();
+            }
+            else
+            {
+                return "";
+            }
+        }
+
+        public string GetFormatBundleName(string formatPath, string assetPath)
+        {
+            string assetRootPath = Path.GetDirectoryName(assetPath);
+            string assetName = Path.GetFileName(assetPath);
+            string assetNameNotEx = Path.GetFileNameWithoutExtension(assetPath);
+            string assetFlatPath = GetFlatPath(assetPath);
+            string assetKey = XStringTools.SplitPathKey(assetPath);
+
+            string nameFormat = formatPath;
+            nameFormat = nameFormat.Replace("{assetRootPath}", assetRootPath);
+            nameFormat = nameFormat.Replace("{assetNameNotEx}", assetNameNotEx);
+            nameFormat = nameFormat.Replace("{assetName}", assetName);
+            nameFormat = nameFormat.Replace("{assetKey}", assetKey);
+            nameFormat = nameFormat.Replace("{assetFlatPath}", assetFlatPath);
+
+            nameFormat = nameFormat.ToLower();
+
+            return nameFormat;
         }
     }
 }

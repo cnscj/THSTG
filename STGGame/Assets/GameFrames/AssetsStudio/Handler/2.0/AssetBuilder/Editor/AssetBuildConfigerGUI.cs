@@ -55,7 +55,8 @@ namespace ASEditor
 
             AssetBuildConfiger.GetInstance().targetType = (AssetBuildConfiger.BuildPlatform)EditorGUILayout.EnumPopup("当前平台", AssetBuildConfiger.GetInstance().targetType);
             AssetBuildConfiger.GetInstance().exportFolder = GUILayoutEx.ShowPathBar("输出目录", AssetBuildConfiger.GetInstance().exportFolder);
-            AssetBuildConfiger.GetInstance().bundleSuffix = EditorGUILayout.TextField("输出后缀", AssetBuildConfiger.GetInstance().bundleSuffix);
+            AssetBuildConfiger.GetInstance().bundleSuffix = EditorGUILayout.TextField("默认包后缀", AssetBuildConfiger.GetInstance().bundleSuffix);
+            AssetBuildConfiger.GetInstance().shareBundleName = EditorGUILayout.TextField("公共包名", AssetBuildConfiger.GetInstance().shareBundleName);
             AssetBuildConfiger.GetInstance().isCombinePlatformName = EditorGUILayout.Toggle("输出目录拼接平台名称", AssetBuildConfiger.GetInstance().isCombinePlatformName);
 
             m_itemSortedList.DoLayoutList();

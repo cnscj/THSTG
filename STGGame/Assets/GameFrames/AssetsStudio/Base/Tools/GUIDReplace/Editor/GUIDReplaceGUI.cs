@@ -16,9 +16,9 @@ namespace ASEditor
     /// 打开项目Unity编辑器：Edit —-> Project Settings —-> Editor 这样就会调到你的Inspector面板的Editor Settings 
     /// 设置 Asset Serialization 的Mode类型为：Force Text(默认是Mixed); 这样你就能看到你的prefab文件引用了哪些贴图，字体，prefab 等资源了
     /// </summary>
-    public class GUIDRefReplace : EditorWindow
+    public class GUIDReplaceGUI : EditorWindow
     {
-        private static GUIDRefReplace _window;
+        private static GUIDReplaceGUI _window;
         private Object _sourceOld;
         private Object _sourceNew;
  
@@ -29,6 +29,7 @@ namespace ASEditor
         private bool isContainPrefab = true;
         private bool isContainMat = true;
         private bool isContainAsset = false;
+        private bool isContainController = false;
         private bool isContainPlayable = false;
 
         private List<string> withoutExtensions = new List<string>();
@@ -39,7 +40,7 @@ namespace ASEditor
         {
  
             // true 表示不能停靠的
-            _window = (GUIDRefReplace)EditorWindow.GetWindow(typeof(GUIDRefReplace), true, "引用替换");
+            _window = (GUIDReplaceGUI)EditorWindow.GetWindow(typeof(GUIDReplaceGUI), true, "引用替换");
             _window.Show();
  
         }
@@ -63,6 +64,7 @@ namespace ASEditor
             isContainPrefab = GUILayout.Toggle(isContainPrefab, ".prefab");
             isContainMat = GUILayout.Toggle(isContainMat, ".mat");
             isContainAsset = GUILayout.Toggle(isContainAsset, ".asset");
+            isContainController = GUILayout.Toggle(isContainController, ".controller");
             isContainPlayable = GUILayout.Toggle(isContainPlayable, ".playable");
 
             EditorGUILayout.EndHorizontal();
@@ -124,6 +126,10 @@ namespace ASEditor
             {
                 withoutExtensions.Add(".asset");
             }
+            if (isContainController)
+            {
+                withoutExtensions.Add(".controller");
+            }
             if (isContainPlayable)
             {
                 withoutExtensions.Add(".playable");
@@ -139,7 +145,7 @@ namespace ASEditor
         {
             if (withoutExtensions == null || withoutExtensions.Count == 0)
             {
-                withoutExtensions = new List<string>() { ".prefab", ".unity", ".mat", ".asset" ,".playable"};
+                withoutExtensions = new List<string>() { ".prefab", ".unity", ".mat", ".asset", ".controller", ".playable"};
             }
  
             string[] files = Directory.GetFiles(Application.dataPath, "*.*", SearchOption.AllDirectories)
@@ -190,56 +196,5 @@ namespace ASEditor
         {
             return "Assets" + Path.GetFullPath(path).Replace(Path.GetFullPath(Application.dataPath), "").Replace('\\', '/');
         }
-
-        public static void ReplaceGUIDs(Dictionary<string,string> guidMap, string []files)
-        {
-            if (guidMap == null || guidMap.Count <= 0)
-                return;
-
-            if (files != null && files.Length > 0)
-            {
-                foreach (var file in files)
-                {
-                    var content = File.ReadAllText(file);
-                    foreach(var guidPair in guidMap)
-                    {
-                        var oldGUID = guidPair.Key;
-                        var newGUID = guidPair.Value;
-                        if (oldGUID != newGUID)
-                        {
-                            if (Regex.IsMatch(content, oldGUID))
-                            {
-                                content = content.Replace(oldGUID, newGUID);
-                            }
-                        }
-                    }
-                    File.WriteAllText(file, content);
-                }
-                AssetDatabase.Refresh();
-            }
-        }
-        public static void ReplaceGUIDs(Dictionary<string, string> guidMap, string path, string[] suffix = null)
-        {
-            suffix = (suffix != null) ? suffix : new string[] { ".prefab", ".unity", ".mat", ".asset", ".playable" };
-            path = !string.IsNullOrEmpty(path) ? path : Application.dataPath;
-            string[] files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories).Where(s => suffix.Contains(Path.GetExtension(s).ToLower())).ToArray();
-            ReplaceGUIDs(guidMap, files);
-        }
-
-        public static void ReplaceGUIDs(string oldGUID, string newGUID, string[] files)
-        {
-            ReplaceGUIDs(new Dictionary<string, string> { { oldGUID, newGUID } }, files);
-        }
-
-        public static void ReplaceGUIDs(string oldGUID, string newGUID, string path, string []suffix = null)
-        {
-            suffix = (suffix != null) ? suffix : new string[] { ".prefab", ".unity", ".mat", ".asset", ".playable" };
-            path = !string.IsNullOrEmpty(path) ? path : Application.dataPath;
-
-            string[] files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories).Where(s => suffix.Contains(Path.GetExtension(s).ToLower())).ToArray();
-            ReplaceGUIDs(new Dictionary<string, string> { { oldGUID, newGUID } }, files);
-        }
-
-
     }
 }

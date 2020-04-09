@@ -15,6 +15,7 @@ MonoBehaviour:
   targetType: 0
   exportFolder: Assets/AssetBundles
   bundleSuffix: .unity3d
+  shareBundleName: share/{assetFlatPath}{assetNameNotEx}.unity3d
   isCombinePlatformName: 1
   buildItemList:
   - isEnabled: 1

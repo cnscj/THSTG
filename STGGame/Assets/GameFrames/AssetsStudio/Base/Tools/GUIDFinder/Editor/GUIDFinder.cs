@@ -10,111 +10,85 @@ using XLibrary;
 
 namespace ASGame
 {
-    public class GUIDFinder : EditorWindow
+    public static class GUIDFinder
     {
-        private static bool m_isUpdate = true;
-        private static Vector2 m_scrollPosition;
-        private static Dictionary<string, ArrayList> m_gridDict = new Dictionary<string, ArrayList>();
-        private static string m_selectedAssetPath;
-
-        void OnGUI()
+        public static string[] SERIALIZABLE_FILE_SUFFIX = { ".prefab", ".unity", ".mat", ".asset", ".controller", ".playable" };
+        public static Dictionary<string,string[]> GetAllReferences(string searchPath = null, string[] searchSuffix = null)
         {
-            if (GUILayout.Button("Refresh"))
+            searchPath = string.IsNullOrEmpty(searchPath) ? Application.dataPath : searchPath;
+            searchSuffix = searchSuffix != null ? searchSuffix : SERIALIZABLE_FILE_SUFFIX;
+            Dictionary<string, HashSet<string>> refSetMap = new Dictionary<string, HashSet<string>>();
+
+            string[] files = Directory.GetFiles(searchPath, "*.*", SearchOption.AllDirectories)
+                   .Where(s => searchSuffix.Contains(Path.GetExtension(s).ToLower()))
+                   .ToArray();
+
+            foreach (var file in files)
             {
-                m_isUpdate = true;
-            }
-
-            if (m_isUpdate)
-            {
-                UpdateReferences();
-                m_isUpdate = false;
-            }
-
-            if (m_selectedAssetPath == null)
-            {
-                m_selectedAssetPath = AssetDatabase.GetAssetPath(Selection.activeObject);
-            }
-    
-            if (m_gridDict.ContainsKey(m_selectedAssetPath))
-            {
-                m_scrollPosition = GUILayout.BeginScrollView(m_scrollPosition, GUILayout.Width(700), GUILayout.Height(500));
-                foreach (string filePath in m_gridDict[m_selectedAssetPath])
-                {
-                    if (GUILayout.Button(filePath))
-                    {
-                        OpenFolderAndSelectFile(filePath);
-                    }
-                }
-                GUILayout.EndScrollView();
-            }
-        }
-
-        private static void OpenFolderAndSelectFile(string relativePath)
-        {
-            Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(relativePath);
-        }
-
-        private static void UpdateReferences()
-        {
-            m_gridDict.Clear();
-            string assetDir = Application.dataPath;
-
-            var withoutExtensions = new List<string>() { ".prefab", ".unity", ".mat", ".asset", ".controller", ".playable" };
-            string[] files = Directory.GetFiles(assetDir, "*.*", SearchOption.AllDirectories)
-                    .Where(s => withoutExtensions.Contains(Path.GetExtension(s).ToLower()))
-                    .ToArray();
-
-            int startIndex = 0;
-            EditorApplication.update = delegate ()
-            {
-                string file = files[startIndex];
-                bool isCancel = EditorUtility.DisplayCancelableProgressBar("匹配资源中", file, (float)startIndex / (float)files.Length);
-
                 string relativePath = XFileTools.GetFileRelativePath(file);
                 string[] dps = AssetDatabase.GetDependencies(relativePath);
                 foreach (string path in dps)
                 {
-                    if (!m_gridDict.ContainsKey(path))
+                    string depRelatPath = XFileTools.GetFileRelativePath(path);
+                    if (depRelatPath.Contains(relativePath))
                     {
-                        m_gridDict.Add(path, new ArrayList());
+                        if (!refSetMap.ContainsKey(relativePath))
+                        {
+                            refSetMap[relativePath] = new HashSet<string>();
+                        }
+                        var fileSet = refSetMap[relativePath];
+                        if (!fileSet.Contains(depRelatPath))
+                        {
+                            fileSet.Add(path);
+                        }
                     }
-                    ArrayList existFiles = m_gridDict[path];
-                    existFiles.Add(relativePath);
                 }
-
-                startIndex++;
-                if (isCancel || startIndex >= files.Length)
-                {
-                    EditorUtility.ClearProgressBar();
-                    EditorApplication.update = null;
-                    startIndex = 0;
-                }
-            };
-        }
-
-        [MenuItem("Assets/Find References In Project", true)]
-        private static bool CheckValidation()
-        {
-            return Selection.activeObject != null;
-        }
-
-        [MenuItem("Assets/Find References In Project")]
-        public static void ShowWindow()
-        {
-            m_selectedAssetPath = null;
-            EditorWindow.GetWindow(typeof(GUIDFinder));
-        }
-
-        [MenuItem("Assets/Find Dependencies")]
-        public static void FindDependencies()
-        {
-            string path = AssetDatabase.GetAssetPath(Selection.activeObject);
-            string deps = path + "deps:";
-            foreach (var dep in AssetDatabase.GetDependencies(path))
-            {
-                deps += "\n" + dep;
             }
-            Debug.Log(deps);            
+
+            Dictionary<string, string[]> refMap = new Dictionary<string, string[]>();
+            foreach (var kv in refSetMap)
+            {
+                refMap[kv.Key] = kv.Value.ToArray();
+            }
+
+            return refMap;
+        }
+        public static string[] FindReferences(string assetPath, string searchPath = null, string[] searchSuffix = null)
+        {
+            searchPath = string.IsNullOrEmpty(searchPath) ? Application.dataPath : searchPath;
+            searchSuffix = searchSuffix != null ? searchSuffix : SERIALIZABLE_FILE_SUFFIX;
+            string assetPathLow = XFileTools.GetFileRelativePath(assetPath.ToLower());
+
+            string[] files = Directory.GetFiles(searchPath, "*.*", SearchOption.AllDirectories)
+                   .Where(s => searchSuffix.Contains(Path.GetExtension(s).ToLower()))
+                   .ToArray();
+
+
+            HashSet<string> refDict = new HashSet<string>();
+            foreach(var file in files)
+            {
+                string relativePath = XFileTools.GetFileRelativePath(file);
+                string[] dps = AssetDatabase.GetDependencies(relativePath);
+                foreach (string path in dps)
+                {
+                    string pathLow = path.ToLower();
+                    if (pathLow.Contains(assetPathLow))
+                    {
+                        if (!refDict.Contains(path))
+                        {
+                            refDict.Add(path);
+                        }
+                    }
+                }
+            }
+
+            return refDict.ToArray();
+        }
+
+        public static string[] FindDependencies(string assetPath, bool recursive = false)
+        {
+            string path = XFileTools.GetFileRelativePath(assetPath);
+            return AssetDatabase.GetDependencies(path, recursive);
         }
 
     }
