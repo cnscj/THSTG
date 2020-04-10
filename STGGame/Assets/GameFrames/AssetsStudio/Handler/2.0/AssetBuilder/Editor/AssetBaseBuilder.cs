@@ -87,6 +87,7 @@ namespace ASEditor
             if (assetFiles == null || assetFiles.Length < 0)
                 return;
 
+            OnBefore(assetFiles);
             var fileList = new List<string>(assetFiles);
             foreach (var assetPath in fileList)
             {
@@ -96,7 +97,7 @@ namespace ASEditor
                 if (fileMap.ContainsKey(realPathLow))
                     continue;
 
-                string bundleName = OnBundleName(realPathLow);
+                string bundleName = OnName(realPathLow);
                 if (string.IsNullOrEmpty(bundleName))
                     continue;
 
@@ -125,6 +126,7 @@ namespace ASEditor
             result.assetPaths = fileList;
             result.assetBuilds = buildList;
 
+            OnAfter(result);
         }
 
         private void DoEnd()
@@ -135,6 +137,8 @@ namespace ASEditor
         protected virtual void OnStart() { }
         protected virtual void OnEnd() { }
         protected abstract string[] OnFiles();
-        protected abstract string OnBundleName(string assetPath);
+        protected virtual void OnBefore(string[] files) { }
+        protected abstract string OnName(string assetPath);
+        protected virtual void OnAfter(Result result) { }
     }
 }

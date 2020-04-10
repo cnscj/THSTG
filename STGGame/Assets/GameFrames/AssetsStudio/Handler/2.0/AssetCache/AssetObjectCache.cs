@@ -1,26 +1,26 @@
 ﻿
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using XLibrary.Package;
 using Object = UnityEngine.Object;
 namespace ASGame
 {
-    public class AssetCommonCache : AssetBaseCache
+    public class AssetObjectCache : AssetBaseCache
     {
-        private Dictionary<string, AssetCacheObject> m_cacheObject = new Dictionary<string, AssetCacheObject>();
+        private Dictionary<string, AssetObjectCacheObject> m_cacheObject = new Dictionary<string, AssetObjectCacheObject>();
         private Queue<string> m_releaseQueue = new Queue<string>();
 
-        public override bool IsContains(string key)
+        public bool IsContains(string key)
         {
             return m_cacheObject.ContainsKey(key);
         }
 
         public override bool Add(string key, Object obj, bool isReplace = false)
         {
+            if (obj == null)
+                return false;
+
             if (!m_cacheObject.ContainsKey(key))
             {
-                AssetCacheObject cacheObj = new AssetCacheObject(cacheName, key, obj);
+                AssetObjectCacheObject cacheObj = new AssetObjectCacheObject(cacheName, key, obj);
 
                 cacheObj.UpdateTick();
                 m_cacheObject.Add(key, cacheObj);
@@ -29,7 +29,7 @@ namespace ASGame
             {
                 if (isReplace)
                 {
-                    AssetCacheObject cacheObj = new AssetCacheObject(cacheName, key, obj);
+                    AssetObjectCacheObject cacheObj = new AssetObjectCacheObject(cacheName, key, obj);
                     m_cacheObject[key] = cacheObj;
                     return true;
                 }
@@ -41,7 +41,6 @@ namespace ASGame
         {
             if (m_cacheObject.ContainsKey(key))
             {
-                //var cacheObj = m_cacheObject[key];
                 m_cacheObject.Remove(key);
             }
         }
@@ -85,10 +84,7 @@ namespace ASGame
             while (m_releaseQueue.Count > 0)
             {
                 var objKey = m_releaseQueue.Dequeue();
-                //if (m_cacheObject.TryGetValue(objKey, out var cacheObj))
-                //{
                 m_cacheObject.Remove(objKey);
-                //}
             }
         }
     }

@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UnityEngine;
-using XLibrary;
-using XLibrary.Package;
+using UnityEditor;
 
 namespace ASEditor
 {
@@ -15,16 +13,37 @@ namespace ASEditor
         {
             buildItem = item;
         }
+
         protected override string[] OnFiles()
         {
             string buildSuffix = buildItem.buildSuffix ?? "*.*";
             string[] files = Directory.GetFiles(buildItem.buildSrcPath, buildSuffix, SearchOption.AllDirectories)
-                   //.Where(s => withoutExtensions.Contains(Path.GetExtension(s).ToLower()))
                    .ToArray();
 
             return files;
         }
-        protected override string OnBundleName(string assetPath)
+
+        //TODO:公共资源处理
+        protected override void OnBefore(string[] files)
+        {
+            //这里剔除两部分,公共的和单独的
+            if (files == null || files.Length <= 0)
+                return;
+
+            foreach(var assetPath in files)
+            {
+                var depFiles = AssetDatabase.GetDependencies(assetPath);
+                foreach(var depFile in depFiles)
+                {
+                    if (string.Compare(assetPath, depFile) == 0)
+                        continue;
+
+
+                }
+            }
+        }
+
+        protected override string OnName(string assetPath)
         {
             if (string.IsNullOrEmpty(buildItem.assetBundleNameFormat))
             {
@@ -34,7 +53,6 @@ namespace ASEditor
             }
             else
             {
-                
                 string buildName = GetName();
 
                 string nameFormat = buildItem.assetBundleNameFormat;

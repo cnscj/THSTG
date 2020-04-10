@@ -22,5 +22,6 @@ MonoBehaviour:
     builderName: text2
     buildSrcPath: 
     buildSuffix: '*.prefab'
-    bundleNameFormat: '{buildName}/{assetNameNotEx}.unity3d'
+    assetBundleNameFormat: '{buildName}/{assetNameNotEx}.ab'
+    shareBundleNameFormat: 
     commonPrefixBuildOne: 0

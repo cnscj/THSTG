@@ -11,14 +11,13 @@ namespace ASEditor
     public abstract class AssetCustomBuilder : AssetBaseBuilder
     {
         protected AssetCustomBuilderInfo _builderInfo;
-        public AssetCustomBuilder():base(null)
+        public AssetCustomBuilder() : base(null)
         {
 
         }
         public void Init()
         {
             _builderInfo = OnInit();
-
             _builderName = _builderInfo.name;
         }
         public int GetPriority()

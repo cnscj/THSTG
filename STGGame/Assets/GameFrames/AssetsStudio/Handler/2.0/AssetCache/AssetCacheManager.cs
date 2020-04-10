@@ -8,7 +8,7 @@ namespace ASGame
 {
     public class AssetCacheManager : MonoSingleton<AssetCacheManager>
     {
-        private static readonly string DEFAULT_CACHE = "DefaultCache";
+        private static readonly string DEFAULT_CACHE = "ObjectCache";
         private Dictionary<string, AssetBaseCache> m_cachesMap = new Dictionary<string, AssetBaseCache>();
 
         public AssetBaseCache GetOrCreateCache<T>(string cacheName) where T : AssetBaseCache
@@ -23,7 +23,7 @@ namespace ASGame
 
         public AssetBaseCache AddCache(string cacheName)
         {
-            return GetOrCreateCache<AssetCommonCache>(cacheName);
+            return GetOrCreateCache<AssetObjectCache>(cacheName);
         }
 
         public AssetBaseCache AddCache<T>(string cacheName) where T : AssetBaseCache
@@ -48,6 +48,15 @@ namespace ASGame
             }
         }
 
+        public void Dispose()
+        {
+            foreach(var cache in m_cachesMap.Values)
+            {
+                cache.Clear();
+            }
+            m_cachesMap.Clear();
+        }
+
         public T GetObject<T>(string objKey) where T : Object
         {
             if (m_cachesMap.TryGetValue(DEFAULT_CACHE, out var cache))
@@ -56,13 +65,13 @@ namespace ASGame
             }
             return null;
         }
+        ///////
 
         public void AddObject(string objKey, Object obj, bool isReplace = false)
         {
-            var cache = GetOrCreateCache<AssetCommonCache>(DEFAULT_CACHE);
+            var cache = GetOrCreateCache<AssetObjectCache>(DEFAULT_CACHE);
             cache.Add(objKey, obj, isReplace);
         }
-
 
         public void RemoveObject(string objKey)
         {

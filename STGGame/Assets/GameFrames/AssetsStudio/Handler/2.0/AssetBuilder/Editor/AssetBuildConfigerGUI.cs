@@ -58,8 +58,15 @@ namespace ASEditor
             AssetBuildConfiger.GetInstance().bundleSuffix = EditorGUILayout.TextField("默认包后缀", AssetBuildConfiger.GetInstance().bundleSuffix);
             AssetBuildConfiger.GetInstance().shareBundleName = EditorGUILayout.TextField("公共包名", AssetBuildConfiger.GetInstance().shareBundleName);
             AssetBuildConfiger.GetInstance().isCombinePlatformName = EditorGUILayout.Toggle("输出目录拼接平台名称", AssetBuildConfiger.GetInstance().isCombinePlatformName);
-
+            
             m_itemSortedList.DoLayoutList();
+            EditorGUILayout.HelpBox("包路径说明\n" +
+                "{assetRootPath}表示资源父路径" +
+                "{assetNameNotEx}表示资源不带后缀名" +
+                "{assetName}表示资源名" +
+                "{assetKey}表示资源名中到_的部分" +
+                "{assetFlatPath}表示资源扁平化路径" +
+                "{buildName}表示构建器名", MessageType.Info);
 
             GUILayout.EndVertical();
         }

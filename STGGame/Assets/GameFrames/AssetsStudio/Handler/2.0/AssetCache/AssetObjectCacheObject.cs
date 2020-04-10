@@ -1,26 +1,25 @@
-﻿using System.Collections.Generic;
+﻿
 using UnityEngine;
-using System.Linq;
 using Object = UnityEngine.Object;
 using XLibGame;
 
 namespace ASGame
 {
     //缓冲数据信息
-    public class AssetCacheObject
+    public class AssetObjectCacheObject : BaseRef
     {
-        public readonly string objName;         //缓冲数据名称
+        public readonly string cacheName;       //所属缓冲数据名称
+
+        public readonly string cacheKey;         //缓冲数据名称
         public readonly Object cacheObj;        //缓冲物体
-        public readonly string cacheName;       //缓冲数据名称
 
         public float stayTime = -1f;            //最长驻留时间s
-
         private float m_updateTick;             //最后一次使用时间
 
-        public AssetCacheObject(string cache, string name, Object obj)
+        public AssetObjectCacheObject(string cache, string key, Object obj)
         {
             cacheName = cache;
-            objName = name;
+            cacheKey = key;
             cacheObj = obj;
         }
 
@@ -34,12 +33,21 @@ namespace ASGame
         {
             if (stayTime > 0)
             {
-                if (m_updateTick + stayTime <= Time.realtimeSinceStartup)
+                if (RefCount() <= 0)
+                {
+                    if (m_updateTick + stayTime <= Time.realtimeSinceStartup)
+                    {
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                if (RefCount() <= 0)
                 {
                     return true;
                 }
             }
-
             return false;
         }
 
@@ -48,7 +56,6 @@ namespace ASGame
             return cacheObj as T;
         }
 
-       
     }
 
 }

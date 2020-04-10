@@ -17,7 +17,10 @@ namespace ASGame
             return comp;
         }
 
-        public abstract bool IsContains(string key);
+        public string GetName()
+        {
+            return cacheName;
+        }
 
         public abstract bool Add(string key, Object obj, bool isReplace = false);
 
@@ -25,6 +28,6 @@ namespace ASGame
 
         public abstract T Get<T>(string key) where T : Object;
 
-        public abstract void Clear();
+        public virtual void Clear() { }
     }
 }
