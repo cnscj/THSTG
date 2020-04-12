@@ -22,7 +22,8 @@ namespace ASGame
             return cacheName;
         }
 
-        public abstract bool Add(string key, Object obj, bool isReplace = false);
+
+        public abstract void Add(string key, Object obj, bool isReplace = false);
 
         public abstract void Remove(string key);
 

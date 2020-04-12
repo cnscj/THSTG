@@ -11,7 +11,8 @@ namespace ASEditor
     public abstract class AssetBaseBuilder
     {
         protected string _builderName;
-        protected Dictionary<string, string[]> m_refMap;
+        private Dictionary<string, string[]> m_refMap;
+        private List<string> m_file;
 
         public AssetBaseBuilder(string name)
         {
@@ -23,60 +24,114 @@ namespace ASEditor
             return _builderName;
         }
 
+        public List<string> GetFileList()
+        {
+            if (m_file == null)
+            {
+                m_file = new List<string>();
+                var files = OnFiles();
+                if (files == null || files.Length <= 0)
+                    return m_file;
+
+                m_file.AddRange(files);
+            }
+            return m_file;
+        }
+
+        public List<AssetBundlePair> GetBundleList()
+        {
+            Clear();
+
+            var fileList = GetFileList();
+            if (fileList.Count() <= 0)
+                return null;
+
+            List<AssetBundlePair> bundleList = new List<AssetBundlePair>();
+            foreach (var file in fileList)
+            {
+                var bundles = OnBundles(file);
+                if (bundles == null || bundles.Length <= 0)
+                    continue;
+
+                bundleList.AddRange(bundles);
+            }
+
+            return bundleList;
+        }
+
+        public List<AssetBundleBuild> GetBuildList()
+        {
+            var bundleList = GetBundleList();
+
+            if (bundleList == null || bundleList.Count <= 0)
+                return null;
+
+            HashSet<string> fileSet = new HashSet<string>();
+            Dictionary<string, HashSet<string>> buildMap = new Dictionary<string, HashSet<string>>();
+            foreach (var pair in bundleList)
+            {
+                if (pair.isEmpty())
+                    continue;
+
+                var assetPath = pair.assetPath.ToLower();
+                var bundleName = pair.bundleName.ToLower();
+
+                if (fileSet.Contains(assetPath))
+                    continue;
+                fileSet.Add(assetPath);
+
+                HashSet<string> bundleSet;
+                if (!buildMap.TryGetValue(bundleName, out bundleSet))
+                {
+                    bundleSet = new HashSet<string>();
+                    buildMap.Add(bundleName, bundleSet);
+
+                }
+                if (!bundleSet.Contains(assetPath))
+                {
+                    bundleSet.Add(assetPath);
+                }
+            }
+
+            List<AssetBundleBuild> buildList = new List<AssetBundleBuild>();
+            foreach (var pair in buildMap)
+            {
+                AssetBundleBuild build = new AssetBundleBuild();
+                build.assetBundleName = pair.Key;
+                build.assetNames = pair.Value.ToArray();
+
+                buildList.Add(build);
+            }
+
+            return buildList;
+        }
+
         public virtual void Build()
         {
-            Clear();
+            var buildList = GetBuildList();
+            if (buildList != null && buildList.Count > 0)
+            {
+                BuildAssetBundleOptions bundleOptions;//打包设置:
+                bundleOptions = BuildAssetBundleOptions.None;
+                bundleOptions |= BuildAssetBundleOptions.ChunkBasedCompression;
+                bundleOptions |= BuildAssetBundleOptions.DeterministicAssetBundle;
+                bundleOptions |= BuildAssetBundleOptions.DisableLoadAssetByFileName;
+                bundleOptions |= BuildAssetBundleOptions.DisableLoadAssetByFileNameWithExtension;
 
-            //var list = GetBuildList();
-            //if (list.Count > 0)
-            //{
-            //    BuildAssetBundleOptions bundleOptions;//打包设置:
-            //    bundleOptions = BuildAssetBundleOptions.None;
-            //    bundleOptions |= BuildAssetBundleOptions.ChunkBasedCompression;
-            //    bundleOptions |= BuildAssetBundleOptions.DeterministicAssetBundle;
-            //    bundleOptions |= BuildAssetBundleOptions.DisableLoadAssetByFileName;
-            //    bundleOptions |= BuildAssetBundleOptions.DisableLoadAssetByFileNameWithExtension;
+                var buildExportPath = AssetBuildConfiger.GetInstance().GetExportFolderPath();
+                var buildPlatform = AssetBuildConfiger.GetInstance().GetBuildType();
 
-            //    var buildExportPath = AssetBuildConfiger.GetInstance().GetExportFolderPath();
-            //    var buildPlatform = AssetBuildConfiger.GetInstance().GetBuildType();
+                if (!XFolderTools.Exists(buildExportPath))
+                    XFolderTools.CreateDirectory(buildExportPath);
 
-            //    if (!XFolderTools.Exists(buildExportPath))
-            //        XFolderTools.CreateDirectory(buildExportPath);
-
-            //    BuildPipeline.BuildAssetBundles(buildExportPath, list.ToArray(), bundleOptions, buildPlatform);
-            //}
-        }
-        public virtual void Deal()
-        {
-            Clear();
-
-           
+                BuildPipeline.BuildAssetBundles(buildExportPath, buildList.ToArray(), bundleOptions, buildPlatform);
+            }
         }
 
         public void Clear()
         {
             m_refMap = null;
-        }
-
-        private void DoAsset()
-        {
-            var files = OnFiles();
-            if (files == null || files.Length <= 0)
-                return;
-
-            var bundles = OnBundles(files);
-            if (bundles == null || bundles.Length <= 0)
-                return;
-
-            Dictionary<string, string> bundleMap = new Dictionary<string, string>();
-            foreach(var pair in bundles)
-            {
-                if (bundleMap.ContainsKey(pair.assetPath))
-                {
-                    bundleMap.Add(pair.assetPath, pair.bundleName);
-                }
-            }
-            //TODO:
+            m_file = null;
         }
 
         protected string[] GetReferenceds(string assetPath)
@@ -100,11 +155,11 @@ namespace ASEditor
             if (m_refMap == null)
             {
                 Dictionary<string, HashSet<string>> refSetMap = new Dictionary<string, HashSet<string>>();
-                string[] files = OnFiles();
-                if (files == null || files.Length <= 0)
+                var fileList = GetFileList();
+                if (fileList.Count() <= 0)
                     return null;
 
-                foreach (var file in files)
+                foreach (var file in fileList)
                 {
                     string relativePathLow = XFileTools.GetFileRelativePath(file).ToLower();
                     string[] dps = AssetDatabase.GetDependencies(relativePathLow);
@@ -137,6 +192,6 @@ namespace ASEditor
 
         protected abstract string[] OnFiles();
 
-        protected abstract AssetBundlePair[] OnBundles(string[] files);
+        protected abstract AssetBundlePair[] OnBundles(string assetPath);
     }
 }

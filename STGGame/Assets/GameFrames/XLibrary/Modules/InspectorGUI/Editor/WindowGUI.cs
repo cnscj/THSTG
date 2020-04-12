@@ -28,9 +28,7 @@ namespace XLibEditor
             }
             EditorGUI.BeginChangeCheck();//开始检查是否有修改
 
-            EditorGUILayout.BeginVertical();
             OnShow();
-            EditorGUILayout.EndVertical();
 
             if (EditorGUI.EndChangeCheck())//结束检查是否有修改
             {

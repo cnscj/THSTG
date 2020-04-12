@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
@@ -16,26 +17,7 @@ namespace ASEditor
         private List<AssetBaseBuilder> m_builderCustomList = new List<AssetBaseBuilder>();
 
         private Dictionary<string, List<string>> m_shareMap = new Dictionary<string, List<string>>();
-        private Dictionary<string, List<AssetBundleBuild>> m_bundleBuilds = new Dictionary<string, List<AssetBundleBuild>>();
-
-        public void AddIntoShareMap(string builderName, List<string> assetPaths)
-        {
-            List<string> assetList = null;
-            if (!m_shareMap.TryGetValue(builderName, out assetList))
-            {
-                assetList = new List<string>();
-                m_shareMap.Add(builderName, assetList);
-            }
-            assetList.AddRange(assetPaths);
-        }
-
-        public void AddIntoBuildMap(string builderName, List<AssetBundleBuild> buildList)
-        {
-            if (!m_bundleBuilds.ContainsKey(builderName))
-            {
-                m_bundleBuilds.Add(builderName,buildList);
-            }
-        }
+        private Dictionary<string, List<AssetBundlePair>> m_bundleBuilds = new Dictionary<string, List<AssetBundlePair>>();
 
         public void Build(AssetBaseBuilder []builders = null)
         {
@@ -123,7 +105,11 @@ namespace ASEditor
         {
             foreach(var builder in m_builderCommonList)
             {
-                builder.Deal();
+                var fileList = builder.GetFileList();
+                m_shareMap.Add(builder.GetName(), fileList);
+
+                var bundleList = builder.GetBundleList();
+                m_bundleBuilds.Add(builder.GetName(), bundleList);
             }
         }
 
@@ -131,9 +117,12 @@ namespace ASEditor
         {
             foreach (var builder in m_builderCustomList)
             {
-                builder.Deal();
-            }
+                var fileList = builder.GetFileList();
+                m_shareMap.Add(builder.GetName(), fileList);
 
+                var bundleList = builder.GetBundleList();
+                m_bundleBuilds.Add(builder.GetName(), bundleList);
+            }
         }
 
         private void Build4Share()
@@ -158,37 +147,17 @@ namespace ASEditor
                 }
             }
 
-            Dictionary<string, List<string>> assetNamesMap = new Dictionary<string, List<string>>();
+            List<AssetBundlePair> shareBundleList = new List<AssetBundlePair>();
             foreach(var refKV in refCounts)
             {
                 if (refKV.Value > 1)
                 {
                     //全部打到Share里去
                     string shareBundleName = AssetBuildConfiger.GetInstance().GetBuildBundleShareName(refKV.Key);
-                    if (!string.IsNullOrEmpty(shareBundleName))
-                    {
-                        List<string> assetList = null;
-                        if (!assetNamesMap.TryGetValue(shareBundleName, out assetList))
-                        {
-                            assetList = new List<string>();
-                            assetNamesMap.Add(shareBundleName, assetList);
-                        }
-                        assetList.Add(refKV.Key);
-                    }
+                    shareBundleList.Add(new AssetBundlePair(refKV.Key, shareBundleName));
                 }
             }
-
-
-            List<AssetBundleBuild> shareBuildList = new List<AssetBundleBuild>();
-            foreach(var kv in assetNamesMap)
-            {
-                AssetBundleBuild build = new AssetBundleBuild();
-                build.assetBundleName = kv.Key;
-                build.assetNames = kv.Value.ToArray();
-
-                shareBuildList.Add(build);
-            }
-            m_bundleBuilds.Add("GloabalShare", shareBuildList);
+            m_bundleBuilds.Add("_GloabalShare_", shareBundleList);
         }
 
         private void BuildAll()
@@ -221,13 +190,49 @@ namespace ASEditor
         private AssetBundleBuild[] GetBuildsArray()
         {
             List<AssetBundleBuild> buildList = new List<AssetBundleBuild>();
-            foreach (var list in m_bundleBuilds.Values)
+            foreach (var bundleList in m_bundleBuilds.Values)
             {
-                buildList.AddRange(list);
+                if (bundleList == null || bundleList.Count <= 0)
+                    continue;
+
+                HashSet<string> fileSet = new HashSet<string>();
+                Dictionary<string, HashSet<string>> buildMap = new Dictionary<string, HashSet<string>>();
+                foreach (var pair in bundleList)
+                {
+                    if (pair.isEmpty())
+                        continue;
+
+                    var assetPath = pair.assetPath.ToLower();
+                    var bundleName = pair.bundleName.ToLower();
+
+                    if (fileSet.Contains(assetPath))
+                        continue;
+                    fileSet.Add(assetPath);
+
+                    HashSet<string> bundleSet;
+                    if (!buildMap.TryGetValue(bundleName, out bundleSet))
+                    {
+                        bundleSet = new HashSet<string>();
+                        buildMap.Add(bundleName, bundleSet);
+
+                    }
+                    if (!bundleSet.Contains(assetPath))
+                    {
+                        bundleSet.Add(assetPath);
+                    }
+
+                    foreach (var kv in buildMap)
+                    {
+                        AssetBundleBuild build = new AssetBundleBuild();
+                        build.assetBundleName = kv.Key;
+                        build.assetNames = kv.Value.ToArray();
+
+                        buildList.Add(build);
+                    }
+                }
             }
             return buildList.ToArray();
         }
-
     }
 
 }

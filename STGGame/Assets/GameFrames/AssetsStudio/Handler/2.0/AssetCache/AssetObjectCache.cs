@@ -8,15 +8,15 @@ namespace ASGame
         private Dictionary<string, AssetObjectCacheObject> m_cacheObject = new Dictionary<string, AssetObjectCacheObject>();
         private Queue<string> m_releaseQueue = new Queue<string>();
 
-        public bool IsContains(string key)
+        public bool Has(string key)
         {
             return m_cacheObject.ContainsKey(key);
         }
 
-        public override bool Add(string key, Object obj, bool isReplace = false)
+        public override void Add(string key, Object obj, bool isReplace = false)
         {
             if (obj == null)
-                return false;
+                return;
 
             if (!m_cacheObject.ContainsKey(key))
             {
@@ -31,10 +31,10 @@ namespace ASGame
                 {
                     AssetObjectCacheObject cacheObj = new AssetObjectCacheObject(cacheName, key, obj);
                     m_cacheObject[key] = cacheObj;
-                    return true;
+                    return;
                 }
             }
-            return false;
+            return;
         }
 
         public override void Remove(string key)

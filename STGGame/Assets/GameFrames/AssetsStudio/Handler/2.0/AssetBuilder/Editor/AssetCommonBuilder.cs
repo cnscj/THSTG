@@ -23,27 +23,69 @@ namespace ASEditor
             return files;
         }
 
-        //TODO:公共资源处理
-        protected override void OnBefore(string[] files)
+        protected override AssetBundlePair[] OnBundles(string assetPath)
         {
-            //这里剔除两部分,公共的和单独的
-            if (files == null || files.Length <= 0)
-                return;
+            List<AssetBundlePair> bundleList = new List<AssetBundlePair>();
 
-            foreach(var assetPath in files)
+            //处理资源
+            var assetBundleName = GetCommonBundleName(assetPath);
+            bundleList.Add(new AssetBundlePair(assetPath, assetBundleName));
+
+            //依赖引用处理
+            var depFiles = GetDependencies(assetPath);
+            if (depFiles != null && depFiles.Length > 0)
             {
-                var depFiles = AssetDatabase.GetDependencies(assetPath);
-                foreach(var depFile in depFiles)
+                foreach (var depFile in depFiles)
                 {
-                    if (string.Compare(assetPath, depFile) == 0)
+                    if (string.Compare(depFile, assetPath) == 0)
                         continue;
 
-
+                    var refFiles = GetReferenceds(depFile);
+                    if (refFiles != null)
+                    {
+                        if (refFiles.Length == 1)
+                        {
+                            //处理单一引用
+                            string firstRefAssetPath = refFiles[0];
+                            if (string.Compare(firstRefAssetPath, assetPath) == 0)
+                            {
+                                var commonBundleName = GetCommonBundleName(firstRefAssetPath);
+                                bundleList.Add(new AssetBundlePair(firstRefAssetPath, commonBundleName));
+                            }
+                        }
+                        else
+                        {
+                            //处理公共的
+                            var shareBundleName = GetShareBundleName(depFile);
+                            bundleList.Add(new AssetBundlePair(depFile, shareBundleName));
+                        } 
+                    }
                 }
+            }
+            return bundleList.ToArray();
+        }
+
+        private string GetShareBundleName(string assetPath)
+        {
+            if (string.IsNullOrEmpty(buildItem.shareBundleNameFormat))
+            {
+                string assetBundleName = AssetBuildConfiger.GetInstance().GetBuildBundleShareName(assetPath);
+                return assetBundleName;
+            }
+            else
+            {
+                string buildName = GetName();
+
+                string nameFormat = buildItem.shareBundleNameFormat;
+                nameFormat = AssetBuildConfiger.GetInstance().GetFormatBundleName(nameFormat, assetPath);
+                nameFormat = nameFormat.Replace("{buildName}", buildName);
+
+                nameFormat = nameFormat.ToLower();
+                return nameFormat;
             }
         }
 
-        protected override string OnName(string assetPath)
+        private string GetCommonBundleName(string assetPath)
         {
             if (string.IsNullOrEmpty(buildItem.assetBundleNameFormat))
             {
@@ -62,8 +104,6 @@ namespace ASEditor
                 nameFormat = nameFormat.ToLower();
                 return nameFormat;
             }
-
         }
-
     }
 }

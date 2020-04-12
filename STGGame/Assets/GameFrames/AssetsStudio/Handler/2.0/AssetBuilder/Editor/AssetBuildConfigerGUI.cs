@@ -10,7 +10,7 @@ namespace ASEditor
     public class AssetBuildConfigerGUI : WindowGUI<AssetBuildConfigerGUI>
     {
         private ReorderableList m_itemSortedList;
-
+        private Vector3 m_scrollPos = Vector2.zero;
         [MenuItem("AssetsStudio/资源打包配置2", false, 3)]
         static void ShowWnd()
         {
@@ -47,7 +47,7 @@ namespace ASEditor
         protected override void OnShow()
         {
             GUILayout.BeginVertical();
-
+            m_scrollPos = GUI.BeginScrollView(new Rect(0, 0, position.width, position.height), m_scrollPos, new Rect(0, 0, position.width, 1000));
             //标题
             GUILayout.Space(10);
             GUILayout.Label("打包配置",new GUIStyle(GUI.skin.label) { fontSize = 24, alignment = TextAnchor.MiddleCenter });
@@ -55,7 +55,6 @@ namespace ASEditor
 
             AssetBuildConfiger.GetInstance().targetType = (AssetBuildConfiger.BuildPlatform)EditorGUILayout.EnumPopup("当前平台", AssetBuildConfiger.GetInstance().targetType);
             AssetBuildConfiger.GetInstance().exportFolder = GUILayoutEx.ShowPathBar("输出目录", AssetBuildConfiger.GetInstance().exportFolder);
-            AssetBuildConfiger.GetInstance().bundleSuffix = EditorGUILayout.TextField("默认包后缀", AssetBuildConfiger.GetInstance().bundleSuffix);
             AssetBuildConfiger.GetInstance().shareBundleName = EditorGUILayout.TextField("公共包名", AssetBuildConfiger.GetInstance().shareBundleName);
             AssetBuildConfiger.GetInstance().isCombinePlatformName = EditorGUILayout.Toggle("输出目录拼接平台名称", AssetBuildConfiger.GetInstance().isCombinePlatformName);
             
@@ -68,6 +67,7 @@ namespace ASEditor
                 "{assetFlatPath}表示资源扁平化路径" +
                 "{buildName}表示构建器名", MessageType.Info);
 
+            GUI.EndScrollView();
             GUILayout.EndVertical();
         }
     }
