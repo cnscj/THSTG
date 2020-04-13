@@ -67,7 +67,7 @@ namespace ASEditor
             return XPathTools.NormalizePath(newExportFolderPath).ToLower();
         }
 
-        public string GetBuildBundleName(string builderName, string assetPath, bool isCommonKey = false)
+        public string GetBuildBundleCommonName(string builderName, string assetPath, bool isCommonKey = false)
         {
             string newBundleSuffix = string.IsNullOrEmpty(bundleSuffix) ? DEFAULT_BUILD_SUFFFIX : bundleSuffix;
             string buildFolderPath = GetBuildFolderPath(builderName);
@@ -84,14 +84,19 @@ namespace ASEditor
 
         public string GetBuildBundleShareName(string assetPath)
         {
-            assetPath = XFileTools.GetFileRelativePath(assetPath);
-            string newBundleSuffix = string.IsNullOrEmpty(bundleSuffix) ? DEFAULT_BUILD_SUFFFIX : bundleSuffix;
-            string assetNameLow = Path.GetFileNameWithoutExtension(assetPath).ToLower();
-            string assetParentPath = Path.GetDirectoryName(assetPath).ToLower();
-            string relaPath = assetParentPath.Replace("assets/", "");
-            string flatPath = relaPath.Replace("/", "_");
-            string bundleName = string.Format("{0}_{1}{2}", flatPath, assetNameLow, newBundleSuffix);
-            return bundleName.ToLower();
+            if (!string.IsNullOrEmpty(shareBundleName))
+            {
+                return GetFormatBundleName(shareBundleName, assetPath);
+            }
+            else
+            {
+                assetPath = XFileTools.GetFileRelativePath(assetPath);
+                string newBundleSuffix = string.IsNullOrEmpty(bundleSuffix) ? DEFAULT_BUILD_SUFFFIX : bundleSuffix;
+                string assetNameLow = Path.GetFileNameWithoutExtension(assetPath).ToLower();
+                string assetFlatPath = GetFlatPath(assetPath);
+                string bundleName = string.Format("share/{0}_{1}{2}", assetFlatPath, assetNameLow, newBundleSuffix);
+                return bundleName.ToLower();
+            }
         }
 
         public string GetFlatPath(string assetPath)
@@ -103,8 +108,8 @@ namespace ASEditor
             if (!string.IsNullOrEmpty(flatPath))
             {
                 string newFlatPath = flatPath.Remove(0, 1);
-                newFlatPath = string.Format("{0}_", flatPath);
-                return newFlatPath.ToLower();
+                newFlatPath = string.Format("{0}_", newFlatPath);
+                return newFlatPath;
             }
             else
             {
@@ -114,22 +119,26 @@ namespace ASEditor
 
         public string GetFormatBundleName(string formatPath, string assetPath)
         {
-            string assetRootPath = Path.GetDirectoryName(assetPath);
-            string assetName = Path.GetFileName(assetPath);
-            string assetNameNotEx = Path.GetFileNameWithoutExtension(assetPath);
-            string assetFlatPath = GetFlatPath(assetPath);
-            string assetKey = XStringTools.SplitPathKey(assetPath);
+            if (!string.IsNullOrEmpty(formatPath))
+            {
+                string assetRootPath = Path.GetDirectoryName(assetPath);
+                string assetEx = Path.GetExtension(assetPath);
+                string assetName = Path.GetFileName(assetPath);
+                string assetNameNotEx = Path.GetFileNameWithoutExtension(assetPath);
+                string assetFlatPath = GetFlatPath(assetPath);
+                string assetKey = XStringTools.SplitPathKey(assetPath);
 
-            string nameFormat = formatPath;
-            nameFormat = nameFormat.Replace("{assetRootPath}", assetRootPath);
-            nameFormat = nameFormat.Replace("{assetNameNotEx}", assetNameNotEx);
-            nameFormat = nameFormat.Replace("{assetName}", assetName);
-            nameFormat = nameFormat.Replace("{assetKey}", assetKey);
-            nameFormat = nameFormat.Replace("{assetFlatPath}", assetFlatPath);
+                string nameFormat = formatPath;
+                nameFormat = nameFormat.Replace("{assetRootPath}", assetRootPath);
+                nameFormat = nameFormat.Replace("{assetEx}", assetEx);
+                nameFormat = nameFormat.Replace("{assetNameNotEx}", assetNameNotEx);
+                nameFormat = nameFormat.Replace("{assetName}", assetName);
+                nameFormat = nameFormat.Replace("{assetKey}", assetKey);
+                nameFormat = nameFormat.Replace("{assetFlatPath}", assetFlatPath);
 
-            nameFormat = nameFormat.ToLower();
-
-            return nameFormat;
+                return nameFormat;
+            }
+            return null;
         }
     }
 }

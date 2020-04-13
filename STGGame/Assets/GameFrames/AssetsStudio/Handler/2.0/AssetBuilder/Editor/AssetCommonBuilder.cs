@@ -37,7 +37,7 @@ namespace ASEditor
             {
                 foreach (var depFile in depFiles)
                 {
-                    if (string.Compare(depFile, assetPath) == 0)
+                    if (assetPath.Contains(depFile))
                         continue;
 
                     var refFiles = GetReferenceds(depFile);
@@ -47,7 +47,7 @@ namespace ASEditor
                         {
                             //处理单一引用
                             string firstRefAssetPath = refFiles[0];
-                            if (string.Compare(firstRefAssetPath, assetPath) == 0)
+                            if (!assetPath.Contains(firstRefAssetPath))
                             {
                                 var commonBundleName = GetCommonBundleName(firstRefAssetPath);
                                 bundleList.Add(new AssetBundlePair(firstRefAssetPath, commonBundleName));
@@ -67,6 +67,9 @@ namespace ASEditor
 
         private string GetShareBundleName(string assetPath)
         {
+            if (string.IsNullOrEmpty(assetPath))
+                return null;
+
             if (string.IsNullOrEmpty(buildItem.shareBundleNameFormat))
             {
                 string assetBundleName = AssetBuildConfiger.GetInstance().GetBuildBundleShareName(assetPath);
@@ -87,10 +90,13 @@ namespace ASEditor
 
         private string GetCommonBundleName(string assetPath)
         {
+            if (string.IsNullOrEmpty(assetPath))
+                return null;
+
             if (string.IsNullOrEmpty(buildItem.assetBundleNameFormat))
             {
                 string assetFileName = Path.GetFileName(assetPath);
-                string assetBundleName = AssetBuildConfiger.GetInstance().GetBuildBundleName(_builderName, assetFileName, buildItem.commonPrefixBuildOne);
+                string assetBundleName = AssetBuildConfiger.GetInstance().GetBuildBundleCommonName(_builderName, assetFileName, buildItem.commonPrefixBuildOne);
                 return assetBundleName;
             }
             else

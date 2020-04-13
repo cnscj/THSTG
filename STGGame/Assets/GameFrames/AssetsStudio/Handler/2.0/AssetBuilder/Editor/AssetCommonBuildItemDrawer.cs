@@ -46,7 +46,7 @@ namespace ASEditor
                 if (GUILayout.Button("浏览"))
                 {
                     var selectedPath = EditorUtility.SaveFolderPanel("Source Folder Path", "Assets", "");
-                    if (string.IsNullOrEmpty(selectedPath))
+                    if (!string.IsNullOrEmpty(selectedPath))
                     {
                         srcPathProperty.stringValue = selectedPath;
                     }

@@ -8,12 +8,28 @@ using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace XLibrary
 {
 	public static class XStringTools
 	{
+        /// <summary>
+        /// 字符串替换
+        /// </summary>
+        /// <param name="inputStr"></param>
+        /// <param name="srcStr"></param>
+        /// <param name="destStr"></param>
+        /// <param name="isIgnoreCase"></param>
+        /// <returns></returns>
+        public static string Replace(string inputStr,string srcStr,string destStr,bool isIgnoreCase = false)
+        {
+            RegexOptions options = RegexOptions.None;
+            if (isIgnoreCase) options |= RegexOptions.IgnoreCase;
+
+            return Regex.Replace(inputStr, srcStr, destStr, options);
+        }
 
 		/// <summary>
 		/// 切分文件名，文件后缀
@@ -81,7 +97,7 @@ namespace XLibrary
         {
             string fileName = Path.GetFileNameWithoutExtension(path);
             int indexOf_ = fileName.IndexOf('_');
-            string pathKey = (indexOf_ == -1) ? path : fileName.Remove(indexOf_);
+            string pathKey = (indexOf_ == -1) ? fileName : fileName.Remove(indexOf_);
 
             return pathKey;
         }

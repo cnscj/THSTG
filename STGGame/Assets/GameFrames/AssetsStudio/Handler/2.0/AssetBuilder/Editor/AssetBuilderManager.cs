@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
@@ -66,8 +67,7 @@ namespace ASEditor
             }
 
             //通过反射获取所有类
-            Assembly ass = Assembly.GetAssembly(typeof(AssetCustomBuilder));
-            Type[] types = ass.GetTypes();
+            Type[] types = Assembly.GetCallingAssembly().GetTypes();
             List<Type> builderClassList = new List<Type>();
             foreach (Type item in types)
             {
@@ -105,6 +105,7 @@ namespace ASEditor
         {
             foreach(var builder in m_builderCommonList)
             {
+                builder.Clear();
                 var fileList = builder.GetFileList();
                 m_shareMap.Add(builder.GetName(), fileList);
 
@@ -117,6 +118,7 @@ namespace ASEditor
         {
             foreach (var builder in m_builderCustomList)
             {
+                builder.Clear();
                 var fileList = builder.GetFileList();
                 m_shareMap.Add(builder.GetName(), fileList);
 
@@ -130,8 +132,9 @@ namespace ASEditor
             Dictionary<string, int> refCounts = new Dictionary<string, int>();
             foreach(var kv in m_shareMap)
             {
-                foreach(var assetPath in kv.Value)
+                foreach(var fullPath in kv.Value)
                 {
+                    string assetPath = XFileTools.GetFileRelativePath(fullPath);
                     string[] dps = AssetDatabase.GetDependencies(assetPath);
                     foreach (var dp in dps)
                     {
@@ -157,7 +160,7 @@ namespace ASEditor
                     shareBundleList.Add(new AssetBundlePair(refKV.Key, shareBundleName));
                 }
             }
-            m_bundleBuilds.Add("_GloabalShare_", shareBundleList);
+            m_bundleBuilds.Add("_GlobalShare_", shareBundleList);
         }
 
         private void BuildAll()
@@ -205,6 +208,10 @@ namespace ASEditor
                     var assetPath = pair.assetPath.ToLower();
                     var bundleName = pair.bundleName.ToLower();
 
+                    var assetPathEx = Path.GetExtension(assetPath);
+                    if (assetPathEx.Contains("cs") || assetPathEx.Contains("shader"))
+                        continue;
+
                     if (fileSet.Contains(assetPath))
                         continue;
                     fileSet.Add(assetPath);
@@ -220,15 +227,14 @@ namespace ASEditor
                     {
                         bundleSet.Add(assetPath);
                     }
+                }
+                foreach (var kv in buildMap)
+                {
+                    AssetBundleBuild build = new AssetBundleBuild();
+                    build.assetBundleName = kv.Key;
+                    build.assetNames = kv.Value.ToArray();
 
-                    foreach (var kv in buildMap)
-                    {
-                        AssetBundleBuild build = new AssetBundleBuild();
-                        build.assetBundleName = kv.Key;
-                        build.assetNames = kv.Value.ToArray();
-
-                        buildList.Add(build);
-                    }
+                    buildList.Add(build);
                 }
             }
             return buildList.ToArray();

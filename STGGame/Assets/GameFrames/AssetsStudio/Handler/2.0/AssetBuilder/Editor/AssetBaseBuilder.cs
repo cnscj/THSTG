@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -12,7 +13,7 @@ namespace ASEditor
     {
         protected string _builderName;
         private Dictionary<string, string[]> m_refMap;
-        private List<string> m_file;
+        private List<string> m_files;
 
         public AssetBaseBuilder(string name)
         {
@@ -26,22 +27,25 @@ namespace ASEditor
 
         public List<string> GetFileList()
         {
-            if (m_file == null)
+            if (m_files == null)
             {
-                m_file = new List<string>();
+                m_files = new List<string>();
                 var files = OnFiles();
                 if (files == null || files.Length <= 0)
-                    return m_file;
+                    return m_files;
 
-                m_file.AddRange(files);
+                foreach(var fullPath in files)
+                {
+                    string assetPath = XFileTools.GetFileRelativePath(fullPath);
+                    m_files.Add(assetPath);
+                }
+                
             }
-            return m_file;
+            return m_files;
         }
 
         public List<AssetBundlePair> GetBundleList()
         {
-            Clear();
-
             var fileList = GetFileList();
             if (fileList.Count() <= 0)
                 return null;
@@ -76,6 +80,10 @@ namespace ASEditor
                 var assetPath = pair.assetPath.ToLower();
                 var bundleName = pair.bundleName.ToLower();
 
+                var assetPathEx = Path.GetExtension(assetPath);
+                if (assetPathEx.Contains("cs") || assetPathEx.Contains("shader"))
+                    continue;
+
                 if (fileSet.Contains(assetPath))
                     continue;
                 fileSet.Add(assetPath);
@@ -108,6 +116,8 @@ namespace ASEditor
 
         public virtual void Build()
         {
+            Clear();
+
             var buildList = GetBuildList();
             if (buildList != null && buildList.Count > 0)
             {
@@ -131,13 +141,13 @@ namespace ASEditor
         public void Clear()
         {
             m_refMap = null;
-            m_file = null;
+            m_files = null;
         }
 
         protected string[] GetReferenceds(string assetPath)
         {
             var refMap = GetRefrenceMap();
-            string relaPathLow = XFileTools.GetFileRelativePath(assetPath).ToLower();
+            string relaPathLow = assetPath.ToLower();
             if (refMap.ContainsKey(relaPathLow))
             {
                 return refMap[relaPathLow];
@@ -147,6 +157,7 @@ namespace ASEditor
 
         protected string[] GetDependencies(string assetPath)
         {
+            assetPath = XFileTools.GetFileRelativePath(assetPath);
             return AssetDatabase.GetDependencies(assetPath);
         }
 
@@ -159,24 +170,19 @@ namespace ASEditor
                 if (fileList.Count() <= 0)
                     return null;
 
-                foreach (var file in fileList)
+                foreach (var assetPath in fileList)
                 {
-                    string relativePathLow = XFileTools.GetFileRelativePath(file).ToLower();
-                    string[] dps = AssetDatabase.GetDependencies(relativePathLow);
-                    foreach (string path in dps)
+                    string[] dps = GetDependencies(assetPath);
+                    foreach (string depPath in dps)
                     {
-                        string depRelatPath = XFileTools.GetFileRelativePath(path);
-                        if (depRelatPath.Contains(relativePathLow))
+                        if (!refSetMap.ContainsKey(depPath))
                         {
-                            if (!refSetMap.ContainsKey(relativePathLow))
-                            {
-                                refSetMap[relativePathLow] = new HashSet<string>();
-                            }
-                            var fileSet = refSetMap[relativePathLow];
-                            if (!fileSet.Contains(depRelatPath))
-                            {
-                                fileSet.Add(path);
-                            }
+                            refSetMap[depPath] = new HashSet<string>();
+                        }
+                        var fileSet = refSetMap[depPath];
+                        if (!fileSet.Contains(assetPath))
+                        {
+                            fileSet.Add(assetPath);
                         }
                     }
                 }

@@ -60,12 +60,13 @@ namespace ASEditor
             
             m_itemSortedList.DoLayoutList();
             EditorGUILayout.HelpBox("包路径说明\n" +
-                "{assetRootPath}表示资源父路径" +
-                "{assetNameNotEx}表示资源不带后缀名" +
-                "{assetName}表示资源名" +
-                "{assetKey}表示资源名中到_的部分" +
-                "{assetFlatPath}表示资源扁平化路径" +
-                "{buildName}表示构建器名", MessageType.Info);
+                "{assetEx}资源后缀" +
+                "{assetRootPath}资源父路径" +
+                "{assetNameNotEx}资源不带后缀名" +
+                "{assetName}资源名" +
+                "{assetKey}资源名中到_的部分" +
+                "{assetFlatPath}资源扁平化路径" +
+                "{buildName}构建器名", MessageType.Info);
 
             GUI.EndScrollView();
             GUILayout.EndVertical();
