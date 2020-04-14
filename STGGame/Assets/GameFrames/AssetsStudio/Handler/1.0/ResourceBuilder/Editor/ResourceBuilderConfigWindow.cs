@@ -115,7 +115,7 @@ namespace ASEditor
                 var selectedFolderPath = EditorUtility.SaveFolderPanel(desc, "Assets", "Effects");
                 if (selectedFolderPath != "")
                 {
-                    path = XFileTools.GetFileRelativePath(selectedFolderPath);
+                    path = XPathTools.GetRelativePath(selectedFolderPath);
                 }
             }
 

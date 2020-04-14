@@ -34,7 +34,7 @@ namespace ASEditor
                 StringBuilder stringBuilder = new StringBuilder();
                 foreach (var filePath in checkList)
                 {
-                    string code = XStringTools.FileToMd5(filePath);
+                    string code = XFileTools.GetMD5(filePath);
                     stringBuilder.Append(filePath);
                     stringBuilder.AppendLine();
                     stringBuilder.Append(code);
@@ -71,7 +71,7 @@ namespace ASEditor
                     foreach (GameObject go in gos)
                     {
                         //判断GameObject是否为一个Prefab的引用
-                        if (PrefabUtility.GetPrefabType(go) == PrefabType.PrefabInstance)
+                        if (PrefabUtility.GetPrefabInstanceStatus(go) == PrefabInstanceStatus.Connected)
                         {
                             UnityEngine.Object parentObject = PrefabUtility.GetCorrespondingObjectFromSource(go);
                             string path = AssetDatabase.GetAssetPath(parentObject);

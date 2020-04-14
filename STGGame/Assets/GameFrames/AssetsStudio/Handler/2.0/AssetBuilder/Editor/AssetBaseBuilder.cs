@@ -36,7 +36,7 @@ namespace ASEditor
 
                 foreach(var fullPath in files)
                 {
-                    string assetPath = XFileTools.GetFileRelativePath(fullPath);
+                    string assetPath = XPathTools.GetRelativePath(fullPath);
                     m_files.Add(assetPath);
                 }
                 
@@ -157,7 +157,7 @@ namespace ASEditor
 
         protected string[] GetDependencies(string assetPath)
         {
-            assetPath = XFileTools.GetFileRelativePath(assetPath);
+            assetPath = XPathTools.GetRelativePath(assetPath);
             return AssetDatabase.GetDependencies(assetPath);
         }
 

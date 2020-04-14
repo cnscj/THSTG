@@ -30,7 +30,7 @@ namespace STGEditor
                  string fileExName = Path.GetExtension(fullPath);
                  if (fileExName.Contains("xlsx"))
                  {
-                     string fileRelaPath = XFileTools.GetFileRelativePath(fullPath);
+                     string fileRelaPath = XPathTools.GetRelativePath(fullPath);
                      filList.Add(fileRelaPath);
                  }
              });

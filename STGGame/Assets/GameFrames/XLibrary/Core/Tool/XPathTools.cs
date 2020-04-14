@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using UnityEngine;
 
 namespace XLibrary
 {
@@ -32,17 +33,23 @@ namespace XLibrary
             }
         }
 
-        //相对某目录的相对路径
-        public static string GetRelativePath(string relaPath,string filePath)
+        //取得全路径
+        public static string GetFullPath(string relaPath)
         {
-            relaPath = NormalizePath(relaPath);
-            filePath = NormalizePath(filePath);
-            int startPos = filePath.IndexOf(relaPath, StringComparison.Ordinal);
-            if (startPos >= 0)
-            {
-                return filePath.Substring(startPos + relaPath.Length + 1);
-            }
-            return filePath;
+            if (string.IsNullOrEmpty(relaPath))
+                return null;
+
+            int length = "Assets".Length;
+            return Application.dataPath + relaPath.Substring(length);
+
+        }
+
+        //取得相对路径
+        public static string GetRelativePath(string fullPath)
+        {
+            if (string.IsNullOrEmpty(fullPath))
+                return null;
+            return fullPath.Replace(Application.dataPath, "Assets");
         }
 
         //获取上层目录
@@ -81,6 +88,19 @@ namespace XLibrary
             }
 
             return finalPath;
+        }
+
+        //截取相对路径
+        public static string SubRelativePath(string relaPath, string filePath)
+        {
+            relaPath = NormalizePath(relaPath);
+            filePath = NormalizePath(filePath);
+            int startPos = filePath.IndexOf(relaPath, StringComparison.Ordinal);
+            if (startPos >= 0)
+            {
+                return filePath.Substring(startPos + relaPath.Length + 1);
+            }
+            return filePath;
         }
     }
 

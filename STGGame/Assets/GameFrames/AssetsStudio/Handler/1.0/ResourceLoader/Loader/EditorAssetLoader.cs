@@ -35,7 +35,7 @@ namespace ASGame
             ResourceLoaderUtil.SplitBundlePath(path, out resPath, out assetName);
 
             //绝对路径转为相对Assets文件夹的相对路径
-            path = XFileTools.GetFileRelativePath(resPath);
+            path = XPathTools.GetRelativePath(resPath);
 
             Object obj = UnityEditor.AssetDatabase.LoadAssetAtPath(resPath, typeof(T));
             if (obj == null)

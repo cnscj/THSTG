@@ -136,7 +136,7 @@ namespace ASEditor
 
                 XFolderTools.TraverseFiles(m_finalExportFolder, (fullPath) =>
                 {
-                    string relaPath = XFileTools.GetFileRelativePath(fullPath).ToLower();
+                    string relaPath = XPathTools.GetRelativePath(fullPath).ToLower();
                     string smallFinalPath = m_finalExportFolder.ToLower();
                     string bundlePath = relaPath.Replace(string.Format("{0}/", smallFinalPath), "");
 

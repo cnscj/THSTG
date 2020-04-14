@@ -48,7 +48,7 @@ namespace ASEditor
             SortedDictionary<string, string> md5Map = new SortedDictionary<string, string>();
             foreach (var filePath in filesPath)
             {
-                string md5 = XStringTools.FileToMd5(filePath);
+                string md5 = XFileTools.GetMD5(filePath);
                 if (!md5Map.ContainsKey(md5))
                 {
                     md5Map.Add(md5, filePath);
@@ -154,7 +154,7 @@ namespace ASEditor
             List<FileInfo> procressList = new List<FileInfo>();
             foreach (var file in assetFiles)
             {
-                string realPath = XFileTools.GetFileRelativePath(file); //路径做Key,有的资源可能名字相同
+                string realPath = XPathTools.GetRelativePath(file); //路径做Key,有的资源可能名字相同
                 string realPathLow = realPath.ToLower();
 
                 if (_assetMap.ContainsKey(realPathLow))
@@ -203,7 +203,7 @@ namespace ASEditor
                 if (isUseGUID)
                 {
                     string srcPath = AssetDatabase.GUIDToAssetPath(fileNameNotEx);
-                    string realPath = XFileTools.GetFileRelativePath(srcPath); //路径做Key,有的资源可能名字相同
+                    string realPath = XPathTools.GetRelativePath(srcPath); //路径做Key,有的资源可能名字相同
                     string realPathLow = realPath.ToLower();
                     if (string.IsNullOrEmpty(srcPath) || !_assetMap.ContainsKey(realPathLow))
                     {

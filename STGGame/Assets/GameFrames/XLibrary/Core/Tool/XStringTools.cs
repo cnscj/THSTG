@@ -61,18 +61,6 @@ namespace XLibrary
             return ToMD5(Encoding.UTF8.GetBytes(str));
 		}
 
-		public static string FileToMd5(string filePath)
-		{
-			if (string.IsNullOrEmpty(filePath))
-				return "";
-
-            FileStream file = new FileStream(filePath, FileMode.Open);
-            byte[] bytes = new byte[file.Length];
-            file.Read(bytes, 0, bytes.Length);
-            file.Close();
-            return ToMD5(bytes);
-        }
-
 		public static string ToMD5(byte[] data)
 		{
             MD5 md5 = MD5.Create();
@@ -131,25 +119,6 @@ namespace XLibrary
             return pathModule;
         }
 
-        /// <summary>
-        /// 把内容弄到剪贴板
-        /// </summary>
-        /// <param name="input"></param>
-        public static void CopyToClipboard(string input)
-        {
-#if UNITY_EDITOR
-            TextEditor t = new TextEditor();
-            t.text = input;
-            t.OnFocus();
-            t.Copy();
-#elif UNITY_IPHONE
-        CopyTextToClipboard_iOS(input);  
-#elif UNITY_ANDROID
-        AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-        AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-        AndroidJavaClass tool = new AndroidJavaClass("com.my.ugcf.Tool");
-        tool.CallStatic("CopyTextToClipboard", currentActivity, input);
-#endif
-        }
+
     }
 }

@@ -95,7 +95,7 @@ namespace ASEditor
 
                 if (!checkMaps.ContainsKey(resId))
                 {
-                    string relaPath = XFileTools.GetFileRelativePath(fullPath);
+                    string relaPath = XPathTools.GetRelativePath(fullPath);
                     string relaRootPath = Path.GetDirectoryName(relaPath);
                     AssetDatabase.DeleteAsset(relaPath);
 
@@ -121,7 +121,7 @@ namespace ASEditor
 
                 if (!checkMaps.ContainsKey(resId))
                 {
-                    string relaPath = XFileTools.GetFileRelativePath(fullPath);
+                    string relaPath = XPathTools.GetRelativePath(fullPath);
                     string relaRootPath = Path.GetDirectoryName(relaPath);
                     AssetDatabase.DeleteAsset(relaPath);
 

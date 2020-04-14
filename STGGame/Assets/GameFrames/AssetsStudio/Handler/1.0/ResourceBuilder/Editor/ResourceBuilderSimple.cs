@@ -33,7 +33,7 @@ namespace ASEditor
             
             XFolderTools.TraverseFiles(m_buildInfo.srcResFolder, (fullPath) =>
             {
-                string relaPath = XFileTools.GetFileRelativePath(fullPath);
+                string relaPath = XPathTools.GetRelativePath(fullPath);
                 string fileEx = Path.GetExtension(relaPath).ToLower();
                 if (fileEx.Contains("meta"))    //忽略meta文件
                 {

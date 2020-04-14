@@ -13,12 +13,26 @@ namespace ASGame
 
         public AssetLoadCallback onCallback;
 
+        public bool IsCompleted()
+        {
+            bool isCompleted = (status == AssetLoadStatus.LOAD_SUCCESS);
+            if (dependencies != null)
+            {
+                foreach(var loader in dependencies)
+                {
+                    isCompleted &= loader.IsCompleted();
+                }
+            }
+            return isCompleted;
+        }
+
         public void Reset()
         {
             id = 0;
             status = 0;
             loader = null;
             path = null;
+            dependencies = null;
 
             onCallback = null;
         }

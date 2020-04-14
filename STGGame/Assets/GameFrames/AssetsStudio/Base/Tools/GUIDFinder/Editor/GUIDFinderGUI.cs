@@ -70,7 +70,7 @@ namespace ASGame
                 string file = files[startIndex];
                 bool isCancel = EditorUtility.DisplayCancelableProgressBar("匹配资源中", file, (float)startIndex / (float)files.Length);
 
-                string relativePath = XFileTools.GetFileRelativePath(file);
+                string relativePath = XPathTools.GetRelativePath(file);
                 string[] dps = AssetDatabase.GetDependencies(relativePath);
                 foreach (string path in dps)
                 {

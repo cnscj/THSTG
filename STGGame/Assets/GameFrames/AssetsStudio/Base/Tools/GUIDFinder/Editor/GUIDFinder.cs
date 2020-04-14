@@ -25,11 +25,11 @@ namespace ASGame
 
             foreach (var file in files)
             {
-                string relativePath = XFileTools.GetFileRelativePath(file);
+                string relativePath = XPathTools.GetRelativePath(file);
                 string[] dps = AssetDatabase.GetDependencies(relativePath);
                 foreach (string path in dps)
                 {
-                    string depRelatPath = XFileTools.GetFileRelativePath(path);
+                    string depRelatPath = XPathTools.GetRelativePath(path);
                     if (depRelatPath.Contains(relativePath))
                     {
                         if (!refSetMap.ContainsKey(relativePath))
@@ -57,7 +57,7 @@ namespace ASGame
         {
             searchPath = string.IsNullOrEmpty(searchPath) ? Application.dataPath : searchPath;
             searchSuffix = searchSuffix != null ? searchSuffix : SERIALIZABLE_FILE_SUFFIX;
-            string assetPathLow = XFileTools.GetFileRelativePath(assetPath.ToLower());
+            string assetPathLow = XPathTools.GetRelativePath(assetPath.ToLower());
 
             string[] files = Directory.GetFiles(searchPath, "*.*", SearchOption.AllDirectories)
                    .Where(s => searchSuffix.Contains(Path.GetExtension(s).ToLower()))
@@ -67,7 +67,7 @@ namespace ASGame
             HashSet<string> refDict = new HashSet<string>();
             foreach(var file in files)
             {
-                string relativePath = XFileTools.GetFileRelativePath(file);
+                string relativePath = XPathTools.GetRelativePath(file);
                 string[] dps = AssetDatabase.GetDependencies(relativePath);
                 foreach (string path in dps)
                 {
@@ -87,7 +87,7 @@ namespace ASGame
 
         public static string[] FindDependencies(string assetPath, bool recursive = false)
         {
-            string path = XFileTools.GetFileRelativePath(assetPath);
+            string path = XPathTools.GetRelativePath(assetPath);
             return AssetDatabase.GetDependencies(path, recursive);
         }
 

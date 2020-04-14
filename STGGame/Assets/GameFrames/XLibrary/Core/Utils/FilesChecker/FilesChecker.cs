@@ -183,7 +183,7 @@ namespace XLibrary
             List<string> filePaths = new List<string>();
             XFolderTools.TraverseFiles(folderPath, (fullPath) =>
             {
-                string path = XFileTools.GetFolderPath(fullPath);
+                string path = Path.GetDirectoryName(fullPath);
                 filePaths.Add(path);
             }, true);
 
@@ -195,7 +195,7 @@ namespace XLibrary
         //
         private string GetFileMd5(string filePath)
         {
-            return XStringTools.FileToMd5(filePath);
+            return XFileTools.GetMD5(filePath);
         }
 
         private string GetFileSha1(string filePath)

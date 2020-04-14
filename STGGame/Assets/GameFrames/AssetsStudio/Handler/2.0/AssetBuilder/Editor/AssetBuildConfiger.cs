@@ -90,7 +90,7 @@ namespace ASEditor
             }
             else
             {
-                assetPath = XFileTools.GetFileRelativePath(assetPath);
+                assetPath = XPathTools.GetRelativePath(assetPath);
                 string newBundleSuffix = string.IsNullOrEmpty(bundleSuffix) ? DEFAULT_BUILD_SUFFFIX : bundleSuffix;
                 string assetNameLow = Path.GetFileNameWithoutExtension(assetPath).ToLower();
                 string assetFlatPath = GetFlatPath(assetPath);
@@ -101,7 +101,7 @@ namespace ASEditor
 
         public string GetFlatPath(string assetPath)
         {
-            assetPath = XFileTools.GetFileRelativePath(assetPath);
+            assetPath = XPathTools.GetRelativePath(assetPath);
             string assetParentPath = Path.GetDirectoryName(assetPath).ToLower();
             string relaPath = assetParentPath.Replace("assets", "");
             string flatPath = relaPath.Replace("/", "_");

@@ -18,7 +18,7 @@ namespace STGEditor
                 string fileExName = Path.GetExtension(fullPath).ToLower();
                 if (!fileExName.Contains("meta"))
                 {
-                    string fileRelaPath = XFileTools.GetFileRelativePath(fullPath);
+                    string fileRelaPath = XPathTools.GetRelativePath(fullPath);
                     filList.Add(fileRelaPath);
                 }
             }, true);
@@ -39,7 +39,7 @@ namespace STGEditor
 
         private string GetRelationPath(string assetPath,string fileName)
         {
-            string relaPath = XPathTools.GetRelativePath(AssetBuilderConfig.tempCustoms, assetPath);
+            string relaPath = XPathTools.SubRelativePath(assetPath, AssetBuilderConfig.tempCustoms);
             string relaRootPath = Path.GetDirectoryName(relaPath);
             return string.Format(AssetBuilderConfig.bundleNameCustoms, string.Format("{0}/{1}", relaRootPath, fileName));
         }

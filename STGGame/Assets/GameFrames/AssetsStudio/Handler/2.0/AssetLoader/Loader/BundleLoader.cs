@@ -91,6 +91,8 @@ namespace ASGame
             string[] pathPairs = handler.path.Split('|');
             string assetPath = pathPairs[0];
             string assetName = pathPairs[1];
+            //TODO:先加载依赖项
+
             var request = AssetBundle.LoadFromFileAsync(assetPath);
             yield return request;
 

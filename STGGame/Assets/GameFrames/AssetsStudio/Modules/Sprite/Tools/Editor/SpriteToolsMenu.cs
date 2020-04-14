@@ -30,7 +30,7 @@ namespace ASEditor
                         if (!ResourceUtil.IsImageFile(fullPath))
                             return;
 
-                        string assetPath = XFileTools.GetFileRelativePath(fullPath);
+                        string assetPath = XPathTools.GetRelativePath(fullPath);
                         assetsList.Add(assetPath);
                     });
                 }
@@ -70,7 +70,7 @@ namespace ASEditor
                         if (!ResourceUtil.IsImageFile(fullPath))
                             return;
 
-                        string assetPath = XFileTools.GetFileRelativePath(fullPath);
+                        string assetPath = XPathTools.GetRelativePath(fullPath);
                         assetsList.Add(assetPath);
                     });
                 }
@@ -109,7 +109,7 @@ namespace ASEditor
                         if (!ResourceUtil.IsImageFile(fullPath))
                             return;
 
-                        string assetPath = XFileTools.GetFileRelativePath(fullPath);
+                        string assetPath = XPathTools.GetRelativePath(fullPath);
                         assetsList.Add(assetPath);
                     });
                 }
@@ -148,7 +148,7 @@ namespace ASEditor
                         if (!ResourceUtil.IsImageFile(fullPath))
                             return;
 
-                        string assetPath = XFileTools.GetFileRelativePath(fullPath);
+                        string assetPath = XPathTools.GetRelativePath(fullPath);
                         assetsList.Add(assetPath);
                     });
                 }
@@ -187,7 +187,7 @@ namespace ASEditor
                     string fileEx = Path.GetExtension(fullPath).ToLower();
                     if (fileEx.Contains("controller"))
                     {
-                        string fleRelaPath = XFileTools.GetFileRelativePath(fullPath);
+                        string fleRelaPath = XPathTools.GetRelativePath(fullPath);
                         string fileRootPath = Path.GetDirectoryName(fleRelaPath);
 
                         exportPathList.Add(fileRootPath);

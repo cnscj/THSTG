@@ -134,7 +134,7 @@ namespace ASEditor
             {
                 foreach(var fullPath in kv.Value)
                 {
-                    string assetPath = XFileTools.GetFileRelativePath(fullPath);
+                    string assetPath = XPathTools.GetRelativePath(fullPath);
                     string[] dps = AssetDatabase.GetDependencies(assetPath);
                     foreach (var dp in dps)
                     {

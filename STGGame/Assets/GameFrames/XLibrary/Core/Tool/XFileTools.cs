@@ -71,7 +71,7 @@ namespace XLibrary
 					if (Exists(metaPath))
 					{
 						string destMetaPath = destPath + ".meta";
-						XFileTools.Move(metaPath, destMetaPath);
+						Move(metaPath, destMetaPath);
 					}
 				}
 			}
@@ -109,41 +109,11 @@ namespace XLibrary
 			}
 		}
 
-		//没用
-		public static string GetFileFullPath(string assetPath)
-		{
-			if (string.IsNullOrEmpty(assetPath))
-				return null;
-			int length = "Assets".Length;
-			return Application.dataPath + assetPath.Substring(length);
-		}
-
-		// get相对路径
-		public static string GetFileRelativePath(string fullPath)
-		{
-			if (string.IsNullOrEmpty(fullPath))
-				return null;
-            return fullPath.Replace(Application.dataPath, "Assets");
-        }
-
-		//没用
-		public static string GetFolderPath(string filePath)
-		{
-			string folder = "";
-			if (Exists(filePath))
-			{
-				string standPath = filePath.ToLower().Replace('\\', '/');
-				string fileName = standPath.Substring(standPath.LastIndexOf('/'));
-				folder = standPath.Replace(fileName, "");
-			}
-			return folder;
-		}
-
-		public static string GetMD5(string fileName)
+		public static string GetMD5(string filePath)
 		{
 			try
 			{
-				FileStream file = new FileStream(fileName, FileMode.Open);
+				FileStream file = new FileStream(filePath, FileMode.Open);
 				MD5 md5 = new MD5CryptoServiceProvider();
 				byte[] retVal = md5.ComputeHash(file);
 				file.Close();

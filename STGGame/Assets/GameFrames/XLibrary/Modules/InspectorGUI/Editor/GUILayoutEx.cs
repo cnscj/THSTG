@@ -16,7 +16,7 @@ namespace XLibEditor
                 var selectedFolderPath = EditorUtility.SaveFolderPanel(desc, "Assets", "");
                 if (selectedFolderPath != null)
                 {
-                    path = XFileTools.GetFileRelativePath(selectedFolderPath);
+                    path = XPathTools.GetRelativePath(selectedFolderPath);
                 }
             }
 

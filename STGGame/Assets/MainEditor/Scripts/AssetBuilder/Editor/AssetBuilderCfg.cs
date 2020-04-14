@@ -17,7 +17,7 @@ namespace STGEditor
                 string fileExName = Path.GetExtension(fullPath).ToLower();
                 if (fileExName.Contains("csv") || fileExName.Contains("json"))
                 {
-                    string fileRelaPath = XFileTools.GetFileRelativePath(fullPath);
+                    string fileRelaPath = XPathTools.GetRelativePath(fullPath);
                     filList.Add(fileRelaPath);
                 }
             });
