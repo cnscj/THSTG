@@ -69,11 +69,13 @@ namespace ASEditor
             //通过反射获取所有类
             Type[] types = Assembly.GetCallingAssembly().GetTypes();
             List<Type> builderClassList = new List<Type>();
+            Type customBuilderType = typeof(AssetCustomBuilder);
             foreach (Type item in types)
             {
                 if (item.IsAbstract) continue;
+                if (item == customBuilderType) continue;
 
-                if (item == typeof(AssetCustomBuilder))
+                if (item.BaseType == customBuilderType)
                 {
                     builderClassList.Add(item);
                 }

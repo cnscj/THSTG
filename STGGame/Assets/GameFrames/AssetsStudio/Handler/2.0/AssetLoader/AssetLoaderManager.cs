@@ -8,16 +8,18 @@ namespace ASGame
 {
     public class AssetLoaderManager : MonoSingleton<AssetLoaderManager>
     {
-        private BaseLoader m_editorOrResLoader;
+        private BaseLoader networkLoader;
+        private BaseLoader m_editorLoader;
+        private BaseLoader m_resourceLoader;
         private BaseLoader m_bundleLoader;
-        public bool LoadBundleMainfest(string mainfestPath)
+        public void LoadBundleMainfest(string mainfestPath)
         {
-            return GetOrCreateBundleLoader().LoadMainfest(mainfestPath);
+            GetOrCreateBundleLoader().LoadMainfest(mainfestPath);
         }
 
         public int LoadAsset<T>(string path, Action<T> onSuccess = null, Action<int> onFailed = null) where T : Object
         {
-            var loader = GetOrCreateLoader<T>(path);
+            var loader = GetOrCreateLoader(path,typeof(T));
             var handler = loader.StartLoad(path);
             handler.onCallback += (AssetLoadResult result) =>
             {
@@ -34,7 +36,7 @@ namespace ASGame
             return handler.id;
         }
 
-        public void BreakLoad(int id)
+        public void LoadBreak(int id)
         {
             var handler = AssetLoadHandlerManager.GetInstance().GetLoadHandler(id);
             if (handler != null)
@@ -43,37 +45,22 @@ namespace ASGame
             }
         }
 
-        private BundleLoader GetOrCreateBundleLoader()
+        public BundleLoader GetOrCreateBundleLoader()
         {
             m_bundleLoader = m_bundleLoader ?? CreateLoader<BundleLoader>();
             return m_bundleLoader as BundleLoader;
         }
 
-        private BaseLoader GetOrCreateLoader<T>(string path)
+        public BundleLoader GetOrCreateEditorLoader()
         {
-            //根据类型判断
-            if (typeof(T) == typeof(AssetBundle))
-            {
-                return GetOrCreateBundleLoader();
-            }
-            else
-            {
-                //如果是复合路径,则使用Bundle加载器
-                if (path.IndexOf('|') >= 0)
-                {
-                    return GetOrCreateBundleLoader();
-                }
-                else
-                {
-#if UNITY_EDITOR
-                    m_editorOrResLoader = m_editorOrResLoader ?? CreateLoader<EditorLoader>();
-                    return m_editorOrResLoader;
-#else
-                    m_editorOrResLoader = m_editorOrResLoader ?? CreateLoader<ResourcesLoader>();
-                    return m_editorOrResLoader;
-#endif
-                }
-            }
+            m_editorLoader = m_editorLoader ?? CreateLoader<EditorLoader>();
+            return m_editorLoader as BundleLoader;
+        }
+
+        public BundleLoader GetOrCreateResourceeLoader()
+        {
+            m_resourceLoader = m_resourceLoader ?? CreateLoader<ResourcesLoader>();
+            return m_resourceLoader as BundleLoader;
         }
 
         private BaseLoader CreateLoader<T>() where T : BaseLoader
@@ -82,6 +69,34 @@ namespace ASGame
             loaderGO.transform.SetParent(transform);
             var loader = loaderGO.AddComponent<T>();
             return loader;
+        }
+
+        private BaseLoader GetOrCreateLoader(string path, Type type)
+        {
+            if (type == typeof(AssetBundle))
+            {
+                return GetOrCreateBundleLoader();
+            }
+            else
+            {
+                //如果是双路径,则为
+                if (path.IndexOf('|') >= 0)
+                {
+                    return GetOrCreateBundleLoader();
+                }
+                else
+                {
+                    //是否是Asset开头的
+#if UNITY_EDITOR
+                    if (path.StartsWith("assets",StringComparison.OrdinalIgnoreCase))
+                    {
+                        return GetOrCreateEditorLoader();
+                    }
+#endif
+                    //最后采用ResourceLoader
+                    return GetOrCreateResourceeLoader();
+                }
+            }
         }
     }
 

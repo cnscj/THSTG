@@ -9,15 +9,15 @@ namespace ASEditor
 {
     public class AssetProcesserManager : Singleton<AssetProcesserManager>
     {
-        private List<AssetBaseProcesser> m_processerList = new List<AssetBaseProcesser>();
+        private List<AssetCustomProcesser> m_customProcesserList = new List<AssetCustomProcesser>();
 
-        public void Do(AssetBaseProcesser []processors)
+        public void Do(AssetCustomProcesser[] processors)
         {
             Clear();
 
             foreach(var processor in processors)
             {
-                m_processerList.Add(processor);
+                m_customProcesserList.Add(processor);
             }
             Proress();
             Purge();
@@ -25,39 +25,47 @@ namespace ASEditor
 
         public void Clear()
         {
-            m_processerList.Clear();
+            m_customProcesserList.Clear();
         }
 
         private void Proress()
         {
             //通过反射获取所有类
-            Assembly ass = Assembly.GetAssembly(typeof(AssetBaseProcesser));
-            Type[] types = ass.GetTypes();
-            List<Type> builderClassList = new List<Type>();
+            Type[] types = Assembly.GetCallingAssembly().GetTypes();
+            List<Type> processerClassList = new List<Type>();
+            Type customProcesserType = typeof(AssetCustomProcesser);
             foreach (Type item in types)
             {
                 if (item.IsAbstract) continue;
+                if (item == customProcesserType) continue;
 
-                if (item == typeof(AssetBaseProcesser))
+                if (item.BaseType == customProcesserType)
                 {
-                    builderClassList.Add(item);
+                    processerClassList.Add(item);
                 }
             }
 
-            SortedList<int, AssetBaseProcesser> sortedClassList = new SortedList<int, AssetBaseProcesser>();
-            foreach (Type item in builderClassList)
+
+            SortedList<int, AssetCustomProcesser> sortedClassList = new SortedList<int, AssetCustomProcesser>();
+            foreach (Type item in processerClassList)
             {
                 object obj = Activator.CreateInstance(item);//创建一个obj对象
-                AssetBaseProcesser builder = obj as AssetBaseProcesser;
-                sortedClassList.Add(1, builder);
+                AssetCustomProcesser processer = obj as AssetCustomProcesser;
+                processer.Init();
+
+                var processerPriority = processer.GetPriority();
+                if (!string.IsNullOrEmpty(processer.GetName()))
+                {
+                    sortedClassList.Add(processerPriority, processer);
+                }
             }
 
-            for (int i = 0; i < m_processerList.Count; i++)
+            for (int i = 0; i < m_customProcesserList.Count; i++)
             {
-                var oldIns = m_processerList[i];
+                var oldIns = m_customProcesserList[i];
                 sortedClassList.Add(100000 + i, oldIns);
             }
-            m_processerList = new List<AssetBaseProcesser>(sortedClassList.Values);
+            m_customProcesserList = new List<AssetCustomProcesser>(sortedClassList.Values);
 
             Proress4Common();
             Proress4Custom();
@@ -70,7 +78,7 @@ namespace ASEditor
 
         private void Proress4Custom()
         {
-            foreach(var processer in m_processerList)
+            foreach(var processer in m_customProcesserList)
             {
                 processer.Deal();
             }

@@ -27,48 +27,78 @@ namespace ASGame
         //TODO:AssetBundler的引用计数
         private Dictionary<string, string[]> m_dependsDataList = new Dictionary<string, string[]>();
         private Dictionary<string, BundleLoader> m_bundlesMap = new Dictionary<string, BundleLoader>();     //已经加载完成的
+        private string m_assetBundleRootPath = "";
 
         private Queue<BundleObject> m_unloadList = new Queue<BundleObject>();                               //释放队列
+
+        /// <summary>
+        /// 加载重写,先加载依赖项
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public override AssetLoadHandler StartLoad(string path)
+        {
+            var mainHandler = base.StartLoad(path);
+            var dependencies = GetBundleDependencies(path);
+            if (dependencies != null)   //XXX:需要解决循环依赖加载的问题
+            {
+                //TODO:依赖加载
+
+                //把mainHandler的回调保存下来
+                var oldCallback = mainHandler.onCallback;
+                mainHandler.onCallback = (AssetLoadResult mainResult) =>
+                {
+                    //如果所有的子handler都加载完了,那么在通知父handler
+                    //如果上层没有handler了,才真正回调
+                    
+                    //XXX:按照异步回调,实际上这里已经调用完了才回调
+                };
+
+                foreach (var assetBundlePath in dependencies)
+                {
+                    string subAssetbundlePath = GetAbsoluteFullPath(assetBundlePath);
+
+                    //XXX:查找是否有加载过,加载过的话引用加1完事
+
+                    var subHandler = StartLoad(subAssetbundlePath);
+                    subHandler.onCallback += (AssetLoadResult subResult) =>
+                    {
+                        //:异步可能同时加载了2次一样的,如果之前有过,就放弃
+
+                        if (subResult.isDone)
+                        {
+                            //TODO:通知父handler,已经加载完了
+                        }
+                    };
+                }
+            }
+            return mainHandler;
+        }
 
         /// <summary>
         /// 加载全局依赖文件
         /// </summary>
         /// <param name="mainfestPath"></param>
-        public bool LoadMainfest(string mainfestPath)
+        public void LoadMainfest(string mainfestPath , bool isAsync = false)
         {
-            if (string.IsNullOrEmpty(mainfestPath))
-                return false;
-            
-            m_dependsDataList.Clear();
-            AssetBundle ab = AssetBundle.LoadFromFile(mainfestPath);
-
-            if (ab == null)
+            if(isAsync)
             {
-                Debug.LogError(string.Format("LoadMainfest ab NULL error !"));
-                return false;
-            }
-
-            AssetBundleManifest mainfest = ab.LoadAsset("AssetBundleManifest") as AssetBundleManifest;
-            if (mainfest == null)
-            {
-                Debug.LogError(string.Format("LoadMainfest NULL error !"));
-                return false;
-            }
-
-            foreach (string assetName in mainfest.GetAllAssetBundles())
-            {
-                string hashName = Path.GetFileNameWithoutExtension(assetName);
-                string[] dps = mainfest.GetAllDependencies(assetName);
-                for (int i = 0; i < dps.Length; i++)
+                var handler = StartLoad(mainfestPath);
+                handler.onCallback += (AssetLoadResult result) =>
                 {
-                    dps[i] = Path.GetFileNameWithoutExtension(dps[i]);
-                }
-                m_dependsDataList.Add(hashName, dps);
+                    var ab = result.asset as AssetBundle;
+                    OnLoadMainfestAssetBundle(ab);
+                };
+
+            }
+            else
+            {
+                var ab = AssetBundle.LoadFromFile(mainfestPath);
+                OnLoadMainfestAssetBundle(ab);
             }
 
-            ab.Unload(true);
-            Debug.Log("AssetBundleLoadMgr dependsCount=" + m_dependsDataList.Count);
-            return true;
+            //用父目录作为assetbundles的root目录
+            m_assetBundleRootPath = Path.GetDirectoryName(mainfestPath);
         }
 
         protected override void OnUpdate()
@@ -88,11 +118,22 @@ namespace ASGame
         //TODO:需要加载其他的依赖,最后才能返回回调
         protected override IEnumerator OnLoadAsset(AssetLoadHandler handler)
         {
-            string[] pathPairs = handler.path.Split('|');
-            string assetPath = pathPairs[0];
-            string assetName = pathPairs[1];
-            //TODO:先加载依赖项
+            if (string.IsNullOrEmpty(handler.path))
+            {
+                handler.onCallback?.Invoke(new AssetLoadResult(null, false));
+                FinishHandler(handler);
+                yield break;
+            }
 
+            string assetPath = handler.path;
+            string assetName = null;
+            if (handler.path.IndexOf("|") > 0)
+            {
+                string[] pathPairs = handler.path.Split('|');
+                assetPath = pathPairs[0];
+                assetName = pathPairs[1];
+            }
+          
             var request = AssetBundle.LoadFromFileAsync(assetPath);
             yield return request;
 
@@ -100,7 +141,7 @@ namespace ASGame
             {
                 Object asset = null;
                 bool isDone = false;
-                if (request.isDone)
+                if (request.isDone) //XXX:路径不正确,加载不到文件也会返回true
                 {
                     if (!string.IsNullOrEmpty(assetName))
                     {
@@ -121,10 +162,72 @@ namespace ASGame
                 }
 
                 handler.onCallback?.Invoke(new AssetLoadResult(asset, isDone));
-                FinishHandler(handler);
+                FinishHandler(handler); //XXX:考虑到还有依赖没加载完,可能不能这么快finish
             }
         }
 
+        private string []GetBundleDependencies(string assetBundlePath)
+        {
+            if (string.IsNullOrEmpty(assetBundlePath))
+                return null;
+
+            if (m_dependsDataList != null)
+            {
+                //assetBundlePath路径必须是从assets/assetbundle开始,
+                string lowPath = assetBundlePath.ToLower();
+                if (m_dependsDataList.TryGetValue(lowPath, out var dependencies))
+                {
+                    return dependencies;
+                }
+
+            }
+            return null;
+        }
+
+        private string GetAbsoluteFullPath(string shortBundlePath)
+        {
+            return Path.Combine(m_assetBundleRootPath, shortBundlePath);
+        }
+        private string GetRelativeShortPath(string fullBundlePath)
+        {
+            int startPos = fullBundlePath.IndexOf(m_assetBundleRootPath, StringComparison.OrdinalIgnoreCase);
+            if (startPos >= 0)
+            {
+                return fullBundlePath.Substring(startPos + m_assetBundleRootPath.Length + 1);
+            }
+            return fullBundlePath;
+        }
+
+        private void OnLoadMainfestAssetBundle(AssetBundle ab)
+        {
+            if (ab == null)
+            {
+                Debug.LogError(string.Format("LoadMainfest ab NULL error !"));
+                return;
+            }
+
+            m_dependsDataList.Clear();
+            AssetBundleManifest mainfest = ab.LoadAsset("AssetBundleManifest") as AssetBundleManifest;
+            if (mainfest == null)
+            {
+                Debug.LogError(string.Format("LoadMainfest NULL error !"));
+                return;
+            }
+
+            foreach (string assetName in mainfest.GetAllAssetBundles())
+            {
+                string fullPathLow = GetAbsoluteFullPath(assetName).ToLower();
+                string[] dps = mainfest.GetAllDependencies(assetName);
+                for (int i = 0; i < dps.Length; i++)
+                {
+                    dps[i] = GetAbsoluteFullPath(dps[i]).ToLower();
+                }
+                m_dependsDataList.Add(fullPathLow, dps);
+            }
+
+            ab.Unload(true);
+            Debug.Log("AssetBundleLoadMgr dependsCount=" + m_dependsDataList.Count);
+        }
     }
 }
 

@@ -10,7 +10,7 @@ namespace ASGame
         private LinkedList<AssetLoadHandler> m_waitQueue;           //准备队列
         private LinkedList<AssetLoadHandler> m_finishQueue;         //完成队列
     
-        public AssetLoadHandler StartLoad(string path)
+        public virtual AssetLoadHandler StartLoad(string path)
         {
             var handler = AssetLoadHandlerManager.GetInstance().GetOrCreateHandler();
             handler.path = path;
@@ -26,7 +26,7 @@ namespace ASGame
             return handler;
         }
 
-        public void StopLoad(AssetLoadHandler handler)
+        public virtual void StopLoad(AssetLoadHandler handler)
         {
             if (handler.status == AssetLoadStatus.LOAD_WAIT)
             {

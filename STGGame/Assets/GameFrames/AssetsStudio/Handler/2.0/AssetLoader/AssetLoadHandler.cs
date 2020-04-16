@@ -9,16 +9,16 @@ namespace ASGame
         public int status;
         public string path;
         public BaseLoader loader;
-        public AssetLoadHandler[] dependencies;
+        public AssetLoadHandler[] children;
 
         public AssetLoadCallback onCallback;
 
         public bool IsCompleted()
         {
             bool isCompleted = (status == AssetLoadStatus.LOAD_SUCCESS);
-            if (dependencies != null)
+            if (children != null)
             {
-                foreach(var loader in dependencies)
+                foreach(var loader in children)
                 {
                     isCompleted &= loader.IsCompleted();
                 }
@@ -32,7 +32,7 @@ namespace ASGame
             status = 0;
             loader = null;
             path = null;
-            dependencies = null;
+            children = null;
 
             onCallback = null;
         }

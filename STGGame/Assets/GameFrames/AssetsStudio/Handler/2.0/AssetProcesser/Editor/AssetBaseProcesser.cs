@@ -30,6 +30,11 @@ namespace ASEditor
             _progresersName = name;
         }
 
+        public string GetName()
+        {
+            return _progresersName;
+        }
+
         public virtual void Deal()
         {
             DoStart();  //用于处理公共资源
@@ -182,7 +187,7 @@ namespace ASEditor
             foreach (var doFileInfo in procressList)
             {
                 var realPathLow = doFileInfo.path;
-                OnOnce(realPathLow, GetSaveFolderPath());
+                OnOnce(realPathLow);
 
                 //保存MD5
                 if (_assetMap.TryGetValue(realPathLow, out var fileInfo))
@@ -252,7 +257,7 @@ namespace ASEditor
             return GetFileMd5(srcFilePath);
         }
         protected abstract string[] OnFiles();
-        protected abstract void OnOnce(string outputFolderPath, string srcFilePath);
+        protected abstract string[] OnOnce(string srcFilePath);
     }
 
 }
