@@ -5,7 +5,7 @@ using XLibrary.Package;
 
 namespace ASGame
 {
-    public class AssetLoadHandlerManager : Singleton<AssetLoadHandlerManager>
+    public class AssetLoadHandlerManager : MonoSingleton<AssetLoadHandlerManager>
     {
         private int m_id;
         private Queue<AssetLoadHandler> m_availableHandlers = new Queue<AssetLoadHandler>();
@@ -62,6 +62,11 @@ namespace ASGame
             }
             m_handlerMaps.Clear();
             m_id = 0;
+        }
+
+        private void Update()
+        {
+            //超时清理
         }
     }
 }

@@ -15,8 +15,9 @@ namespace ASGame
     {
         public class BundleObject : BaseRef
         {
-            public string hashName;                                            //hash标识符
-            public List<BundleObject> depends = new List<BundleObject>();      //依赖项
+            public string hashName;                                                 //hash标识符
+            public AssetBundle assetBundle;
+            public HashSet<BundleObject> depends = new HashSet<BundleObject>();     //依赖项
 
             protected override void OnRelease()
             {
@@ -40,10 +41,8 @@ namespace ASGame
         {
             var mainHandler = base.StartLoad(path);
             var dependencies = GetBundleDependencies(path);
-            if (dependencies != null)   //XXX:需要解决循环依赖加载的问题
+            if (dependencies != null && dependencies.Length > 0)   //XXX:需要解决循环依赖加载的问题
             {
-                //TODO:依赖加载
-
                 //把mainHandler的回调保存下来
                 var oldCallback = mainHandler.onCallback;
                 mainHandler.onCallback = (AssetLoadResult mainResult) =>
@@ -54,17 +53,13 @@ namespace ASGame
                     //XXX:按照异步回调,实际上这里已经调用完了才回调
                 };
 
-                foreach (var assetBundlePath in dependencies)
+                foreach (var subAssetbundlePath in dependencies)
                 {
-                    string subAssetbundlePath = GetAbsoluteFullPath(assetBundlePath);
-
                     //XXX:查找是否有加载过,加载过的话引用加1完事
-
                     var subHandler = StartLoad(subAssetbundlePath);
                     subHandler.onCallback += (AssetLoadResult subResult) =>
                     {
                         //:异步可能同时加载了2次一样的,如果之前有过,就放弃
-
                         if (subResult.isDone)
                         {
                             //TODO:通知父handler,已经加载完了
@@ -79,26 +74,12 @@ namespace ASGame
         /// 加载全局依赖文件
         /// </summary>
         /// <param name="mainfestPath"></param>
-        public void LoadMainfest(string mainfestPath , bool isAsync = false)
+        public void LoadMainfest(string mainfestPath)
         {
-            if(isAsync)
-            {
-                var handler = StartLoad(mainfestPath);
-                handler.onCallback += (AssetLoadResult result) =>
-                {
-                    var ab = result.asset as AssetBundle;
-                    OnLoadMainfestAssetBundle(ab);
-                };
-
-            }
-            else
-            {
-                var ab = AssetBundle.LoadFromFile(mainfestPath);
-                OnLoadMainfestAssetBundle(ab);
-            }
-
             //用父目录作为assetbundles的root目录
             m_assetBundleRootPath = Path.GetDirectoryName(mainfestPath);
+            var handler = StartLoad(mainfestPath);
+            handler.onCallback = OnLoadMainfestCallback;
         }
 
         protected override void OnUpdate()
@@ -133,7 +114,7 @@ namespace ASGame
                 assetPath = pathPairs[0];
                 assetName = pathPairs[1];
             }
-          
+
             var request = AssetBundle.LoadFromFileAsync(assetPath);
             yield return request;
 
@@ -186,20 +167,21 @@ namespace ASGame
 
         private string GetAbsoluteFullPath(string shortBundlePath)
         {
-            return Path.Combine(m_assetBundleRootPath, shortBundlePath);
+            return Path.Combine(m_assetBundleRootPath, shortBundlePath).ToLower();
         }
         private string GetRelativeShortPath(string fullBundlePath)
         {
             int startPos = fullBundlePath.IndexOf(m_assetBundleRootPath, StringComparison.OrdinalIgnoreCase);
             if (startPos >= 0)
             {
-                return fullBundlePath.Substring(startPos + m_assetBundleRootPath.Length + 1);
+                return fullBundlePath.Substring(startPos + m_assetBundleRootPath.Length + 1).ToLower();
             }
-            return fullBundlePath;
+            return fullBundlePath.ToLower();
         }
 
-        private void OnLoadMainfestAssetBundle(AssetBundle ab)
+        private void OnLoadMainfestCallback(AssetLoadResult result)
         {
+            var ab = result.asset as AssetBundle;
             if (ab == null)
             {
                 Debug.LogError(string.Format("LoadMainfest ab NULL error !"));
@@ -216,11 +198,11 @@ namespace ASGame
 
             foreach (string assetName in mainfest.GetAllAssetBundles())
             {
-                string fullPathLow = GetAbsoluteFullPath(assetName).ToLower();
+                string fullPathLow = GetAbsoluteFullPath(assetName);
                 string[] dps = mainfest.GetAllDependencies(assetName);
                 for (int i = 0; i < dps.Length; i++)
                 {
-                    dps[i] = GetAbsoluteFullPath(dps[i]).ToLower();
+                    dps[i] = GetAbsoluteFullPath(dps[i]);
                 }
                 m_dependsDataList.Add(fullPathLow, dps);
             }
