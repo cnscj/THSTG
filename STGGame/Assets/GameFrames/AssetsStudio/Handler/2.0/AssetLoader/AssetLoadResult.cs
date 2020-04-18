@@ -3,6 +3,8 @@ namespace ASGame
 {
     public class AssetLoadResult
     {
+        public static readonly AssetLoadResult FAILED_RESULT = new AssetLoadResult(null,false);
+
         public readonly Object asset;
         public readonly bool isDone;
 
