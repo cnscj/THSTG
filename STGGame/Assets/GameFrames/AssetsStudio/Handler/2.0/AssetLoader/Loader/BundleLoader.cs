@@ -16,17 +16,17 @@ namespace ASGame
     {
         public class BundleObject : BaseRef
         {
-            public string hashName;                                                 //hash标识符
+            public string bundlePath;
             public AssetBundle assetBundle;
             public HashSet<BundleObject> depends = new HashSet<BundleObject>();     //依赖项
 
             protected override void OnRelease()
             {
-                //TODO:递归向上释放
+                //TODO:递归向下释放,先释放自己在释放依赖
+                assetBundle.Unload(true);
             }
         }
 
-        //TODO:AssetBundler的引用计数
         private Dictionary<string, string[]> m_dependsDataList = new Dictionary<string, string[]>();
         private Dictionary<string, BundleObject> m_bundlesMap = new Dictionary<string, BundleObject>();     //已经加载完成的
         private string m_assetBundleRootPath = "";
@@ -40,34 +40,14 @@ namespace ASGame
         /// <returns></returns>
         public override AssetLoadHandler StartLoad(string path)
         {
-            //TODO:判断加载队列里是否已经存在过正在加载的项了,有就不用再次加载
-
             var mainHandler = base.StartLoad(path);
             var dependencies = GetBundleDependencies(path, false);
             if (dependencies != null && dependencies.Length > 0)
             {
-                //把mainHandler的回调保存下来
-                var oldCallback = mainHandler.onCallback;
-                mainHandler.onCallback = (AssetLoadResult mainResult) =>
-                {
-                    //如果所有的子handler都加载完了,那么在通知父handler
-                    //如果上层没有handler了,才真正回调
-                    
-                    //XXX:按照异步回调,实际上这里已经调用完了才回调
-                };
-
                 foreach(var subDependence in dependencies)
                 {
-                    //TODO:产生了循环加载,且同一帧可能加载了多个
-                    var subHandler = StartLoad(subDependence);      //TODO:这里递归加载了,容易加载到相同的文件
-
-                    subHandler.onCallback += (AssetLoadResult subResult) =>
-                    {
-                        if (subResult.isDone)
-                        {
-                            //TODO:通知父handler,已经加载完了
-                        }
-                    };
+                    var subHandler = StartLoad(subDependence);
+                    mainHandler.AddChild(subHandler);
                 }
             }
             return mainHandler;
@@ -89,11 +69,11 @@ namespace ASGame
             {
                 //用父目录作为assetbundles的root目录
                 var handler = StartLoad(mainfestPath);
-                handler.onCallback = (AssetLoadResult result) =>
+                handler.OnCompleted((AssetLoadResult result) =>
                 {
                     var ab = result.asset as AssetBundle;
                     OnLoadMainfestCallback(ab);
-                }; 
+                }); 
             }
 
         }
@@ -111,6 +91,8 @@ namespace ASGame
                 //但由可能在同一帧时,卸载前又有加载
             }
         }
+
+        
 
         /// <summary>
         /// 取得依赖
@@ -184,7 +166,9 @@ namespace ASGame
         private void OnLoadAssetCallback(AssetLoadHandler handler, AssetLoadResult result)
         {
             //如果加载了Bundle,必须记录下来
-            handler?.onCallback?.Invoke(result);
+
+            //必须记录
+            handler?.Invoke(result);
         }
 
         private void OnLoadMainfestCallback(AssetBundle ab)
@@ -229,9 +213,12 @@ namespace ASGame
 
         private void AddBundleObject(string bundlePath, AssetBundle assetBundle)
         {
+            //TODO:这里需要把子依赖项也添加进去,不然会出大问题(引用计数
+            //但是加载到此项是并不知道依赖了哪些资源,
             if (!m_bundlesMap.ContainsKey(bundlePath))
             {
                 var bundleObject = new BundleObject();
+                bundleObject.bundlePath = bundlePath;
                 bundleObject.assetBundle = assetBundle;
                 m_bundlesMap.Add(bundlePath, bundleObject);
             } 
@@ -271,31 +258,28 @@ namespace ASGame
             var request = AssetBundle.LoadFromFileAsync(assetPath);
             yield return request;
 
-            if (handler.onCallback != null)
+            Object asset = request.assetBundle;
+            bool isDone = request.isDone;
+            if (request.isDone) //路径不正确,加载不到文件也会返回true
             {
-                Object asset = request.assetBundle;
-                bool isDone = request.isDone;
-                if (request.isDone) //路径不正确,加载不到文件也会返回true
+                var assetBundle = asset as AssetBundle;
+                if (assetBundle != null)
                 {
-                    var assetBundle = asset as AssetBundle;
-                    if (assetBundle != null)
+                    //先把加载到的AssetBundle加入记录缓存,并且标记引用次数+1
+                    //不记录Bundle为空的项
+                    bundleObject = GetBundleObject(assetPath);
+                    if (bundleObject == null)
                     {
-                        //先把加载到的AssetBundle加入记录缓存,并且标记引用次数+1
-                        //不记录Bundle为空的项
-                        bundleObject = GetBundleObject(assetPath);
-                        if (bundleObject == null)
-                        {
-                            AddBundleObject(assetPath, assetBundle);
-                        }
+                        AddBundleObject(assetPath, assetBundle);
+                    }
 
-                        if (!string.IsNullOrEmpty(assetName))
-                        {
-                            var loadRequest = assetBundle.LoadAssetAsync(assetName);
-                            yield return loadRequest;
+                    if (!string.IsNullOrEmpty(assetName))
+                    {
+                        var loadRequest = assetBundle.LoadAssetAsync(assetName);
+                        yield return loadRequest;
 
-                            asset = loadRequest.asset;
-                            isDone = loadRequest.isDone;
-                        }
+                        asset = loadRequest.asset;
+                        isDone = loadRequest.isDone;
                     }
                 }
 

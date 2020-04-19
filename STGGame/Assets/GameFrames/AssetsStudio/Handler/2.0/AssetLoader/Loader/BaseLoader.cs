@@ -7,14 +7,32 @@ namespace ASGame
     public abstract class BaseLoader : MonoBehaviour
     {
         public int maxLoadingCount = -1;                            //最大同时加载资源个数
-        private LinkedList<AssetLoadHandler> m_waitQueue;           //准备队列
-        private LinkedList<AssetLoadHandler> m_finishQueue;         //完成队列
-    
+        private LinkedList<AssetLoadHandler> m_waitQueue;           //等待队列
+        private Dictionary<string, AssetLoadHandler> m_loadingMap;  //加载队列
+        private LinkedList<AssetLoadHandler> m_releaseQueue;        //释放队列
+
+        public int WaitingCount
+        {
+            get{ return m_waitQueue != null ? m_waitQueue.Count : 0; }
+        }
+
+        public int LoadingCount
+        {
+            get { return m_loadingMap != null ? m_loadingMap.Count : 0; }
+        }
+
         public virtual AssetLoadHandler StartLoad(string path)
         {
-            var handler = AssetLoadHandlerManager.GetInstance().GetOrCreateHandler();
+            //先判断正作加载的队列中是否已经正在加载
+            AssetLoadHandler handler = null;
+            if (m_loadingMap != null && m_loadingMap.TryGetValue(path, out handler))
+            {
+                return handler;
+            }
+            
+            handler = AssetLoadHandlerManager.GetInstance().GetOrCreateHandler();
             handler.path = path;
-            if (maxLoadingCount > 0 && OnLoadingCount() >= maxLoadingCount)
+            if (maxLoadingCount > 0 && LoadingCount >= maxLoadingCount)
             {
                 handler.status = AssetLoadStatus.LOAD_WAIT;
                 GetWaitQueue().AddLast(handler);
@@ -30,13 +48,16 @@ namespace ASGame
         {
             if (handler.status == AssetLoadStatus.LOAD_WAIT)
             {
-                if (m_waitQueue != null)
+                if (m_waitQueue != null && m_waitQueue.Count > 0)
                 {
-                    foreach (var waitHandler in m_waitQueue)
+                    for (LinkedListNode<AssetLoadHandler> iterNode = m_waitQueue.Last; iterNode != null; iterNode = iterNode.Previous)
                     {
+                        var waitHandler = iterNode.Value;
                         if (waitHandler == handler)
                         {
-                            m_waitQueue.Remove(waitHandler);
+                            m_waitQueue.Remove(iterNode);
+                            AssetLoadHandlerManager.GetInstance().RecycleHandler(waitHandler);
+                            break;
                         }
                     }
                 }
@@ -47,27 +68,25 @@ namespace ASGame
             }
         }
 
-        public void FinishHandler(AssetLoadHandler handler)
+        public virtual void Clear()
         {
-            m_finishQueue = m_finishQueue ?? new LinkedList<AssetLoadHandler>();
-            m_finishQueue.AddLast(handler);
-        }
-
-        public void Clear()
-        {
-            OnClear();
-        }
-
-        public int GetLoadingCount()
-        {
-            return OnLoadingCount();
+            m_waitQueue?.Clear();
+            if (m_loadingMap != null)
+            {
+                foreach(var handler in m_loadingMap.Values)
+                {
+                    StopLoad(handler);
+                }
+                m_loadingMap.Clear();
+            }
         }
 
         protected void Update()
         {
             UpdateWait();
             OnUpdate();
-            UpdateCompleted();
+            UpdateStatus();
+            UpdateRelease();
         }
 
         protected LinkedList<AssetLoadHandler> GetWaitQueue()
@@ -76,11 +95,23 @@ namespace ASGame
             return m_waitQueue;
         }
 
+        protected Dictionary<string,AssetLoadHandler> GetLoadingMap()
+        {
+            m_loadingMap = m_loadingMap ?? new Dictionary<string, AssetLoadHandler>();
+            return m_loadingMap;
+        }
+
+        public LinkedList<AssetLoadHandler> GetReleaseQueue()
+        {
+            m_releaseQueue = m_releaseQueue ?? new LinkedList<AssetLoadHandler>();
+            return m_releaseQueue;
+        }
+
         protected void UpdateWait()
         {
             if (m_waitQueue != null)
             {
-                while (maxLoadingCount > 0 && OnLoadingCount() < maxLoadingCount && GetWaitQueue().Count > 0)
+                while (maxLoadingCount > 0 && LoadingCount < maxLoadingCount && WaitingCount > 0)
                 {
                     var handler = GetWaitQueue().First.Value;
                     StartWithHandler(handler);
@@ -89,17 +120,36 @@ namespace ASGame
             }
         }
 
-        protected void UpdateCompleted()
+        protected void UpdateStatus()
         {
-            if (m_finishQueue != null)
+            if (m_loadingMap != null)
             {
-                while(m_finishQueue.Count > 0)
+                foreach(var handler in m_loadingMap.Values)
                 {
-                    var handler = m_finishQueue.First.Value;
+                    if (handler.status == AssetLoadStatus.LOAD_FINISH)
+                    {
+                        OnLoadCompleted(handler);
+                        GetReleaseQueue().AddLast(handler);
+                    }
+                    else if(handler.status == AssetLoadStatus.LOAD_TIMEOUT)
+                    {
+                        GetReleaseQueue().AddLast(handler);
+                    }
+                }
+            }
+        }
 
-                    OnLoadCompleted(handler);
+        protected void UpdateRelease()
+        {
+            if (m_releaseQueue != null)
+            {
+                while (m_releaseQueue.Count > 0)
+                {
+                    var handler = m_releaseQueue.First.Value;
+                    m_loadingMap.Remove(handler.path);
+
                     AssetLoadHandlerManager.GetInstance().RecycleHandler(handler);
-                    m_finishQueue.RemoveFirst();
+                    m_releaseQueue.RemoveFirst();
                 }
             }
         }
@@ -107,15 +157,14 @@ namespace ASGame
         private void StartWithHandler(AssetLoadHandler handler)
         {
             handler.status = AssetLoadStatus.LOAD_LOADING;
+            GetLoadingMap().Add(handler.path, handler);
             OnStartLoad(handler);
         }
 
         protected virtual void OnUpdate(){ }
-        protected abstract int OnLoadingCount();
         protected abstract void OnStartLoad(AssetLoadHandler handler);
         protected abstract void OnStopLoad(AssetLoadHandler handler);
-        protected abstract void OnLoadCompleted(AssetLoadHandler handler);
-        protected abstract void OnClear();
+        protected virtual void OnLoadCompleted(AssetLoadHandler handler) { }
     }
 }
 

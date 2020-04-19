@@ -8,6 +8,13 @@ namespace ASGame
     {
         private Dictionary<int, KeyValuePair<AssetLoadHandler, Coroutine>> m_loadCoroutines = new Dictionary<int, KeyValuePair<AssetLoadHandler, Coroutine>>();  //正在加载的队列
 
+        public override void Clear()
+        {
+            base.Clear();
+           
+            m_loadCoroutines.Clear();
+        }
+
         protected override void OnStartLoad(AssetLoadHandler handler)
         {
             handler.loader = this;
@@ -29,30 +36,13 @@ namespace ASGame
                 m_loadCoroutines.Remove(handler.id);
             }
         }
-        protected override void OnLoadCompleted(AssetLoadHandler handler)
-        {
-            m_loadCoroutines.Remove(handler.id);
-        }
+        
 
-        protected override void OnClear()
-        {
-            foreach(var mapPair in m_loadCoroutines)
-            {
-                var itPair = mapPair.Value;
-                StopCoroutine(itPair.Value);
-                AssetLoadHandlerManager.GetInstance().RecycleHandler(itPair.Key);
-            }
-            m_loadCoroutines.Clear();
-        }
+
 
         private IEnumerator LoadAssetCoroutine(AssetLoadHandler handler)
         {
             yield return OnLoadAsset(handler);
-        }
-
-        protected override int OnLoadingCount()
-        {
-            return m_loadCoroutines.Count;
         }
 
         protected abstract IEnumerator OnLoadAsset(AssetLoadHandler handler);

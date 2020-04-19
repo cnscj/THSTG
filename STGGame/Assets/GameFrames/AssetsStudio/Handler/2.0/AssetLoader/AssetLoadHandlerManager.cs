@@ -66,7 +66,7 @@ namespace ASGame
 
         private void Update()
         {
-            //超时清理
+            //超时清理,不过有可能卡在加载力,这里只做标记
         }
     }
 }

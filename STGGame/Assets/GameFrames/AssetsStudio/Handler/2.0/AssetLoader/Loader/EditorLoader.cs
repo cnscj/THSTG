@@ -10,7 +10,7 @@ namespace ASGame
         {
 #if UNITY_EDITOR
             Object obj = AssetDatabase.LoadAssetAtPath<Object>(handler.path);
-            handler.onCallback?.Invoke(new AssetLoadResult(obj, true));
+            handler?.Invoke(new AssetLoadResult(obj, true));
 #endif
             yield break;
         }

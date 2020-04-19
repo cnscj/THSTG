@@ -21,7 +21,7 @@ namespace ASGame
         {
             var loader = GetOrCreateLoader(path,typeof(T));
             var handler = loader.StartLoad(path);
-            handler.onCallback += (AssetLoadResult result) =>
+            handler.OnCompleted((AssetLoadResult result) =>
             {
                 if (result.isDone)
                 {
@@ -29,10 +29,10 @@ namespace ASGame
                 }
                 else
                 {
-                    onFailed?.Invoke(AssetLoadStatus.LOAD_FAILED);
+                    onFailed?.Invoke(AssetLoadStatus.LOAD_ERROR);
                 }
 
-            };
+            });
             return handler.id;
         }
 
