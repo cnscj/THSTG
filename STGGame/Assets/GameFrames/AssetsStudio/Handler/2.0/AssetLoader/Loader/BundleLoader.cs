@@ -34,26 +34,6 @@ namespace ASGame
         private Queue<BundleObject> m_unloadList = new Queue<BundleObject>();                               //释放队列
 
         /// <summary>
-        /// 加载重写,先加载依赖项
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public override AssetLoadHandler StartLoad(string path)
-        {
-            var mainHandler = base.StartLoad(path);
-            var dependencies = GetBundleDependencies(path, false);
-            if (dependencies != null && dependencies.Length > 0)
-            {
-                foreach(var subDependence in dependencies)
-                {
-                    var subHandler = StartLoad(subDependence);
-                    mainHandler.AddChild(subHandler);
-                }
-            }
-            return mainHandler;
-        }
-
-        /// <summary>
         /// 加载全局依赖文件
         /// </summary>
         /// <param name="mainfestPath"></param>
@@ -91,8 +71,6 @@ namespace ASGame
                 //但由可能在同一帧时,卸载前又有加载
             }
         }
-
-        
 
         /// <summary>
         /// 取得依赖
@@ -165,10 +143,15 @@ namespace ASGame
 
         private void OnLoadAssetCallback(AssetLoadHandler handler, AssetLoadResult result)
         {
-            //如果加载了Bundle,必须记录下来
+            //TODO:只有子依赖完成回调了,才真正回调
 
             //必须记录
-            handler?.Invoke(result);
+            result = result ?? AssetLoadResult.EMPTY_RESULT;
+            handler.Invoke(result);
+            if (handler.IsDone())   //TODO:
+            {
+                handler.status = AssetLoadStatus.LOAD_FINISH;
+            }
         }
 
         private void OnLoadMainfestCallback(AssetBundle ab)
@@ -213,8 +196,6 @@ namespace ASGame
 
         private void AddBundleObject(string bundlePath, AssetBundle assetBundle)
         {
-            //TODO:这里需要把子依赖项也添加进去,不然会出大问题(引用计数
-            //但是加载到此项是并不知道依赖了哪些资源,
             if (!m_bundlesMap.ContainsKey(bundlePath))
             {
                 var bundleObject = new BundleObject();
@@ -224,12 +205,30 @@ namespace ASGame
             } 
         }
 
+        //非等待加载
+        protected override void OnStartLoad(AssetLoadHandler handler)
+        {
+            var mainHandler = handler;
+            string path = mainHandler.path;
+            var mainDependencies = GetBundleDependencies(path, false);
+            if (mainDependencies != null && mainDependencies.Length > 0)
+            {
+                foreach (var subDependence in mainDependencies)
+                {
+                    var subHandler = GetOrCreateHandler(subDependence);
+                    StartLoadWithHandler(subHandler);
+                    mainHandler.AddChild(subHandler);
+                }
+            }
+            base.OnStartLoad(mainHandler);
+        }
+
         //加载元操作
         protected override IEnumerator OnLoadAsset(AssetLoadHandler handler)
         {
             if (string.IsNullOrEmpty(handler.path))
             {
-                var result = AssetLoadResult.FAILED_RESULT;
+                var result = AssetLoadResult.EMPTY_RESULT;
                 OnLoadAssetCallback(handler, result);
                 yield break;
             }
@@ -270,6 +269,7 @@ namespace ASGame
                     bundleObject = GetBundleObject(assetPath);
                     if (bundleObject == null)
                     {
+                        //TODO:这里需要把子依赖项也添加进去,不然会出大问题(引用计数
                         AddBundleObject(assetPath, assetBundle);
                     }
 

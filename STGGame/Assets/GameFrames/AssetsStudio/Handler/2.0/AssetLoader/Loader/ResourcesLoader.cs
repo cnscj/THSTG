@@ -15,7 +15,7 @@ namespace ASGame
             yield return request;
 
             handler.status = AssetLoadStatus.LOAD_FINISH;
-            handler?.Invoke(new AssetLoadResult(request.asset, request.isDone));
+            handler.Invoke(new AssetLoadResult(request.asset, request.isDone));
         }
     }
 }

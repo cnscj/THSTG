@@ -9,14 +9,12 @@ namespace ASGame
         public int id;
         public int status;
         public string path;
-        public int timeout;
         public BaseLoader loader;
 
-
-        private long m_tick;
         private AssetLoadCallback m_onCallback;
         private AssetLoadHandler m_parent;
         private List<AssetLoadHandler> m_children;
+        private int m_callbackCount;
 
         public void AddChild(AssetLoadHandler handler)
         {
@@ -76,17 +74,35 @@ namespace ASGame
             return isCompleted;
         }
 
+        public bool IsDone()
+        {
+            if (m_children != null && m_children.Count > 0)
+            {
+                return m_callbackCount == m_children.Count;
+            }
+            return true;
+        }
+
         //当且仅当子handler返回所有结果后才返回
         public void Invoke(AssetLoadResult result)
         {
             if (m_children != null && m_children.Count > 0)
             {
-                //TODO:如果所有子都回调完成了,在回调
-
+                //如果所有子都回调完成了,在回调
+                if (m_callbackCount == m_children.Count)
+                {
+                    m_onCallback?.Invoke(result);
+                    m_parent?.Invoke(result);
+                }
+                else if(m_callbackCount < m_children.Count)
+                {
+                    m_callbackCount++;
+                }
             }
             else
             {
                 m_onCallback?.Invoke(result);
+                m_parent?.Invoke(result);
             }
         }
 
@@ -98,9 +114,9 @@ namespace ASGame
             path = null;
 
             m_onCallback = null;
-
             m_parent = null;
-            m_children?.Clear();
+            m_children = null;
+            m_callbackCount = 0;
         }
     }
 }

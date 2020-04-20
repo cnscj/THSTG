@@ -23,15 +23,9 @@ namespace ASGame
 
         public virtual AssetLoadHandler StartLoad(string path)
         {
-            //先判断正作加载的队列中是否已经正在加载
-            AssetLoadHandler handler = null;
-            if (m_loadingMap != null && m_loadingMap.TryGetValue(path, out handler))
-            {
-                return handler;
-            }
-            
-            handler = AssetLoadHandlerManager.GetInstance().GetOrCreateHandler();
-            handler.path = path;
+            var handler = GetOrCreateHandler(path);
+
+            //等待队列里如果有依赖加载器,会引起主加载器没法完成,造成无限等待,所以依赖加载不能走这里
             if (maxLoadingCount > 0 && LoadingCount >= maxLoadingCount)
             {
                 handler.status = AssetLoadStatus.LOAD_WAIT;
@@ -39,7 +33,7 @@ namespace ASGame
             }
             else
             {
-                StartWithHandler(handler);
+                StartLoadWithHandler(handler);
             }
             return handler;
         }
@@ -89,6 +83,20 @@ namespace ASGame
             UpdateRelease();
         }
 
+        protected AssetLoadHandler GetOrCreateHandler(string path)
+        {
+            //先判断正作加载的队列中是否已经正在加载
+            AssetLoadHandler handler = null;
+            if (m_loadingMap != null && m_loadingMap.TryGetValue(path, out handler))
+            {
+                return handler;
+            }
+
+            handler = AssetLoadHandlerManager.GetInstance().GetOrCreateHandler();
+            handler.path = path;
+            return handler;
+        }
+
         protected LinkedList<AssetLoadHandler> GetWaitQueue()
         {
             m_waitQueue = m_waitQueue ?? new LinkedList<AssetLoadHandler>();
@@ -114,7 +122,7 @@ namespace ASGame
                 while (maxLoadingCount > 0 && LoadingCount < maxLoadingCount && WaitingCount > 0)
                 {
                     var handler = GetWaitQueue().First.Value;
-                    StartWithHandler(handler);
+                    StartLoadWithHandler(handler);
                     GetWaitQueue().RemoveFirst();
                 }
             }
@@ -154,11 +162,15 @@ namespace ASGame
             }
         }
 
-        private void StartWithHandler(AssetLoadHandler handler)
+        protected void StartLoadWithHandler(AssetLoadHandler handler)
         {
-            handler.status = AssetLoadStatus.LOAD_LOADING;
-            GetLoadingMap().Add(handler.path, handler);
-            OnStartLoad(handler);
+            var loadingMap = GetLoadingMap();
+            if (!loadingMap.ContainsKey(handler.path))
+            {
+                loadingMap.Add(handler.path, handler);
+                handler.status = AssetLoadStatus.LOAD_LOADING;
+                OnStartLoad(handler);
+            }
         }
 
         protected virtual void OnUpdate(){ }
