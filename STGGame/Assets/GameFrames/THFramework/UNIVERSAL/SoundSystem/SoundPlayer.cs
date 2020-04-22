@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace THGame
 {
-    //TODO:混音器设置,在水区域,效果不同,和慢放效果
+    //TODO:混音器设置,在水区域,效果不同,和慢放效果,应该是一个全局的
     public class SoundPlayer : MonoBehaviour
     {
         private static readonly SoundArgs DEFAULT_ARGS = new SoundArgs();
@@ -22,7 +22,7 @@ namespace THGame
 
         private Dictionary<string, int> m_curTagCount = new Dictionary<string, int>();  //当前最大个数
         private Dictionary<string, int> m_maxTagCount = new Dictionary<string, int>();  //最大同类型播放个数
-        private Coroutine m_fadeVolumeCoroutine = null;
+        private Coroutine m_fadeVolumeCoroutine;
         private SoundPool m_poolObj;
         private SoundArgsCache m_argsCache;
 

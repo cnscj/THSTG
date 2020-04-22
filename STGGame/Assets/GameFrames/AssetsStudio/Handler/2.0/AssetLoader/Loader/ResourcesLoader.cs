@@ -14,8 +14,10 @@ namespace ASGame
             var request = Resources.LoadAsync(assetPath);
             yield return request;
 
-            handler.status = AssetLoadStatus.LOAD_FINISH;
-            handler.Invoke(new AssetLoadResult(request.asset, request.isDone));
+            if (handler.TryInvoke(new AssetLoadResult(request.asset, request.isDone)))
+            {
+                handler.status = AssetLoadStatus.LOAD_FINISHED;
+            }
         }
     }
 }

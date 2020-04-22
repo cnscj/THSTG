@@ -89,6 +89,7 @@ namespace ASGame
             AssetLoadHandler handler = null;
             if (m_loadingMap != null && m_loadingMap.TryGetValue(path, out handler))
             {
+                //handler.Retain();   //XXX:有点迷惑,到底应不应该持有
                 return handler;
             }
 
@@ -134,7 +135,7 @@ namespace ASGame
             {
                 foreach(var handler in m_loadingMap.Values)
                 {
-                    if (handler.status == AssetLoadStatus.LOAD_FINISH)
+                    if (handler.status == AssetLoadStatus.LOAD_FINISHED)
                     {
                         OnLoadCompleted(handler);
                         GetReleaseQueue().AddLast(handler);
@@ -156,7 +157,7 @@ namespace ASGame
                     var handler = m_releaseQueue.First.Value;
                     m_loadingMap.Remove(handler.path);
 
-                    AssetLoadHandlerManager.GetInstance().RecycleHandler(handler);
+                    handler.ReleaseLater(); //下一帧释放
                     m_releaseQueue.RemoveFirst();
                 }
             }

@@ -49,6 +49,7 @@ namespace XLibGame
         {
             Purge();
         }
+
         // 增加一个自动释放池  
         private void Push()
         {

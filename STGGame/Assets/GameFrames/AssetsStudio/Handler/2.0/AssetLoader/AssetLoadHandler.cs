@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
+using XLibGame;
 
 namespace ASGame
 {
-    public class AssetLoadHandler
+    public class AssetLoadHandler : BaseRef
     {
         public int id;
         public int status;
         public string path;
         public BaseLoader loader;
 
+        private AssetLoadResult m_result;
         private AssetLoadCallback m_onCallback;
         private AssetLoadHandler m_parent;
         private List<AssetLoadHandler> m_children;
@@ -22,6 +22,7 @@ namespace ASGame
                 return;
             
             handler.m_parent = this;
+            handler.Retain();
             m_children = m_children ?? new List<AssetLoadHandler>();
             m_children.Add(handler);
         }
@@ -61,49 +62,23 @@ namespace ASGame
             return m_onCallback;
         }
 
-        public bool IsCompleted()
-        {
-            bool isCompleted = (status == AssetLoadStatus.LOAD_FINISH);
-            if (m_children != null && m_children.Count > 0)
-            {
-                foreach(var loader in m_children)
-                {
-                    isCompleted &= loader.IsCompleted();
-                }
-            }
-            return isCompleted;
-        }
-
-        public bool IsDone()
-        {
-            if (m_children != null && m_children.Count > 0)
-            {
-                return m_callbackCount == m_children.Count;
-            }
-            return true;
-        }
-
         //当且仅当子handler返回所有结果后才返回
-        public void Invoke(AssetLoadResult result)
+        public bool TryInvoke(AssetLoadResult result)
         {
+            //这里得区分是自己的回调,还是由子回调引起的回调由此来确定result的正确性
+            m_result = result ?? m_result;
             if (m_children != null && m_children.Count > 0)
             {
-                //如果所有子都回调完成了,在回调
-                if (m_callbackCount == m_children.Count)
-                {
-                    m_onCallback?.Invoke(result);
-                    m_parent?.Invoke(result);
-                }
-                else if(m_callbackCount < m_children.Count)
+                if(m_callbackCount < m_children.Count)
                 {
                     m_callbackCount++;
+                    return false;
                 }
             }
-            else
-            {
-                m_onCallback?.Invoke(result);
-                m_parent?.Invoke(result);
-            }
+
+            m_onCallback?.Invoke(m_result);
+            m_parent?.TryInvoke(null);
+            return true;
         }
 
         public void Reset()
@@ -113,10 +88,25 @@ namespace ASGame
             loader = null;
             path = null;
 
+            m_result = null;
             m_onCallback = null;
             m_parent = null;
             m_children = null;
             m_callbackCount = 0;
+        }
+
+        protected override void OnRelease()
+        {
+            //递归释放
+            if (m_children != null && m_children.Count > 0)
+            {
+                for (int i = m_children.Count - 1; i >= 0; i--)
+                {
+                    var handler = m_children[i];
+                    handler.Release();
+                }
+            }
+            AssetLoadHandlerManager.GetInstance().RecycleHandler(this);
         }
     }
 }

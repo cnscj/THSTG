@@ -22,8 +22,7 @@ namespace ASGame
 
             protected override void OnRelease()
             {
-                //TODO:递归向下释放,先释放自己在释放依赖
-                assetBundle.Unload(true);
+                assetBundle.Unload(false); //TODO:递归向下释放,先释放自己在释放依赖
             }
         }
 
@@ -37,15 +36,10 @@ namespace ASGame
         /// 加载全局依赖文件
         /// </summary>
         /// <param name="mainfestPath"></param>
-        public void LoadMainfest(string mainfestPath, bool isSync = true)
+        public void LoadMainfest(string mainfestPath, bool isAsync = false)
         {
             m_assetBundleRootPath = Path.GetDirectoryName(mainfestPath);
-            if (isSync)
-            {
-                var ab = AssetBundle.LoadFromFile(mainfestPath);
-                OnLoadMainfestCallback(ab);
-            }
-            else
+            if (isAsync)
             {
                 //用父目录作为assetbundles的root目录
                 var handler = StartLoad(mainfestPath);
@@ -53,7 +47,13 @@ namespace ASGame
                 {
                     var ab = result.asset as AssetBundle;
                     OnLoadMainfestCallback(ab);
-                }); 
+                });
+               
+            }
+            else
+            {
+                var ab = AssetBundle.LoadFromFile(mainfestPath);
+                OnLoadMainfestCallback(ab);
             }
 
         }
@@ -63,8 +63,12 @@ namespace ASGame
             UpdateUnload();
         }
 
+
         protected void UpdateUnload()
         {
+            //规则:
+            //正在异步加载中也不能卸载
+            //常驻资源就不卸载；非常驻资源，并且引用计数为0才能卸载
             while (m_unloadList.Count > 0)
             {
                 //TODO:卸载队列,如果引用已经没有了,会被送往这里卸载,
@@ -143,15 +147,15 @@ namespace ASGame
 
         private void OnLoadAssetCallback(AssetLoadHandler handler, AssetLoadResult result)
         {
-            //TODO:只有子依赖完成回调了,才真正回调
-
-            //必须记录
+            //只有子依赖完成回调了,才真正回调
             result = result ?? AssetLoadResult.EMPTY_RESULT;
-            handler.Invoke(result);
-            if (handler.IsDone())   //TODO:
+            var isDone = handler.TryInvoke(result);
+            if (isDone)
             {
-                handler.status = AssetLoadStatus.LOAD_FINISH;
+                //记录依赖信息,引用自增
+                handler.status = AssetLoadStatus.LOAD_FINISHED;
             }
+           
         }
 
         private void OnLoadMainfestCallback(AssetBundle ab)

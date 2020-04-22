@@ -8,7 +8,7 @@ namespace ASGame
         public static readonly int LOAD_IDLE = 0;
         public static readonly int LOAD_WAIT = 101;
         public static readonly int LOAD_LOADING = 102;
-        public static readonly int LOAD_FINISH = 200;
+        public static readonly int LOAD_FINISHED = 200;
     }
 
 }
