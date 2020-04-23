@@ -26,6 +26,11 @@ namespace XLibGame
             {
                 OnRelease();
             }
+            else if (m_refCount < 0)
+            {
+                m_refCount = 0;
+            }
+            
         }
 
         public int RefCount()

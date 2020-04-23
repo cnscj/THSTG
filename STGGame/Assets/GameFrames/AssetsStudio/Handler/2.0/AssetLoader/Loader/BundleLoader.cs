@@ -63,7 +63,6 @@ namespace ASGame
             UpdateUnload();
         }
 
-
         protected void UpdateUnload()
         {
             //规则:
@@ -232,8 +231,7 @@ namespace ASGame
         {
             if (string.IsNullOrEmpty(handler.path))
             {
-                var result = AssetLoadResult.EMPTY_RESULT;
-                OnLoadAssetCallback(handler, result);
+                OnLoadAssetCallback(handler, AssetLoadResult.EMPTY_RESULT);
                 yield break;
             }
 
@@ -246,50 +244,49 @@ namespace ASGame
                 assetName = pathPairs[1];
             }
 
+            Object asset = null;
+            bool isDone = false;
             //是否已经在加载池中,如果是就直接返回,引用数加1
             var bundleObject = GetBundleObject(assetPath);
             if (bundleObject != null)
             {
-                var assetBundle = bundleObject.assetBundle;
-                var result = new AssetLoadResult(assetBundle,true);
-                OnLoadAssetCallback(handler, result);
                 bundleObject.Retain();
-                yield break;
+                asset = bundleObject.assetBundle;
+                isDone = true;
+            }
+            else
+            {
+                var request = AssetBundle.LoadFromFileAsync(assetPath);
+                yield return request;
+
+                asset = request.assetBundle;
+                isDone = request.isDone;
+
+                //先把加载到的AssetBundle加入记录缓存,并且标记引用次数+1
+                //不记录Bundle为空的项
+                if (isDone && asset != null)
+                {
+                    //TODO:这里需要把子依赖项也添加进去,不然会出大问题(引用计数
+                    AddBundleObject(assetPath, asset as AssetBundle);
+                }
             }
 
             ////////////////////////////////
-            var request = AssetBundle.LoadFromFileAsync(assetPath);
-            yield return request;
-
-            Object asset = request.assetBundle;
-            bool isDone = request.isDone;
-            if (request.isDone) //路径不正确,加载不到文件也会返回true
+            var assetBundle = asset as AssetBundle;
+            if (assetBundle != null)
             {
-                var assetBundle = asset as AssetBundle;
-                if (assetBundle != null)
+                if (!string.IsNullOrEmpty(assetName))
                 {
-                    //先把加载到的AssetBundle加入记录缓存,并且标记引用次数+1
-                    //不记录Bundle为空的项
-                    bundleObject = GetBundleObject(assetPath);
-                    if (bundleObject == null)
-                    {
-                        //TODO:这里需要把子依赖项也添加进去,不然会出大问题(引用计数
-                        AddBundleObject(assetPath, assetBundle);
-                    }
+                    var loadRequest = assetBundle.LoadAssetAsync(assetName);
+                    yield return loadRequest;
 
-                    if (!string.IsNullOrEmpty(assetName))
-                    {
-                        var loadRequest = assetBundle.LoadAssetAsync(assetName);
-                        yield return loadRequest;
-
-                        asset = loadRequest.asset;
-                        isDone = loadRequest.isDone;
-                    }
+                    asset = loadRequest.asset;
+                    isDone = loadRequest.isDone;
                 }
-
-                var result = new AssetLoadResult(asset, isDone);
-                OnLoadAssetCallback(handler, result);
             }
+
+            var result = new AssetLoadResult(asset, isDone);
+            OnLoadAssetCallback(handler, result);
         }
     }
 }

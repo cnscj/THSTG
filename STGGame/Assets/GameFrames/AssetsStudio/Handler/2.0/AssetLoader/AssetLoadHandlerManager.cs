@@ -27,9 +27,11 @@ namespace ASGame
             if (m_availableHandlers.Count <= 0)
             {
                 var newHandler = new AssetLoadHandler();
+                newHandler.ReleaseLater();
                 m_availableHandlers.Enqueue(newHandler);
             }
             AssetLoadHandler handler = m_availableHandlers.Dequeue();
+            handler.Retain();
             handler.id = GetNewHandlerId();
 
             if (m_handlerMaps.ContainsKey(handler.id))

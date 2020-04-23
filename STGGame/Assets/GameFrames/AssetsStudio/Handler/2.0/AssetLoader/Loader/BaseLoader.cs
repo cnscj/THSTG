@@ -89,7 +89,6 @@ namespace ASGame
             AssetLoadHandler handler = null;
             if (m_loadingMap != null && m_loadingMap.TryGetValue(path, out handler))
             {
-                //handler.Retain();   //XXX:有点迷惑,到底应不应该持有
                 return handler;
             }
 

@@ -55,7 +55,7 @@ namespace ASGame
 
         public AssetLoadCallback OnCompleted(AssetLoadCallback callback = null)
         {
-            if (m_onCallback != null && callback != null)
+            if (callback != null)
             {
                 m_onCallback += callback;
             }
