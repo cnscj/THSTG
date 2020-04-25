@@ -28,10 +28,8 @@ namespace ASGame
 
         private Dictionary<string, string[]> m_dependsDataList = new Dictionary<string, string[]>();
         private Dictionary<string, BundleObject> m_bundlesMap = new Dictionary<string, BundleObject>();     //已经加载完成的
-        private string m_assetBundleRootPath = "";
-
         private Queue<BundleObject> m_unloadList = new Queue<BundleObject>();                               //释放队列
-
+        private string m_assetBundleRootPath = "";
         /// <summary>
         /// 加载全局依赖文件
         /// </summary>
@@ -47,15 +45,13 @@ namespace ASGame
                 {
                     var ab = result.asset as AssetBundle;
                     OnLoadMainfestCallback(ab);
-                });
-               
+                });   
             }
             else
             {
                 var ab = AssetBundle.LoadFromFile(mainfestPath);
                 OnLoadMainfestCallback(ab);
             }
-
         }
 
         protected override void OnUpdate()
@@ -70,6 +66,8 @@ namespace ASGame
             //常驻资源就不卸载；非常驻资源，并且引用计数为0才能卸载
             while (m_unloadList.Count > 0)
             {
+                var bundleObj = m_unloadList.Dequeue();
+                
                 //TODO:卸载队列,如果引用已经没有了,会被送往这里卸载,
                 //但由可能在同一帧时,卸载前又有加载
             }
@@ -153,8 +151,7 @@ namespace ASGame
             {
                 //记录依赖信息,引用自增
                 handler.status = AssetLoadStatus.LOAD_FINISHED;
-            }
-           
+            }  
         }
 
         private void OnLoadMainfestCallback(AssetBundle ab)
@@ -212,14 +209,22 @@ namespace ASGame
         protected override void OnStartLoad(AssetLoadHandler handler)
         {
             var mainHandler = handler;
-            string path = mainHandler.path;
-            var mainDependencies = GetBundleDependencies(path, false);
+            string assetPath = mainHandler.path;
+
+            if (handler.path.IndexOf("|") > 0)
+            {
+                string[] pathPairs = handler.path.Split('|');
+                assetPath = pathPairs[0];
+            }
+
+            //这里一次性读取所有依赖,无需递归
+            var mainDependencies = GetBundleDependencies(assetPath, false);
             if (mainDependencies != null && mainDependencies.Length > 0)
             {
                 foreach (var subDependence in mainDependencies)
                 {
                     var subHandler = GetOrCreateHandler(subDependence);
-                    StartLoadWithHandler(subHandler);
+                    base.OnStartLoad(subHandler);//StartLoadWithHandler(subHandler);
                     mainHandler.AddChild(subHandler);
                 }
             }

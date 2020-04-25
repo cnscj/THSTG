@@ -31,6 +31,7 @@ namespace ASGame
                 m_availableHandlers.Enqueue(newHandler);
             }
             AssetLoadHandler handler = m_availableHandlers.Dequeue();
+            handler.Reset();
             handler.Retain();
             handler.id = GetNewHandlerId();
 
@@ -50,7 +51,6 @@ namespace ASGame
                 {
                     m_handlerMaps.Remove(handler.id);
                     m_availableHandlers.Enqueue(handler);
-                    handler.Reset();
                 }
             }
         }
@@ -66,9 +66,5 @@ namespace ASGame
             m_id = 0;
         }
 
-        private void Update()
-        {
-            //超时清理,不过有可能卡在加载力,这里只做标记
-        }
     }
 }

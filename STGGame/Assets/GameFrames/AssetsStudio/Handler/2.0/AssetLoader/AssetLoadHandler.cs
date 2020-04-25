@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 using XLibGame;
 
 namespace ASGame
@@ -9,7 +10,9 @@ namespace ASGame
         public int status;
         public string path;
         public BaseLoader loader;
+        public float stayTime = 120f;
 
+        private float m_updateTick;
         private AssetLoadResult m_result;
         private AssetLoadCallback m_onCallback;
         private AssetLoadHandler m_parent;
@@ -81,18 +84,35 @@ namespace ASGame
             return true;
         }
 
+        public bool CheckTimeout()
+        {
+            if (m_updateTick + stayTime <= Time.realtimeSinceStartup)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public void UpdateTick()
+        {
+            m_updateTick = Time.realtimeSinceStartup;
+        }
+
         public void Reset()
         {
             id = 0;
             status = 0;
             loader = null;
             path = null;
+            stayTime = 120f;
 
             m_result = null;
             m_onCallback = null;
             m_parent = null;
             m_children = null;
             m_callbackCount = 0;
+
+            UpdateTick();
         }
 
         protected override void OnRelease()
@@ -108,5 +128,6 @@ namespace ASGame
             }
             AssetLoadHandlerManager.GetInstance().RecycleHandler(this);
         }
+
     }
 }

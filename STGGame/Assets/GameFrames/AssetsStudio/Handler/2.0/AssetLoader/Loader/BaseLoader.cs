@@ -9,6 +9,7 @@ namespace ASGame
         public int maxLoadingCount = -1;                            //最大同时加载资源个数
         private LinkedList<AssetLoadHandler> m_waitQueue;           //等待队列
         private Dictionary<string, AssetLoadHandler> m_loadingMap;  //加载队列
+        private LinkedList<AssetLoadHandler> m_finishQueue;         //完成队列
         private LinkedList<AssetLoadHandler> m_releaseQueue;        //释放队列
 
         public int WaitingCount
@@ -80,6 +81,7 @@ namespace ASGame
             UpdateWait();
             OnUpdate();
             UpdateStatus();
+            UpdateFinish();
             UpdateRelease();
         }
 
@@ -109,6 +111,12 @@ namespace ASGame
             return m_loadingMap;
         }
 
+        public LinkedList<AssetLoadHandler> GetFinishQueue()
+        {
+            m_finishQueue = m_finishQueue ?? new LinkedList<AssetLoadHandler>();
+            return m_finishQueue;
+        }
+
         public LinkedList<AssetLoadHandler> GetReleaseQueue()
         {
             m_releaseQueue = m_releaseQueue ?? new LinkedList<AssetLoadHandler>();
@@ -136,13 +144,36 @@ namespace ASGame
                 {
                     if (handler.status == AssetLoadStatus.LOAD_FINISHED)
                     {
-                        OnLoadCompleted(handler);
-                        GetReleaseQueue().AddLast(handler);
+                        GetFinishQueue().AddLast(handler);
                     }
-                    else if(handler.status == AssetLoadStatus.LOAD_TIMEOUT)
+                    else if (handler.status == AssetLoadStatus.LOAD_TIMEOUT)
                     {
                         GetReleaseQueue().AddLast(handler);
                     }
+                    else if (handler.status == AssetLoadStatus.LOAD_LOADING)
+                    {
+                        if (handler.CheckTimeout())
+                        {
+                            handler.status = AssetLoadStatus.LOAD_TIMEOUT;
+                        }
+                    }
+
+                }
+            }
+        }
+
+        protected void UpdateFinish()
+        {
+            if (m_finishQueue != null)
+            {
+                while (m_finishQueue.Count > 0)
+                {
+                    var handler = m_finishQueue.First.Value;
+                    OnLoadCompleted(handler);
+
+                    m_loadingMap.Remove(handler.path);
+                    handler.ReleaseLater();
+                    m_finishQueue.RemoveFirst();
                 }
             }
         }
@@ -156,7 +187,7 @@ namespace ASGame
                     var handler = m_releaseQueue.First.Value;
                     m_loadingMap.Remove(handler.path);
 
-                    handler.ReleaseLater(); //下一帧释放
+                    handler.ReleaseLater();
                     m_releaseQueue.RemoveFirst();
                 }
             }

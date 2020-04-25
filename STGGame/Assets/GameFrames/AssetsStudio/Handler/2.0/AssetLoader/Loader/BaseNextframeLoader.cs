@@ -52,7 +52,7 @@ namespace ASGame
             }
         }
 
-        protected abstract IEnumerator OnLoadAsset(AssetLoadHandler handler);
+        protected abstract void OnLoadAsset(AssetLoadHandler handler);
     }
 }
 

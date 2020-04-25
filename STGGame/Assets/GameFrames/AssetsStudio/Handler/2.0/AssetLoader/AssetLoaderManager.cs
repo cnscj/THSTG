@@ -19,8 +19,13 @@ namespace ASGame
 
         public int LoadAsset<T>(string path, Action<T> onSuccess = null, Action<int> onFailed = null) where T : Object
         {
-            var loader = GetOrCreateLoader(path,typeof(T));
-            var handler = loader.StartLoad(path);
+            BaseLoader loader;
+            string rightPath;
+
+            SelectLoaderAndPath<T>(path,out loader, out rightPath);
+
+            var handler = loader.StartLoad(rightPath);
+
             handler.OnCompleted((AssetLoadResult result) =>
             {
                 if (result.isDone)
@@ -51,16 +56,16 @@ namespace ASGame
             return m_bundleLoader as BundleLoader;
         }
 
-        public BundleLoader GetOrCreateEditorLoader()
+        public EditorLoader GetOrCreateEditorLoader()
         {
             m_editorLoader = m_editorLoader ?? CreateLoader<EditorLoader>();
-            return m_editorLoader as BundleLoader;
+            return m_editorLoader as EditorLoader;
         }
 
-        public BundleLoader GetOrCreateResourceeLoader()
+        public ResourcesLoader GetOrCreateResourceeLoader()
         {
             m_resourceLoader = m_resourceLoader ?? CreateLoader<ResourcesLoader>();
-            return m_resourceLoader as BundleLoader;
+            return m_resourceLoader as ResourcesLoader;
         }
 
         private BaseLoader CreateLoader<T>() where T : BaseLoader
@@ -71,32 +76,39 @@ namespace ASGame
             return loader;
         }
 
-        private BaseLoader GetOrCreateLoader(string path, Type type)
+        private void SelectLoaderAndPath<T>(string path, out BaseLoader loader, out string realpath) where T: Object
         {
-            if (type == typeof(AssetBundle))
+
+            //如果是双路径
+            if (path.IndexOf('|') >= 0)
             {
-                return GetOrCreateBundleLoader();
+#if !UNITY_EDITOR    //编辑器下直接加载源路径
+                loader = GetOrCreateEditorLoader();
+                string[] pathPairs = path.Split('|');
+                string assetName = pathPairs[1];
+                realpath = assetName;
+#else
+                loader =  GetOrCreateBundleLoader();
+                realpath = path;
+#endif
+
             }
             else
             {
-                //如果是双路径,则为
-                if (path.IndexOf('|') >= 0)
-                {
-                    return GetOrCreateBundleLoader();
-                }
-                else
-                {
                     //是否是Asset开头的
 #if UNITY_EDITOR
-                    if (path.StartsWith("assets",StringComparison.OrdinalIgnoreCase))
-                    {
-                        return GetOrCreateEditorLoader();
-                    }
-#endif
-                    //最后采用ResourceLoader
-                    return GetOrCreateResourceeLoader();
+                if (path.StartsWith("assets",StringComparison.OrdinalIgnoreCase))
+                {
+                    loader = GetOrCreateEditorLoader();
+                    realpath = path;
+                    return;
                 }
+#endif
+                //最后采用ResourceLoader
+                loader = GetOrCreateResourceeLoader();
+                realpath = path;
             }
+            
         }
     }
 

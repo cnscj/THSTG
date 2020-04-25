@@ -20,5 +20,10 @@ namespace ASGame
         {
 
         }
+
+        public override void To(string key)
+        {
+            
+        }
     }
 }

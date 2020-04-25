@@ -36,9 +36,6 @@ namespace ASGame
                 m_loadCoroutines.Remove(handler.id);
             }
         }
-        
-
-
 
         private IEnumerator LoadAssetCoroutine(AssetLoadHandler handler)
         {

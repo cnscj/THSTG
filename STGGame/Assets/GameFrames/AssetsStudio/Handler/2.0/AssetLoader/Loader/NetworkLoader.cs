@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
+using Object = UnityEngine.Object;
 
 namespace ASGame
 {
@@ -9,7 +11,11 @@ namespace ASGame
     {
         protected override IEnumerator OnLoadAsset(AssetLoadHandler handler)
         {
-            throw new NotImplementedException();
+            //TODO:
+            UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle("");
+            yield return request.SendWebRequest();
+            Object res = DownloadHandlerAssetBundle.GetContent(request);
+
         }
     }
 }

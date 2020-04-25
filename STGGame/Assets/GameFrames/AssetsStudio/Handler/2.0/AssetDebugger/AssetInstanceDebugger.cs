@@ -39,5 +39,10 @@ namespace ASGame
             }
             m_resGameObj.Clear();
         }
+
+        public override void To(string key)
+        {
+            
+        }
     }
 }
