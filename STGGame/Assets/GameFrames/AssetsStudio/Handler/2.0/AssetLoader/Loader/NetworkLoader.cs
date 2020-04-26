@@ -14,7 +14,7 @@ namespace ASGame
             //TODO:
             UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle("");
             yield return request.SendWebRequest();
-            Object res = DownloadHandlerAssetBundle.GetContent(request);
+
 
         }
     }

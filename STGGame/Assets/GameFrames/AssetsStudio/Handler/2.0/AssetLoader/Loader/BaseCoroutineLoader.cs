@@ -32,7 +32,7 @@ namespace ASGame
             {
                 var itPair = m_loadCoroutines[handler.id];
                 StopCoroutine(itPair.Value);
-                AssetLoadHandlerManager.GetInstance().RecycleHandler(itPair.Key);
+
                 m_loadCoroutines.Remove(handler.id);
             }
         }

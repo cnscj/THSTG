@@ -7,6 +7,7 @@ using IEnumerator = System.Collections.IEnumerator;
 using XLibGame;
 using System.IO;
 using System.Linq;
+using UnityEngine.Networking;
 
 namespace ASGame
 {
@@ -14,6 +15,14 @@ namespace ASGame
     //加载依赖应该返回依赖信息,包括哪些依赖文件加载失败
     public class BundleLoader : BaseCoroutineLoader
     {
+        public readonly float HANDLER_BUNDLE_LOCAL_STAY_TIME = 120;
+        public readonly float HANDLER_BUNDLE_NETWORK_STAY_TIME = 300f;
+        public class RequestObj
+        {
+            public int id;
+            public AssetBundleCreateRequest abRequest;
+            public UnityWebRequest webRequest;
+        }
         public class BundleObject : BaseRef
         {
             public string bundlePath;
@@ -26,8 +35,10 @@ namespace ASGame
             }
         }
 
+
         private Dictionary<string, string[]> m_dependsDataList = new Dictionary<string, string[]>();
         private Dictionary<string, BundleObject> m_bundlesMap = new Dictionary<string, BundleObject>();     //已经加载完成的
+        private Dictionary<int, RequestObj> m_handlerWithRequestMap = new Dictionary<int, RequestObj>();   //正在异步的请求
         private Queue<BundleObject> m_unloadList = new Queue<BundleObject>();                               //释放队列
         private string m_assetBundleRootPath = "";
         /// <summary>
@@ -231,6 +242,30 @@ namespace ASGame
             base.OnStartLoad(mainHandler);
         }
 
+        protected override void OnLoadCompleted(AssetLoadHandler handler)
+        {
+            m_handlerWithRequestMap.Remove(handler.id);
+        }
+
+        protected override void OnLoadAborted(AssetLoadHandler handler)
+        {
+            //这里应该强制将异步转同步,提前结束加载
+            if (m_handlerWithRequestMap.TryGetValue(handler.id, out var requestObj))
+            {
+                if (requestObj.webRequest != null)
+                {
+                    requestObj.webRequest.Abort();
+                }
+
+                if(requestObj.abRequest != null)
+                {
+                    //直接取assetBundle即为同步
+                    requestObj.abRequest?.assetBundle.Unload(false);
+                }
+            }
+            m_handlerWithRequestMap.Remove(handler.id);
+        }
+
         //加载元操作
         protected override IEnumerator OnLoadAsset(AssetLoadHandler handler)
         {
@@ -261,11 +296,35 @@ namespace ASGame
             }
             else
             {
-                var request = AssetBundle.LoadFromFileAsync(assetPath);
-                yield return request;
+                if (assetPath.Contains("://"))
+                {
+                    handler.stayTime = HANDLER_BUNDLE_NETWORK_STAY_TIME;    //网络Handler超时时间
+                    var request = UnityWebRequestAssetBundle.GetAssetBundle(assetPath);
+                    request.timeout = (int)handler.stayTime;
+                    m_handlerWithRequestMap[handler.id] = new RequestObj()
+                    {
+                        id = handler.id,
+                        webRequest = request,
+                    };
+                    yield return request.SendWebRequest();
 
-                asset = request.assetBundle;
-                isDone = request.isDone;
+                    asset = DownloadHandlerAssetBundle.GetContent(request);
+                    isDone = request.isDone;
+                }
+                else
+                {
+                    handler.stayTime = HANDLER_BUNDLE_LOCAL_STAY_TIME;    //本地Handler超时时间
+                    var request = AssetBundle.LoadFromFileAsync(assetPath);
+                    m_handlerWithRequestMap[handler.id] = new RequestObj()
+                    {
+                        id = handler.id,
+                        abRequest = request,
+                    };
+                    yield return request;
+
+                    asset = request.assetBundle;
+                    isDone = request.isDone;
+                }
 
                 //先把加载到的AssetBundle加入记录缓存,并且标记引用次数+1
                 //不记录Bundle为空的项
