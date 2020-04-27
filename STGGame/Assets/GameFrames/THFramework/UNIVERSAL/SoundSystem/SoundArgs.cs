@@ -39,7 +39,7 @@ namespace THGame
         public float endTime = -1;
 
         /// <summary>
-        /// 延迟
+        /// 延迟,用作时间间隔
         /// </summary>
         public ulong delay = 0;
 
