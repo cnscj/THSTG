@@ -33,7 +33,7 @@ namespace XLibGame
             for (int i = m_objectArray.Count - 1; i >= 0; i--)
             {
                 var iter = m_objectArray[i];
-                if (iter.RefCount() >= iter.ManagedCount())
+                if (iter.RefCount >= iter.ManagedCount)
                 {
                     iter.ManagedRelease();
                     iter.Release();

@@ -33,7 +33,7 @@ namespace ASGame
         {
             if (stayTime > 0)
             {
-                if (RefCount() <= 0)
+                if (RefCount <= 0)
                 {
                     if (m_updateTick + stayTime <= Time.realtimeSinceStartup)
                     {
@@ -43,7 +43,7 @@ namespace ASGame
             }
             else
             {
-                if (RefCount() <= 0)
+                if (RefCount <= 0)
                 {
                     return true;
                 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ASGame
 {
-    public abstract class BaseLoader : MonoBehaviour
+    public abstract class BaseLoader : MonoBehaviour, IAssetLoader
     {
         public int maxLoadingCount = -1;                            //最大同时加载资源个数
         private LinkedList<AssetLoadHandler> m_waitQueue;           //等待队列

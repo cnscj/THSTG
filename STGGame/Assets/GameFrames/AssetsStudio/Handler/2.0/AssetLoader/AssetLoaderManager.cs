@@ -91,7 +91,6 @@ namespace ASGame
                 loader =  GetOrCreateBundleLoader();
                 realpath = path;
 #endif
-
             }
             else
             {

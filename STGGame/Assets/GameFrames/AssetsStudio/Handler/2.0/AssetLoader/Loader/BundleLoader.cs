@@ -11,7 +11,6 @@ using UnityEngine.Networking;
 
 namespace ASGame
 {
-    //TODO:要非常注意循环依赖的问题
     //加载依赖应该返回依赖信息,包括哪些依赖文件加载失败
     public class BundleLoader : BaseCoroutineLoader
     {
@@ -23,24 +22,22 @@ namespace ASGame
             public AssetBundleCreateRequest abRequest;
             public UnityWebRequest webRequest;
         }
+
         public class BundleObject : BaseRef
         {
             public string bundlePath;
             public AssetBundle assetBundle;
-            public HashSet<BundleObject> depends = new HashSet<BundleObject>();     //依赖项
 
-            protected override void OnRelease()
-            {
-                assetBundle.Unload(false); //TODO:递归向下释放,先释放自己在释放依赖
-            }
+            protected override void OnRelease() { assetBundle.Unload(false); }
         }
 
-
-        private Dictionary<string, string[]> m_dependsDataList = new Dictionary<string, string[]>();
-        private Dictionary<string, BundleObject> m_bundlesMap = new Dictionary<string, BundleObject>();     //已经加载完成的
+        private Dictionary<string, string[]> m_dependsDataList = new Dictionary<string, string[]>();       //总依赖表
+        private Dictionary<string, BundleObject> m_bundlesMap = new Dictionary<string, BundleObject>();    //已经加载完成的
         private Dictionary<int, RequestObj> m_handlerWithRequestMap = new Dictionary<int, RequestObj>();   //正在异步的请求
-        private Queue<BundleObject> m_unloadList = new Queue<BundleObject>();                               //释放队列
+        private Queue<BundleObject> m_unloadList = new Queue<BundleObject>();                              //释放队列
         private string m_assetBundleRootPath = "";
+
+
         /// <summary>
         /// 加载全局依赖文件
         /// </summary>
@@ -65,6 +62,18 @@ namespace ASGame
             }
         }
 
+        public void Unload(string path)
+        {
+            if (!string.IsNullOrEmpty(path))
+            {
+                if (m_bundlesMap.TryGetValue(path, out var bundleObj))
+                {
+                    m_unloadList.Enqueue(bundleObj);
+                }
+            }
+        }
+
+
         protected override void OnUpdate()
         {
             UpdateUnload();
@@ -78,11 +87,30 @@ namespace ASGame
             while (m_unloadList.Count > 0)
             {
                 var bundleObj = m_unloadList.Dequeue();
-                
+                UnloadBundleObject(bundleObj);
                 //TODO:卸载队列,如果引用已经没有了,会被送往这里卸载,
                 //但由可能在同一帧时,卸载前又有加载
             }
         }
+
+
+        private void UnloadBundleObject(BundleObject mainBundleObj)
+        {
+            if (mainBundleObj != null)
+            {
+                string mainBundlePath = mainBundleObj.bundlePath;
+                var dependiencies = GetBundleDependencies(mainBundlePath);
+                foreach (var subBundlePath in dependiencies)
+                {
+                    if (m_bundlesMap.TryGetValue(subBundlePath, out var subBundleObj))
+                    {
+                        subBundleObj.Release();
+                    }
+                }
+                mainBundleObj.Release();
+            }
+        }
+
 
         /// <summary>
         /// 取得依赖
@@ -209,9 +237,11 @@ namespace ASGame
         {
             if (!m_bundlesMap.ContainsKey(bundlePath))
             {
+                //TODO:引用计数和依赖计数有问题
                 var bundleObject = new BundleObject();
                 bundleObject.bundlePath = bundlePath;
                 bundleObject.assetBundle = assetBundle;
+
                 m_bundlesMap.Add(bundlePath, bundleObject);
             } 
         }
@@ -286,6 +316,7 @@ namespace ASGame
 
             Object asset = null;
             bool isDone = false;
+
             //是否已经在加载池中,如果是就直接返回,引用数加1
             var bundleObject = GetBundleObject(assetPath);
             if (bundleObject != null)
@@ -330,7 +361,6 @@ namespace ASGame
                 //不记录Bundle为空的项
                 if (isDone && asset != null)
                 {
-                    //TODO:这里需要把子依赖项也添加进去,不然会出大问题(引用计数
                     AddBundleObject(assetPath, asset as AssetBundle);
                 }
             }
