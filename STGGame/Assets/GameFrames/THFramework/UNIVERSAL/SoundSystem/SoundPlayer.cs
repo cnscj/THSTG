@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 namespace THGame
 {
@@ -8,20 +9,26 @@ namespace THGame
     public class SoundPlayer : MonoBehaviour
     {
         private static readonly SoundArgs DEFAULT_ARGS = new SoundArgs();
+        private static readonly SoundPlayerSetting DEFAULT_SETTING = new SoundPlayerSetting();
+
         public int maxCount = -1;               //最大同时播放个数,-1无限制
+        public float interval = 0;              //两次播放的时间间隔
 
         private float m_volume = 1f;
         private bool m_mute = false;
         private float m_speed = 1f;
         private bool m_isAbort = false;
         private int m_id = 0;
+        private float m_lastTick = 0;
+        private AudioMixer m_mixer;//混音器
 
         private LinkedList<SoundCommand> m_readingSounds = new LinkedList<SoundCommand>();                                      //准备队列
         private Dictionary<int,KeyValuePair<SoundArgs,SoundController>> m_playingSounds = new Dictionary<int, KeyValuePair<SoundArgs, SoundController>>();           //播放队列
         private Queue<int> m_releaseSounds = new Queue<int>();                                                                  //释放队列
 
-        private Dictionary<string, int> m_curTagCount = new Dictionary<string, int>();  //当前最大个数
-        private Dictionary<string, int> m_maxTagCount = new Dictionary<string, int>();  //最大同类型播放个数
+        private Dictionary<string, SoundPlayerRecorder> m_recorerMap = new Dictionary<string, SoundPlayerRecorder>();
+        private Dictionary<string, SoundPlayerSetting> m_settingMap = new Dictionary<string, SoundPlayerSetting>();
+
         private Coroutine m_fadeVolumeCoroutine;
         private SoundPool m_poolObj;
         private SoundArgsCache m_argsCache;
@@ -80,6 +87,9 @@ namespace THGame
             if (!IsTagCanPlay(args))
                 return -1;
 
+            if (!IsTagAtTime(args))
+                return -1;
+
             var id = PushSound(data, args);
             m_isAbort = false;
             return id;
@@ -90,7 +100,7 @@ namespace THGame
             if (!IsTagCanPlay(args))
                 return -1;
 
-            if (maxCount >= 0 && m_playingSounds.Count >= maxCount)
+            if (maxCount >= 0 && m_playingSounds.Count >= maxCount || Time.realtimeSinceStartup < m_lastTick + interval || !IsTagAtTime(args))
             {
                 return PushSound(data, args);
             }
@@ -105,6 +115,12 @@ namespace THGame
             if (!IsTagCanPlay(args))
                 return -1;
 
+            if (!IsTagAtTime(args))
+                return -1;
+
+            if (Time.realtimeSinceStartup < m_lastTick + interval)
+                return -1;
+
             while (maxCount >= 0 && m_playingSounds.Count >= maxCount)
             {
                 //找到一个播放最久的踢掉
@@ -114,9 +130,23 @@ namespace THGame
             return PlaySound(data, args);
         }
 
+        public int PlayDirectly(SoundData data, SoundArgs args = null)
+        {
+            if (!IsTagCanPlay(args))
+                return -1;
+
+            if (!IsTagAtTime(args))
+                return -1;
+
+            return PlaySound(data, args);
+        }
+
         public int Play(SoundData data, SoundArgs args = null)
         {
             if (!IsTagCanPlay(args))
+                return -1;
+
+            if (Time.realtimeSinceStartup < m_lastTick + interval)
                 return -1;
 
             if (maxCount < 0 || m_playingSounds.Count < maxCount)
@@ -205,6 +235,7 @@ namespace THGame
             {
                 StopSound(pair.Key);
             }
+            m_recorerMap.Clear();
         }
 
         /// <summary>
@@ -228,24 +259,105 @@ namespace THGame
             m_poolObj.Dispose();
         }
         ///
-        public void SetTagMaxCount(string key, int count)
+        public void SetSetting(string tag, SoundPlayerSetting setting)
         {
-            if(!string.IsNullOrEmpty(key))
+            if (!string.IsNullOrEmpty(tag))
             {
-                m_maxTagCount[key] = count;
+                m_settingMap[tag] = setting;
             }
         }
-        public int GetTagMaxCount(string key)
+
+        public SoundPlayerSetting GetSetting(string tag)
         {
-            if (!string.IsNullOrEmpty(key))
+            if (!string.IsNullOrEmpty(tag))
             {
-                if (m_maxTagCount.TryGetValue(key,out var count))
+                if (!m_settingMap.TryGetValue(tag, out var setting))
                 {
-                    return count;
+                    return setting;
                 }
+            }
+            return null;
+        }
+        
+        public void SetTagMaxCount(string tag, int count)
+        {
+            SoundPlayerSetting setting = GetSetting(tag);
+            if (setting != null)
+            {
+                setting = new SoundPlayerSetting();
+                SetSetting(tag, setting);
+            }
+            setting.maxCount = count;
+        }
+
+        public int GetTagMaxCount(string tag)
+        {
+            SoundPlayerSetting setting = GetSetting(tag);
+            if (setting != null)
+            {
+                return setting.maxCount;
             }
             return maxCount >= 0 ? maxCount : int.MaxValue;
         }
+
+        public float GetTagInterval(string tag)
+        {
+            SoundPlayerSetting setting = GetSetting(tag);
+            if (setting != null)
+            {
+                return setting.interval;
+            }
+            return interval;
+        }
+
+        private float GetCurTagTick(string key)
+        {
+            if (m_recorerMap.TryGetValue(key, out var recorer))
+            {
+                return recorer.lastTick;
+            }
+            return 0;
+        }
+
+        private int GetCurTagCount(string key)
+        {
+            if (m_recorerMap.TryGetValue(key, out var recorer))
+            {
+                return recorer.curCount;
+            }
+            return 0;
+        }
+
+
+        public bool IsTagAtTime(SoundArgs args)
+        {
+            if (args != null)
+            {
+                if (!string.IsNullOrEmpty(args.tag))
+                {
+                    var curTick = GetCurTagTick(args.tag);
+                    var tagInterval = GetTagInterval(args.tag);
+                    return Time.realtimeSinceStartup >= curTick + tagInterval;
+                }
+            }
+            return true;
+        }
+
+        private bool IsTagCanPlay(SoundArgs args)
+        {
+            if (args != null)
+            {
+                if (!string.IsNullOrEmpty(args.tag))
+                {
+                    var curCount = GetCurTagCount(args.tag);
+                    var maxCount = GetTagMaxCount(args.tag);
+                    return curCount < maxCount;
+                }
+            }
+            return true;
+        }
+       
+        ///
         public void TweenVolume(float from, float to, float fadeTime)
         {
             if (m_fadeVolumeCoroutine != null)
@@ -420,7 +532,7 @@ namespace THGame
                     {
                         var command = m_readingSounds.First.Value;
                         m_readingSounds.RemoveFirst();
-                        if (IsTagCanPlay(command))
+                        if (IsTagCanPlay(command?.args))
                         {
                             PlaySound(command);
                         }
@@ -453,37 +565,6 @@ namespace THGame
             }
         }
 
-        private int GetCurTagCount(string key)
-        {
-            if (m_curTagCount.TryGetValue(key,out var count))
-            {
-                return count;
-            }
-            return 0;
-        }
-
-        private bool IsTagCanPlay(SoundArgs args)
-        {
-            if (args != null)
-            {
-                if (!string.IsNullOrEmpty(args.tag))
-                {
-                    var curCount = GetCurTagCount(args.tag);
-                    var maxCount = GetTagMaxCount(args.tag);
-                    return curCount < maxCount;
-                }
-            }
-            return true;
-        }
-        private bool IsTagCanPlay(SoundCommand command)
-        {
-            if (command != null)
-            {
-                return IsTagCanPlay(command.args);
-            }
-            return true;
-        }
-
         private int PlaySound(SoundCommand command)
         {
             if (command == null)
@@ -514,10 +595,17 @@ namespace THGame
             m_playingSounds.Add(id, new KeyValuePair<SoundArgs, SoundController>(args, ctrl));
             if (!string.IsNullOrEmpty(args.tag))
             {
-                if (m_curTagCount.ContainsKey(args.tag)) m_curTagCount[args.tag]++;
-                else m_curTagCount[args.tag] = 1;
+                if (!m_recorerMap.TryGetValue(args.tag, out var recorer))
+                {
+                    m_recorerMap[args.tag] = new SoundPlayerRecorder();
+                }
+           
+                recorer.curCount++;
+                recorer.lastTick = Time.realtimeSinceStartup;
             }
-            
+
+            m_lastTick = Time.realtimeSinceStartup;
+
             return id;
         }
 
@@ -554,14 +642,15 @@ namespace THGame
         {
             if (m_playingSounds.TryGetValue(key, out var pair))
             {
-                pair.Value.Stop();
                 if (!string.IsNullOrEmpty(pair.Key.tag))
                 {
-                    if (m_curTagCount.ContainsKey(pair.Key.tag)) m_curTagCount[pair.Key.tag]--;
-                    else m_curTagCount[pair.Key.tag] = 1;
+                    if (m_recorerMap.TryGetValue(pair.Key.tag, out var recorer))
+                    {
+                        recorer.curCount--;
+                    }
                 }
 
-                GetOrCreateSoundPool().Release(pair.Value);
+                ReleaseSound(pair.Value);
                 GetOrCreateSoundArgsCache().Release(pair.Key);
                 m_playingSounds.Remove(key);
                 

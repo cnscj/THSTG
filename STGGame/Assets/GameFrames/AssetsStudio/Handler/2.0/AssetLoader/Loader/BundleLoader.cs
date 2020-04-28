@@ -190,6 +190,8 @@ namespace ASGame
             {
                 //记录依赖信息,引用自增
                 handler.status = AssetLoadStatus.LOAD_FINISHED;
+
+                //TODO:子AB依赖+1
             }  
         }
 
@@ -258,6 +260,7 @@ namespace ASGame
                 assetPath = pathPairs[0];
             }
 
+            //加载顺序决定是否能完全卸载,如果先加载依赖,在加载自己,就能够完全释放(这个与释放顺序无关
             //这里一次性读取所有依赖,无需递归
             var mainDependencies = GetBundleDependencies(assetPath, false);
             if (mainDependencies != null && mainDependencies.Length > 0)
