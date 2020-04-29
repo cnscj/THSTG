@@ -12,10 +12,10 @@ namespace ASGame
 
             Object obj = AssetDatabase.LoadAssetAtPath<Object>(handler.path);
             
-            if (handler.TryInvoke(new AssetLoadResult(obj, true)))
-            {
-                handler.status = AssetLoadStatus.LOAD_FINISHED;
-            }
+            //if (handler.TryInvoke(new AssetLoadResult(obj, true)))
+            //{
+            //    handler.status = AssetLoadStatus.LOAD_FINISHED;
+            //}
 
         }
 #else

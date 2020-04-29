@@ -19,6 +19,12 @@ namespace ASGame
         /// </summary>
         /// <param name="handler"></param>
         void StopLoad(AssetLoadHandler handler);
+
+        /// <summary>
+        /// 卸载资源
+        /// </summary>
+        /// <param name="pat"></param>
+        void UnLoad(string pat);
     }
 
 }

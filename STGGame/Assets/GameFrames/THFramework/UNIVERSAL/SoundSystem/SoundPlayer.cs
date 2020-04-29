@@ -9,7 +9,6 @@ namespace THGame
     public class SoundPlayer : MonoBehaviour
     {
         private static readonly SoundArgs DEFAULT_ARGS = new SoundArgs();
-        private static readonly SoundPlayerSetting DEFAULT_SETTING = new SoundPlayerSetting();
 
         public int maxCount = -1;               //最大同时播放个数,-1无限制
         public float interval = 0;              //两次播放的时间间隔
@@ -20,14 +19,13 @@ namespace THGame
         private bool m_isAbort = false;
         private int m_id = 0;
         private float m_lastTick = 0;
-        private AudioMixer m_mixer;//混音器
 
         private LinkedList<SoundCommand> m_readingSounds = new LinkedList<SoundCommand>();                                      //准备队列
         private Dictionary<int,KeyValuePair<SoundArgs,SoundController>> m_playingSounds = new Dictionary<int, KeyValuePair<SoundArgs, SoundController>>();           //播放队列
         private Queue<int> m_releaseSounds = new Queue<int>();                                                                  //释放队列
 
-        private Dictionary<string, SoundPlayerRecorder> m_recorerMap = new Dictionary<string, SoundPlayerRecorder>();
-        private Dictionary<string, SoundPlayerSetting> m_settingMap = new Dictionary<string, SoundPlayerSetting>();
+        private Dictionary<string, SoundPlayerRecorder> m_recorderMap = new Dictionary<string, SoundPlayerRecorder>();
+        private Dictionary<string, SoundPlayerAdjuster> m_adjusterMap = new Dictionary<string, SoundPlayerAdjuster>();
 
         private Coroutine m_fadeVolumeCoroutine;
         private SoundPool m_poolObj;
@@ -60,7 +58,7 @@ namespace THGame
         }
 
         /// <summary>
-        /// 正作播放的音效个数
+        /// 正在播放的音频个数
         /// </summary>
         public int Count
         {
@@ -235,7 +233,7 @@ namespace THGame
             {
                 StopSound(pair.Key);
             }
-            m_recorerMap.Clear();
+            m_recorderMap.Clear();
         }
 
         /// <summary>
@@ -259,40 +257,29 @@ namespace THGame
             m_poolObj.Dispose();
         }
         ///
-        public void SetSetting(string tag, SoundPlayerSetting setting)
+        public void SetAdjuster(string tag, SoundPlayerAdjuster adjuster)
         {
             if (!string.IsNullOrEmpty(tag))
             {
-                m_settingMap[tag] = setting;
+                m_adjusterMap[tag] = adjuster;
             }
         }
 
-        public SoundPlayerSetting GetSetting(string tag)
+        public SoundPlayerAdjuster GetAdjuster(string tag)
         {
             if (!string.IsNullOrEmpty(tag))
             {
-                if (!m_settingMap.TryGetValue(tag, out var setting))
+                if (!m_adjusterMap.TryGetValue(tag, out var setting))
                 {
                     return setting;
                 }
             }
             return null;
         }
-        
-        public void SetTagMaxCount(string tag, int count)
-        {
-            SoundPlayerSetting setting = GetSetting(tag);
-            if (setting != null)
-            {
-                setting = new SoundPlayerSetting();
-                SetSetting(tag, setting);
-            }
-            setting.maxCount = count;
-        }
 
-        public int GetTagMaxCount(string tag)
+        private int GetTagMaxCount(string tag)
         {
-            SoundPlayerSetting setting = GetSetting(tag);
+            SoundPlayerAdjuster setting = GetAdjuster(tag);
             if (setting != null)
             {
                 return setting.maxCount;
@@ -300,9 +287,9 @@ namespace THGame
             return maxCount >= 0 ? maxCount : int.MaxValue;
         }
 
-        public float GetTagInterval(string tag)
+        private float GetTagInterval(string tag)
         {
-            SoundPlayerSetting setting = GetSetting(tag);
+            SoundPlayerAdjuster setting = GetAdjuster(tag);
             if (setting != null)
             {
                 return setting.interval;
@@ -310,18 +297,18 @@ namespace THGame
             return interval;
         }
 
-        private float GetCurTagTick(string key)
+        private float GetCurTagTick(string tag)
         {
-            if (m_recorerMap.TryGetValue(key, out var recorer))
+            if (m_recorderMap.TryGetValue(tag, out var recorer))
             {
                 return recorer.lastTick;
             }
             return 0;
         }
 
-        private int GetCurTagCount(string key)
+        private int GetCurTagCount(string tag)
         {
-            if (m_recorerMap.TryGetValue(key, out var recorer))
+            if (m_recorderMap.TryGetValue(tag, out var recorer))
             {
                 return recorer.curCount;
             }
@@ -329,7 +316,7 @@ namespace THGame
         }
 
 
-        public bool IsTagAtTime(SoundArgs args)
+        private bool IsTagAtTime(SoundArgs args)
         {
             if (args != null)
             {
@@ -595,9 +582,10 @@ namespace THGame
             m_playingSounds.Add(id, new KeyValuePair<SoundArgs, SoundController>(args, ctrl));
             if (!string.IsNullOrEmpty(args.tag))
             {
-                if (!m_recorerMap.TryGetValue(args.tag, out var recorer))
+                if (!m_recorderMap.TryGetValue(args.tag, out var recorer))
                 {
-                    m_recorerMap[args.tag] = new SoundPlayerRecorder();
+                    var recorder = new SoundPlayerRecorder();
+                    m_recorderMap[args.tag] = recorder;
                 }
            
                 recorer.curCount++;
@@ -644,7 +632,7 @@ namespace THGame
             {
                 if (!string.IsNullOrEmpty(pair.Key.tag))
                 {
-                    if (m_recorerMap.TryGetValue(pair.Key.tag, out var recorer))
+                    if (m_recorderMap.TryGetValue(pair.Key.tag, out var recorer))
                     {
                         recorer.curCount--;
                     }

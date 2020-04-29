@@ -9,11 +9,12 @@ namespace ASGame
         public int id;
         public int status;
         public string path;
+        public AssetLoadResult result;
         public BaseLoader loader;
         public float stayTime = 120f;
 
         private float m_updateTick;
-        private AssetLoadResult m_result;
+
         private AssetLoadCallback m_onCallback;
         private AssetLoadHandler m_parent;
         private List<AssetLoadHandler> m_children;
@@ -65,23 +66,41 @@ namespace ASGame
             return m_onCallback;
         }
 
+
+
         //当且仅当子handler返回所有结果后才返回
-        public bool TryInvoke(AssetLoadResult result)
+        public void Transmit(AssetLoadResult ret)
         {
             //这里得区分是自己的回调,还是由子回调引起的回调由此来确定result的正确性
-            m_result = result ?? m_result;
+            result = ret ?? result;
             if (m_children != null && m_children.Count > 0)
             {
-                if(m_callbackCount < m_children.Count)
+                if (m_callbackCount < m_children.Count)
                 {
                     m_callbackCount++;
-                    return false;
                 }
             }
 
-            m_onCallback?.Invoke(m_result);
-            m_parent?.TryInvoke(null);
-            return true;
+            m_parent?.Transmit(null);
+        }
+
+        public bool IsCompleted()
+        {
+            if (m_children != null && m_children.Count > 0)
+            {
+                if (m_callbackCount < m_children.Count)
+                {
+                    return false;
+                }
+            }
+            return result != null;
+        }
+
+
+        public void Callback(AssetLoadResult ret = null)
+        {
+            result = ret ?? result;
+            m_onCallback?.Invoke(result);
         }
 
         public bool CheckTimeout()
@@ -102,11 +121,12 @@ namespace ASGame
         {
             id = 0;
             status = 0;
+            result = null;
             loader = null;
             path = null;
             stayTime = 120f;
 
-            m_result = null;
+
             m_onCallback = null;
             m_parent = null;
             m_children = null;

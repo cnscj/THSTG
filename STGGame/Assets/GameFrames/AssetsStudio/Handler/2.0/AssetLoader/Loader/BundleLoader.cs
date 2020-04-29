@@ -34,7 +34,6 @@ namespace ASGame
         private Dictionary<string, string[]> m_dependsDataList = new Dictionary<string, string[]>();       //总依赖表
         private Dictionary<string, BundleObject> m_bundlesMap = new Dictionary<string, BundleObject>();    //已经加载完成的
         private Dictionary<int, RequestObj> m_handlerWithRequestMap = new Dictionary<int, RequestObj>();   //正在异步的请求
-        private Queue<BundleObject> m_unloadList = new Queue<BundleObject>();                              //释放队列
         private string m_assetBundleRootPath = "";
 
 
@@ -62,37 +61,16 @@ namespace ASGame
             }
         }
 
-        public void Unload(string path)
+        public override void UnLoad(string path)
         {
             if (!string.IsNullOrEmpty(path))
             {
                 if (m_bundlesMap.TryGetValue(path, out var bundleObj))
                 {
-                    m_unloadList.Enqueue(bundleObj);
+                    UnloadBundleObject(bundleObj);
                 }
             }
         }
-
-
-        protected override void OnUpdate()
-        {
-            UpdateUnload();
-        }
-
-        protected void UpdateUnload()
-        {
-            //规则:
-            //正在异步加载中也不能卸载
-            //常驻资源就不卸载；非常驻资源，并且引用计数为0才能卸载
-            while (m_unloadList.Count > 0)
-            {
-                var bundleObj = m_unloadList.Dequeue();
-                UnloadBundleObject(bundleObj);
-                //TODO:卸载队列,如果引用已经没有了,会被送往这里卸载,
-                //但由可能在同一帧时,卸载前又有加载
-            }
-        }
-
 
         private void UnloadBundleObject(BundleObject mainBundleObj)
         {
@@ -181,20 +159,6 @@ namespace ASGame
             return fullBundlePath.ToLower();
         }
 
-        private void OnLoadAssetCallback(AssetLoadHandler handler, AssetLoadResult result)
-        {
-            //只有子依赖完成回调了,才真正回调
-            result = result ?? AssetLoadResult.EMPTY_RESULT;
-            var isDone = handler.TryInvoke(result);
-            if (isDone)
-            {
-                //记录依赖信息,引用自增
-                handler.status = AssetLoadStatus.LOAD_FINISHED;
-
-                //TODO:子AB依赖+1
-            }  
-        }
-
         private void OnLoadMainfestCallback(AssetBundle ab)
         {
             if (ab == null)
@@ -240,6 +204,7 @@ namespace ASGame
             if (!m_bundlesMap.ContainsKey(bundlePath))
             {
                 //TODO:引用计数和依赖计数有问题
+                //应该递归添加所有依赖数(不过可能父依赖先与子依赖先加载,导致没有办法正确增加引用
                 var bundleObject = new BundleObject();
                 bundleObject.bundlePath = bundlePath;
                 bundleObject.assetBundle = assetBundle;
@@ -262,6 +227,8 @@ namespace ASGame
 
             //加载顺序决定是否能完全卸载,如果先加载依赖,在加载自己,就能够完全释放(这个与释放顺序无关
             //这里一次性读取所有依赖,无需递归
+
+            //TODO:这里应该启用协程的嵌套,确保顺序
             var mainDependencies = GetBundleDependencies(assetPath, false);
             if (mainDependencies != null && mainDependencies.Length > 0)
             {
@@ -275,14 +242,13 @@ namespace ASGame
             base.OnStartLoad(mainHandler);
         }
 
-        protected override void OnLoadCompleted(AssetLoadHandler handler)
+        protected override void OnLoadSuccess(AssetLoadHandler handler)
         {
             m_handlerWithRequestMap.Remove(handler.id);
         }
 
-        protected override void OnLoadAborted(AssetLoadHandler handler)
+        protected override void OnLoadFailed(AssetLoadHandler handler)
         {
-            //这里应该强制将异步转同步,提前结束加载
             if (m_handlerWithRequestMap.TryGetValue(handler.id, out var requestObj))
             {
                 if (requestObj.webRequest != null)
@@ -292,6 +258,7 @@ namespace ASGame
 
                 if(requestObj.abRequest != null)
                 {
+                    //这里强制将异步转同步,提前结束加载
                     //直接取assetBundle即为同步
                     requestObj.abRequest?.assetBundle.Unload(false);
                 }
@@ -299,12 +266,47 @@ namespace ASGame
             m_handlerWithRequestMap.Remove(handler.id);
         }
 
-        //加载元操作
         protected override IEnumerator OnLoadAsset(AssetLoadHandler handler)
+        {
+            //TODO:循环等待所有子加载器加载完在回调
+            yield return LoadAssetPrimitive(handler);
+        }
+
+        //加载回调处理
+        private void LoadAssetPrimitiveCallback(AssetLoadHandler handler, AssetLoadResult result)
+        {
+            //只有子依赖完成回调了,才真正回调
+            //TODO:不过可能父比子先回调回来,导致没有真正回调到
+            result = result ?? AssetLoadResult.EMPTY_RESULT;
+            handler.Transmit(result);
+            if (handler.IsCompleted())
+            {
+                var handleResult = handler.result;
+                if (handleResult.isDone)
+                {
+                    if (handleResult.asset != null)
+                    {
+                        handler.status = AssetLoadStatus.LOAD_FINISHED;
+                    }
+                    else
+                    {
+                        handler.status = AssetLoadStatus.LOAD_NOTFOUND;
+                    }
+                }
+                else
+                {
+                    handler.status = AssetLoadStatus.LOAD_ERROR;
+                }
+                handler.Callback();
+            }
+        }
+
+        //加载元操作
+        private IEnumerator LoadAssetPrimitive(AssetLoadHandler handler)
         {
             if (string.IsNullOrEmpty(handler.path))
             {
-                OnLoadAssetCallback(handler, AssetLoadResult.EMPTY_RESULT);
+                LoadAssetPrimitiveCallback(handler, AssetLoadResult.EMPTY_RESULT);
                 yield break;
             }
 
@@ -324,7 +326,7 @@ namespace ASGame
             var bundleObject = GetBundleObject(assetPath);
             if (bundleObject != null)
             {
-                bundleObject.Retain();
+                //bundleObject.Retain();
                 asset = bundleObject.assetBundle;
                 isDone = true;
             }
@@ -383,7 +385,7 @@ namespace ASGame
             }
 
             var result = new AssetLoadResult(asset, isDone);
-            OnLoadAssetCallback(handler, result);
+            LoadAssetPrimitiveCallback(handler, result);
         }
     }
 }

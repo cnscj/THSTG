@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class SoundPlayerRecorder
 {
-    public string key;
 
     /// <summary>
     /// 该类型当前最大个数

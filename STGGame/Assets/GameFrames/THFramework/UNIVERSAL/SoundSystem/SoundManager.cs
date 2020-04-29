@@ -135,6 +135,20 @@ namespace THGame
             }
         }
 
+        public SoundPlayer GetOrCreatePlayer(SoundType type)
+        {
+            m_soundDict = m_soundDict ?? new Dictionary<SoundType, SoundPlayer>();
+            if (!m_soundDict.ContainsKey(type))
+            {
+                string typeName = Enum.Parse(typeof(SoundType), type.ToString()).ToString();
+                string playerName = string.Format("{0}Player", typeName);
+                GameObject playerGobj = new GameObject(playerName);
+                SoundPlayer soundPlayer = playerGobj.AddComponent<SoundPlayer>();
+                playerGobj.transform.SetParent(transform);
+                m_soundDict[type] = soundPlayer;
+            }
+            return m_soundDict[type];
+        }
         /////////////////////////////
 
         /// <summary>
@@ -174,9 +188,33 @@ namespace THGame
         /// </summary>
         /// <param name="tag"></param>
         /// <param name="count"></param>
-        public void SetEffectTagMaxCount(string tag,int count)
+        public void SetEffectMaxCount(string tag, int count)
         {
-            GetOrCreatePlayer(SoundType.Effect).SetTagMaxCount(tag, count);
+            var player = GetOrCreatePlayer(SoundType.Effect);
+            var adjuster = player.GetAdjuster(tag);
+            if (adjuster == null)
+            {
+                adjuster = new SoundPlayerAdjuster();
+            }
+            adjuster.maxCount = count;
+            player.SetAdjuster(tag,adjuster);
+        }
+
+        /// <summary>
+        /// 相同两次播放的时间间隔
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="interval"></param>
+        public void SetEffectInterval(string tag, float interval)
+        {
+            var player = GetOrCreatePlayer(SoundType.Effect);
+            var adjuster = player.GetAdjuster(tag);
+            if (adjuster == null)
+            {
+                adjuster = new SoundPlayerAdjuster();
+            }
+            adjuster.interval = interval;
+            player.SetAdjuster(tag, adjuster);
         }
 
         ///////////////////
@@ -332,21 +370,6 @@ namespace THGame
                 }
             }
             return null;
-        }
-
-        private SoundPlayer GetOrCreatePlayer(SoundType type)
-        {
-            m_soundDict = m_soundDict ?? new Dictionary<SoundType, SoundPlayer>();
-            if (!m_soundDict.ContainsKey(type))
-            {
-                string typeName = Enum.Parse(typeof(SoundType), type.ToString()).ToString();
-                string playerName = string.Format("{0}Player", typeName);
-                GameObject playerGobj = new GameObject(playerName);
-                SoundPlayer soundPlayer = playerGobj.AddComponent<SoundPlayer>();
-                playerGobj.transform.SetParent(transform);
-                m_soundDict[type] = soundPlayer;
-            }
-            return m_soundDict[type];
         }
 
     }

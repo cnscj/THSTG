@@ -9,8 +9,9 @@ namespace ASGame
         public int maxLoadingCount = -1;                            //最大同时加载资源个数
         private LinkedList<AssetLoadHandler> m_waitQueue;           //等待队列
         private Dictionary<string, AssetLoadHandler> m_loadingMap;  //加载队列
-        private LinkedList<AssetLoadHandler> m_finishQueue;         //完成队列
-        private LinkedList<AssetLoadHandler> m_abortedQueue;        //中断队列
+
+        private LinkedList<AssetLoadHandler> m_successQueue;        //成功队列
+        private LinkedList<AssetLoadHandler> m_failedQueue;         //失败队列
         private LinkedList<AssetLoadHandler> m_releaseQueue;        //释放队列
 
         public int WaitingCount
@@ -64,6 +65,11 @@ namespace ASGame
             }
         }
 
+        public virtual void UnLoad(string path)
+        {
+
+        }
+
         public virtual void Clear()
         {
             m_waitQueue?.Clear();
@@ -82,8 +88,9 @@ namespace ASGame
             UpdateWait();
             OnUpdate();
             UpdateStatus();
-            UpdateFinish();
-            UpdateAborted();
+            UpdateSuccess();
+            UpdateFailed();
+
             UpdateRelease();
         }
 
@@ -119,6 +126,24 @@ namespace ASGame
             
         }
 
+        //资源加载成功
+        protected void LoadHandlerSuccess(AssetLoadHandler handler)
+        {
+
+            OnLoadSuccess(handler);
+        }
+
+        //资源加载失败
+        protected void LoadHandlerFailed(AssetLoadHandler handler)
+        {
+            //资源加载失败
+
+            //TODO:释放掉所有的依赖加载器
+
+            OnLoadFailed(handler);
+        }
+
+        ////////////
         private LinkedList<AssetLoadHandler> GetWaitQueue()
         {
             m_waitQueue = m_waitQueue ?? new LinkedList<AssetLoadHandler>();
@@ -131,16 +156,16 @@ namespace ASGame
             return m_loadingMap;
         }
 
-        private LinkedList<AssetLoadHandler> GetFinishQueue()
+        private LinkedList<AssetLoadHandler> GetSuccessQueue()
         {
-            m_finishQueue = m_finishQueue ?? new LinkedList<AssetLoadHandler>();
-            return m_finishQueue;
+            m_successQueue = m_successQueue ?? new LinkedList<AssetLoadHandler>();
+            return m_successQueue;
         }
 
-        private LinkedList<AssetLoadHandler> GetAbortQueue()
+        private LinkedList<AssetLoadHandler> GetFailedQueue()
         {
-            m_abortedQueue = m_abortedQueue ?? new LinkedList<AssetLoadHandler>();
-            return m_abortedQueue;
+            m_failedQueue = m_failedQueue ?? new LinkedList<AssetLoadHandler>();
+            return m_failedQueue;
         }
 
         private LinkedList<AssetLoadHandler> GetReleaseQueue()
@@ -168,60 +193,65 @@ namespace ASGame
             {
                 foreach(var handler in m_loadingMap.Values)
                 {
+                    //状态更新
                     if (handler.status == AssetLoadStatus.LOAD_LOADING)
                     {
+                        //超时检测
                         if (handler.CheckTimeout())
                         {
                             handler.status = AssetLoadStatus.LOAD_TIMEOUT;
                         }
                     }
 
+
+                    //全部只有两种结果,要么成功,要么失败
                     if (handler.status == AssetLoadStatus.LOAD_FINISHED)
                     {
-                        GetFinishQueue().AddLast(handler);
+                        GetSuccessQueue().AddLast(handler);
                     }
-                    else if (
-                        handler.status == AssetLoadStatus.LOAD_ABORT ||
-                        handler.status == AssetLoadStatus.LOAD_TIMEOUT)
+                    else if (handler.status < AssetLoadStatus.LOAD_IDLE)
                     {
-                        GetAbortQueue().AddLast(handler);
+                        GetFailedQueue().AddLast(handler);
                     }
                 }
             }
         }
 
-        private void UpdateFinish()
+        //送入缓存,并返回
+        private void UpdateSuccess()
         {
-            if (m_finishQueue != null)
+            if (m_successQueue != null)
             {
-                while (m_finishQueue.Count > 0)
+                while (m_successQueue.Count > 0)
                 {
-                    var handler = m_finishQueue.First.Value;
-                    OnLoadCompleted(handler);
+                    var handler = m_successQueue.First.Value;
+                    LoadHandlerSuccess(handler);
      
                     m_loadingMap.Remove(handler.path);
-                    m_finishQueue.RemoveFirst();
+                    m_successQueue.RemoveFirst();
                     GetReleaseQueue().AddLast(handler);
                 }
             }
         }
 
-        private void UpdateAborted()
+        //释放所有依赖,并返回
+        private void UpdateFailed()
         {
-            if (m_abortedQueue != null)
+            if (m_failedQueue != null)
             {
-                while (m_abortedQueue.Count > 0)
+                while (m_failedQueue.Count > 0)
                 {
-                    var handler = m_abortedQueue.First.Value;
-                    OnLoadAborted(handler);
+                    var handler = m_failedQueue.First.Value;
+                    LoadHandlerFailed(handler);
 
                     m_loadingMap.Remove(handler.path);
-                    m_abortedQueue.RemoveFirst();
+                    m_failedQueue.RemoveFirst();
                     GetReleaseQueue().AddLast(handler);
                 }
             }
         }
 
+        //如果外部不持有Handler,释放
         private void UpdateRelease()
         {
             if (m_releaseQueue != null)
@@ -239,8 +269,8 @@ namespace ASGame
         protected virtual void OnUpdate(){ }
         protected abstract void OnStartLoad(AssetLoadHandler handler);
         protected abstract void OnStopLoad(AssetLoadHandler handler);
-        protected virtual void OnLoadCompleted(AssetLoadHandler handler) { }
-        protected virtual void OnLoadAborted(AssetLoadHandler handler) { }
+        protected virtual void OnLoadSuccess(AssetLoadHandler handler) { }
+        protected virtual void OnLoadFailed(AssetLoadHandler handler) { }
     }
 }
 

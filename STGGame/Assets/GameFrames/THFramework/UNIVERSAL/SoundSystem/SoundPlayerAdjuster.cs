@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SoundPlayerSetting
+public class SoundPlayerAdjuster
 {
-    public string key;
-
     /// <summary>
     /// 该类型最大的播放个数
     /// </summary>

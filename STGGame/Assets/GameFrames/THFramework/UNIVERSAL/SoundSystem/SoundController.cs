@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Audio;
 
 namespace THGame
 {
@@ -108,6 +109,18 @@ namespace THGame
         public float Length
         {
             get { return (GetAudio().clip ? GetAudio().clip.length : 0f); }
+        }
+
+        public AudioMixerGroup MixerGroup
+        {
+            get
+            {
+                return GetAudio().outputAudioMixerGroup;
+            }
+            set
+            {
+                GetAudio().outputAudioMixerGroup = value;
+            }
         }
 
         public object CustomData
