@@ -16,45 +16,27 @@ namespace ASGame
         private float m_updateTick;
 
         private AssetLoadCallback m_onCallback;
-        private AssetLoadHandler m_parent;
+        private HashSet<AssetLoadHandler> m_parents;
         private List<AssetLoadHandler> m_children;
         private int m_callbackCount;
 
         public void AddChild(AssetLoadHandler handler)
         {
-            if (handler.m_parent != null)
-                return;
-            
-            handler.m_parent = this;
-            handler.Retain();
+            m_parents = m_parents ?? new HashSet<AssetLoadHandler>();
             m_children = m_children ?? new List<AssetLoadHandler>();
+
+            if (m_parents.Contains(this))
+                return;
+
+            handler.Retain();
+
+            m_parents.Add(this);
             m_children.Add(handler);
         }
 
         public AssetLoadHandler[] GetChildren()
         {
             return m_children?.ToArray();
-        }
-
-        public void RemoveFromParent()
-        {
-            if (m_parent != null)
-            {
-                var childList = m_parent.m_children;
-                if (childList != null && childList.Count > 0)
-                {
-                    for (int i = childList.Count - 1; i >= 0; i--)
-                    {
-                        var handler = childList[i];
-                        if (handler == this)
-                        {
-                            childList.RemoveAt(i);
-                            m_parent = null;
-                            break;
-                        }
-                    }
-                }
-            }
         }
 
         public AssetLoadCallback OnCompleted(AssetLoadCallback callback = null)
@@ -69,37 +51,56 @@ namespace ASGame
 
 
         //当且仅当子handler返回所有结果后才返回
-        public void Transmit(AssetLoadResult ret)
+        public bool Transmit(AssetLoadResult ret)
         {
             //这里得区分是自己的回调,还是由子回调引起的回调由此来确定result的正确性
             result = ret ?? result;
             if (m_children != null && m_children.Count > 0)
             {
-                if (m_callbackCount < m_children.Count)
+                if (m_callbackCount < m_children.Count)   //所有子回调
                 {
                     m_callbackCount++;
+                    return false;
+                }
+                else
+                {
+                    if (result == null)
+                    {
+                        return false;
+                    }
+                }  
+            }
+
+            if (m_parents != null && m_parents.Count > 0)
+            {
+                foreach (var parent in m_parents)
+                {
+                    parent?.Transmit(null);
                 }
             }
 
-            m_parent?.Transmit(null);
+            return true;
         }
 
         public bool IsCompleted()
         {
+            bool isCompleted = (result != null);
             if (m_children != null && m_children.Count > 0)
             {
-                if (m_callbackCount < m_children.Count)
+                foreach(var child in m_children)
                 {
-                    return false;
+                    if (!child.IsCompleted())
+                    {
+                        isCompleted = false;
+                        break;
+                    }
                 }
             }
-            return result != null;
+            return isCompleted;
         }
 
-
-        public void Callback(AssetLoadResult ret = null)
+        public void Callback()
         {
-            result = ret ?? result;
             m_onCallback?.Invoke(result);
         }
 
@@ -128,8 +129,8 @@ namespace ASGame
 
 
             m_onCallback = null;
-            m_parent = null;
-            m_children = null;
+            m_parents?.Clear();
+            m_children?.Clear();
             m_callbackCount = 0;
 
             UpdateTick();
@@ -143,6 +144,7 @@ namespace ASGame
                 for (int i = m_children.Count - 1; i >= 0; i--)
                 {
                     var handler = m_children[i];
+                    handler.m_parents?.Remove(this);
                     handler.Release();
                 }
             }

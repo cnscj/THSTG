@@ -139,7 +139,6 @@ namespace ASGame
                     }
                     return dependenciesSet.ToArray();
                 }
-
             }
             return null;
         }
@@ -228,18 +227,28 @@ namespace ASGame
             //加载顺序决定是否能完全卸载,如果先加载依赖,在加载自己,就能够完全释放(这个与释放顺序无关
             //这里一次性读取所有依赖,无需递归
 
-            //TODO:这里应该启用协程的嵌套,确保顺序
+            //这里应该启用协程的嵌套,确保顺序
             var mainDependencies = GetBundleDependencies(assetPath, false);
             if (mainDependencies != null && mainDependencies.Length > 0)
             {
                 foreach (var subDependence in mainDependencies)
                 {
                     var subHandler = GetOrCreateHandler(subDependence);
-                    base.OnStartLoad(subHandler);//StartLoadWithHandler(subHandler);
+                    base.OnStartLoad(subHandler);
                     mainHandler.AddChild(subHandler);
                 }
             }
             base.OnStartLoad(mainHandler);
+        }
+
+        protected override void OnStopLoad(AssetLoadHandler handler)
+        {
+            //TODO:这里只中止了主Handler的加载,没有阻止子Handler加载
+            //问题是如果子Handler被别的ab引用,是不能被中止的,除非没有引用才中止
+            //因此可能要记录下有多少个主handler引用着这个子handle
+            //不过如果中止子handler 的话,可能引起主handler卡死无法回调
+            handler.result = handler.result ?? AssetLoadResult.EMPTY_RESULT;  //防止卡死无法回调
+            base.OnStopLoad(handler);
         }
 
         protected override void OnLoadSuccess(AssetLoadHandler handler)
@@ -268,18 +277,33 @@ namespace ASGame
 
         protected override IEnumerator OnLoadAsset(AssetLoadHandler handler)
         {
-            //TODO:循环等待所有子加载器加载完在回调
+            //循环等待所有子加载器加载完在回调
+            var children = handler.GetChildren();
+            if (children != null && children.Length > 0)
+            {
+                bool isCompleted;
+                do
+                {
+                    isCompleted = true;
+                    foreach (var subHandler in children)
+                    {
+                        if (!subHandler.IsCompleted())
+                        {
+                            isCompleted = false;
+                            break;
+                        }
+                    }
+                } while (!isCompleted);
+            }
             yield return LoadAssetPrimitive(handler);
         }
 
         //加载回调处理
         private void LoadAssetPrimitiveCallback(AssetLoadHandler handler, AssetLoadResult result)
         {
-            //只有子依赖完成回调了,才真正回调
-            //TODO:不过可能父比子先回调回来,导致没有真正回调到
             result = result ?? AssetLoadResult.EMPTY_RESULT;
-            handler.Transmit(result);
-            if (handler.IsCompleted())
+            var isCompleted = handler.Transmit(result);
+            if (isCompleted)
             {
                 var handleResult = handler.result;
                 if (handleResult.isDone)
@@ -326,7 +350,6 @@ namespace ASGame
             var bundleObject = GetBundleObject(assetPath);
             if (bundleObject != null)
             {
-                //bundleObject.Retain();
                 asset = bundleObject.assetBundle;
                 isDone = true;
             }

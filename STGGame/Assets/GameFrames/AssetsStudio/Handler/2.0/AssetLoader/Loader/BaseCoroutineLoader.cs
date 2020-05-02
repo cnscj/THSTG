@@ -17,10 +17,16 @@ namespace ASGame
 
         protected override void OnStartLoad(AssetLoadHandler handler)
         {
-            handler.loader = this;
+            if (handler == null)
+                return;
 
-            var coroutine = StartCoroutine(LoadAssetCoroutine(handler));
-            m_loadCoroutines[handler.id] = new KeyValuePair<AssetLoadHandler, Coroutine>(handler, coroutine);
+            if (!m_loadCoroutines.ContainsKey(handler.id))
+            {
+                handler.loader = this;
+
+                var coroutine = StartCoroutine(LoadAssetCoroutine(handler));
+                m_loadCoroutines[handler.id] = new KeyValuePair<AssetLoadHandler, Coroutine>(handler, coroutine);
+            }
         }
 
         protected override void OnStopLoad(AssetLoadHandler handler)

@@ -8,7 +8,7 @@ namespace THGame
         public class PoolInfo
         {
             public float stayTime;
-            public Queue<SoundController> idleQueue = new Queue<SoundController>();
+            public Stack<SoundController> idleQueue = new Stack<SoundController>();//用栈使得空闲的频繁使用,
 
             public int curMaxCount;
             public float updateTick;
@@ -16,7 +16,7 @@ namespace THGame
 
         private int m_disposeTimes = 0;
         private Dictionary<string, PoolInfo> m_poolMap = new Dictionary<string, PoolInfo>();
-        private Queue<string> m_releaseList = new Queue<string>();
+        private Stack<string> m_releaseList = new Stack<string>();      
         
         public SoundController GetOrCreate(string key,float lifeTime = 0f)
         {
@@ -35,10 +35,10 @@ namespace THGame
                 ctrl = ctrlGobj.AddComponent<SoundController>();
                 ctrlGobj.transform.SetParent(transform);
 
-                poolInfo.idleQueue.Enqueue(ctrl);
+                poolInfo.idleQueue.Push(ctrl);
             }
       
-            ctrl = poolInfo.idleQueue.Dequeue();
+            ctrl = poolInfo.idleQueue.Pop();
             ctrlGobj = ctrl.gameObject;
             var poolObj = ctrlGobj.GetComponent<SoundPoolObject>();
             if (poolObj == null)
@@ -92,7 +92,7 @@ namespace THGame
                             poolInfo = new PoolInfo();
                             m_poolMap.Add(key, poolInfo);
                         }
-                        poolInfo.idleQueue.Enqueue(soundCtrl);
+                        poolInfo.idleQueue.Push(soundCtrl);
 
                         gobj.transform.SetParent(transform);
                         gobj.SetActive(false);
@@ -129,6 +129,7 @@ namespace THGame
                 {
                     Object.Destroy(ctrl.gameObject);
                 }
+                idleQueue.Clear();
             }
             m_poolMap.Clear();
             m_disposeTimes++;
@@ -156,7 +157,7 @@ namespace THGame
                         if (poolInfo.updateTick + poolInfo.stayTime <= Time.realtimeSinceStartup)
                         {
                             var poolKey = pair.Key;
-                            m_releaseList.Enqueue(poolKey);
+                            m_releaseList.Push(poolKey);
                         }
                     }
                     else
@@ -168,7 +169,7 @@ namespace THGame
             }
             while(m_releaseList.Count > 0 )
             {
-                var poolKey = m_releaseList.Dequeue();
+                var poolKey = m_releaseList.Pop();
                 if (m_poolMap.TryGetValue(poolKey,out var poolInfo))
                 {
                     var idleQueue = poolInfo.idleQueue;
@@ -176,6 +177,7 @@ namespace THGame
                     {
                         Object.Destroy(ctrl.gameObject);
                     }
+                    idleQueue.Clear();
                 }
                 m_poolMap.Remove(poolKey);
             } 

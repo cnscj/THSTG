@@ -59,7 +59,7 @@ namespace ASGame
                     }
                 }
             }
-            else
+            else if(handler.status == AssetLoadStatus.LOAD_LOADING)
             {
                 StopLoadWithHandler(handler);
             }
@@ -121,8 +121,12 @@ namespace ASGame
 
         protected void StopLoadWithHandler(AssetLoadHandler handler)
         {
-            handler.status = AssetLoadStatus.LOAD_ABORT;
-            OnStopLoad(handler);
+            var loadingMap = GetLoadingMap();
+            if (loadingMap.ContainsKey(handler.path))
+            {
+                handler.status = AssetLoadStatus.LOAD_ABORT;
+                OnStopLoad(handler);
+            }
             
         }
 
@@ -136,9 +140,6 @@ namespace ASGame
         //资源加载失败
         protected void LoadHandlerFailed(AssetLoadHandler handler)
         {
-            //资源加载失败
-
-            //TODO:释放掉所有的依赖加载器
 
             OnLoadFailed(handler);
         }
@@ -199,6 +200,7 @@ namespace ASGame
                         //超时检测
                         if (handler.CheckTimeout())
                         {
+                            StopLoad(handler);
                             handler.status = AssetLoadStatus.LOAD_TIMEOUT;
                         }
                     }

@@ -582,14 +582,15 @@ namespace THGame
             m_playingSounds.Add(id, new KeyValuePair<SoundArgs, SoundController>(args, ctrl));
             if (!string.IsNullOrEmpty(args.tag))
             {
-                if (!m_recorderMap.TryGetValue(args.tag, out var recorer))
+                SoundPlayerRecorder recorder;
+                if (!m_recorderMap.TryGetValue(args.tag, out recorder))
                 {
-                    var recorder = new SoundPlayerRecorder();
+                    recorder = new SoundPlayerRecorder();
                     m_recorderMap[args.tag] = recorder;
                 }
-           
-                recorer.curCount++;
-                recorer.lastTick = Time.realtimeSinceStartup;
+
+                recorder.curCount++;
+                recorder.lastTick = Time.realtimeSinceStartup;
             }
 
             m_lastTick = Time.realtimeSinceStartup;
