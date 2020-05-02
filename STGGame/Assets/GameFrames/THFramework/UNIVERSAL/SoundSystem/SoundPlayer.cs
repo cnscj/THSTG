@@ -649,12 +649,12 @@ namespace THGame
         private void ReleaseSound(SoundController ctrl)
         {
             ctrl.Stop();
-            GetOrCreateSoundPool().Release(ctrl);
+            GetOrCreateSoundPool().Release(ctrl.gameObject);
         }
 
         private string GetPoolObjectKey(SoundCommand command)
         {
-            string key = string.Format("Crtl");//string.Format("{0}", command?.data?.clip?.GetHashCode());
+            string key = string.Format("SoundCrtl");//string.Format("{0}", command?.data?.clip?.GetHashCode());
             return key;
         }
 
@@ -676,10 +676,15 @@ namespace THGame
         private SoundController GetOrCreateSoundController(string key)
         {
             var pool = GetOrCreateSoundPool();
-            SoundController ctrl = pool.GetOrCreate(key);
-            ctrl.transform.SetParent(transform);
+            GameObject poolGobj = pool.GetOrCreate(key);
+            var soundCtrl = poolGobj.GetComponent<SoundController>();
+            if (soundCtrl == null)
+            {
+                soundCtrl = poolGobj.AddComponent<SoundController>();
+            }
+            poolGobj.transform.SetParent(transform);
 
-            return ctrl;
+            return soundCtrl;
         }
 
         private SoundPool GetOrCreateSoundPool()

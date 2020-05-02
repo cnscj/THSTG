@@ -7,8 +7,8 @@ namespace THGame
     {
         public class PoolInfo
         {
-            public float stayTime;
-            public Stack<SoundController> idleQueue = new Stack<SoundController>();//用栈使得空闲的频繁使用,
+            public float stayTime = 0;
+            public LinkedList<GameObject> idleQueue = new LinkedList<GameObject>();//用栈使得空闲的频繁使用,
 
             public int curMaxCount;
             public float updateTick;
@@ -18,11 +18,11 @@ namespace THGame
         private Dictionary<string, PoolInfo> m_poolMap = new Dictionary<string, PoolInfo>();
         private Stack<string> m_releaseList = new Stack<string>();      
         
-        public SoundController GetOrCreate(string key,float lifeTime = 0f)
+        public GameObject GetOrCreate(string key,float lifeTime = 0f)
         {
             PoolInfo poolInfo = null;
-            SoundController ctrl = null;
-            GameObject ctrlGobj = null;
+            GameObject idleGobj = null;
+
             if (!m_poolMap.TryGetValue(key, out poolInfo))
             {
                 poolInfo = new PoolInfo();
@@ -31,30 +31,30 @@ namespace THGame
 
             if (poolInfo.idleQueue.Count <= 0)
             {
-                ctrlGobj = new GameObject();
-                ctrl = ctrlGobj.AddComponent<SoundController>();
-                ctrlGobj.transform.SetParent(transform);
+                idleGobj = new GameObject();
+                idleGobj.transform.SetParent(transform);
 
-                poolInfo.idleQueue.Push(ctrl);
+                poolInfo.idleQueue.AddLast(idleGobj);
             }
-      
-            ctrl = poolInfo.idleQueue.Pop();
-            ctrlGobj = ctrl.gameObject;
-            var poolObj = ctrlGobj.GetComponent<SoundPoolObject>();
+
+            idleGobj = poolInfo.idleQueue.Last.Value;
+            poolInfo.idleQueue.RemoveLast();
+
+            var poolObj = idleGobj.GetComponent<SoundPoolObject>();
             if (poolObj == null)
             {
-                poolObj = ctrlGobj.AddComponent<SoundPoolObject>();
+                poolObj = idleGobj.AddComponent<SoundPoolObject>();
             }
             poolObj.lifetime = lifeTime;
             poolObj.times = m_disposeTimes;
             poolObj.poolObj = this;
             poolObj.key = key;
 
-            ctrlGobj.SetActive(true);
+            idleGobj.SetActive(true);
 
             UpdatePoolInfo(key);
 
-            return ctrl;
+            return idleGobj;
         }
 
         public void Release(SoundPoolObject poolObj)
@@ -74,7 +74,6 @@ namespace THGame
             if (gobj != null)
             {
                 var poolObj = gobj.GetComponent<SoundPoolObject>();
-                var soundCtrl = gobj.GetComponent<SoundController>();
                     
                 if (poolObj != null)
                 {
@@ -92,7 +91,7 @@ namespace THGame
                             poolInfo = new PoolInfo();
                             m_poolMap.Add(key, poolInfo);
                         }
-                        poolInfo.idleQueue.Push(soundCtrl);
+                        poolInfo.idleQueue.AddLast(gobj);
 
                         gobj.transform.SetParent(transform);
                         gobj.SetActive(false);
@@ -105,18 +104,6 @@ namespace THGame
                     Destroy(gobj);
                     return;
                 }
-            }
-        }
-
-        public void Release(SoundController ctrl)
-        {
-            if (ctrl != null)
-            {
-                Release(ctrl.gameObject);
-            }
-            else
-            {
-                Destroy(ctrl.gameObject);
             }
         }
 
@@ -148,7 +135,6 @@ namespace THGame
         {
             foreach (var pair in m_poolMap)
             {
-
                 var poolInfo = pair.Value;
                 if (poolInfo.stayTime > 0f)
                 {
@@ -164,7 +150,29 @@ namespace THGame
                     {
                         poolInfo.updateTick = Time.realtimeSinceStartup;
                     }
-
+                }
+                else if (poolInfo.stayTime < 0f)
+                {
+                    //采用另一种策略
+                    if (poolInfo.idleQueue != null && poolInfo.idleQueue.Count > 0)
+                    {
+                        for (LinkedListNode<GameObject> iterNode = poolInfo.idleQueue.Last; iterNode != null; iterNode = iterNode.Previous)
+                        {
+                            var poolGobj = iterNode.Value;
+                            if (poolGobj != null)
+                            {
+                                var poolObj = poolGobj.GetComponent<SoundPoolObject>();
+                                if (poolObj != null)
+                                {
+                                    if (poolObj.CheckRemove())
+                                    {
+                                        poolInfo.idleQueue.Remove(iterNode);
+                                        Object.Destroy(poolGobj);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
             while(m_releaseList.Count > 0 )

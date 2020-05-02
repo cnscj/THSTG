@@ -6,14 +6,9 @@ namespace THGame
     public class SoundPoolObject : MonoBehaviour
     {
         /// <summary>
-        /// 对象显示的持续时间，若=0，则不隐藏
+        /// 类型
         /// </summary>
-        public float lifetime = 0f;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public int times;
+        public string key;
 
         /// <summary>
         /// 所属对象池
@@ -21,12 +16,29 @@ namespace THGame
         public SoundPool poolObj;
 
         /// <summary>
-        /// 类型
+        /// 对象显示的持续时间，若=0，则不隐藏
         /// </summary>
-        public string key;
+        public float lifetime;
+
+        /// <summary>
+        /// 池清空时的次数
+        /// </summary>
+        public int times;
+
+        /// <summary>
+        /// 在池中能存活的最长时间
+        /// </summary>
+        public float stayTime = 30f;
+
+        /// <summary>
+        /// 上次使用的tick
+        /// </summary>
+        private float m_updateTick;
 
         void OnEnable()
         {
+            UpdateTick();
+
             if (!enabled)
                 return;
 
@@ -53,6 +65,23 @@ namespace THGame
             {
                 Destroy(gameObject);
             }
+        }
+
+        public void UpdateTick()
+        {
+            m_updateTick = Time.realtimeSinceStartup;
+        }
+
+        public bool CheckRemove()
+        {
+            if (stayTime > 0)
+            {
+                if (m_updateTick + stayTime <= Time.realtimeSinceStartup)
+                {
+                    return true;
+                } 
+            }
+            return false;
         }
 
     }
