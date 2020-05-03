@@ -14,8 +14,8 @@ namespace ASGame
     //加载依赖应该返回依赖信息,包括哪些依赖文件加载失败
     public class BundleLoader : BaseCoroutineLoader
     {
-        public readonly float HANDLER_BUNDLE_LOCAL_STAY_TIME = 120;
-        public readonly float HANDLER_BUNDLE_NETWORK_STAY_TIME = 300f;
+        public readonly float HANDLER_BUNDLE_LOCAL_STAY_TIME = 5;
+        public readonly float HANDLER_BUNDLE_NETWORK_STAY_TIME = 15f;
         public class RequestObj
         {
             public int id;
@@ -88,7 +88,6 @@ namespace ASGame
                 mainBundleObj.Release();
             }
         }
-
 
         /// <summary>
         /// 取得依赖
@@ -225,9 +224,6 @@ namespace ASGame
             }
 
             //加载顺序决定是否能完全卸载,如果先加载依赖,在加载自己,就能够完全释放(这个与释放顺序无关
-            //这里一次性读取所有依赖,无需递归
-
-            //这里应该启用协程的嵌套,确保顺序
             var mainDependencies = GetBundleDependencies(assetPath, false);
             if (mainDependencies != null && mainDependencies.Length > 0)
             {
@@ -305,22 +301,7 @@ namespace ASGame
             var isCompleted = handler.Transmit(result);
             if (isCompleted)
             {
-                var handleResult = handler.result;
-                if (handleResult.isDone)
-                {
-                    if (handleResult.asset != null)
-                    {
-                        handler.status = AssetLoadStatus.LOAD_FINISHED;
-                    }
-                    else
-                    {
-                        handler.status = AssetLoadStatus.LOAD_NOTFOUND;
-                    }
-                }
-                else
-                {
-                    handler.status = AssetLoadStatus.LOAD_ERROR;
-                }
+                handler.status = AssetLoadStatus.LOAD_FINISHED;
                 handler.Callback();
             }
         }

@@ -2,24 +2,24 @@
 
 namespace THGame
 {
-    public class SoundArgsCache
+    public class SoundObjectCache<T> where T :class, new()
     {
         public int maxCount = -1;
-        private HashSet<SoundArgs> m_recordDict = new HashSet<SoundArgs>();
-        private Queue<SoundArgs> m_available = new Queue<SoundArgs>();
+        private HashSet<T> m_recordDict = new HashSet<T>();
+        private Queue<T> m_available = new Queue<T>();
 
-        public SoundArgs GetOrCreate()
+        public T GetOrCreate()
         {
             if (m_available.Count <= 0)
             {
-                var newArgs = new SoundArgs();
-                m_available.Enqueue(newArgs);
-                m_recordDict.Add(newArgs);
+                var newObj = new T();
+                m_available.Enqueue(newObj);
+                m_recordDict.Add(newObj);
             }
             return m_available.Dequeue();
         }
 
-        public void Release(SoundArgs args)
+        public void Release(T args)
         {
             if (!m_recordDict.Contains(args))
                 return;

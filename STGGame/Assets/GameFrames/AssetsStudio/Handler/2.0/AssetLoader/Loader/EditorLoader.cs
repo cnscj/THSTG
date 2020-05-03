@@ -9,13 +9,14 @@ namespace ASGame
 #if UNITY_EDITOR
         protected override void OnLoadAsset(AssetLoadHandler handler)
         {
-
             Object obj = AssetDatabase.LoadAssetAtPath<Object>(handler.path);
-            
-            //if (handler.TryInvoke(new AssetLoadResult(obj, true)))
-            //{
-            //    handler.status = AssetLoadStatus.LOAD_FINISHED;
-            //}
+            var result = new AssetLoadResult(obj, true);
+
+            var isCompleted = handler.Transmit(result);
+            if (isCompleted)
+            {
+                handler.status = AssetLoadStatus.LOAD_FINISHED;
+            }
 
         }
 #else

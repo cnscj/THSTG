@@ -29,7 +29,8 @@ namespace THGame
 
         private Coroutine m_fadeVolumeCoroutine;
         private SoundPool m_poolObj;
-        private SoundArgsCache m_argsCache;
+        private SoundObjectCache<SoundArgs> m_argsCache;
+        private SoundObjectCache<SoundCommand> m_commonCache;
 
         /// <summary>
         /// 播放器音量
@@ -249,6 +250,9 @@ namespace THGame
         {
             StopAll();
             ClearList();
+
+            m_argsCache?.Clear();
+            m_commonCache?.Clear();
         }
 
         public void DisposeAll()
@@ -595,6 +599,7 @@ namespace THGame
 
             m_lastTick = Time.realtimeSinceStartup;
 
+            GetOrCreateSoundCommonCache().Release(command);
             return id;
         }
 
@@ -658,14 +663,24 @@ namespace THGame
             return key;
         }
 
-        private SoundArgsCache GetOrCreateSoundArgsCache()
+        private SoundObjectCache<SoundArgs> GetOrCreateSoundArgsCache()
         {
             if (m_argsCache == null)
             {
-                m_argsCache = new SoundArgsCache();
+                m_argsCache = new SoundObjectCache<SoundArgs>();
             }
             return m_argsCache;
         }
+
+        private SoundObjectCache<SoundCommand> GetOrCreateSoundCommonCache()
+        {
+            if (m_commonCache == null)
+            {
+                m_commonCache = new SoundObjectCache<SoundCommand>();
+            }
+            return m_commonCache;
+        }
+        
 
         private SoundController GetOrCreateSoundController(SoundCommand command)
         {
@@ -700,7 +715,7 @@ namespace THGame
 
         private SoundCommand NewCommand(SoundData data, SoundArgs args)
         {
-            var command = new SoundCommand();
+            var command = GetOrCreateSoundCommonCache().GetOrCreate();
             command.id = ++m_id;
             command.data = data;
             command.args = args ?? DEFAULT_ARGS;
@@ -731,6 +746,7 @@ namespace THGame
                 {
                     m_readingSounds.Remove(iterNode);
                     GetOrCreateSoundArgsCache().Release(command.args);
+                    GetOrCreateSoundCommonCache().Release(command);
                     break;
                 }
             }
@@ -742,6 +758,7 @@ namespace THGame
             {
                 var command = iterNode.Value;
                 GetOrCreateSoundArgsCache().Release(command.args);
+                GetOrCreateSoundCommonCache().Release(command);
             }
             m_readingSounds.Clear();
         }

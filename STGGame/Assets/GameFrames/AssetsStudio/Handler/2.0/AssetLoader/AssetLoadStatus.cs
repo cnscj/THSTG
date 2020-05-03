@@ -2,8 +2,7 @@
 {
     public class AssetLoadStatus
     {
-        public static readonly int LOAD_ERROR = -104;
-        public static readonly int LOAD_NOTFOUND = -103;
+        public static readonly int LOAD_ERROR = -103;
         public static readonly int LOAD_ABORT = -102;
         public static readonly int LOAD_TIMEOUT = -101;
         public static readonly int LOAD_IDLE = 0;
