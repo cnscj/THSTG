@@ -61,7 +61,7 @@ namespace ASGame
             }
         }
 
-        public override void UnLoad(string path)
+        public void UnLoad(string path)
         {
             if (!string.IsNullOrEmpty(path))
             {
@@ -201,7 +201,7 @@ namespace ASGame
         {
             if (!m_bundlesMap.ContainsKey(bundlePath))
             {
-                //TODO:引用计数和依赖计数有问题
+                //XXX:引用计数和依赖计数有问题
                 //应该递归添加所有依赖数(不过可能父依赖先与子依赖先加载,导致没有办法正确增加引用
                 var bundleObject = new BundleObject();
                 bundleObject.bundlePath = bundlePath;
@@ -230,7 +230,8 @@ namespace ASGame
                 foreach (var subDependence in mainDependencies)
                 {
                     var subHandler = GetOrCreateHandler(subDependence);
-                    base.OnStartLoad(subHandler);
+                    //FIXME:用OnStartLoad无法加到LoadingMap中,无法自释放
+                    base.StartLoadWithHandler(subHandler);//base.OnStartLoad(subHandler);
                     mainHandler.AddChild(subHandler);
                 }
             }
@@ -239,7 +240,7 @@ namespace ASGame
 
         protected override void OnStopLoad(AssetLoadHandler handler)
         {
-            //TODO:这里只中止了主Handler的加载,没有阻止子Handler加载
+            //XXX:这里只中止了主Handler的加载,没有阻止子Handler加载
             //问题是如果子Handler被别的ab引用,是不能被中止的,除非没有引用才中止
             //因此可能要记录下有多少个主handler引用着这个子handle
             //不过如果中止子handler 的话,可能引起主handler卡死无法回调
@@ -277,19 +278,13 @@ namespace ASGame
             var children = handler.GetChildren();
             if (children != null && children.Length > 0)
             {
-                bool isCompleted;
-                do
+                foreach (var subHandler in children)
                 {
-                    isCompleted = true;
-                    foreach (var subHandler in children)
+                    if (!subHandler.IsCompleted())
                     {
-                        if (!subHandler.IsCompleted())
-                        {
-                            isCompleted = false;
-                            break;
-                        }
+                        yield return null;
                     }
-                } while (!isCompleted);
+                }
             }
             yield return LoadAssetPrimitive(handler);
         }

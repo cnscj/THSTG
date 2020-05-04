@@ -20,17 +20,22 @@ namespace ASGame
         private List<AssetLoadHandler> m_children;
         private int m_callbackCount;
 
+        public void Abort()
+        {
+            loader?.StopLoad(this);
+        }
+
         public void AddChild(AssetLoadHandler handler)
         {
-            m_parents = m_parents ?? new HashSet<AssetLoadHandler>();
+            handler.m_parents = handler.m_parents ?? new HashSet<AssetLoadHandler>();
             m_children = m_children ?? new List<AssetLoadHandler>();
 
-            if (m_parents.Contains(this))
+            if (handler.m_parents.Contains(this))
                 return;
 
             handler.Retain();
 
-            m_parents.Add(this);
+            handler.m_parents.Add(this);
             m_children.Add(handler);
         }
 
@@ -47,8 +52,6 @@ namespace ASGame
             }
             return m_onCallback;
         }
-
-
 
         //当且仅当子handler返回所有结果后才返回
         public bool Transmit(AssetLoadResult ret)

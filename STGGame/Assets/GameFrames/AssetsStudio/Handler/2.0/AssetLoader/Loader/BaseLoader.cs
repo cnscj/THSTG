@@ -85,6 +85,7 @@ namespace ASGame
 
         protected void Update()
         {
+            //XXX:资源加载的回调比执行这里时还早,可能会引发问题
             UpdateWait();
             OnUpdate();
             UpdateStatus();
@@ -227,11 +228,11 @@ namespace ASGame
                 while (m_successQueue.Count > 0)
                 {
                     var handler = m_successQueue.First.Value;
-                    LoadHandlerSuccess(handler);
-     
-                    m_loadingMap.Remove(handler.path);
                     m_successQueue.RemoveFirst();
+                    m_loadingMap.Remove(handler.path);
                     GetReleaseQueue().AddLast(handler);
+
+                    LoadHandlerSuccess(handler);
                 }
             }
         }
@@ -244,11 +245,12 @@ namespace ASGame
                 while (m_failedQueue.Count > 0)
                 {
                     var handler = m_failedQueue.First.Value;
+                    m_failedQueue.RemoveFirst();
+                    m_loadingMap.Remove(handler.path);
+                    GetReleaseQueue().AddLast(handler);
+
                     LoadHandlerFailed(handler);
 
-                    m_loadingMap.Remove(handler.path);
-                    m_failedQueue.RemoveFirst();
-                    GetReleaseQueue().AddLast(handler);
                 }
             }
         }
@@ -261,9 +263,9 @@ namespace ASGame
                 while (m_releaseQueue.Count > 0)
                 {
                     var handler = m_releaseQueue.First.Value;
+                    m_releaseQueue.RemoveFirst();
 
                     handler.ReleaseLater();
-                    m_releaseQueue.RemoveFirst();
                 }
             }
         }
