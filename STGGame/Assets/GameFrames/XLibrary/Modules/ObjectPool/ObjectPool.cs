@@ -4,14 +4,14 @@ using UnityEngine;
 
 namespace XLibGame
 {
-    public class ObjectPool<T> : BaseObjectPool where T : class, new()
+    public class ObjectPool<T> : IObjectPool where T : class, new()
     {
         public int maxCount = -1;
+
         private Dictionary<T, ObjectPoolObject> m_recordDict = new Dictionary<T, ObjectPoolObject>();
         private LinkedList<T> m_available = new LinkedList<T>();
         private Queue<T> m_release = new Queue<T>();
 
-        public int MaxCount { get => maxCount; }
         public int AvailableCount { get => m_available.Count; }
         public int TotalCount { get => m_recordDict.Count; }
 
@@ -81,7 +81,7 @@ namespace XLibGame
             m_recordDict.Clear();
         }
 
-        public override void Update()
+        public void Update()
         {
             UpdateCheck();
             UpdateRelease();
@@ -112,6 +112,16 @@ namespace XLibGame
                 m_available.Remove(releaseObj);
                 m_recordDict.Remove(releaseObj);
             }
+        }
+
+        public T1 GetOrCreate<T1>() where T1 : class, new()
+        {
+            return GetOrCreate() as T1;
+        }
+
+        public void Release<T1>(T1 obj) where T1 : class, new()
+        {
+            Release(obj);
         }
     }
 }

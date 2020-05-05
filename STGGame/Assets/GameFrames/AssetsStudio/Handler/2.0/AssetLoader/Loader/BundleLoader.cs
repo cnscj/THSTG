@@ -61,7 +61,7 @@ namespace ASGame
             }
         }
 
-        public void UnLoad(string path)
+        public override void UnLoad(string path)
         {
             if (!string.IsNullOrEmpty(path))
             {
@@ -201,7 +201,7 @@ namespace ASGame
         {
             if (!m_bundlesMap.ContainsKey(bundlePath))
             {
-                //XXX:引用计数和依赖计数有问题
+                //TODO:引用计数和依赖计数有问题
                 //应该递归添加所有依赖数(不过可能父依赖先与子依赖先加载,导致没有办法正确增加引用
                 var bundleObject = new BundleObject();
                 bundleObject.bundlePath = bundlePath;

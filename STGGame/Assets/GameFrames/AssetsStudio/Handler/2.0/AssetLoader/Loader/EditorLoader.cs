@@ -16,6 +16,7 @@ namespace ASGame
             if (isCompleted)
             {
                 handler.status = AssetLoadStatus.LOAD_FINISHED;
+                handler.Callback();
             }
 
         }
