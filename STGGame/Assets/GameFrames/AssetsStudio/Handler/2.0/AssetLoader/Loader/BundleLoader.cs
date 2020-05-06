@@ -28,7 +28,7 @@ namespace ASGame
             public string bundlePath;
             public AssetBundle assetBundle;
 
-            protected override void OnRelease() { assetBundle.Unload(false); }
+            protected override void OnRelease() { assetBundle?.Unload(false); }
         }
 
         private Dictionary<string, string[]> m_dependsDataList = new Dictionary<string, string[]>();       //总依赖表
@@ -201,14 +201,26 @@ namespace ASGame
         {
             if (!m_bundlesMap.ContainsKey(bundlePath))
             {
-                //TODO:引用计数和依赖计数有问题
-                //应该递归添加所有依赖数(不过可能父依赖先与子依赖先加载,导致没有办法正确增加引用
                 var bundleObject = new BundleObject();
                 bundleObject.bundlePath = bundlePath;
                 bundleObject.assetBundle = assetBundle;
 
                 m_bundlesMap.Add(bundlePath, bundleObject);
             } 
+        }
+
+        private void AddOrRetainBundleObject(string bundlePath, AssetBundle assetBundle)
+        {
+            var bundleObject = GetBundleObject(bundlePath);
+            if (bundleObject != null)
+            {
+                bundleObject.assetBundle = bundleObject.assetBundle ?? assetBundle;
+                bundleObject.Retain();
+            }
+            else
+            {
+                AddBundleObject(bundlePath, assetBundle);
+            }
         }
 
         //非等待加载
@@ -231,7 +243,8 @@ namespace ASGame
                 {
                     var subHandler = GetOrCreateHandler(subDependence);
                     //FIXME:用OnStartLoad无法加到LoadingMap中,无法自释放
-                    base.StartLoadWithHandler(subHandler);//base.OnStartLoad(subHandler);
+                    //StartLoadWithHandler(subHandler);
+                    base.OnStartLoad(subHandler);
                     mainHandler.AddChild(subHandler);
                 }
             }
@@ -289,7 +302,7 @@ namespace ASGame
             yield return LoadAssetPrimitive(handler);
         }
 
-        //加载回调处理
+        //加载资源回调处理
         private void LoadAssetPrimitiveCallback(AssetLoadHandler handler, AssetLoadResult result)
         {
             result = result ?? AssetLoadResult.EMPTY_RESULT;
@@ -298,6 +311,21 @@ namespace ASGame
             {
                 handler.status = AssetLoadStatus.LOAD_FINISHED;
                 handler.Callback();
+            }
+        }
+
+        //加载bundle的回调
+        private void LoadAssetBundleCallback(AssetLoadHandler handler, AssetBundle assetBundle)
+        {
+            if (assetBundle)
+            {
+                string bundlePath = GetAbsoluteFullPath(assetBundle.name);
+                AddOrRetainBundleObject(bundlePath, assetBundle);
+                var dependiencies = GetBundleDependencies(bundlePath);
+                foreach (var subBundlePath in dependiencies)
+                {
+                    AddOrRetainBundleObject(subBundlePath, null);   //就算子没加载完也记录
+                }
             }
         }
 
@@ -363,10 +391,8 @@ namespace ASGame
 
                 //先把加载到的AssetBundle加入记录缓存,并且标记引用次数+1
                 //不记录Bundle为空的项
-                if (isDone && asset != null)
-                {
-                    AddBundleObject(assetPath, asset as AssetBundle);
-                }
+                LoadAssetBundleCallback(handler, asset as AssetBundle);
+                
             }
 
             ////////////////////////////////
