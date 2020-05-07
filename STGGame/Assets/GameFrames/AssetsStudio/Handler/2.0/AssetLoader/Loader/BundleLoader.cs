@@ -14,8 +14,8 @@ namespace ASGame
     //加载依赖应该返回依赖信息,包括哪些依赖文件加载失败
     public class BundleLoader : BaseCoroutineLoader
     {
-        public static readonly float HANDLER_BUNDLE_LOCAL_STAY_TIME = -5;
-        public static readonly float HANDLER_BUNDLE_NETWORK_STAY_TIME = -15f;
+        public static readonly float HANDLER_BUNDLE_LOCAL_STAY_TIME = 10;
+        public static readonly float HANDLER_BUNDLE_NETWORK_STAY_TIME = 20f;
         public class RequestObj
         {
             public int id;
@@ -34,6 +34,7 @@ namespace ASGame
         private Dictionary<string, string[]> m_dependsDataList = new Dictionary<string, string[]>();       //总依赖表
         private Dictionary<string, BundleObject> m_bundlesMap = new Dictionary<string, BundleObject>();    //已经加载完成的
         private Dictionary<int, RequestObj> m_handlerWithRequestMap = new Dictionary<int, RequestObj>();   //正在异步的请求
+
         private string m_assetBundleRootPath = "";
 
 
@@ -242,28 +243,25 @@ namespace ASGame
                 foreach (var subDependence in mainDependencies)
                 {
                     var subHandler = GetOrCreateHandler(subDependence);
-                    //FIXME:用OnStartLoad无法加到LoadingMap中,无法自释放
-                    //StartLoadWithHandler(subHandler);
-                    base.OnStartLoad(subHandler);
+                    StartLoadWithHandler(subHandler);
                     mainHandler.AddChild(subHandler);
                 }
             }
             base.OnStartLoad(mainHandler);
         }
 
+        //AssetBundle加载无法中断,直接失败返回结果
         protected override void OnStopLoad(AssetLoadHandler handler)
         {
-            //XXX:这里只中止了主Handler的加载,没有阻止子Handler加载
-            //问题是如果子Handler被别的ab引用,是不能被中止的,除非没有引用才中止
-            //因此可能要记录下有多少个主handler引用着这个子handle
-            //不过如果中止子handler 的话,可能引起主handler卡死无法回调
-            handler.result = handler.result ?? AssetLoadResult.EMPTY_RESULT;  //防止卡死无法回调
-            base.OnStopLoad(handler);
+            handler.result = handler.result ?? AssetLoadResult.EMPTY_RESULT;  //防止卡死无法回调(必须有结果才能返回
+            
         }
 
         protected override void OnLoadSuccess(AssetLoadHandler handler)
         {
             m_handlerWithRequestMap.Remove(handler.id);
+
+            base.OnLoadSuccess(handler);
         }
 
         protected override void OnLoadFailed(AssetLoadHandler handler)
@@ -277,12 +275,12 @@ namespace ASGame
 
                 if(requestObj.abRequest != null)
                 {
-                    //这里强制将异步转同步,提前结束加载
-                    //直接取assetBundle即为同步
-                    requestObj.abRequest?.assetBundle.Unload(false);
+                    //无法强制卸载加载中的AB,会报错
                 }
             }
             m_handlerWithRequestMap.Remove(handler.id);
+
+            base.OnLoadFailed(handler);
         }
 
         protected override IEnumerator OnLoadAsset(AssetLoadHandler handler)
@@ -305,14 +303,14 @@ namespace ASGame
         //加载资源回调处理
         private void LoadAssetPrimitiveCallback(AssetLoadHandler handler, AssetLoadResult result)
         {
-            //TODO:回调有问题,被多次执行
+            //FIXME:如果是无序回调,父回调可能执行不到
             result = result ?? AssetLoadResult.EMPTY_RESULT;
             var isCompleted = handler.Transmit(result);
-            //if (isCompleted)
-            //{
-            //    handler.status = AssetLoadStatus.LOAD_FINISHED;
-            //    handler.Callback();
-            //}
+            if (isCompleted)
+            {
+                handler.status = AssetLoadStatus.LOAD_FINISHED;
+                handler.Callback();
+            }
         }
 
         //加载bundle的回调

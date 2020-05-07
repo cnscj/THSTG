@@ -1,6 +1,4 @@
 ﻿
-using UnityEngine;
-using Unity.Entities;
 using XLibrary.Package;
 
 namespace STGU3D

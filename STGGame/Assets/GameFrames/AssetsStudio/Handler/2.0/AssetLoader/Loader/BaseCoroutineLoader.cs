@@ -43,6 +43,16 @@ namespace ASGame
             }
         }
 
+        protected override void OnLoadSuccess(AssetLoadHandler handler)
+        {
+            m_loadCoroutines.Remove(handler.id);
+        }
+
+        protected override void OnLoadFailed(AssetLoadHandler handler)
+        {
+            m_loadCoroutines.Remove(handler.id);
+        }
+
         private IEnumerator LoadAssetCoroutine(AssetLoadHandler handler)
         {
             yield return OnLoadAsset(handler);

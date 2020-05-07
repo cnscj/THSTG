@@ -35,7 +35,7 @@ namespace ASGame
             handler.Retain();
             handler.id = GetNewHandlerId();
 
-            if (m_handlerMaps.ContainsKey(handler.id))
+            if (!m_handlerMaps.ContainsKey(handler.id))
             {
                 m_handlerMaps.Add(handler.id, handler);
             }

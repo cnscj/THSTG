@@ -44,13 +44,12 @@ namespace ASGame
             return m_children?.ToArray();
         }
 
-        public AssetLoadCallback OnCompleted(AssetLoadCallback callback = null)
+        public void OnCompleted(AssetLoadCallback callback = null)
         {
             if (callback != null)
             {
                 m_onCallback += callback;
             }
-            return m_onCallback;
         }
 
         //当且仅当子handler返回所有结果后才返回
@@ -85,6 +84,7 @@ namespace ASGame
             return true;
         }
 
+        //有结果返回就是完成,与成功失败无关
         public bool IsCompleted()
         {
             bool isCompleted = (result != null);
@@ -102,6 +102,24 @@ namespace ASGame
             return isCompleted;
         }
 
+        //是否存在报错
+        public bool IsHadError()
+        {
+            bool isHadError = (status < AssetLoadStatus.LOAD_IDLE);
+            if (m_children != null && m_children.Count > 0)
+            {
+                foreach (var child in m_children)
+                {
+                    if (!child.IsHadError())
+                    {
+                        isHadError = true;
+                        break;
+                    }
+                }
+            }
+            return isHadError;
+        }
+
         public void Callback()
         {
             m_onCallback?.Invoke(result);
@@ -109,9 +127,12 @@ namespace ASGame
 
         public bool CheckTimeout()
         {
-            if (m_updateTick + stayTime <= Time.realtimeSinceStartup)
+            if (stayTime >= 0)
             {
-                return true;
+                if (m_updateTick + stayTime <= Time.realtimeSinceStartup)
+                {
+                    return true;
+                }
             }
             return false;
         }
