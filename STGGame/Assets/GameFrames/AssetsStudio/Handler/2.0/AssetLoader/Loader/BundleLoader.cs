@@ -14,8 +14,8 @@ namespace ASGame
     //加载依赖应该返回依赖信息,包括哪些依赖文件加载失败
     public class BundleLoader : BaseCoroutineLoader
     {
-        public readonly float HANDLER_BUNDLE_LOCAL_STAY_TIME = 5;
-        public readonly float HANDLER_BUNDLE_NETWORK_STAY_TIME = 15f;
+        public static readonly float HANDLER_BUNDLE_LOCAL_STAY_TIME = -5;
+        public static readonly float HANDLER_BUNDLE_NETWORK_STAY_TIME = -15f;
         public class RequestObj
         {
             public int id;
@@ -305,13 +305,14 @@ namespace ASGame
         //加载资源回调处理
         private void LoadAssetPrimitiveCallback(AssetLoadHandler handler, AssetLoadResult result)
         {
+            //TODO:回调有问题,被多次执行
             result = result ?? AssetLoadResult.EMPTY_RESULT;
             var isCompleted = handler.Transmit(result);
-            if (isCompleted)
-            {
-                handler.status = AssetLoadStatus.LOAD_FINISHED;
-                handler.Callback();
-            }
+            //if (isCompleted)
+            //{
+            //    handler.status = AssetLoadStatus.LOAD_FINISHED;
+            //    handler.Callback();
+            //}
         }
 
         //加载bundle的回调
