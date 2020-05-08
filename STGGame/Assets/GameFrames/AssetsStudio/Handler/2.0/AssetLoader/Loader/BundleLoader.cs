@@ -14,8 +14,8 @@ namespace ASGame
     //加载依赖应该返回依赖信息,包括哪些依赖文件加载失败
     public class BundleLoader : BaseCoroutineLoader
     {
-        public static readonly float HANDLER_BUNDLE_LOCAL_STAY_TIME = 10;
-        public static readonly float HANDLER_BUNDLE_NETWORK_STAY_TIME = 20f;
+        public static readonly float HANDLER_BUNDLE_LOCAL_STAY_TIME = 30;       //考虑到加载场景AB估计要好久
+        public static readonly float HANDLER_BUNDLE_NETWORK_STAY_TIME = 60f;    //下载网络不好估计也好好久
         public class RequestObj
         {
             public int id;
@@ -28,7 +28,7 @@ namespace ASGame
             public string bundlePath;
             public AssetBundle assetBundle;
 
-            protected override void OnRelease() { assetBundle?.Unload(false); }
+            protected override void OnRelease(){ assetBundle?.Unload(false); }  //非严格释放:引用计数又不一定准
         }
 
         private Dictionary<string, string[]> m_dependsDataList = new Dictionary<string, string[]>();       //总依赖表
@@ -66,7 +66,14 @@ namespace ASGame
         {
             if (!string.IsNullOrEmpty(path))
             {
-                if (m_bundlesMap.TryGetValue(path, out var bundleObj))
+                string assetPath = path;
+                if (path.IndexOf("|") > 0)
+                {
+                    string[] pathPairs = path.Split('|');
+                    assetPath = pathPairs[0];
+                }
+
+                if (m_bundlesMap.TryGetValue(assetPath, out var bundleObj))
                 {
                     UnloadBundleObject(bundleObj);
                 }
@@ -83,10 +90,21 @@ namespace ASGame
                 {
                     if (m_bundlesMap.TryGetValue(subBundlePath, out var subBundleObj))
                     {
-                        subBundleObj.Release();
+                        UnLoad(subBundlePath);
                     }
                 }
                 mainBundleObj.Release();
+
+                //因为被m_bundlesMap弱引用着,导致无法正确释放
+                if (mainBundleObj.RefCount == 1)    //最后一次是m_bundlesMap的引用
+                {
+                    mainBundleObj.Release(); 
+                }
+
+                if (mainBundleObj.RefCount == 0)
+                {
+                    m_bundlesMap.Remove(mainBundlePath);
+                }
             }
         }
 
@@ -243,7 +261,7 @@ namespace ASGame
                 foreach (var subDependence in mainDependencies)
                 {
                     var subHandler = GetOrCreateHandler(subDependence);
-                    StartLoadWithHandler(subHandler);
+                    StartLoadWithHandler(subHandler);   //TODO:循环引用了
                     mainHandler.AddChild(subHandler);
                 }
             }
@@ -253,8 +271,7 @@ namespace ASGame
         //AssetBundle加载无法中断,直接失败返回结果
         protected override void OnStopLoad(AssetLoadHandler handler)
         {
-            handler.result = handler.result ?? AssetLoadResult.EMPTY_RESULT;  //防止卡死无法回调(必须有结果才能返回
-            
+            //不进行处理,标记下就行了
         }
 
         protected override void OnLoadSuccess(AssetLoadHandler handler)
@@ -303,19 +320,26 @@ namespace ASGame
         //加载资源回调处理
         private void LoadAssetPrimitiveCallback(AssetLoadHandler handler, AssetLoadResult result)
         {
-            //FIXME:如果是无序回调,父回调可能执行不到
+            //如果是无序回调,父回调可能执行不到,改用TryCallback
             result = result ?? AssetLoadResult.EMPTY_RESULT;
-            var isCompleted = handler.Transmit(result);
-            if (isCompleted)
+            if (handler.status == AssetLoadStatus.LOAD_LOADING)
             {
                 handler.status = AssetLoadStatus.LOAD_FINISHED;
-                handler.Callback();
             }
+            handler.Callback(result);
         }
 
         //加载bundle的回调
+        //子依赖的不记录(应为根本无法从外部释放)
         private void LoadAssetBundleCallback(AssetLoadHandler handler, AssetBundle assetBundle)
         {
+            //非依赖加载的Ab,不过不排除加载时被依赖了,不一定准
+            //var parents = handler.GetParents();
+            //if (parents == null)
+            //{
+            //    //可以做一些只有首AB要做的事
+            //}
+
             if (assetBundle)
             {
                 string bundlePath = GetAbsoluteFullPath(assetBundle.name);
@@ -360,9 +384,9 @@ namespace ASGame
             {
                 if (assetPath.Contains("://"))
                 {
-                    handler.stayTime = HANDLER_BUNDLE_NETWORK_STAY_TIME;    //网络Handler超时时间
+                    handler.timeoutChecker.stayTime = HANDLER_BUNDLE_NETWORK_STAY_TIME;    //网络Handler超时时间
                     var request = UnityWebRequestAssetBundle.GetAssetBundle(assetPath);
-                    request.timeout = (int)handler.stayTime;
+                    request.timeout = (int)handler.timeoutChecker.stayTime;
                     m_handlerWithRequestMap[handler.id] = new RequestObj()
                     {
                         id = handler.id,
@@ -375,7 +399,7 @@ namespace ASGame
                 }
                 else
                 {
-                    handler.stayTime = HANDLER_BUNDLE_LOCAL_STAY_TIME;    //本地Handler超时时间
+                    handler.timeoutChecker.stayTime = HANDLER_BUNDLE_LOCAL_STAY_TIME;    //本地Handler超时时间
                     var request = AssetBundle.LoadFromFileAsync(assetPath);
                     m_handlerWithRequestMap[handler.id] = new RequestObj()
                     {

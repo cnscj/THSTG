@@ -739,28 +739,34 @@ namespace THGame
 
         private void RemoveCommandFromReading(int id)
         {
-            for (LinkedListNode<SoundCommand> iterNode = m_readingSounds.Last; iterNode != null; iterNode = iterNode.Previous)
+            if (m_readingSounds.Count > 0)
             {
-                var command = iterNode.Value;
-                if (id == command.id)
+                for (LinkedListNode<SoundCommand> iterNode = m_readingSounds.Last; iterNode != null; iterNode = iterNode.Previous)
                 {
-                    m_readingSounds.Remove(iterNode);
-                    GetOrCreateSoundArgsCache().Release(command.args);
-                    GetOrCreateSoundCommonCache().Release(command);
-                    break;
+                    var command = iterNode.Value;
+                    if (id == command.id)
+                    {
+                        m_readingSounds.Remove(iterNode);
+                        GetOrCreateSoundArgsCache().Release(command.args);
+                        GetOrCreateSoundCommonCache().Release(command);
+                        break;
+                    }
                 }
             }
         }
 
         private void ClearCommandFromReading()
         {
-            for (LinkedListNode<SoundCommand> iterNode = m_readingSounds.Last; iterNode != null; iterNode = iterNode.Previous)
+            if (m_readingSounds.Count > 0)
             {
-                var command = iterNode.Value;
-                GetOrCreateSoundArgsCache().Release(command.args);
-                GetOrCreateSoundCommonCache().Release(command);
+                for (LinkedListNode<SoundCommand> iterNode = m_readingSounds.Last; iterNode != null; iterNode = iterNode.Previous)
+                {
+                    var command = iterNode.Value;
+                    GetOrCreateSoundArgsCache().Release(command.args);
+                    GetOrCreateSoundCommonCache().Release(command);
+                }
+                m_readingSounds.Clear();
             }
-            m_readingSounds.Clear();
         }
 
         private IEnumerator TweenFadeVolume(float from, float to, float fadeTime)

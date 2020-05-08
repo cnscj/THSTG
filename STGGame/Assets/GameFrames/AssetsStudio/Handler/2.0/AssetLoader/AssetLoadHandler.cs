@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using XLibGame;
 
 namespace ASGame
@@ -10,15 +11,16 @@ namespace ASGame
         public int status;
         public string path;
         public AssetLoadResult result;
+        public AssetLoadCallback onCallback;
         public BaseLoader loader;
-        public float stayTime = 120f;
 
-        private float m_updateTick;
+        public Timechecker timeoutChecker = new Timechecker();
+        public Timechecker clearChecker = new Timechecker();
 
-        private AssetLoadCallback m_onCallback;
         private HashSet<AssetLoadHandler> m_parents;
         private List<AssetLoadHandler> m_children;
         private int m_callbackCount;
+        private Action<AssetLoadHandler> m_callbackCall;
 
         public void Abort()
         {
@@ -44,44 +46,17 @@ namespace ASGame
             return m_children?.ToArray();
         }
 
+        public AssetLoadHandler[] GetParents()
+        {
+            return m_parents?.ToArray();
+        }
+
         public void OnCompleted(AssetLoadCallback callback = null)
         {
             if (callback != null)
             {
-                m_onCallback += callback;
+                onCallback += callback;
             }
-        }
-
-        //当且仅当子handler返回所有结果后才返回
-        public bool Transmit(AssetLoadResult ret)
-        {
-            //这里得区分是自己的回调,还是由子回调引起的回调由此来确定result的正确性
-            result = ret ?? result;
-            if (m_children != null && m_children.Count > 0)
-            {
-                if (m_callbackCount < m_children.Count)   //所有子回调
-                {
-                    m_callbackCount++;
-                    return false;
-                }
-                else
-                {
-                    if (result == null)
-                    {
-                        return false;
-                    }
-                }  
-            }
-
-            if (m_parents != null && m_parents.Count > 0)
-            {
-                foreach (var parent in m_parents)
-                {
-                    parent?.Transmit(null);
-                }
-            }
-
-            return true;
         }
 
         //有结果返回就是完成,与成功失败无关
@@ -102,7 +77,7 @@ namespace ASGame
             return isCompleted;
         }
 
-        //是否存在报错
+        //是否存在加载出错的项
         public bool IsHadError()
         {
             bool isHadError = (status < AssetLoadStatus.LOAD_IDLE);
@@ -120,26 +95,43 @@ namespace ASGame
             return isHadError;
         }
 
-        public void Callback()
+        public void Callback(AssetLoadResult ret)
         {
-            m_onCallback?.Invoke(result);
+            result = ret ?? result;
+            onCallback?.Invoke(result);
         }
 
-        public bool CheckTimeout()
+        public void TryCallback(AssetLoadResult ret = null, Action<AssetLoadHandler> callback = null)
         {
-            if (stayTime >= 0)
+            //这里得区分是自己的回调,还是由子回调引起的回调由此来确定result的正确性
+            result = ret ?? result;
+            m_callbackCall = m_callbackCall ?? callback;
+
+            if (m_children != null && m_children.Count > 0)
             {
-                if (m_updateTick + stayTime <= Time.realtimeSinceStartup)
+                if (m_callbackCount < m_children.Count)   //所有子回调
                 {
-                    return true;
+                    m_callbackCount++;
+                }
+                else
+                {
+                    if (result == null)
+                    {
+                        return;
+                    }
                 }
             }
-            return false;
-        }
 
-        public void UpdateTick()
-        {
-            m_updateTick = Time.realtimeSinceStartup;
+            m_callbackCall?.Invoke(this);
+            Callback(result);
+
+            if (m_parents != null && m_parents.Count > 0)
+            {
+                foreach (var parent in m_parents)
+                {
+                    parent?.TryCallback(ret, callback);
+                }
+            }
         }
 
         public void Reset()
@@ -149,15 +141,13 @@ namespace ASGame
             result = null;
             loader = null;
             path = null;
-            stayTime = 120f;
 
+            onCallback = null;
 
-            m_onCallback = null;
             m_parents?.Clear();
             m_children?.Clear();
             m_callbackCount = 0;
-
-            UpdateTick();
+            m_callbackCall = null;
         }
 
         protected override void OnRelease()

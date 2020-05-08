@@ -7,8 +7,9 @@ namespace ASGame
 {
     public class AssetLoadHandlerManager : MonoSingleton<AssetLoadHandlerManager>
     {
+        private static readonly float HANDLER_CLEAR_TIME = 15f;
         private int m_id;
-        private Queue<AssetLoadHandler> m_availableHandlers = new Queue<AssetLoadHandler>();
+        private LinkedList<AssetLoadHandler> m_availableHandlers = new LinkedList<AssetLoadHandler>();
         private Dictionary<int, AssetLoadHandler> m_handlerMaps = new Dictionary<int, AssetLoadHandler>();
 
         public AssetLoadHandler GetLoadHandler(int id)
@@ -28,9 +29,14 @@ namespace ASGame
             {
                 var newHandler = new AssetLoadHandler();
                 newHandler.ReleaseLater();
-                m_availableHandlers.Enqueue(newHandler);
+                m_availableHandlers.AddLast(newHandler);
+
+                newHandler.clearChecker.stayTime = HANDLER_CLEAR_TIME;
+                newHandler.clearChecker.UpdateTick();
             }
-            AssetLoadHandler handler = m_availableHandlers.Dequeue();
+            AssetLoadHandler handler = m_availableHandlers.Last.Value;
+            m_availableHandlers.RemoveLast();
+
             handler.Reset();
             handler.Retain();
             handler.id = GetNewHandlerId();
@@ -50,7 +56,10 @@ namespace ASGame
                 if (m_handlerMaps.ContainsKey(handler.id))
                 {
                     m_handlerMaps.Remove(handler.id);
-                    m_availableHandlers.Enqueue(handler);
+                    m_availableHandlers.AddLast(handler);
+
+                    handler.clearChecker.stayTime = HANDLER_CLEAR_TIME;
+                    handler.clearChecker.UpdateTick();
                 }
             }
         }
@@ -66,5 +75,19 @@ namespace ASGame
             m_id = 0;
         }
 
+        private void Update()
+        {
+            if (m_availableHandlers.Count > 0)
+            {
+                for (LinkedListNode<AssetLoadHandler> iterNode = m_availableHandlers.Last; iterNode != null; iterNode = iterNode.Previous)
+                {
+                    var handler = iterNode.Value;
+                    if (handler.clearChecker.CheckTick())
+                    {
+                        m_availableHandlers.Remove(iterNode);
+                    }
+                }
+            }
+        }
     }
 }

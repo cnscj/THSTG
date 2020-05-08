@@ -28,20 +28,20 @@ namespace ASGame
 
             handler.OnCompleted((AssetLoadResult result) =>
             {
-                if (result.isDone)
+                if (handler.status == AssetLoadStatus.LOAD_FINISHED)
                 {
                     onSuccess?.Invoke(result.GetAsset<T>());
                 }
                 else
                 {
-                    onFailed?.Invoke(AssetLoadStatus.LOAD_ERROR);
+                    onFailed?.Invoke(handler.status);
                 }
 
             });
             return handler.id;
         }
 
-        public void LoadBreak(int id)
+        public void LoadAbort(int id)
         {
             var handler = AssetLoadHandlerManager.GetInstance().GetLoadHandler(id);
             if (handler != null)

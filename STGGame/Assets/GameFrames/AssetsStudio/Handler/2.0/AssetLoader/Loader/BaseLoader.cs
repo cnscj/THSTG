@@ -85,7 +85,7 @@ namespace ASGame
 
         protected void Update()
         {
-            //XXX:资源加载的回调比执行这里时还早,可能会引发问题
+            //如果资源加载的回调比执行这里时还早,可能会引发问题
             UpdateWait();
             OnUpdate();
             UpdateStatus();
@@ -105,6 +105,7 @@ namespace ASGame
             }
 
             handler = AssetLoadHandlerManager.GetInstance().GetOrCreateHandler();
+            handler.timeoutChecker.UpdateTick();
             handler.path = path;
             return handler;
         }
@@ -199,7 +200,7 @@ namespace ASGame
                     if (handler.status == AssetLoadStatus.LOAD_LOADING)
                     {
                         //超时检测
-                        if (handler.CheckTimeout())
+                        if (handler.timeoutChecker.CheckTick())
                         {
                             StopLoad(handler);
                             handler.status = AssetLoadStatus.LOAD_TIMEOUT;

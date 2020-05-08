@@ -12,13 +12,8 @@ namespace ASGame
             Object obj = AssetDatabase.LoadAssetAtPath<Object>(handler.path);
             var result = new AssetLoadResult(obj, true);
 
-            var isCompleted = handler.Transmit(result);
-            if (isCompleted)
-            {
-                handler.status = AssetLoadStatus.LOAD_FINISHED;
-                handler.Callback();
-            }
-
+            handler.status = AssetLoadStatus.LOAD_FINISHED;
+            handler.Callback(result);
         }
 #else
         protected override void OnLoadAsset(AssetLoadHandler handler)
