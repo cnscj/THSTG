@@ -261,7 +261,7 @@ namespace ASGame
                 foreach (var subDependence in mainDependencies)
                 {
                     var subHandler = GetOrCreateHandler(subDependence);
-                    StartLoadWithHandler(subHandler);   //TODO:循环引用了
+                    StartLoadWithHandler(subHandler);
                     mainHandler.AddChild(subHandler);
                 }
             }
@@ -333,13 +333,6 @@ namespace ASGame
         //子依赖的不记录(应为根本无法从外部释放)
         private void LoadAssetBundleCallback(AssetLoadHandler handler, AssetBundle assetBundle)
         {
-            //非依赖加载的Ab,不过不排除加载时被依赖了,不一定准
-            //var parents = handler.GetParents();
-            //if (parents == null)
-            //{
-            //    //可以做一些只有首AB要做的事
-            //}
-
             if (assetBundle)
             {
                 string bundlePath = GetAbsoluteFullPath(assetBundle.name);

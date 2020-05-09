@@ -251,7 +251,6 @@ namespace ASGame
                     GetReleaseQueue().AddLast(handler);
 
                     LoadHandlerFailed(handler);
-
                 }
             }
         }
