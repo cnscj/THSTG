@@ -8,8 +8,8 @@ namespace XLibGame
 {
     public class ObjectPoolManager : MonoSingleton<ObjectPoolManager>
     {
-        private Dictionary<string, IObjectPool> m_objPool = new Dictionary<string, IObjectPool>();
-        public void AddPool(string key, IObjectPool pool) 
+        private Dictionary<string, BaseObjectPool> m_objPool = new Dictionary<string, BaseObjectPool>();
+        public void AddPool(string key, BaseObjectPool pool) 
         {
             if (pool != null)
             {
@@ -20,7 +20,7 @@ namespace XLibGame
             }
         }
 
-        public IObjectPool GetPool(string key)
+        public BaseObjectPool GetPool(string key)
         {
             if (!m_objPool.TryGetValue(key, out var poolObj))
             {
@@ -42,7 +42,7 @@ namespace XLibGame
         public ObjectPool<T> GetOrCreatePool<T>() where T : class, new()
         {
             Type type = typeof(T);
-            IObjectPool poolObj;
+            BaseObjectPool poolObj;
             if (!m_objPool.TryGetValue(type.Name, out poolObj))
             {
                 poolObj = new ObjectPool<T>();

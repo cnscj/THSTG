@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace XLibGame
 {
-    public class ObjectPool<T> : IObjectPool where T : class, new()
+    public class ObjectPool<T> : BaseObjectPool where T : class, new()
     {
         public int maxCount = -1;
 
@@ -75,13 +75,13 @@ namespace XLibGame
             }
         }
 
-        public void Clear()
+        public override void Clear()
         {
             m_available.Clear();
             m_recordDict.Clear();
         }
 
-        public void Update()
+        public override void Update()
         {
             UpdateCheck();
             UpdateRelease();
@@ -114,12 +114,12 @@ namespace XLibGame
             }
         }
 
-        public T1 GetOrCreate<T1>() where T1 : class, new()
+        public override T1 GetOrCreate<T1>() 
         {
             return GetOrCreate() as T1;
         }
 
-        public void Release<T1>(T1 obj) where T1 : class, new()
+        public override void Release<T1>(T1 obj)
         {
             Release(obj);
         }
