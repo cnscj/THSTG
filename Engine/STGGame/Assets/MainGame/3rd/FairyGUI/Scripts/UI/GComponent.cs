@@ -40,7 +40,7 @@ namespace FairyGUI
 
         Vector2 _clipSoftness;
         int _sortingChildCount;
-        EventCallback0 _buildDelegate;
+        Action _buildDelegate;
         Controller _applyingController;
 
         EventListener _onDrop;
@@ -58,7 +58,7 @@ namespace FairyGUI
         {
             rootContainer = new Container("GComponent");
             rootContainer.gOwner = this;
-            rootContainer.onUpdate = OnUpdate;
+            rootContainer.onUpdate += OnUpdate;
             container = rootContainer;
 
             displayObject = rootContainer;
@@ -119,6 +119,10 @@ namespace FairyGUI
             set { rootContainer.fairyBatching = value; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="childChanged"></param>
         public void InvalidateBatchingState(bool childChanged)
         {
             if (childChanged)
@@ -136,6 +140,10 @@ namespace FairyGUI
             set { rootContainer.opaque = value; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <value></value>
         public Margin margin
         {
             get { return _margin; }
@@ -148,6 +156,9 @@ namespace FairyGUI
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public ChildrenRenderOrder childrenRenderOrder
         {
             get { return _childrenRenderOrder; }
@@ -161,6 +172,9 @@ namespace FairyGUI
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public int apexIndex
         {
             get { return _apexIndex; }
@@ -174,6 +188,15 @@ namespace FairyGUI
                         BuildNativeDisplayList();
                 }
             }
+        }
+
+        /// <summary>
+        /// If true, children can be navigated by TAB from first to last, and repeat
+        /// </summary>
+        public bool tabStopChildren
+        {
+            get { return rootContainer.tabStopChildren; }
+            set { rootContainer.tabStopChildren = value; }
         }
 
         /// <summary>
@@ -630,6 +653,26 @@ namespace FairyGUI
                 p = p.parent;
             }
             return false;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="objs"></param>
+        public void ChangeChildrenOrder(IList<GObject> objs)
+        {
+            int cnt = objs.Count;
+            for (int i = 0; i < cnt; i++)
+            {
+                GObject obj = objs[i];
+                if (obj.parent != this)
+                    throw new Exception("Not a child of this container");
+
+                _children[i] = obj;
+            }
+            BuildNativeDisplayList();
+            SetBoundsChangedFlag();
         }
 
         /// <summary>
@@ -1295,13 +1338,15 @@ namespace FairyGUI
         {
             this.gameObjectName = packageItem.name;
 
-            if (!packageItem.translated)
+            PackageItem contentItem = packageItem.getBranch();
+
+            if (!contentItem.translated)
             {
-                packageItem.translated = true;
-                TranslationHelper.TranslateComponent(packageItem);
+                contentItem.translated = true;
+                TranslationHelper.TranslateComponent(contentItem);
             }
 
-            ByteBuffer buffer = packageItem.rawData;
+            ByteBuffer buffer = contentItem.rawData;
             buffer.Seek(0, 0);
 
             underConstruct = true;
@@ -1398,7 +1443,7 @@ namespace FairyGUI
                         if (pkgId != null)
                             pkg = UIPackage.GetById(pkgId);
                         else
-                            pkg = packageItem.owner;
+                            pkg = contentItem.owner;
 
                         pi = pkg != null ? pkg.GetItem(src) : null;
                     }
@@ -1406,7 +1451,6 @@ namespace FairyGUI
                     if (pi != null)
                     {
                         child = UIObjectFactory.NewObject(pi);
-                        child.packageItem = pi;
                         child.ConstructFromResource();
                     }
                     else
@@ -1450,7 +1494,7 @@ namespace FairyGUI
                 child.Setup_AfterAdd(buffer, buffer.position);
                 child.underConstruct = false;
                 if (child.displayObject != null)
-                    ToolSet.SetParent(child.displayObject.cachedTransform, this.displayObject.cachedTransform);
+                    child.displayObject.cachedTransform.SetParent(this.displayObject.cachedTransform, false);
 
                 buffer.position = nextPos;
             }
@@ -1473,7 +1517,7 @@ namespace FairyGUI
                 int i2 = buffer.ReadInt();
                 if (hitTestId != null)
                 {
-                    PackageItem pi = packageItem.owner.GetItem(hitTestId);
+                    PackageItem pi = contentItem.owner.GetItem(hitTestId);
                     if (pi != null && pi.pixelHitTestData != null)
                         rootContainer.hitArea = new PixelHitTest(pi.pixelHitTestData, i1, i2, sourceWidth, sourceHeight);
                 }
@@ -1512,7 +1556,7 @@ namespace FairyGUI
             BuildNativeDisplayList();
             SetBoundsChangedFlag();
 
-            if (packageItem.objectType != ObjectType.Component)
+            if (contentItem.objectType != ObjectType.Component)
                 ConstructExtension(buffer);
 
             ConstructFromXML(null);
@@ -1603,7 +1647,15 @@ namespace FairyGUI
                 LuaFunction ctor = _peerTable.GetLuaFunction(funcName);
                 if (ctor != null)
                 {
-                    ctor.Call(this);
+                    try
+                    {
+                        ctor.Call(this);
+                    }
+                    catch (Exception err)
+                    {
+                        Debug.LogError(err);
+                    }
+                    
                     ctor.Dispose();
                     return true;
                 }

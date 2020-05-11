@@ -49,16 +49,42 @@ namespace ASEditor
             return EditorUserBuildSettings.activeBuildTarget;
         }
 
+        public BuildPlatform GetBuildPlatform()
+        {
+            var buildTarget = EditorUserBuildSettings.activeBuildTarget;
+            switch (buildTarget)
+            {
+                case BuildTarget.StandaloneWindows:
+                case BuildTarget.StandaloneOSX:
+                    return BuildPlatform.PC;
+                case BuildTarget.Android:
+                    return BuildPlatform.Android;
+                case BuildTarget.iOS:
+                    return BuildPlatform.IOS;
+            }
+            return BuildPlatform.Auto;
+        }
         public string GetExportFolderPath()
         {
             string newExportFolder = string.IsNullOrEmpty(exportFolder) ? DEFAULT_EXPORT_PATH : exportFolder;
             string retExportPath = newExportFolder;
             if (isCombinePlatformName)
             {
-                string buildPlatformStr = Enum.GetName(typeof(BuildPlatform), targetType);
-                retExportPath = Path.Combine(newExportFolder, buildPlatformStr);
+                if (targetType == BuildPlatform.Auto)
+                {
+                    var buildPlatform = GetBuildPlatform();
+                    string buildPlatformStr = Enum.GetName(typeof(BuildPlatform), buildPlatform);
+                    retExportPath = Path.Combine(newExportFolder, buildPlatformStr);
+                }
+                else
+                {
+                    string buildPlatformStr = Enum.GetName(typeof(BuildPlatform), targetType);
+                    retExportPath = Path.Combine(newExportFolder, buildPlatformStr);
+                }
+
             }
-            return XPathTools.NormalizePath(retExportPath);
+            string normalRetExportPath = XPathTools.NormalizePath(retExportPath);
+            return normalRetExportPath.ToLower();
         }
 
         public string GetBuildFolderPath(string builderName)

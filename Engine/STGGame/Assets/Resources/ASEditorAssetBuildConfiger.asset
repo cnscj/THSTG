@@ -13,14 +13,14 @@ MonoBehaviour:
   m_Name: ASEditorAssetBuildConfiger
   m_EditorClassIdentifier: 
   targetType: 0
-  exportFolder: Assets/AssetBundles
+  exportFolder: /Users/cnscj/UnityWorkspace/THSTG/Game/Resource
   bundleSuffix: .unity3d
   shareBundleName: share/{assetFlatPath}{assetName}.unity3d
-  isCombinePlatformName: 0
+  isCombinePlatformName: 1
   buildItemList:
   - isEnabled: 1
     builderName: Effect
-    buildSrcPath: /Users/cnscj/UnityWorkspace/THSTG/STGGame/Assets/GameAssets/Effects
+    buildSrcPath: /Users/cnscj/UnityWorkspace/THSTG/Engine/STGGame/Assets/GameAssets/Effects
     buildSuffix: '*.prefab'
     assetBundleNameFormat: '{buildName}/{assetKey}.ab'
     shareBundleNameFormat: 
