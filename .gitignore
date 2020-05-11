@@ -33,23 +33,20 @@ sysinfo.txt
 *.unitypackage
 
 # Unity3D Ignore
-STGGame/Library
-STGGame/Logs
-#STGGame/Packages
-STGGame/Temp
-STGGame/obj
-STGGame/.history
-STGGame/.vs
+Engine/STGGame/Library
+Engine/STGGame/Logs
+#Engine/STGGame/Packages
+Engine/STGGame/Temp
+Engine/STGGame/obj
+Engine/STGGame/.history
+Engine/STGGame/.vs
 
 ResEditor/Art/UIProject/.objs
 /ResEditor/ResProject
 /ResEditor/Art/MayaProject
-STGGame/Assets/MainGame/Z_Test
-STGGame/Assets/MainGame/ZCustom_Test
-/STGGame/Assets/MainGame/ZCustom_Test
-STGGame/Assets/StreamingAssets/ABRes
+Engine/STGGame/Assets/MainGame/Z_Test
+Engine/STGGame/Assets/MainGame/ZCustom_Test
+/Engine/STGGame/Assets/MainGame/ZCustom_Test
+Engine/STGGame/Assets/StreamingAssets/ABRes
 
-HotfixProject/ILRuntime/THProject/THProject/obj
-HotfixProject/ILRuntime/THProject/THProject/bin
-mono_crash.115869eaf6.0.json
-STGGame/Assets/AssetBundles
+Engine/STGGame/Assets/AssetBundles
