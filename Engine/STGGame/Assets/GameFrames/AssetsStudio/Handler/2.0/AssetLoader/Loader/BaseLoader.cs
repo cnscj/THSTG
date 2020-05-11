@@ -67,7 +67,7 @@ namespace ASGame
 
         public virtual void UnLoad(string path)
         {
-
+            UnloadWithPath(path);
         }
 
         public virtual void Clear()
@@ -106,7 +106,7 @@ namespace ASGame
 
             handler = AssetLoadHandlerManager.GetInstance().GetOrCreateHandler();
             handler.timeoutChecker.UpdateTick();
-            handler.path = path;
+            handler.path = path.ToLower();
             return handler;
         }
 
@@ -130,6 +130,12 @@ namespace ASGame
                 OnStopLoad(handler);
             }
             
+        }
+
+        protected void UnloadWithPath(string path)
+        {
+            string lowPath = path.ToLower();
+            OnUnLoad(lowPath);
         }
 
         //资源加载成功
@@ -273,6 +279,7 @@ namespace ASGame
         protected virtual void OnUpdate(){ }
         protected abstract void OnStartLoad(AssetLoadHandler handler);
         protected abstract void OnStopLoad(AssetLoadHandler handler);
+        protected virtual void OnUnLoad(string path) { }
         protected virtual void OnLoadSuccess(AssetLoadHandler handler) { }
         protected virtual void OnLoadFailed(AssetLoadHandler handler) { }
     }

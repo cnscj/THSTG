@@ -62,52 +62,6 @@ namespace ASGame
             }
         }
 
-        public override void UnLoad(string path)
-        {
-            if (!string.IsNullOrEmpty(path))
-            {
-                string assetPath = path;
-                if (path.IndexOf("|") > 0)
-                {
-                    string[] pathPairs = path.Split('|');
-                    assetPath = pathPairs[0];
-                }
-
-                if (m_bundlesMap.TryGetValue(assetPath, out var bundleObj))
-                {
-                    UnloadBundleObject(bundleObj);
-                }
-            }
-        }
-
-        private void UnloadBundleObject(BundleObject mainBundleObj)
-        {
-            if (mainBundleObj != null)
-            {
-                string mainBundlePath = mainBundleObj.bundlePath;
-                var dependiencies = GetBundleDependencies(mainBundlePath);
-                foreach (var subBundlePath in dependiencies)
-                {
-                    if (m_bundlesMap.TryGetValue(subBundlePath, out var subBundleObj))
-                    {
-                        UnLoad(subBundlePath);
-                    }
-                }
-                mainBundleObj.Release();
-
-                //因为被m_bundlesMap弱引用着,导致无法正确释放
-                if (mainBundleObj.RefCount == 1)    //最后一次是m_bundlesMap的引用
-                {
-                    mainBundleObj.Release(); 
-                }
-
-                if (mainBundleObj.RefCount == 0)
-                {
-                    m_bundlesMap.Remove(mainBundlePath);
-                }
-            }
-        }
-
         /// <summary>
         /// 取得依赖
         /// </summary>
@@ -274,6 +228,24 @@ namespace ASGame
             //不进行处理,标记下就行了
         }
 
+        protected override void OnUnLoad(string path)
+        {
+            if (!string.IsNullOrEmpty(path))
+            {
+                string assetPath = path;
+                if (path.IndexOf("|") > 0)
+                {
+                    string[] pathPairs = path.Split('|');
+                    assetPath = pathPairs[0];
+                }
+
+                if (m_bundlesMap.TryGetValue(assetPath, out var bundleObj))
+                {
+                    UnloadBundleObject(bundleObj);
+                }
+            }
+        }
+
         protected override void OnLoadSuccess(AssetLoadHandler handler)
         {
             m_handlerWithRequestMap.Remove(handler.id);
@@ -316,6 +288,36 @@ namespace ASGame
             }
             yield return LoadAssetPrimitive(handler);
         }
+
+        //卸载
+        private void UnloadBundleObject(BundleObject mainBundleObj)
+        {
+            if (mainBundleObj != null)
+            {
+                string mainBundlePath = mainBundleObj.bundlePath;
+                var dependiencies = GetBundleDependencies(mainBundlePath);
+                foreach (var subBundlePath in dependiencies)
+                {
+                    if (m_bundlesMap.TryGetValue(subBundlePath, out var subBundleObj))
+                    {
+                        UnLoad(subBundlePath);
+                    }
+                }
+                mainBundleObj.Release();
+
+                //因为被m_bundlesMap弱引用着,导致无法正确释放
+                if (mainBundleObj.RefCount == 1)    //最后一次是m_bundlesMap的引用
+                {
+                    mainBundleObj.Release();
+                }
+
+                if (mainBundleObj.RefCount == 0)
+                {
+                    m_bundlesMap.Remove(mainBundlePath);
+                }
+            }
+        }
+
 
         //加载资源回调处理
         private void LoadAssetPrimitiveCallback(AssetLoadHandler handler, AssetLoadResult result)
