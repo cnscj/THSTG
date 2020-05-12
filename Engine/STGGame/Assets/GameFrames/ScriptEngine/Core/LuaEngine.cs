@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using UnityEngine;
 using XLibrary.Package;
 using XLua;
@@ -9,7 +10,8 @@ namespace SEGame
     public class LuaEngine : MonoSingleton<LuaEngine>
     {
         public float intervalGC = 120f;     //GC间隔
-        public string scriptPath = "";      //lua脚本路径
+        public string scriptPath = "/Users/cnscj/UnityWorkspace/THSTG/Game/Script/Client";      //lua脚本路径
+        public string mainDostring = "require 'Main'";
 
         private LuaEnv m_luaEnv;
         private IntPtr m_luaCache = IntPtr.Zero;
@@ -42,10 +44,7 @@ namespace SEGame
 
             m_luaEnv.AddLoader(OnLoader);
 
-            m_luaEnv.DoString(@"
-                require 'Agent'
-                require 'Main'
-            ");
+            m_luaEnv.DoString(OnMainString());
         }
 
         public void Restart()
@@ -85,10 +84,32 @@ namespace SEGame
             System.GC.WaitForPendingFinalizers();
         }
 
+        private string GetFullPath(string fileName)
+        {
+            return Path.Combine(scriptPath, string.Format("{0}.lua", fileName));
+        }
+
+        private string OnMainString()
+        {
+            return mainDostring;
+        }
 
         private byte[] OnLoader(ref string fileName)
         {
-            Debug.Log(fileName);
+            
+            try
+            {
+                string filePath = GetFullPath(fileName);
+                if (!string.IsNullOrEmpty(filePath))
+                {
+                    return File.ReadAllBytes(filePath);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+
             return null;
         }
 
