@@ -21,6 +21,7 @@ ExportedObj/
 *.vscode
 *.vs
 *.objs
+*.history
 
 # Unity3D generated meta files
 *.pidb.meta
@@ -51,3 +52,4 @@ Engine/STGGame/Assets/StreamingAssets/ABRes
 
 Engine/STGGame/Assets/AssetBundles
 Game/Resource/pc
+Game/.history
