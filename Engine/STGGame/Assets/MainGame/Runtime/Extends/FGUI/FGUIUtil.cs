@@ -72,10 +72,10 @@ namespace STGRuntime
             Stage.inst.onKeyDown.Clear();
         }
 
-        public static void GetStageWidthAndHeight(out int width, out int height)
+        public static void GetStageWidthAndHeight(out float width, out float height)
         {
-            width = Stage.inst.stageWidth;
-            height = Stage.inst.stageHeight;
+            width = Stage.inst.size.x;
+            height = Stage.inst.size.y;
         }
 
         //GRoot

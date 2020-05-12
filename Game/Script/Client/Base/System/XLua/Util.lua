@@ -77,29 +77,28 @@ local function loadpackage(...)
     end
 end
 
---HotfixInit要收集xlua.hotfix()注册的所有函数，不允许其它地方重写这个函数，这边没有用到，直接注释了！
--- local function auto_id_map()
---     local hotfix_id_map = require 'hotfix_id_map'
---     local org_hotfix = xlua.hotfix
---     xlua.hotfix = function(cs, field, func)
---         local map_info_of_type = hotfix_id_map[typeof(cs):ToString()]
---         if map_info_of_type then
---             if func == nil then func = false end
---             local tbl = (type(field) == 'table') and field or {[field] = func}
---             for k, v in pairs(tbl) do
---                 local map_info_of_methods = map_info_of_type[k]
---                 local f = type(v) == 'function' and v or nil
---                 for _, id in ipairs(map_info_of_methods or {}) do
---                     CS.XLua.HotfixDelegateBridge.Set(id, f)
---                 end
---                 --CS.XLua.HotfixDelegateBridge.Set(
---             end
---             xlua.private_accessible(cs)
---         else
---             return org_hotfix(cs, field, func)
---         end
---     end
--- end
+local function auto_id_map()
+    local hotfix_id_map = require 'hotfix_id_map'
+    local org_hotfix = xlua.hotfix
+    xlua.hotfix = function(cs, field, func)
+        local map_info_of_type = hotfix_id_map[typeof(cs):ToString()]
+        if map_info_of_type then
+            if func == nil then func = false end
+            local tbl = (type(field) == 'table') and field or {[field] = func}
+            for k, v in pairs(tbl) do
+                local map_info_of_methods = map_info_of_type[k]
+                local f = type(v) == 'function' and v or nil
+                for _, id in ipairs(map_info_of_methods or {}) do
+                    CS.XLua.HotfixDelegateBridge.Set(id, f)
+                end
+                --CS.XLua.HotfixDelegateBridge.Set(
+            end
+            xlua.private_accessible(cs)
+        else
+            return org_hotfix(cs, field, func)
+        end
+    end
+end
 
 --和xlua.hotfix的区别是：这个可以调用原来的函数
 local function hotfix_ex(cs, field, func)
@@ -156,19 +155,13 @@ local function state(csobj, state)
 end
 
 local function print_func_ref_by_csharp()
-    local logFunc = CS.GYGame.Logger.LogError or print
-    local logWarn = CS.GYGame.Logger.LogWarning or print
-    logWarn("--------The functions referenced by c# start---------")
-
     local registry = debug.getregistry()
     for k, v in pairs(registry) do
         if type(k) == 'number' and type(v) == 'function' and registry[v] == k then
             local info = debug.getinfo(v)
-            logFunc(string.format('%s:%d', info.short_src, info.linedefined))
+            print(string.format('%s:%d', info.short_src, info.linedefined))
         end
     end
-
-    logWarn("--------The functions referenced by c# end  ---------")
 end
 
 return {
@@ -176,7 +169,7 @@ return {
     coroutine_call = coroutine_call,
     cs_generator = cs_generator,
     loadpackage = loadpackage,
-    -- auto_id_map = auto_id_map,
+    auto_id_map = auto_id_map,
     hotfix_ex = hotfix_ex,
     bind = bind,
     createdelegate = createdelegate,
