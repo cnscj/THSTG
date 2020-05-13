@@ -21,12 +21,12 @@ local Tweening = CS.DG.Tweening
 
 local _getter = {
     --Unity
-    Application = function() return UnityEngine.Application end,  --使用之前看看ApplicationUtil有没有相关接口
+    Application = function() return UnityEngine.Application end,
     Object = function() return UnityEngine.Object end,
     GameObject = function() return UnityEngine.GameObject end,
   
     --自定义
-    LuaManagerInstance = function() return SEGame.LuaManager.GetInstance() end,  
+    LuaEngineIns = function() return SEGame.LuaEngine.GetInstance() end,  
 
 }
 ---@class CSharp

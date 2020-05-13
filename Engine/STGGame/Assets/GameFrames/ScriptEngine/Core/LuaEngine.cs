@@ -9,8 +9,9 @@ namespace SEGame
 {
     public class LuaEngine : MonoSingleton<LuaEngine>
     {
-        public float intervalGC = 120f;     //GC间隔
-        public string scriptPath = "/Users/cnscj/UnityWorkspace/THSTG/Game/Script/Client";      //lua脚本路径
+        public float intervalGC = 120f;                             //GC间隔
+
+        public string scriptPath = "../../Game/Script/Client";      //lua脚本路径
         public string mainDostring = "require 'Main'";
 
         private LuaEnv m_luaEnv;
