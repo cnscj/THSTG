@@ -53,7 +53,7 @@ end
 
 function M:init()
     if not self._updateId then
-        self._updateId = Director:registerUpdateHandler(function(dt, currentTime, preTime)
+        self._updateId = Engine:registerUpdateHandler(function(dt, currentTime, preTime)
             self:update(dt, currentTime, preTime)
         end)
     end

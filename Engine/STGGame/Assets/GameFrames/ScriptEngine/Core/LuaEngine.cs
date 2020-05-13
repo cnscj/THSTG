@@ -85,6 +85,33 @@ namespace SEGame
             System.GC.WaitForPendingFinalizers();
         }
 
+        /////////////////////////
+
+        /// <summary>
+        /// 添加加载器
+        /// </summary>
+        public void AddLoadListener()
+        {
+
+        }
+
+        /// <summary>
+        /// 添加更新器
+        /// </summary>
+        public void AddUpdateListener()
+        {
+
+        }
+
+        /// <summary>
+        /// 添加更新器
+        /// </summary>
+        public void AddFixUpdateListener()
+        {
+
+        }
+
+        /////////////////////////
         private string GetFullPath(string fileName)
         {
             return Path.Combine(scriptPath, string.Format("{0}.lua", fileName));
@@ -97,7 +124,6 @@ namespace SEGame
 
         private byte[] OnLoader(ref string fileName)
         {
-            
             try
             {
                 string filePath = GetFullPath(fileName);

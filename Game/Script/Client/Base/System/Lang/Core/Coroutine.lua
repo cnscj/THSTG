@@ -1,10 +1,10 @@
 -- 协程中使用的一些方法
-CoUtil = {}
+Coroutine = {}
 
 local coroutinePool = {}
 
 -- 复用协程create方法
-function CoUtil.create(f)
+function Coroutine.create(f)
 	local co = table.remove(coroutinePool)
 	if co == nil then
 		co = coroutine.create(function(...)
@@ -23,7 +23,7 @@ function CoUtil.create(f)
 end
 
 -- 改自xlua中，resume阻断
-function CoUtil.asyncToSync(f, callbackPos)
+function Coroutine.asyncToSync(f, callbackPos)
 	return function(...)
 		local _co = coroutine.running() or error ('this function must be run in coroutine')
 		local rets
@@ -53,6 +53,6 @@ function CoUtil.asyncToSync(f, callbackPos)
 end
 
 -- 暂停一会
-CoUtil.delayTime = CoUtil.asyncToSync(function(time, cb)
+Coroutine.delayTime = Coroutine.asyncToSync(function(time, cb)
 	Timer:scheduleOnce(time, cb)
 end)

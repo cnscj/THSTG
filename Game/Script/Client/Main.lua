@@ -2,8 +2,10 @@
 require("Test")
 require("Agent")
 
-function Init()
+function Main()
+    --注册更新函数
+
     print("启动成功了!!!!!")
 end
 
-Init()
+Main()
