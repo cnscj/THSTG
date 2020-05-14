@@ -2,3 +2,5 @@
 __TRUNK__ = "Base"
 -- 分支版本目录名，根据特殊分支要求填写，如繁体版(TW)、韩文版(KO)等
 __BRANCH__ = "Base"
+-- 默认语言
+__LANGUAGE__ = "CN"

@@ -38,5 +38,9 @@ function M:reloadClear()
     self.__eventListeners = {}
 end
 
+function M:clear()
+    
+end
+
 rawset(_G, "Controller", false)
 Controller = M

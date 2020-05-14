@@ -26,7 +26,7 @@ local _getter = {
     GameObject = function() return UnityEngine.GameObject end,
   
     --自定义
-    LuaEngineIns = function() return SEGame.LuaEngine.GetInstance() end,  
+    LuaEngine = function() return SEGame.LuaEngine.GetInstance() end,  
 
 }
 ---@class CSharp
@@ -35,10 +35,10 @@ CSharp = setmetatable({}, {
         local obj = rawget(t, k)
         if not obj then
             if _getter[k] then
-                startProfile("accessing " .. k)
+                -- startProfile("accessing " .. k)
                 obj = _getter[k]()
                 rawset(t, k, obj)
-                stopProfile()
+                -- stopProfile()
             end
         end
         return obj

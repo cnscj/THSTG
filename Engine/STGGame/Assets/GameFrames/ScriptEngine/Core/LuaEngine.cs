@@ -17,6 +17,10 @@ namespace SEGame
         private LuaEnv m_luaEnv;
         private IntPtr m_luaCache = IntPtr.Zero;
 
+        // 给lua用的刷新回调
+        Action<float> m_luaUpdateCallback;
+        Action m_luaLateUpdateCallback;
+
         internal LuaEnv LuaEnv
         {
             get { return m_luaEnv; }
@@ -96,19 +100,18 @@ namespace SEGame
         }
 
         /// <summary>
-        /// 添加更新器
+        /// 添加Lua更新器
         /// </summary>
-        public void AddUpdateListener()
+        public void RegisterLuaUpdateListeners(Action<float> updateCallback, Action lateUpdateCallback)
         {
-
+            m_luaUpdateCallback = updateCallback;
+            m_luaLateUpdateCallback = lateUpdateCallback;
         }
 
-        /// <summary>
-        /// 添加更新器
-        /// </summary>
-        public void AddFixUpdateListener()
+        public void UnregisterLuaUpdateListeners()
         {
-
+            m_luaUpdateCallback = null;
+            m_luaLateUpdateCallback = null;
         }
 
         /////////////////////////
@@ -140,6 +143,21 @@ namespace SEGame
             return null;
         }
 
+        private void Update()
+        {
+            if (m_luaUpdateCallback != null)
+            {
+                m_luaUpdateCallback(Time.deltaTime);
+            }
+        }
+
+        private void LateUpdate()
+        {
+            if (m_luaLateUpdateCallback != null)
+            {
+                m_luaLateUpdateCallback();
+            }
+        }
     }
 
 }

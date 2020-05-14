@@ -31,13 +31,5 @@ function M:removeEventListener(name, listener)
     self.__eventListeners = t
 end
 
-
-function M:reloadClear()
-    for _, v in ipairs(self.__eventListeners) do
-        Dispatcher.removeEventListener(v.name, v.listener)
-    end
-    self.__eventListeners = {}
-end
-
 rawset(_G, "View", false)
 View = M
