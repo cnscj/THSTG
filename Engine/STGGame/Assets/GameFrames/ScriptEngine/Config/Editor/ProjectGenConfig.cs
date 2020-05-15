@@ -36,10 +36,6 @@ public static class ProjectGenConfig
         typeof(DG.Tweening.TweenSettingsExtensions),
         typeof(DG.Tweening.ShortcutExtensions),
 
-        //dotween pro 的功能
-        //typeof(DG.Tweening.DOTweenPath),
-        //typeof(DG.Tweening.DOTweenVisualManager),
-
         typeof(Dictionary<string, object>),
         typeof(Dictionary<string, int>),
         typeof(Dictionary<string, string>),
@@ -54,14 +50,14 @@ public static class ProjectGenConfig
         typeof(DG.Tweening.TweenCallback),
         typeof(DG.Tweening.TweenCallback<float>),
 
-        typeof(System.Action),
-        typeof(System.Action<float>),
-        typeof(System.Action<float, float>),
-        typeof(System.Action<Vector2>),
-        typeof(System.Action<Vector3>),
-        typeof(System.Action<GameObject>),
+        typeof(Action),
+        typeof(Action<float>),
+        typeof(Action<float, float>),
+        typeof(Action<Vector2>),
+        typeof(Action<Vector3>),
+        typeof(Action<GameObject>),
 
-        typeof(System.Func<string>),
+        typeof(Func<string>),
 
         typeof(System.Collections.IEnumerator),        
      };

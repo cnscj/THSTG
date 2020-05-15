@@ -25,7 +25,7 @@ namespace STGU3D
             return Mathf.Abs(val) < PRECISION ? 0f : val;
         }
 
-        public Vector3 NormalizeZero(in Vector3 inVec, out Vector3 outVec)
+        public Vector3 NormalizeZero(ref Vector3 inVec, ref Vector3 outVec)
         {
             outVec.x = NormalizeZero(inVec.x);
             outVec.y = NormalizeZero(inVec.y);
@@ -59,8 +59,8 @@ namespace STGU3D
                         }
 
                         //修改长度
-                        MathUtil.ChangeVectorLength(newMoveSpeed, in abVec, out abVec);
-                        NormalizeZero(in abVec, out abVec);
+                        MathUtil.ChangeVectorLength(newMoveSpeed, ref abVec, ref abVec);
+                        NormalizeZero(ref abVec, ref abVec);
 
                         //球的参数方程
                         entity.movement.moveSpeed = abVec;

@@ -47,7 +47,7 @@ namespace STGGame
             return Mathf.Abs(val) < FLOAT_PRECISION ? 0f : val;
         }
 
-        public static Vector3 NormalizeZero(in Vector3 inVec, out Vector3 outVec)
+        public static Vector3 NormalizeZero(ref Vector3 inVec, ref Vector3 outVec)
         {
             outVec.x = NormalizeZero(inVec.x);
             outVec.y = NormalizeZero(inVec.y);
@@ -112,7 +112,7 @@ namespace STGGame
         /// <param name="inVec">原向量</param>
         /// <param name="outVec">输出向量</param>
         /// <returns></returns>
-        public static Vector3 ChangeVectorLength(float radius, in Vector3 inVec, out Vector3 outVec)
+        public static Vector3 ChangeVectorLength(float radius, ref Vector3 inVec, ref Vector3 outVec)
         {
             Vector3 direction = inVec.normalized;
             float theta = Deg2Rad(Angle360(Vector3.right, direction));     //与X轴夹角
@@ -134,11 +134,11 @@ namespace STGGame
         /// <param name="inVec">原向量</param>
         /// <param name="outVec">输出向量</param>
         /// <returns></returns>
-        public static Vector3 ChangeVectorDirection(Vector3 newVec, in Vector3 inVec, out Vector3 outVec)
+        public static Vector3 ChangeVectorDirection(Vector3 newVec, ref Vector3 inVec, ref Vector3 outVec)
         {
             float oldLength = inVec.magnitude;
 
-            return ChangeVectorLength(oldLength, in newVec, out outVec);
+            return ChangeVectorLength(oldLength, ref newVec, ref outVec);
         }
     }
 

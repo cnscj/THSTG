@@ -169,7 +169,7 @@ namespace THGame
             parser.Open(path);
 
             Dictionary<string, string> dectionary = null;
-            parser.ReadAllValues(SECTION_KEY, out dectionary);
+            parser.ReadAllValues(SECTION_KEY, dectionary);
             parser.Close();
 
             if (dectionary != null)

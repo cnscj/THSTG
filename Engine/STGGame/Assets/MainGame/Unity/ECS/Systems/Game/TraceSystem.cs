@@ -44,7 +44,7 @@ namespace STGU3D
                     var angle_1 = 360 - Mathf.Atan2(abVec.x, abVec.y) * Mathf.Rad2Deg;
                     //将当前物体的角度设置为对应角度
                     entity.movement.rotationSpeed = new Vector3(0, 0, angle_1);
-                    entity.movement.moveSpeed = MathUtil.ChangeVectorDirection(entity.movement.rotationSpeed, entity.movement.moveSpeed, out entity.movement.moveSpeed);
+                    entity.movement.moveSpeed = MathUtil.ChangeVectorDirection(entity.movement.rotationSpeed, ref entity.movement.moveSpeed, ref entity.movement.moveSpeed);
                 }
             }
 

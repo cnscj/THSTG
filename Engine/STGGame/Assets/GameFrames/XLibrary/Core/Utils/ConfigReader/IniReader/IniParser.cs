@@ -500,7 +500,7 @@ namespace XLibrary
         }
 
         // *** Read all values from local cache ***
-        public bool ReadAllValues(string SectionName,out Dictionary<string, string> values)
+        public bool ReadAllValues(string SectionName, Dictionary<string, string> values)
         {
             lock (m_Lock)
             {
@@ -510,7 +510,7 @@ namespace XLibrary
         }
 
         // *** Insert or modify all values in local cache ***
-        public void WriteAllValues(string SectionName, in Dictionary<string, string> values)
+        public void WriteAllValues(string SectionName, Dictionary<string, string> values)
         {
             if (values != null)
             {
