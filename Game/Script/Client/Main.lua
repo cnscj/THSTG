@@ -17,10 +17,10 @@ function main()
     --设置分支版本,或者其他设置
     setBranch()
 
-
     --设置逻辑更新
-    CSharp.LuaEngine:RegisterLuaUpdateListeners(update,nil)
+    CSharp.LuaEngine:RegisterLuaUpdateListeners(update)
 
+    
     print("启动成功了!!!!!")
 end
 

@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Linq;
 using UnityEngine;
 using XLua;
 
@@ -62,6 +60,7 @@ public static class ProjectGenConfig
         typeof(System.Action<Vector2>),
         typeof(System.Action<Vector3>),
         typeof(System.Action<GameObject>),
+
         typeof(System.Func<string>),
 
         typeof(System.Collections.IEnumerator),        

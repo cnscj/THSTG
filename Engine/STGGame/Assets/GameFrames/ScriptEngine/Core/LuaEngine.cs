@@ -5,17 +5,21 @@ using XLibrary.Package;
 using XLua;
 using static XLua.LuaEnv;
 
+/*
+    Lua回调如果在C#中注册,最好只只留一个入口
+    因为回调注销必须确保两边都注销掉,不如只有C#单方面持有回调会报错的(先注销C#
+*/
 namespace SEGame
 {
+    
     public class LuaEngine : MonoSingleton<LuaEngine>
     {
-        public float intervalGC = 120f;                             //GC间隔
-
         public string scriptPath = "../../Game/Script/Client";      //lua脚本路径
         public string mainDostring = "require 'Main'";
 
         private LuaEnv m_luaEnv;
         private IntPtr m_luaCache = IntPtr.Zero;
+        private CustomLoader m_customLoader = null;
 
         // 给lua用的刷新回调
         Action<float> m_luaUpdateCallback;
@@ -36,18 +40,13 @@ namespace SEGame
 
         }
 
-        public void Start()
-        {
-            Launch();
-        }
-
         public void Launch()
         {
             Clear();
 
             m_luaEnv = new LuaEnv();
 
-            m_luaEnv.AddLoader(OnLoader);
+            m_luaEnv.AddLoader(OnCustomLoader());
 
             m_luaEnv.DoString(OnMainString());
         }
@@ -74,6 +73,8 @@ namespace SEGame
                 m_luaCache = IntPtr.Zero;
             }
 
+            UnregisterLuaUpdateListeners();
+
             Debug.Log("LuaEngine.Clear()");
         }
 
@@ -92,11 +93,11 @@ namespace SEGame
         /////////////////////////
 
         /// <summary>
-        /// 添加加载器
+        /// 添加Lua加载器
         /// </summary>
-        public void AddLoadListener()
+        public void SetCustomLoadListener(CustomLoader loader)
         {
-
+            m_customLoader = loader;
         }
 
         /// <summary>
@@ -115,9 +116,11 @@ namespace SEGame
         }
 
         /////////////////////////
-        private string GetFullPath(string fileName)
+
+        private CustomLoader OnCustomLoader()
         {
-            return Path.Combine(scriptPath, string.Format("{0}.lua", fileName));
+            m_customLoader = m_customLoader ?? OnLoaderInvoke;
+            return m_customLoader;
         }
 
         private string OnMainString()
@@ -125,7 +128,12 @@ namespace SEGame
             return mainDostring;
         }
 
-        private byte[] OnLoader(ref string fileName)
+        private string GetFullPath(string fileName)
+        {
+            return Path.Combine(scriptPath, string.Format("{0}.lua", fileName));
+        }
+
+        private byte[] OnLoaderInvoke(ref string fileName)
         {
             try
             {

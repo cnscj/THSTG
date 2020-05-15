@@ -117,8 +117,6 @@ public static class XLuaGenConfig
         "ConsoleWindow",
         "XConsoleHelper",
 
-        "FairyGUI.GoWrapper",
-
     };
 
     static bool isExcludedCustom(Type type)
@@ -250,7 +248,6 @@ public static class XLuaGenConfig
     // 类.委托名 中间不是“.”，而是"+"，只有命名空间下面的东西才是"."
     static List<string> excludeDelegates = new List<string>()
     {
-
         "XLua.ObjectCast",
         "XLua.ObjectCheck",
         "XLua.LuaEnv+CustomLoader",
