@@ -40,7 +40,7 @@ namespace SEGame
 
         }
 
-        public void Launch()
+        public void Startup()
         {
             Clear();
 
@@ -63,7 +63,7 @@ namespace SEGame
                 m_luaEnv = null;
             }
 
-            Launch();
+            Startup();
         }
 
         public void Clear()

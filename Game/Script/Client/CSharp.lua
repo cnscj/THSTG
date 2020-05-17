@@ -14,9 +14,11 @@
 local UnityEngine = CS.UnityEngine
 local FairyGUI = CS.FairyGUI
 
+local XLibGame = CS.XLibGame
 local SEGame = CS.SEGame
 local ASGame = CS.ASGame
-local XLibGame = CS.XLibGame
+local STGGame = CS.STGGame
+
 local Tweening = CS.DG.Tweening
 
 local _getter = {
@@ -27,7 +29,7 @@ local _getter = {
   
     --自定义
     LuaEngine = function() return SEGame.LuaEngine.GetInstance() end,  
-
+    GameEngine = function() return STGGame.GameEngine.GetInstance() end, 
 }
 ---@class CSharp
 CSharp = setmetatable({}, {

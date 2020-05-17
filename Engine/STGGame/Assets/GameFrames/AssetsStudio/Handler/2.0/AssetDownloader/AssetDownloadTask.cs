@@ -7,7 +7,11 @@ namespace ASGame
 {
     public class AssetDownloadTask
     {
-        
+        public int id;
+        public int status;
+        public string path;
+        public AssetDownloadCallback onCallback;
+
     }
 
 }

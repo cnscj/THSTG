@@ -4,10 +4,7 @@ require("CSharp")
 
 require("Test")
 require("Agent")
-
-function setBranch()
-
-end
+require("Version")
 
 function update(dt)
 
@@ -15,13 +12,13 @@ end
 
 function main()
     --设置分支版本,或者其他设置
-    setBranch()
+
 
     --设置逻辑更新
     CSharp.LuaEngine:RegisterLuaUpdateListeners(update)
 
-    
-    print("启动成功了!!!!!")
+    print(string.format("EngineName:%s EngineVersion:%s",__ENGINE__NAME__,__ENGINE_VERSION__))
+    print(string.format("ProjectName:%s ProjectVersion:%s",__PROJECT_NAME__,__SCRIPT_VERSION__))
 end
 
 main()

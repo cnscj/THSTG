@@ -15,6 +15,11 @@ namespace XLibGame
         public int AvailableCount { get => m_available.Count; }
         public int TotalCount { get => m_recordDict.Count; }
 
+        public ObjectPool(int defaultNum = 0)
+        {
+            Fill(defaultNum);
+        }
+
         public T GetOrCreate()
         {
             if (m_available.Count <= 0)
@@ -59,18 +64,28 @@ namespace XLibGame
 
         public void Fill(int count)
         {
-            if (maxCount > 0)
+            if (count > 0)
             {
-                while (m_available.Count < maxCount && m_available.Count < count)
+                Queue<T> tempList = new Queue<T>();
+                if (maxCount > 0)
                 {
-                    Release(GetOrCreate());
+                    while (m_available.Count < maxCount && m_available.Count < count)
+                    {
+                        tempList.Enqueue(GetOrCreate());
+                    }
                 }
-            }
-            else
-            {
-                while (m_available.Count < count)
+                else
                 {
-                    Release(GetOrCreate());
+                    while (m_available.Count < count)
+                    {
+                        tempList.Enqueue(GetOrCreate());
+                    }
+                }
+
+                while (tempList.Count > 0)
+                {
+                    var newObject = tempList.Dequeue();
+                    Release(newObject);
                 }
             }
         }

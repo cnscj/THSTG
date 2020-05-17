@@ -10,7 +10,7 @@ namespace ASGame
     //提供 静默下载 一个开关
     public class AssetDownloadManager : MonoSingleton<AssetDownloadManager>
     {
-        
+ 
     }
 
 }
