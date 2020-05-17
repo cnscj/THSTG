@@ -101,7 +101,8 @@ public class DataService  {
 	}
 
 	public IEnumerable<Person> GetPersonsNamedRoberto(){
-		return _connection.Table<Person>().Where(x => x.Name == "Roberto");
+        var tt = _connection.Table<Person>().Where(x => x.Name == "Roberto");
+        return _connection.Table<Person>().Where(x => x.Name == "Roberto");
 	}
 
 	public Person GetJohnny(){
