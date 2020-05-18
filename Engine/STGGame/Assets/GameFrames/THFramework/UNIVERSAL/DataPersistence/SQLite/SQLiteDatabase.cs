@@ -2,20 +2,30 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using SQLite4Unity3d;
+using SqlCipher4Unity3D;
 
 namespace THGame
 {
     public class SQLiteDatabase
     {
-        private SQLiteConnection m_connection;
+        public static bool IsExist(string path)
+        {
+            return false;
+        }
 
+        public static SQLiteDatabase Create(string dbPath, string password)
+        {
+            return null;
+        }
+
+        private SQLiteConnection m_connection;
         public SQLiteConnection Connection
         {
             get { return m_connection; }
         }
 
-        public SQLiteDatabase(string databasePath)
+        /////////////////////////////////////////////
+        public SQLiteDatabase()
         {
 
         }
@@ -30,16 +40,15 @@ namespace THGame
             return 0;
         }
         /////////////////////////////////////////////
-
-
-        //基础操作:增删改查
         public void CreateTable<T>() where T : new()
         {
+            DropTable<T>();
             if (m_connection != null)
             {
                 m_connection.CreateTable<T>();
             }
         }
+
         public void DropTable<T>() where T : new()
         {
             if (m_connection != null)
@@ -48,20 +57,60 @@ namespace THGame
             }
         }
 
-        //增
-        public int InsetItems(IEnumerable objs)
+        public void RollbackTo(string point)
         {
             if (m_connection != null)
             {
-                return m_connection.InsertAll(objs);
+                m_connection.RollbackTo(point);
+            }
+        }
+
+        public void SavePoint(string point)
+        {
+            if (m_connection != null)
+            {
+                m_connection.Release(point);
+            }
+        }
+
+        //增
+        public int InsetItem(object item, bool isReplace = false)
+        {
+            if (m_connection != null)
+            {
+                if(isReplace)
+                {
+                    return m_connection.InsertOrReplace(item);
+                }
+                else
+                {
+                    return m_connection.Insert(item);
+                }
+
             }
             return 0;
         }
-        public int InsetItem(object item)
+
+        public int InsetItems(IEnumerable objs, bool isReplace = false)
         {
             if (m_connection != null)
             {
-                return m_connection.Insert(item);
+                if (objs != null)
+                {
+                    if (isReplace)
+                    {
+                        int total = 0;
+                        foreach(var it in objs)
+                        {
+                            total += InsetItem(objs, isReplace);
+                        }
+                        return total;
+                    }
+                    else
+                    {
+                        return m_connection.InsertAll(objs);
+                    }
+                }
             }
             return 0;
         }
@@ -78,11 +127,20 @@ namespace THGame
 
         public int DeleteItems(IEnumerable objs)
         {
-            if (m_connection != null)
+            int total = 0;
+            if (m_connection != null && objs != null)
             {
-
+                foreach(var it in objs)
+                {
+                    total += DeleteItem(it);
+                }
             }
-            return 0;
+            return total;
+        }
+
+        public int DeleteItems<T>(Expression<Func<T, bool>> predExpr) where T : new()
+        {
+            return DeleteItems(QueryItems(predExpr));
         }
 
         public int DeleteAllItems<T>()
@@ -132,9 +190,21 @@ namespace THGame
 
         /////////////////////////////////////////////
 
-        public void Close()
+        public void Open(string dbPath, string password, SQLiteOpenFlags openFlags)
         {
-            m_connection.Close();
+            Dispose();
+            m_connection = new SQLiteConnection(dbPath, password, openFlags);
+        }
+
+        public void OpenOrCreate(string dbPath, string password)
+        {
+            Open(dbPath, password, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
+        }
+
+        public void Dispose()
+        {
+            m_connection?.Close();
+            m_connection?.Dispose();
         }
     }
 

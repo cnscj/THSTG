@@ -82,7 +82,7 @@ namespace XLibrary
             string fileRootPath = Path.GetDirectoryName(savePath);
 
             string finalPath = savePath;
-            for(int i = 0; XFileTools.Exists(finalPath);i++)
+            for (int i = 0; XFileTools.Exists(finalPath); i++)
             {
                 finalPath = Combine(fileRootPath, string.Format("{0}({1}){2}", fileNameNotEx, i, fileEx));
             }
@@ -103,6 +103,5 @@ namespace XLibrary
             return filePath;
         }
     }
-
 }
 

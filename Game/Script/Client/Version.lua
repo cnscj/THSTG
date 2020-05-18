@@ -1,5 +1,5 @@
 -- 引擎名
-__ENGINE__NAME__ = CSharp.GameEngine:GetEngineName()
+__ENGINE_NAME__ = CSharp.GameEngine:GetEngineName()
 -- 引擎版本号
 __ENGINE_VERSION__ = CSharp.GameEngine:GetEngineVersion()
 -- APP字符串版本号
