@@ -8,14 +8,16 @@ namespace THGame
 {
     public class SQLiteDatabase
     {
-        public static bool IsExist(string path)
+        public static bool IsExists(string dePath)
         {
-            return false;
+            return System.IO.File.Exists(dePath);
         }
 
         public static SQLiteDatabase Create(string dbPath, string password)
         {
-            return null;
+            var sqldatabase = new SQLiteDatabase();
+            sqldatabase.Open(dbPath, password, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
+            return sqldatabase;
         }
 
         private SQLiteConnection m_connection;
@@ -29,6 +31,10 @@ namespace THGame
         {
 
         }
+        ~SQLiteDatabase()
+        {
+            Dispose();
+        }
 
         //基础SQL执行
         public int Execute(string query, params object[] args)
@@ -39,22 +45,32 @@ namespace THGame
             }
             return 0;
         }
-        /////////////////////////////////////////////
-        public void CreateTable<T>() where T : new()
+
+        public List<T> Queue<T>(string query, params object[] args) where T : new()
         {
-            DropTable<T>();
             if (m_connection != null)
             {
-                m_connection.CreateTable<T>();
+                return m_connection.Query<T>(query, args);
             }
+            return default;
+        }
+        /////////////////////////////////////////////
+        public int CreateTable<T>() where T : new()
+        {
+            if (m_connection != null)
+            {
+                return m_connection.CreateTable<T>();
+            }
+            return 0;
         }
 
-        public void DropTable<T>() where T : new()
+        public int DropTable<T>() where T : new()
         {
             if (m_connection != null)
             {
-                m_connection.DropTable<T>();
+                return m_connection.DropTable<T>();
             }
+            return 0;
         }
 
         public void RollbackTo(string point)
@@ -65,11 +81,20 @@ namespace THGame
             }
         }
 
-        public void SavePoint(string point)
+        public string SavePoint()
         {
             if (m_connection != null)
             {
-                m_connection.Release(point);
+                return m_connection.SaveTransactionPoint();
+            }
+            return null;
+        }
+
+        public void Commit()
+        {
+            if (m_connection != null)
+            {
+                m_connection.Commit();
             }
         }
 
@@ -140,7 +165,7 @@ namespace THGame
 
         public int DeleteItems<T>(Expression<Func<T, bool>> predExpr) where T : new()
         {
-            return DeleteItems(QueryItems(predExpr));
+            return DeleteItems(SelectItems(predExpr));
         }
 
         public int DeleteAllItems<T>()
@@ -161,6 +186,7 @@ namespace THGame
             }
             return 0;
         }
+
         public int UpdateItems(IEnumerable objs)
         {
             if (m_connection != null)
@@ -171,21 +197,22 @@ namespace THGame
         }
 
         //查
-        public IEnumerable<T> QueryItems<T>() where T : new()
+        public IEnumerable<T> SelectItems<T>() where T : new()
         {
             if (m_connection != null)
             {
                 return m_connection.Table<T>();
             }
-            return null;
+            return default;
         }
-        public IEnumerable<T> QueryItems<T>(Expression<Func<T, bool>> predExpr) where T : new()
+
+        public IEnumerable<T> SelectItems<T>(Expression<Func<T, bool>> predExpr) where T : new()
         {
             if (m_connection != null)
             {
                 return m_connection.Table<T>().Where(predExpr);
             }
-            return null;
+            return default;
         }
 
         /////////////////////////////////////////////
@@ -201,9 +228,14 @@ namespace THGame
             Open(dbPath, password, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
         }
 
-        public void Dispose()
+        public void Close()
         {
             m_connection?.Close();
+        }
+
+        public void Dispose()
+        {
+            Close();
             m_connection?.Dispose();
         }
     }
