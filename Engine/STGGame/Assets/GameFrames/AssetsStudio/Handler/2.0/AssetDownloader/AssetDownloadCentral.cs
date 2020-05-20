@@ -13,7 +13,7 @@ namespace ASGame
         //全局最大任务下载数
         //定时任务
         public int maxCount = -1;
-        public float limitSpeed = -1f;
+        public float limidSpeed = -1f;
 
         private Dictionary<string, AssetDownloadTask> m_waitQueue = new Dictionary<string, AssetDownloadTask>();         //排队队列
         private Dictionary<string, AssetDownloadTask> m_progressMap = new Dictionary<string, AssetDownloadTask>();       //下载队列
@@ -55,14 +55,25 @@ namespace ASGame
             if (!string.IsNullOrEmpty(urlPath) && !string.IsNullOrEmpty(storePath))
             {
                 //TODO:判断是否已经在队列中,是的话,下载优先级往前提
+                if (m_waitQueue.TryGetValue(urlPath, out var waitTask))
+                {
+                    return waitTask;
+                }
 
+                if (m_progressMap.TryGetValue(urlPath, out var progressTask))
+                {
+                    return progressTask;
+                }
+
+                if (m_stopMap.TryGetValue(urlPath, out var stopTask))
+                {
+                    return stopTask;
+                }
 
                 var task = GetOrCreateTask();
                 task.urlPath = urlPath;
                 task.storePath = storePath;
                 task.createTime = XTimeTools.NowTimeStampMs();
-
-
             }
             return null;
         }
@@ -70,32 +81,56 @@ namespace ASGame
 
         public void StartTask(AssetDownloadTask task)
         {
+            if (m_waitQueue.ContainsValue(task))
+            {
 
+            }
+
+            if (m_stopMap.ContainsValue(task))
+            {
+
+            }
         }
 
         public void StopTask(AssetDownloadTask task)
         {
+            if (m_progressMap.ContainsValue(task))
+            {
 
+            }
         }
 
         public void CancelTask(AssetDownloadTask task)
         {
+            if (m_waitQueue.ContainsValue(task))
+            {
 
+            }
+
+            if (m_stopMap.ContainsValue(task))
+            {
+
+            }
+
+            if (m_progressMap.ContainsValue(task))
+            {
+
+            }
         }
 
         public void StartAll()
         {
-
+            //所有
         }
 
         public void StopAll()
         {
-
+            //
         }
 
         public void CancelAll()
         {
-
+            //
         }
         /////////////////////////////////////
 
