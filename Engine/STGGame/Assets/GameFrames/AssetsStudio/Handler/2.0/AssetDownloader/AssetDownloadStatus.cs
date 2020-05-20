@@ -7,8 +7,8 @@ namespace ASGame
 {
     public static class AssetDownloadStatus
     {
-        public static readonly int DOWNLOAD_ASSET_ERROR = -104;
-        public static readonly int DOWNLOAD_CENCELED = -103;
+        public static readonly int DOWNLOAD_ERROR = -104;
+        public static readonly int DOWNLOAD_CANCELED = -103;
         public static readonly int DOWNLOAD_TIMEOUT = -102;
         public static readonly int DOWNLOAD_INVALID_URL = -101;
         public static readonly int DOWNLOAD_IDLE = 0;

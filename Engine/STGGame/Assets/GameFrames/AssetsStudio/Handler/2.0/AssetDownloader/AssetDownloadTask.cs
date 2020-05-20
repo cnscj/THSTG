@@ -15,11 +15,11 @@ namespace ASGame
         public long createTime;                     //创建时间
         public long finishTime;                     //完成时间
 
-        public AssetDownloadCallback onCallback;    //回调
-
         public long curSize;                       //当前下载量
         public long totalSize;                     //总量
 
+        public AssetDownloadCompletedCallback onCompleted;    //完成回调
+        public AssetDownloadProgressCallback onProgress;     //进度回调
 
         public void Reset()
         {
@@ -31,9 +31,10 @@ namespace ASGame
             createTime = -1;
             finishTime = -1;
 
-            onCallback = null;
+            onCompleted = null;
+            onProgress = null;
 
-            curSize= 0;
+            curSize = 0;
             totalSize = 0;
         }
     }

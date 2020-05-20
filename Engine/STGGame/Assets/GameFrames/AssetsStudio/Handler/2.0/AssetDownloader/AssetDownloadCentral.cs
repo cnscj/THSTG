@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using XLibrary;
 
 namespace ASGame
 {
@@ -11,8 +12,10 @@ namespace ASGame
         //全局限速
         //全局最大任务下载数
         //定时任务
-        private int m_id;
-        private LinkedList<AssetDownloadTask> m_waitQueue = new LinkedList<AssetDownloadTask>();                         //排队队列
+        public int maxCount = -1;
+        public float limitSpeed = -1f;
+
+        private Dictionary<string, AssetDownloadTask> m_waitQueue = new Dictionary<string, AssetDownloadTask>();         //排队队列
         private Dictionary<string, AssetDownloadTask> m_progressMap = new Dictionary<string, AssetDownloadTask>();       //下载队列
         private Dictionary<string, AssetDownloadTask> m_stopMap = new Dictionary<string, AssetDownloadTask>();           //停止队列
 
@@ -51,9 +54,13 @@ namespace ASGame
         {
             if (!string.IsNullOrEmpty(urlPath) && !string.IsNullOrEmpty(storePath))
             {
+                //TODO:判断是否已经在队列中,是的话,下载优先级往前提
+
+
                 var task = GetOrCreateTask();
                 task.urlPath = urlPath;
                 task.storePath = storePath;
+                task.createTime = XTimeTools.NowTimeStampMs();
 
 
             }
@@ -95,7 +102,6 @@ namespace ASGame
         private AssetDownloadTask GetOrCreateTask()
         {
             var task = AssetDownloadTaskManager.GetInstance().GetOrCreateTask();
-            task.id = ++m_id;
 
             return task;
         }
@@ -167,6 +173,8 @@ namespace ASGame
         }
 
         ///
+
+        //Android目录下,下载中的存放路径必须在Application.dataPath,下载完成在拷贝到Application.persistentDataPath
     }
 
 }

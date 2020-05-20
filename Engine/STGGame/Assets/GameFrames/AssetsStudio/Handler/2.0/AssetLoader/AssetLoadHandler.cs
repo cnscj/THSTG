@@ -95,7 +95,7 @@ namespace ASGame
             return isHadError;
         }
 
-        public void Callback(AssetLoadResult ret)
+        public void Callback(AssetLoadResult ret = null)
         {
             result = ret ?? result;
             onCallback?.Invoke(result);

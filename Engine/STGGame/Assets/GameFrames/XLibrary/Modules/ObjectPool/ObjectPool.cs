@@ -6,6 +6,7 @@ namespace XLibGame
 {
     public class ObjectPool<T> : BaseObjectPool where T : class, new()
     {
+        public float stayTime = -1;
         public int maxCount = -1;
 
         private Dictionary<T, ObjectPoolObject> m_recordDict = new Dictionary<T, ObjectPoolObject>();
@@ -28,6 +29,8 @@ namespace XLibGame
                 m_available.AddLast(newObj);
 
                 var poolObj = new ObjectPoolObject();
+                poolObj.stayTime = stayTime;
+
                 m_recordDict.Add(newObj, poolObj);
             }
 

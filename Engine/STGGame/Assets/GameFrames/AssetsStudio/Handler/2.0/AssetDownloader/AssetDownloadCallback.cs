@@ -5,5 +5,6 @@ using XLibrary.Package;
 
 namespace ASGame
 {
-    public delegate void AssetDownloadCallback(AssetDownloadTask task); //下载回调
+    public delegate void AssetDownloadCompletedCallback(AssetDownloadTask task); //下载完成回调
+    public delegate void AssetDownloadProgressCallback(AssetDownloadTask task); //下载进度回调
 }

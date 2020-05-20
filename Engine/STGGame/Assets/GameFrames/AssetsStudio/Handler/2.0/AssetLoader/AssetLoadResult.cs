@@ -1,4 +1,4 @@
-﻿using Object = UnityEngine.Object;
+﻿using Object = System.Object;
 namespace ASGame
 {
     public class AssetLoadResult
@@ -13,7 +13,7 @@ namespace ASGame
             this.asset = asset;
             this.isDone = isDone;
         }
-        public T GetAsset<T>() where T : Object
+        public T GetAsset<T>() where T : class
         {
             return asset as T;
         }

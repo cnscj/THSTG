@@ -8,12 +8,14 @@ namespace ASGame
 {
     public class AssetLoaderManager : MonoSingleton<AssetLoaderManager>
     {
-        private BaseLoader networkLoader;
+        private BaseLoader m_binaryLoader;
+        private BaseLoader m_networkLoader;
         private BaseLoader m_editorLoader;
         private BaseLoader m_resourceLoader;
         private BaseLoader m_bundleLoader;
         public void LoadBundleMainfest(string mainfestPath)
         {
+            //XXX:然而大多数情况下下Mainfest是加密的,可能需要先用到二进制打开
             GetOrCreateBundleLoader().LoadMainfest(mainfestPath);
         }
 
@@ -50,22 +52,34 @@ namespace ASGame
             }
         }
 
+        public BinarylLoader GetOrCreateBinaryLoader()
+        {
+            m_binaryLoader = m_binaryLoader ?? CreateLoader<BinarylLoader>();
+            return m_binaryLoader as BinarylLoader;
+        }
+
+        public NetworkLoader GetOrCreateNetworkLoader()
+        {
+            m_networkLoader = m_networkLoader ?? CreateLoader<NetworkLoader>();
+            return m_networkLoader as NetworkLoader;
+        }
+
         public BundleLoader GetOrCreateBundleLoader()
         {
             m_bundleLoader = m_bundleLoader ?? CreateLoader<BundleLoader>();
             return m_bundleLoader as BundleLoader;
         }
 
-        public EditorLoader GetOrCreateEditorLoader()
-        {
-            m_editorLoader = m_editorLoader ?? CreateLoader<EditorLoader>();
-            return m_editorLoader as EditorLoader;
-        }
-
         public ResourcesLoader GetOrCreateResourceeLoader()
         {
             m_resourceLoader = m_resourceLoader ?? CreateLoader<ResourcesLoader>();
             return m_resourceLoader as ResourcesLoader;
+        }
+
+        private EditorLoader GetOrCreateEditorLoader()
+        {
+            m_editorLoader = m_editorLoader ?? CreateLoader<EditorLoader>();
+            return m_editorLoader as EditorLoader;
         }
 
         private BaseLoader CreateLoader<T>() where T : BaseLoader
