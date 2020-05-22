@@ -19,6 +19,7 @@ function main()
 
     print(string.format("EngineName:%s EngineVersion:%s",__ENGINE_NAME__,__ENGINE_VERSION__))
     print(string.format("ProjectName:%s ProjectVersion:%s",__PROJECT_NAME__,__SCRIPT_VERSION__))
+
 end
 
 main()

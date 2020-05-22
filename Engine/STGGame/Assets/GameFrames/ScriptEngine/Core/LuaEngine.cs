@@ -46,8 +46,10 @@ namespace SEGame
 
             m_luaEnv = new LuaEnv();
 
-            m_luaEnv.AddLoader(OnCustomLoader());
+            //TODO:还没编译json库
+            //m_luaEnv.AddBuildin("cjson", XLua.LuaDLL.Lua.LoadCJson);
 
+            m_luaEnv.AddLoader(OnCustomLoader());
             m_luaEnv.DoString(OnMainString());
         }
 
@@ -166,6 +168,9 @@ namespace SEGame
                 m_luaLateUpdateCallback();
             }
         }
+
+        //////////////////////
+        //TODO:注入调试方法:U9,如果在特定目录有这个脚本,优先用这个脚本,否则用原来的(先加载luaS,在加载先加载luaU
     }
 
 }
