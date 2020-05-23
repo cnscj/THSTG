@@ -26,11 +26,15 @@ local _getter = {
     Application = function() return UnityEngine.Application end,
     Object = function() return UnityEngine.Object end,
     GameObject = function() return UnityEngine.GameObject end,
-  
+    Debug = function() return UnityEngine.Debug end,
+
     --自定义
     LuaEngine = function() return SEGame.LuaEngine.GetInstance() end,  
     GameEngine = function() return STGGame.GameEngine.GetInstance() end, 
 }
+
+
+
 ---@class CSharp
 CSharp = setmetatable({}, {
     __index = function(t, k)

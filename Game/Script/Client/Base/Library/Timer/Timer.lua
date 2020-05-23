@@ -551,5 +551,6 @@ function M:scheduleDuration(interval,duration,pollFunc,endCall)
 
     return T.timer
 end
+
 rawset(_G, "Timer", false)
 Timer = M.new()

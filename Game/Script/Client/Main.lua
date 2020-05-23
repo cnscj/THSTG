@@ -1,24 +1,41 @@
 
 
 require("CSharp")
-
-require("Test")
 require("Agent")
-require("Version")
+require("Test")
 
-function update(dt)
+function init()
+    require("Version")
 
+    --设置主干版本和分支版本
+    CSharp.LuaEngine:SetLuaTrunkAndBrench(__TRUNK__,__BRANCH__)
+
+    --设置游戏逻辑更新
+    CSharp.LuaEngine:RegisterLuaUpdateListeners(update)
+end
+function setup()
+    --游戏依赖加载
+    require("3rdInit")
+    require("SystemInit")
+    require("LibraryInit")
+
+    require("ContextInit")
+end
+
+function start()
+    --启动
+    print(string.format("Engine Name:%s Engine Version:%s\nProject Name:%s Project Version:%s",__ENGINE_NAME__,__ENGINE_VERSION__,__PROJECT_NAME__,__SCRIPT_VERSION__))
+    print(string.format("Launch Finish!"))
 end
 
 function main()
-    --设置分支版本,或者其他设置
+    init()
 
+    setup()
+    start()
+end
 
-    --设置逻辑更新
-    CSharp.LuaEngine:RegisterLuaUpdateListeners(update)
-
-    print(string.format("EngineName:%s EngineVersion:%s",__ENGINE_NAME__,__ENGINE_VERSION__))
-    print(string.format("ProjectName:%s ProjectVersion:%s",__PROJECT_NAME__,__SCRIPT_VERSION__))
+function update(dt)
 
 end
 

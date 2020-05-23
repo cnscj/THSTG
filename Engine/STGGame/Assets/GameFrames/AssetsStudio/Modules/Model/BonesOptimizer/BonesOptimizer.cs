@@ -1,75 +1,181 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using XLibrary;
 
-
 namespace ASGame
 {
-    //XXX:每次优化都要遍历一遍所有节点,非常耗时,待优化
-    public class BonesOptimizer : MonoBehaviour
+    public class ModelBonesOptimize : MonoBehaviour
     {
-        public string[] exposeBoneKeys;                             //只要包含了这个key的都会暴露
-        public List<string> exposeBoneList;                         //名字或路径
-
+        [SerializeField]
+        public List<string> exposeBoneList = new List<string>();   //可以是路径或名字
         private bool m_isOptimezed = false;
         private bool m_hasVisited = false;
 
-        public void AddBones(string[] bones)
+        public void AddBones(List<string> bones, bool isUseName = true)
         {
             if (bones != null)
             {
-                exposeBoneList = exposeBoneList ?? new List<string>();
                 foreach (var bone in bones)
                 {
-                    exposeBoneList.Add(bone);
+                    string newBones = isUseName ? Path.GetFileName(bone) : bone;
+                    exposeBoneList.Add(newBones);
                 }
             }
         }
 
-        public void AddBone(string bone)
+        public void AddBone(string bone, bool isUseName = true)
         {
-            AddBones(new string[] { bone });
+            List<string> oneList = new List<string>();
+            oneList.Add(bone);
+            AddBones(oneList, isUseName);
         }
-
-        public bool IsOptimizable()
+        public bool IsOptimizable(GameObject modelGO)
         {
-            var animator = gameObject.GetComponentInChildren<Animator>();
-            if (animator)
+            if (modelGO)
             {
-                return animator.isOptimizable;
+                var animator = modelGO.GetComponentInChildren<Animator>();
+                if (animator)
+                {
+                    return animator.isOptimizable;
+                }
             }
-            
             return false;
         }
 
-        public bool IsOptimezed()
+        public bool IsOptimezed(GameObject modelGO)
         {
-            return m_isOptimezed;
-        }
-
-        [ContextMenu("Optimize")]
-        public void Optimize(string[] bones = null)
-        {
-            AddBones(bones);
-            m_isOptimezed = OptimizeTransformHierarchyByNames(gameObject, exposeBoneList != null ? exposeBoneList.ToArray() : null);
-        }
-
-        [ContextMenu("Deoptmize")]
-        public void Deoptmize(bool isSaveChildren = false)
-        {
-            if (isSaveChildren)
+            modelGO = modelGO ? modelGO : gameObject;
+            var boneOptimize = modelGO.GetComponent<ModelBonesOptimize>();
+            if (boneOptimize != null)
             {
-                foreach (var subOptmize in gameObject.GetComponentsInChildren<BonesOptimizer>())
+                return boneOptimize.m_isOptimezed;
+            }
+            return false;
+        }
+
+        public void Optimize(GameObject modelGO = null, bool isUseName = true, bool isNeedChild = true)
+        {
+            modelGO = modelGO ? modelGO : gameObject;
+            //优化前,先把所有移到和model同级在去优化
+            var myAnimator = modelGO.GetComponent<Animator>();
+            List<KeyValuePair<string, GameObject>> childAminatorList = null;
+            if (!isNeedChild && myAnimator != null)
+            {
+                childAminatorList = new List<KeyValuePair<string, GameObject>>();
+                var myAnimatorParentNodeTrans = myAnimator.gameObject.transform.parent;
+                var myAnimatorParentNode = myAnimatorParentNodeTrans != null ? myAnimatorParentNodeTrans.gameObject : null;
+                var animators = modelGO.GetComponentsInChildren<Animator>(true);
+                foreach (var animator in animators)
                 {
-                    subOptmize.m_hasVisited = false;
+                    if (myAnimator == animator) //自己的就算了,要子的
+                        continue;
+
+                    //记录父节点名字
+                    var animatorNode = animator.gameObject;
+                    exposeBoneList.Add(XGameObjectTools.GetPathByGameObject(modelGO, animatorNode));
+                    
+                    childAminatorList.Add(new KeyValuePair<string, GameObject>(animatorNode.name, animatorNode));
+
+                    animatorNode.transform.SetParent(myAnimatorParentNode.transform, false);//
                 }
             }
-            m_isOptimezed = DeoptimizeTransformHierarchy(gameObject, isSaveChildren);
+
+            if (isUseName)
+            {
+                OptimizeTransformHierarchyByNames(modelGO, exposeBoneList.ToArray());
+            }
+            else
+            {
+                OptimizeTransformHierarchyByPaths(modelGO, exposeBoneList.ToArray());
+            }
+            var boneOptimize = modelGO.GetComponent<ModelBonesOptimize>();
+            if (boneOptimize != null)
+            {
+                boneOptimize.m_isOptimezed = true;
+            }
+
+
+            //还原
+            if (!isNeedChild && myAnimator != null)
+            {
+                foreach (var info in childAminatorList)
+                {
+                    var childNodeName = info.Key;
+                    var childNode = info.Value;
+                    var childNodeParent = modelGO.transform.Find(childNodeName);
+                    if (childNodeParent == null)
+                    {
+                        foreach (var childTransNode in modelGO.GetComponentsInChildren<Transform>())
+                        {
+                            var nodeName = childTransNode.name;
+                            if (nodeName == childNodeName)
+                            {
+                                childNodeParent = childTransNode;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (childNodeParent != null)
+                    {
+                        if (info.Value != null)
+                        {
+                            childNode.transform.SetParent(childNodeParent.transform, false);
+                           
+                        }
+                    }
+                    else
+                    {
+                        if (info.Value != null)
+                        {
+                            Destroy(info.Value);
+                        }
+                    }
+                }
+            }
         }
 
-        bool OptimizeTransformHierarchyByNames(GameObject go, string[] exposedTransforms)
+        public void Deoptmize(GameObject modelGO = null, bool isSaveChildren = true)
+        {
+            modelGO = modelGO ? modelGO : gameObject;
+            foreach (var subOptmize in modelGO.GetComponentsInChildren<ModelBonesOptimize>())
+            {
+                subOptmize.m_hasVisited = false;
+            }
+            DeoptimizeTransformHierarchy(modelGO, isSaveChildren);
+            var boneOptimize = modelGO.GetComponent<ModelBonesOptimize>();
+            if (boneOptimize != null)
+            {
+                boneOptimize.m_isOptimezed = false;
+            }
+        }
+
+        //////
+        void OptimizeTransformHierarchyByPaths(GameObject go, string[] exposedTransforms)
+        {
+            //必须要有Animator,且挂点必须与Avatar一致(否则报错),节点不存在报C++错
+            if (go)
+            {
+                var animator = go.GetComponentInChildren<Animator>();
+                if (animator)
+                {
+                    List<string> exposeNodes = new List<string>();
+                    foreach (var path in exposedTransforms)
+                    {
+                        var hangNode = go.transform.Find(path);
+                        if (hangNode)
+                        {
+                            exposeNodes.Add(path);
+                        }
+                    }
+                    AnimatorUtility.OptimizeTransformHierarchy(go, exposeNodes.ToArray());
+
+                }
+            }
+        }
+
+        void OptimizeTransformHierarchyByNames(GameObject go, string[] exposedTransforms, bool isDefaultG = false)
         {
             //必须要有Animator,且挂点必须与Avatar一致(否则报错),节点不存在报C++错
             if (go)
@@ -79,45 +185,67 @@ namespace ASGame
                 {
                     List<string> exposeNodes = new List<string>();
                     Dictionary<string, bool> bonesMap = new Dictionary<string, bool>();
-                    foreach (var node in go.GetComponentsInChildren<Transform>())
+
+                    if (isDefaultG)
                     {
-                        if (!bonesMap.ContainsKey(node.name))
+                        foreach (var node in go.GetComponentsInChildren<Transform>())
                         {
-                            bonesMap.Add(node.name, true);
-                        }
-                        if (exposeBoneKeys != null)
-                        {
-                            foreach(var boneKey in exposeBoneKeys)
+                            string nodeName = node.name;
+                            if (!bonesMap.ContainsKey(nodeName))
                             {
-                                if (!string.IsNullOrEmpty(boneKey))
+                                bonesMap.Add(nodeName, true);
+                                if (nodeName.ToLower().Contains("g_")) //这种格式的挂点,自动暴露
                                 {
-                                    if (node.name.Contains(boneKey))
-                                    {
-                                        exposeNodes.Add(node.name);
-                                        break;
-                                    }
+                                    exposeNodes.Add(nodeName);
                                 }
                             }
                         }
-                        
                     }
-                    
-                    foreach (var bonePath in exposedTransforms)
+
+                    else
                     {
-                        string boneName = Path.GetFileName(bonePath);
-                        if (bonesMap.ContainsKey(boneName))
+#if UNITY_EDITOR
+                        foreach (var node in go.GetComponentsInChildren<Transform>())
                         {
-                            exposeNodes.Add(boneName);
+                            string nodeName = node.name;
+                            if (!bonesMap.ContainsKey(nodeName))
+                            {
+                                bonesMap.Add(nodeName, true);
+                            }
+                        }
+#else
+                        if (exposedTransforms != null && exposedTransforms.Length > 0)
+                        {
+                            foreach (var nodeName in exposedTransforms)
+                            {
+                                if (!bonesMap.ContainsKey(nodeName))
+                                {
+                                    bonesMap.Add(nodeName, true);
+                                }
+                            }
+                            //exposeNodes.AddRange(exposedTransforms);
+                        }
+                        
+#endif
+                    }
+
+                    if (exposedTransforms != null && exposedTransforms.Length > 0)
+                    {
+                        foreach (var bname in exposedTransforms)
+                        {
+                            if (bonesMap.ContainsKey(bname))
+                            {
+                                exposeNodes.Add(bname);
+                            }
                         }
                     }
                     AnimatorUtility.OptimizeTransformHierarchy(go, exposeNodes.ToArray());
-                    return true;
                 }
             }
-            return false;
         }
 
-        bool DeoptimizeTransformHierarchy(GameObject go, bool isSaveChildren = false)
+        //优化了就尽量不要在去还原了,
+        void DeoptimizeTransformHierarchy(GameObject go, bool isSaveChildren = false)
         {
             if (go)
             {
@@ -125,14 +253,13 @@ namespace ASGame
                 {
                     //还原之前,找到已经优化的挂点,临时取出保存
                     GameObject tmpNode = new GameObject();
-                    tmpNode.SetActive(false);
+                    tmpNode.SetActive(true);
                     if (go.transform.parent != null)
                     {
                         tmpNode.transform.SetParent(go.transform.parent, false);
                     }
-
                     List<KeyValuePair<GameObject, string>> tmpList = new List<KeyValuePair<GameObject, string>>();
-                    foreach (var subOptmize in go.GetComponentsInChildren<BonesOptimizer>())
+                    foreach (var subOptmize in go.GetComponentsInChildren<ModelBonesOptimize>())
                     {
                         if (subOptmize.gameObject == go)
                             continue;
@@ -141,17 +268,19 @@ namespace ASGame
                             continue;
 
                         //递归搞下
-                        subOptmize.m_isOptimezed = DeoptimizeTransformHierarchy(subOptmize.gameObject, isSaveChildren);
+                        DeoptimizeTransformHierarchy(subOptmize.gameObject, isSaveChildren);
 
                         tmpList.Add(new KeyValuePair<GameObject, string>(subOptmize.gameObject, subOptmize.transform.parent.name));
                         subOptmize.gameObject.transform.SetParent(tmpNode.transform, false);
 
-                        m_hasVisited = true;
+                        subOptmize.m_hasVisited = true;
                     }
 
                     //还原
                     AnimatorUtility.DeoptimizeTransformHierarchy(go);
 
+                    //在塞回去
+                    //因为根本不知道具体路径
                     Dictionary<string, string> bonesPaths = new Dictionary<string, string>();
                     if (tmpList.Count > 0)
                     {
@@ -187,10 +316,7 @@ namespace ASGame
                     AnimatorUtility.DeoptimizeTransformHierarchy(go);
                 }
 
-                return true;
             }
-            return false;
         }
     }
 }
-

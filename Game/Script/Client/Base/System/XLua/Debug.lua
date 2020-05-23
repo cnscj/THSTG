@@ -1,12 +1,14 @@
-
---__LUA_LOG_LEVEL__在Test.lua定义
-
-
 -- 打印 控件创建和点击回调堆栈
-__PRINT_TRACK__ = true
+-- __PRINT_TRACK__ = __PRINT_TRACK__ or true
 
 -- 是否打印 traceback
-__PRINT_TRACE_BACK__ = true
+-- __PRINT_TRACE_BACK__ = __PRINT_TRACE_BACK__ or true
+
+--日志级别
+-- __LUA_LOG_LEVEL__ = __LUA_LOG_LEVEL__ or 1
+
+--输出类型
+-- __LUA_LOG_LEVEL__ = __LUA_LOG_LEVEL__ or 0
 
 --日志级别
 local LOG_LEVEL_INFO = 1
@@ -83,10 +85,6 @@ function string2Table(str)
 	str = string.gsub(str,"(%w+) = function: (%w+)(,?)","")
 
     return load(string.format("return %s",str))()
-end
-
-if __SILENT__ then
-	__PRINT_TYPE__ = 77
 end
 
 function print(...)

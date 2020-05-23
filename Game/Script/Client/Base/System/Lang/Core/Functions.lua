@@ -33,7 +33,7 @@ function override(baseFunc, derivedFunc)
     end
 end
 
-local socket = require "lsocket"
+local socket = require "socket"
 -- 获取当前时间(ms)
 function millisecondNow()
     return socket.gettime() * 1000

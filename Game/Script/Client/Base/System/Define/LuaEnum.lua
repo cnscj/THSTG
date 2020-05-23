@@ -49,3 +49,5 @@ ThrowTextType = {
     HeroDeadlyHit = "HurtText5",
     NormalHit = "HurtText6",
 }
+
+rawset(_G, "LuaEnum", false)

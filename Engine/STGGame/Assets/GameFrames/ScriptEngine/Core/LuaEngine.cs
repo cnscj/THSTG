@@ -14,9 +14,13 @@ namespace SEGame
     
     public class LuaEngine : MonoSingleton<LuaEngine>
     {
-        public string scriptPath = "../../Game/Script/Client";      //lua脚本路径
-        public string mainDostring = "require 'Main'";
+        private static readonly string DEFAULT_DOSTRING = "require 'Main'"; //执行代码
+        public string scriptSPath = "../../Game/Script/Client";             //首包脚本路径
+        public string scriptUPath = "";                                   //更新脚本路径
+        public string trunkRoot = "";                                     //主干目录
+        public string branchRoot = "";                                    //更新目录
 
+        
         private LuaEnv m_luaEnv;
         private IntPtr m_luaCache = IntPtr.Zero;
         private CustomLoader m_customLoader = null;
@@ -48,6 +52,8 @@ namespace SEGame
 
             //TODO:还没编译json库
             //m_luaEnv.AddBuildin("cjson", XLua.LuaDLL.Lua.LoadCJson);
+            //m_luaEnv.AddBuildin("lsocket", XLua.LuaDLL.Lua.LoadLsocket);
+
 
             m_luaEnv.AddLoader(OnCustomLoader());
             m_luaEnv.DoString(OnMainString());
@@ -117,6 +123,12 @@ namespace SEGame
             m_luaLateUpdateCallback = null;
         }
 
+        public void SetLuaTrunkAndBrench(string trunk, string brench)
+        {
+            trunkRoot = trunk;
+            branchRoot = brench;
+        }
+
         /////////////////////////
 
         private CustomLoader OnCustomLoader()
@@ -127,22 +139,65 @@ namespace SEGame
 
         private string OnMainString()
         {
-            return mainDostring;
+            return DEFAULT_DOSTRING;
         }
 
-        private string GetFullPath(string fileName)
+        private string GetFullPath(string parentRoot, string filePath)
         {
-            return Path.Combine(scriptPath, string.Format("{0}.lua", fileName));
+            //将"\"转为"/"
+            //将"."转为"/"
+            var scrPath = filePath.Replace(".", "/").Replace("\\", "/");
+            var fullPath = scrPath;
+            if (!string.IsNullOrEmpty(parentRoot))
+            {
+                fullPath = Path.Combine(parentRoot, string.Format("{0}.lua", scrPath));
+            }
+            return fullPath;
         }
 
-        private byte[] OnLoaderInvoke(ref string fileName)
+        //TODO:注入调试方法:U9,如果在特定目录有这个脚本,优先用这个脚本,否则用原来的(先加载luaU,在加载先加载luaS
+        //不能通过IO方式去判断,效率低
+        //内置库不能通过路劲去搞,还得判断内置库
+        private string GetScriptPath(string filePath)
+        {
+            string sPath = GetFullPath(scriptSPath, filePath);
+            string uPath = GetFullPath(scriptUPath, filePath);
+            if (File.Exists(uPath))
+            {
+                return uPath;
+            }
+            else
+            {
+                string tRoot = Path.Combine(scriptSPath, trunkRoot);
+                string bRoot = Path.Combine(scriptSPath, branchRoot);
+                string tPath = GetFullPath(tRoot, filePath);
+                string bPath = GetFullPath(bRoot, filePath);
+
+                if (File.Exists(bPath))
+                {
+                    return bPath;
+                }
+                else if(File.Exists(tPath))
+                {
+                    return tPath;
+                }
+                else if (File.Exists(sPath))
+                {
+                    return sPath;
+                }
+            }
+
+            return GetFullPath(null,filePath);
+        }
+
+        private byte[] OnLoaderInvoke(ref string fileRelaPath)
         {
             try
             {
-                string filePath = GetFullPath(fileName);
-                if (!string.IsNullOrEmpty(filePath))
+                string fileFullPath = GetScriptPath(fileRelaPath);
+                if (!string.IsNullOrEmpty(fileFullPath))
                 {
-                    return File.ReadAllBytes(filePath);
+                    return File.ReadAllBytes(fileFullPath);
                 }
             }
             catch (Exception e)
@@ -170,7 +225,7 @@ namespace SEGame
         }
 
         //////////////////////
-        //TODO:注入调试方法:U9,如果在特定目录有这个脚本,优先用这个脚本,否则用原来的(先加载luaS,在加载先加载luaU
+
     }
 
 }
