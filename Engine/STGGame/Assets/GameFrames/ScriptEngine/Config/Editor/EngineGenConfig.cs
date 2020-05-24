@@ -44,7 +44,7 @@ public static class EngineGenConfig
                 typeof(SkinnedMeshRenderer),
                 typeof(Renderer),
                 typeof(WWW),
-                typeof(Light),
+                //typeof(Light),
                 typeof(Mathf),
                 typeof(System.Collections.Generic.List<int>),
                 typeof(Action<string>),
@@ -54,8 +54,11 @@ public static class EngineGenConfig
     //C#静态调用Lua的配置（包括事件的原型），仅可以配delegate，interface
     [CSharpCallLua]
     public static List<Type> CSharpCallLua = new List<Type>() {
-                typeof(Action),
+                typeof(Func<GameObject, bool>),
                 typeof(Func<double, double, double>),
+
+                typeof(Action),
+                typeof(Action<int>),
                 typeof(Action<string>),
                 typeof(Action<double>),
                 typeof(UnityEngine.Events.UnityAction),

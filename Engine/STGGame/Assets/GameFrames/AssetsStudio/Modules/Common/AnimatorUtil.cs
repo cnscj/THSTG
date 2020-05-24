@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace THGame
+namespace ASGame
 {
     public class AnimatorUtil : MonoBehaviour
     {

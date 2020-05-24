@@ -5,10 +5,10 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/MainGame/Main.unity
     guid: 71984fa89ad314e86b583e08cad013bb
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
+  - enabled: 1
+    path: Assets/MainGame/ZCustom_Test/LuaTest/New Scene.unity
+    guid: 498c26a4e3a72e6429e7826a6c32975f
   m_configObjects: {}

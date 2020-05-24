@@ -57,7 +57,6 @@ namespace XLibrary
             {
                 action.Invoke(transform.gameObject);
             }
-            
         }
 
         /// <summary>
@@ -65,7 +64,7 @@ namespace XLibrary
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="action"></param>
-        public static void TraverseDFS(GameObject obj, Action<GameObject> action)
+        public static void TraverseDFS(GameObject obj, Action<GameObject> action , Func<GameObject,bool> excludeExp = null)
         {
             if (obj == null || action == null)
                 return;
@@ -80,6 +79,7 @@ namespace XLibrary
                 {
                     var itNode = curNode.transform.GetChild(i).gameObject;
                     if (curNode == itNode) continue;
+                    if (excludeExp != null && !excludeExp(itNode)) continue;
 
                     parentNodes.Push(itNode);
                 }
@@ -94,7 +94,7 @@ namespace XLibrary
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="action"></param>
-        public static void TraverseBFS(GameObject obj, Action<GameObject> action)
+        public static void TraverseBFS(GameObject obj, Action<GameObject> action, Func<GameObject, bool> excludeExp = null)
         {
             if (obj == null || action == null)
                 return;
@@ -109,6 +109,7 @@ namespace XLibrary
                 {
                     var itNode = curNode.transform.GetChild(i).gameObject;
                     if (curNode == itNode) continue;
+                    if (excludeExp != null && !excludeExp(itNode)) continue;
 
                     parentNodes.Enqueue(itNode);
                 }

@@ -1,2 +1,2 @@
-Dispatcher = {}
-Timer = {}
+rawset(_G, "Dispatcher", {})
+rawset(_G, "Timer", {})

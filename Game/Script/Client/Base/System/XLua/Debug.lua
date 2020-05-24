@@ -1,14 +1,17 @@
 -- 打印 控件创建和点击回调堆栈
--- __PRINT_TRACK__ = __PRINT_TRACK__ or true
+__PRINT_TRACK__ = __PRINT_TRACK__ or true
 
 -- 是否打印 traceback
--- __PRINT_TRACE_BACK__ = __PRINT_TRACE_BACK__ or true
+__PRINT_TRACE_BACK__ = __PRINT_TRACE_BACK__ or true
 
 --日志级别
--- __LUA_LOG_LEVEL__ = __LUA_LOG_LEVEL__ or 1
+__LUA_LOG_LEVEL__ = __LUA_LOG_LEVEL__ or 1
 
 --输出类型
--- __LUA_LOG_LEVEL__ = __LUA_LOG_LEVEL__ or 0
+__LUA_LOG_LEVEL__ = __LUA_LOG_LEVEL__ or 0
+
+--输出文件所在行
+__PRINT_WITH_FILE_LINE__ = __PRINT_WITH_FILE_LINE__  or false
 
 --日志级别
 local LOG_LEVEL_INFO = 1

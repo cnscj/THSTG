@@ -152,6 +152,7 @@ namespace SEGame
             {
                 fullPath = Path.Combine(parentRoot, string.Format("{0}.lua", scrPath));
             }
+
             return fullPath;
         }
 

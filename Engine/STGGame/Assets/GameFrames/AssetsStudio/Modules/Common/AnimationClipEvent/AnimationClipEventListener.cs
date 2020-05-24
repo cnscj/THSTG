@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using Object = UnityEngine.Object;
-namespace THGame
+namespace ASGame
 {
     //管理动画系统的所有事件
     public delegate void AnimationClipEventCallback0();
