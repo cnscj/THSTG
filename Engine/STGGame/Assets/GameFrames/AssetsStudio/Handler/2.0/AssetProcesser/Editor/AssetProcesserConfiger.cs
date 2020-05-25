@@ -18,7 +18,7 @@ namespace ASEditor
         public bool createFolderOrAddSuffix;
         public bool useGUID4SaveMd5Name;
 
-        public string processFolderName = DEFAULT_MD5_FOLDER_NAME;
+        public string processFolderName = DEFAULT_PROCESS_FOLDER_NAME;
 
         public string GetOutputFolderPath()
         {

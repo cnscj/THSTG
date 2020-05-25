@@ -44,11 +44,11 @@ namespace ASGame
             {
                 foreach (var optimizer in childOptimizerList)
                 {
-                    Optimize(isEffectChildren);
+                    optimizer.Optimize(isEffectChildren);
                 }
             }
         }
-        public void Deoptmize(bool isEffectChildren = true)
+        public void Deoptimize(bool isEffectChildren = true)
         {
             if (!IsCanOptmizeOrDeoptmize())
                 return;
@@ -66,7 +66,7 @@ namespace ASGame
             {
                 foreach(var optimizer in childOptimizerList)
                 {
-                    Deoptmize(isEffectChildren);
+                    optimizer.Deoptimize(isEffectChildren);
                 }
             }
         }
@@ -88,7 +88,7 @@ namespace ASGame
                     var itNode = curNode.transform.GetChild(i).gameObject;
                     if (curNode == itNode) continue;
 
-                    var optimizer = GetComponent<ModelBonesOptimizer>();
+                    var optimizer = itNode.GetComponent<ModelBonesOptimizer>();
                     if (optimizer != null)
                     {
                         nodeDict.Add(optimizer);
