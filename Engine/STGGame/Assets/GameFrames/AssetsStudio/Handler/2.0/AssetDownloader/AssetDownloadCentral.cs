@@ -15,17 +15,18 @@ namespace ASGame
         public int maxCount = -1;
         public float limidSpeed = -1f;
 
-        private Dictionary<string, AssetDownloadTask> m_waitMap = new Dictionary<string, AssetDownloadTask>();            //排队队列(含优先级
-        private Dictionary<string, AssetDownloadTask> m_progressMap = new Dictionary<string, AssetDownloadTask>();          //下载队列
-        private Dictionary<string, AssetDownloadTask> m_stopMap = new Dictionary<string, AssetDownloadTask>();              //停止队列
+        private Dictionary<string, AssetDownloadTask> m_tasksMap;               //所有任务列表
+        private SortedSet<AssetDownloadTask> m_queueMap;                         //排队队列(含优先级
+        private HashSet<AssetDownloadTask> m_progressMap;                       //下载队列
+        private HashSet<AssetDownloadTask> m_pauseMap;                           //停止队列
 
-        private LinkedList<AssetDownloadTask> m_successQueue = new LinkedList<AssetDownloadTask>();               //成功队列
-        private LinkedList<AssetDownloadTask> m_failedQueue = new LinkedList<AssetDownloadTask>();                //失败队列
-        private LinkedList<AssetDownloadTask> m_releaseQueue = new LinkedList<AssetDownloadTask>();               //释放队列
+        private LinkedList<AssetDownloadTask> m_successQueue;                   //成功队列
+        private LinkedList<AssetDownloadTask> m_failedQueue;                    //失败队列
+        private LinkedList<AssetDownloadTask> m_releaseQueue;                   //释放队列
 
         public int TaskCount
         {
-            get { return m_waitMap.Count + m_progressMap.Count + m_stopMap.Count; }
+            get { return m_queueMap.Count + m_progressMap.Count + m_pauseMap.Count; }
         }
 
         public int DownloadingCount
@@ -54,29 +55,19 @@ namespace ASGame
         {
             if (!string.IsNullOrEmpty(urlPath) && !string.IsNullOrEmpty(storePath))
             {
-                if (m_waitMap != null && m_waitMap.TryGetValue(urlPath, out var waitTask))
+                if (m_tasksMap != null && m_tasksMap.TryGetValue(urlPath, out var taskInMap))
                 {
-                    return waitTask;
-                }
-
-                if (m_progressMap != null && m_progressMap.TryGetValue(urlPath, out var progressTask))
-                {
-                    return progressTask;
-                }
-
-                if (m_stopMap != null && m_stopMap.TryGetValue(urlPath, out var stopTask))
-                {
-                    return stopTask;
+                    return taskInMap;
                 }
 
                 var task = GetOrCreateTask();
                 task.urlPath = urlPath;
                 task.storePath = storePath;
                 task.createTime = XTimeTools.NowTimeStampMs();
-
+                GetTaskMap().Add(urlPath, task);
 
                 //默认全部送到暂停队列,方便以后开启空闲下载
-                GetStopMap().Add(urlPath, task);
+                GetPauseMap().Add(task);
                 task.status = AssetDownloadStatus.DOWNLOAD_PAUSE;
             }
             return null;
@@ -85,24 +76,26 @@ namespace ASGame
 
         public void StartTask(AssetDownloadTask task)
         {
-            if (m_waitMap.ContainsKey(task.urlPath))
+            if (m_queueMap != null && m_queueMap.Contains(task))
             {
+                //如果本来就在排队,提高优先级
                 task.status = AssetDownloadStatus.DOWNLOAD_QUEUE;
             }
-            else if (m_stopMap.ContainsKey(task.urlPath))
+            else if (m_pauseMap != null && m_pauseMap.Contains(task))
             {
-                m_stopMap.Remove(task.urlPath);
-                m_waitMap.Add(task.urlPath, task);
+                //从暂停队列移到排队队列
+                m_pauseMap.Remove(task);
+                GetQueueMap().Add(task);
             }
         }
 
         public void StopTask(AssetDownloadTask task)
         {
-            if (m_progressMap.ContainsValue(task))
+            if (m_progressMap.Contains(task))
             {
 
             }
-            else if (m_waitMap.ContainsValue(task))
+            else if (m_queueMap.Contains(task))
             {
 
             }
@@ -110,17 +103,17 @@ namespace ASGame
 
         public void CancelTask(AssetDownloadTask task)
         {
-            if (m_waitMap.ContainsValue(task))
+            if (m_queueMap.Contains(task))
             {
 
             }
 
-            if (m_stopMap.ContainsValue(task))
+            if (m_pauseMap.Contains(task))
             {
 
             }
 
-            if (m_progressMap.ContainsValue(task))
+            if (m_progressMap.Contains(task))
             {
 
             }
@@ -149,88 +142,115 @@ namespace ASGame
             return task;
         }
 
-        private Dictionary<string, AssetDownloadTask> GetWaitMap()
+        private Dictionary<string, AssetDownloadTask> GetTaskMap()
         {
-            return null;
+            m_tasksMap = m_tasksMap ?? new Dictionary<string, AssetDownloadTask>();
+            return m_tasksMap;
         }
 
-        private Dictionary<string, AssetDownloadTask> GetProcressMap()
+        private SortedSet<AssetDownloadTask> GetQueueMap()
         {
-            return null;
+            m_queueMap = m_queueMap ?? new SortedSet<AssetDownloadTask>();
+            return m_queueMap;
         }
 
-        private Dictionary<string, AssetDownloadTask> GetStopMap()
+        private HashSet<AssetDownloadTask> GetProcressMap()
         {
-            return null;
+            m_progressMap = m_progressMap ?? new HashSet<AssetDownloadTask>();
+            return m_progressMap;
+        }
+
+        private HashSet<AssetDownloadTask> GetPauseMap()
+        {
+            m_pauseMap = m_pauseMap ?? new HashSet<AssetDownloadTask>();
+            return m_pauseMap;
+        }
+
+        private LinkedList<AssetDownloadTask> GetSuccessList()
+        {
+            m_successQueue = m_successQueue ?? new LinkedList<AssetDownloadTask>();
+            return m_successQueue;
+        }
+
+        private LinkedList<AssetDownloadTask> GetFailedList()
+        {
+            m_failedQueue = m_failedQueue ?? new LinkedList<AssetDownloadTask>();
+            return m_failedQueue;
+        }
+
+        private LinkedList<AssetDownloadTask> GetReleaseList()
+        {
+            m_releaseQueue = m_releaseQueue ?? new LinkedList<AssetDownloadTask>();
+            return m_releaseQueue;
         }
 
         /////////////////////////////////////
 
         private void UpdateWait()
         {
-            while (m_waitMap.Count > 0 && (maxCount > 0 && m_progressMap.Count < maxCount))
+            while (m_queueMap.Count > 0 && (maxCount > 0 && m_progressMap.Count < maxCount))
             {
                 AssetDownloadTask task = null;
-                foreach(var itemPair in m_waitMap)
+                foreach(var item in m_queueMap)
                 {
-                    task = itemPair.Value;
+                    task = item;
                     break;
                 }
-                m_waitMap.Remove(task.urlPath);
-                m_progressMap.Add(task.urlPath, task);
-                task.status = AssetDownloadStatus.DOWNLOAD_DOWNLOADING;
+
+                m_queueMap.Remove(task);
 
                 ActiveTask(task);
+                GetProcressMap().Add(task);
+                task.status = AssetDownloadStatus.DOWNLOAD_DOWNLOADING;
             }
-
         }
 
         private void UpdateProgress()
         {
             if (m_progressMap != null)
             {
-                foreach (var task in m_progressMap.Values)
+                foreach (var task in m_progressMap)
                 {
                     if (task.status == AssetDownloadStatus.DOWNLOAD_FINISH)
                     {
-                        m_successQueue.AddLast(task);
+                        GetSuccessList().AddLast(task);
                     }
                     else if(task.status < AssetDownloadStatus.DOWNLOAD_NONE)
                     {
-                        m_failedQueue.AddLast(task);
+                        GetFailedList().AddLast(task);
                     }
                 }
 
-                foreach (var taskInSuccess in m_successQueue) m_progressMap.Remove(taskInSuccess.urlPath);
-                foreach (var taskIFailed in m_successQueue) m_progressMap.Remove(taskIFailed.urlPath);
+                if (m_successQueue != null) foreach (var taskInSuccess in m_successQueue) m_progressMap.Remove(taskInSuccess);
+                if (m_successQueue != null) foreach (var taskIFailed in m_successQueue) m_progressMap.Remove(taskIFailed);
             }
         }
 
         private void UpdateSuccess()
         {
-            if (m_successQueue != null)
+            while (m_successQueue != null && m_successQueue.Count > 0)
             {
                 var task = m_successQueue.Last.Value;
                 m_successQueue.RemoveLast();
 
-
+                GetReleaseList().AddLast(task);
             }
         }
 
         private void UpdateFailed()
         {
-            if (m_failedQueue != null)
+            while (m_failedQueue != null && m_failedQueue.Count > 0)
             {
                 var task = m_failedQueue.Last.Value;
                 m_failedQueue.RemoveLast();
 
-
+                GetReleaseList().AddLast(task);
             }
         }
 
         private void UpdateRelease()
         {
-            while(m_releaseQueue.Count > 0)
+            while (m_releaseQueue != null && m_releaseQueue.Count > 0)
             {
                 var task = m_releaseQueue.Last.Value;
                 m_releaseQueue.RemoveLast();
