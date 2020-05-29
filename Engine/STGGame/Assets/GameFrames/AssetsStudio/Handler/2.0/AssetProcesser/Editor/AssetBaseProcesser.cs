@@ -38,7 +38,7 @@ namespace ASEditor
 
             DoAssets();
 
-            DoEnd();
+            DoEnd();  //TODO:存在误伤的情况
         }
         ////////////
         protected string GetFilesMd5(string[] filesPath)
@@ -115,10 +115,10 @@ namespace ASEditor
         {
             //没有则创建
             AssetProcessCheckfile checkfile;
-            string md5SavePath = AssetProcesserConfiger.GetInstance().GetMd5SavePath(_progresersName, srcPath);
-            if (XFileTools.Exists(md5SavePath))
+            string checkfileSavePath = AssetProcesserConfiger.GetInstance().GetCheckfileSavePath(_progresersName, srcPath, ".asset");
+            if (XFileTools.Exists(checkfileSavePath))
             {
-                var srcAsset = AssetDatabase.LoadAssetAtPath<AssetProcessCheckfile>(md5SavePath);
+                var srcAsset = AssetDatabase.LoadAssetAtPath<AssetProcessCheckfile>(checkfileSavePath);
                 checkfile = Object.Instantiate(srcAsset);
             }
             else
@@ -134,18 +134,18 @@ namespace ASEditor
             if (checkfile == null)
                 return false;
 
-            string md5SavePath = AssetProcesserConfiger.GetInstance().GetMd5SavePath(_progresersName, srcPath);
-            if (!XFileTools.Exists(md5SavePath))
+            string checkfileSavePath = AssetProcesserConfiger.GetInstance().GetCheckfileSavePath(_progresersName, srcPath, ".asset");
+            if (!XFileTools.Exists(checkfileSavePath))
             {
-                string md5ParentPath = Path.GetDirectoryName(md5SavePath);
-                if (!XFolderTools.Exists(md5ParentPath))
+                string checkfileParentPath = Path.GetDirectoryName(checkfileSavePath);
+                if (!XFolderTools.Exists(checkfileParentPath))
                 {
-                    XFolderTools.CreateDirectory(md5ParentPath);
+                    XFolderTools.CreateDirectory(checkfileParentPath);
                 }
             }
-            AssetDatabase.DeleteAsset(md5SavePath);
-            AssetDatabase.CreateAsset(checkfile, md5SavePath);
-            AssetDatabase.SaveAssets();
+            AssetDatabase.DeleteAsset(checkfileSavePath);
+            AssetDatabase.CreateAsset(checkfile, checkfileSavePath);
+            //AssetDatabase.SaveAssets();
 
             return true;
         }
@@ -157,6 +157,12 @@ namespace ASEditor
             if (!XFolderTools.Exists(processFolderPath))
             {
                 XFolderTools.CreateDirectory(processFolderPath);
+            }
+
+            string outputPath = AssetProcesserConfiger.GetInstance().GetProcessSaveFolderPath(_progresersName);
+            if (!XFolderTools.Exists(outputPath))
+            {
+                XFolderTools.CreateDirectory(outputPath);
             }
 
             OnStart();
@@ -177,12 +183,12 @@ namespace ASEditor
                     continue;
 
                 //检测可key,这么不能区分同名不同路径的情况
-                string checkKey = Path.GetFileNameWithoutExtension(realPathLow).ToLower();
+                string checkKey = XStringTools.SplitPathKey(realPathLow);
                 if (!_checkSet.Contains(checkKey))
                     _checkSet.Add(checkKey);
 
                 AssetProcessCheckfile checkfile = LoadCheckfile(realPathLow);
-                if (!OnCheck(realPathLow, checkfile))
+                if (!OnCheck(realPathLow, checkfile))   //如果生成的文件没了,也应该重新生成
                     continue;
 
                 FileInfo fileInfo = new FileInfo();
@@ -190,6 +196,7 @@ namespace ASEditor
                 fileInfo.checkfile = checkfile;
 
                 _assetMap.Add(realPathLow, fileInfo);
+                procressList.Add(fileInfo);
             }
 
             foreach (var doFileInfo in procressList)
@@ -197,25 +204,27 @@ namespace ASEditor
                 var realPathLow = doFileInfo.path;
                 OnOnce(realPathLow);
 
-                //保存MD5
+                //保存Checkfile
                 if (_assetMap.TryGetValue(realPathLow, out var fileInfo))
                 {
-                    SaveCheckfile(realPathLow, fileInfo.checkfile);
+                    var newCheckfile = OnUpdate(fileInfo.path, fileInfo.checkfile);
+                    newCheckfile = newCheckfile ?? fileInfo.checkfile;
+                    SaveCheckfile(realPathLow, newCheckfile);
                 }
             }
         }
+        //TODO:有问题
         private void DoEnd()
         {
-            //处理无效的MD5文件
-            string md5FolderPath = AssetProcesserConfiger.GetInstance().GetMd5SaveFolderPath(_progresersName);
-            bool isUseGUID = AssetProcesserConfiger.GetInstance().useGUID4SaveMd5Name;
+            //处理无效的Checkfile文件
+            string checkfileFolderPath = AssetProcesserConfiger.GetInstance().GetCheckfileSaveFolderPath(_progresersName);
+            bool isUseGUID = AssetProcesserConfiger.GetInstance().useGUID4SaveCheckfileName;
 
-            XFolderTools.TraverseFiles(md5FolderPath, (fullPath) =>
+            XFolderTools.TraverseFiles(checkfileFolderPath, (fullPath) =>
             {
-                string fileNameNotEx = Path.GetFileNameWithoutExtension(fullPath).ToLower();
                 if (isUseGUID)
                 {
-                    string srcPath = AssetDatabase.GUIDToAssetPath(fileNameNotEx);
+                    string srcPath = AssetDatabase.GUIDToAssetPath(fullPath);
                     string realPath = XPathTools.GetRelativePath(srcPath); //路径做Key,有的资源可能名字相同
                     string realPathLow = realPath.ToLower();
                     if (string.IsNullOrEmpty(srcPath) || !_assetMap.ContainsKey(realPathLow))
@@ -225,7 +234,8 @@ namespace ASEditor
                 }
                 else
                 {
-                    if (!_checkSet.Contains(fileNameNotEx))
+                    string checkKey = XStringTools.SplitPathKey(fullPath);
+                    if (!_checkSet.Contains(checkKey))
                     {
                         XFileTools.Delete(fullPath);
                     }
@@ -234,19 +244,11 @@ namespace ASEditor
 
             //处理无效输出文件
             string outputFolderPath = AssetProcesserConfiger.GetInstance().GetProcessSaveFolderPath(_progresersName);
-            XFolderTools.TraverseFolder(outputFolderPath, (fullPath) =>
-            {
-                string fileNameNotEx = Path.GetFileNameWithoutExtension(fullPath).ToLower();
-                if (!_checkSet.Contains(fileNameNotEx))
-                {
-                    XFolderTools.DeleteDirectory(fullPath, true);
-                }
-            }, true);
             XFolderTools.TraverseFiles(outputFolderPath, (fullPath) =>
             {
-                string fileNameNotEx = Path.GetFileNameWithoutExtension(fullPath).ToLower();
+                string checkKey = XStringTools.SplitPathKey(fullPath);
                 //但凡在名字上有点关系都移除
-                if (!_checkSet.Contains(fileNameNotEx))
+                if (!_checkSet.Contains(checkKey))
                 {
                     XFileTools.Delete(fullPath);
                 }
@@ -259,6 +261,8 @@ namespace ASEditor
         ////////////
         protected virtual void OnStart(){}
         protected virtual void OnEnd(){}
+
+        //为false时重新生成
         protected virtual bool OnCheck(string srcFilePath , AssetProcessCheckfile checkfile)//对指纹文件进行检查
         {
             bool ret = true;
@@ -267,15 +271,21 @@ namespace ASEditor
 
             //判断Md5,不区分大小写
             if (string.Compare(recordedMd5, nowMd5, true) == 0)
-            {
-                checkfile.md5 = nowMd5;
                 ret = false;
-            }
 
             return ret;
         }
+        protected virtual AssetProcessCheckfile OnUpdate(string srcFilePath, AssetProcessCheckfile checkfile)
+        {
+            string nowMd5 = GetFileMd5(srcFilePath);
+            checkfile.md5 = nowMd5;
 
+            return checkfile;
+        }
+        //所有待处理文件路径
         protected abstract string[] OnFiles();
+
+        //
         protected abstract string[] OnOnce(string srcFilePath);
     }
 

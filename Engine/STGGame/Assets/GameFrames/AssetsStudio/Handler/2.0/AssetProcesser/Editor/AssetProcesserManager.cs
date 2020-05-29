@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using UnityEngine;
+using UnityEditor;
 using XLibrary.Package;
 
 namespace ASEditor
@@ -11,16 +10,22 @@ namespace ASEditor
     {
         private List<AssetCustomProcesser> m_customProcesserList = new List<AssetCustomProcesser>();
 
-        public void Do(AssetCustomProcesser[] processors)
+        public void Do(AssetCustomProcesser[] processors = null)
         {
             Clear();
 
-            foreach(var processor in processors)
+            if (processors != null && processors.Length > 0)
             {
-                m_customProcesserList.Add(processor);
+                foreach (var processor in processors)
+                {
+                    m_customProcesserList.Add(processor);
+                }
             }
+
             Proress();
             Purge();
+
+            //AssetDatabase.Refresh();
         }
 
         public void Clear()

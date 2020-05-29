@@ -29,6 +29,9 @@ namespace ASEditor
                 m_builderCustomList.AddRange(builders);
             }
             Build();
+
+
+            AssetDatabase.Refresh();
         }
 
         public void Clear()

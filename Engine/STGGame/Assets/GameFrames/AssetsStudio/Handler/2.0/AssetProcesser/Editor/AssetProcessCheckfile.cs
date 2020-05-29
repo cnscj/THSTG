@@ -6,7 +6,11 @@ namespace ASEditor
     {
         public string md5;
 
-
+        public AssetProcessCheckfile() { }
+        public AssetProcessCheckfile(AssetProcessCheckfile other)
+        {
+            this.md5 = other.md5;
+        }
     }
 
 }
