@@ -17,7 +17,7 @@ namespace ASEditor
         public string outputFolderPath = DEFAULT_OUTPUT_FOLDER_PATH;
         public string processFolderName = DEFAULT_PROCESS_FOLDER_NAME;
         public string checkfileFolderName = DEFAULT_MD5_FOLDER_NAME;
-        public bool createFolderOrAddSuffix;
+        public bool createFolderOrAddSuffix = true;
         public bool useGUID4SaveCheckfileName;
 
 
@@ -61,7 +61,17 @@ namespace ASEditor
                 {
                     cehckfileSaveName = string.Format("{0}_{1}{2}", cehckfileSaveName, progressName, suffix);
                 }
-                
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(suffix))
+                {
+                    cehckfileSaveName = string.Format("{0}", cehckfileSaveName);
+                }
+                else
+                {
+                    cehckfileSaveName = string.Format("{0}{1}", cehckfileSaveName, suffix);
+                }
             }
 
             if (useGUID4SaveCheckfileName)

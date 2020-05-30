@@ -25,7 +25,7 @@ namespace ASEditor
             Proress();
             Purge();
 
-            //AssetDatabase.Refresh();
+            AssetDatabase.Refresh();
         }
 
         public void Clear()

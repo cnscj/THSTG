@@ -38,7 +38,7 @@ namespace ASEditor
 
             DoAssets();
 
-            DoEnd();  //TODO:存在误伤的情况
+            DoEnd();    //存在误伤的情况
         }
         ////////////
         protected string GetFilesMd5(string[] filesPath)
@@ -113,13 +113,20 @@ namespace ASEditor
         /////////////
         private AssetProcessCheckfile LoadCheckfile(string srcPath)
         {
-            //没有则创建
+            //没有或读取有问题则创建
             AssetProcessCheckfile checkfile;
             string checkfileSavePath = AssetProcesserConfiger.GetInstance().GetCheckfileSavePath(_progresersName, srcPath, ".asset");
             if (XFileTools.Exists(checkfileSavePath))
             {
-                var srcAsset = AssetDatabase.LoadAssetAtPath<AssetProcessCheckfile>(checkfileSavePath);
-                checkfile = Object.Instantiate(srcAsset);
+                var srcAsset = AssetDatabase.LoadAssetAtPath<AssetProcessCheckfile>(checkfileSavePath); //脚本丢失可能造成信息丢失
+                if (srcAsset == null)
+                {
+                    checkfile = ScriptableObject.CreateInstance<AssetProcessCheckfile>();
+                }
+                else
+                {
+                    checkfile = Object.Instantiate(srcAsset);
+                }
             }
             else
             {
@@ -145,7 +152,6 @@ namespace ASEditor
             }
             AssetDatabase.DeleteAsset(checkfileSavePath);
             AssetDatabase.CreateAsset(checkfile, checkfileSavePath);
-            //AssetDatabase.SaveAssets();
 
             return true;
         }
@@ -189,7 +195,9 @@ namespace ASEditor
 
                 AssetProcessCheckfile checkfile = LoadCheckfile(realPathLow);
                 if (!OnCheck(realPathLow, checkfile))   //如果生成的文件没了,也应该重新生成
+                {
                     continue;
+                }  
 
                 FileInfo fileInfo = new FileInfo();
                 fileInfo.path = realPathLow;
@@ -213,7 +221,7 @@ namespace ASEditor
                 }
             }
         }
-        //TODO:有问题
+        
         private void DoEnd()
         {
             //处理无效的Checkfile文件
@@ -286,7 +294,7 @@ namespace ASEditor
         protected abstract string[] OnFiles();
 
         //
-        protected abstract string[] OnOnce(string srcFilePath);
+        protected abstract void OnOnce(string srcFilePath);
     }
 
 }
