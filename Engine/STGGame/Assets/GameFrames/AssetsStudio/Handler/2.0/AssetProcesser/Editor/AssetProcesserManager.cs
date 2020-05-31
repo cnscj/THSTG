@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
@@ -8,6 +9,15 @@ namespace ASEditor
 {
     public class AssetProcesserManager : Singleton<AssetProcesserManager>
     {
+        public class ProcesserComparer : IComparer<int>
+        {
+            public int Compare(int x, int y)
+            {
+                int iResult = (int)x - (int)y;
+                if (iResult == 0) iResult = -1;
+                return iResult;
+            }
+        }
         private List<AssetCustomProcesser> m_customProcesserList = new List<AssetCustomProcesser>();
 
         public void Do(AssetCustomProcesser[] processors = null)
@@ -51,7 +61,7 @@ namespace ASEditor
             }
 
 
-            SortedList<int, AssetCustomProcesser> sortedClassList = new SortedList<int, AssetCustomProcesser>();
+            SortedList<int, AssetCustomProcesser> sortedClassList = new SortedList<int, AssetCustomProcesser>(new ProcesserComparer());
             foreach (Type item in processerClassList)
             {
                 object obj = Activator.CreateInstance(item);//创建一个obj对象

@@ -36,6 +36,9 @@ namespace ASEditor
 
                 foreach(var fullPath in files)
                 {
+                    if (string.IsNullOrEmpty(fullPath))
+                        continue;
+
                     string assetPath = XPathTools.GetRelativePath(fullPath);
                     m_files.Add(assetPath);
                 }

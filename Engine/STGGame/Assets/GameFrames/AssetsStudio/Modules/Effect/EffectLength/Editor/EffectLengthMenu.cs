@@ -19,7 +19,7 @@ namespace ASEditor
                         EffectLengthMono = fxGO.AddComponent<EffectLengthMono>();
 
                     }
-                    float len = EffectLengthTools.CalculatePlayEndTime(fxGO);
+                    float len = EffectLengthMono.CalculatePlayEndTime(fxGO);
                     EffectLengthMono.length = len;
 
                     Debug.Log(len);

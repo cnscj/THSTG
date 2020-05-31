@@ -13,6 +13,16 @@ namespace ASEditor
 {
     public class AssetBuilderManager : Singleton<AssetBuilderManager>
     {
+        public class BuilderComparer : IComparer<int>
+        {
+            public int Compare(int x, int y)
+            {
+                int iResult = (int)x - (int)y;
+                if (iResult == 0) iResult = -1;
+                return iResult;
+            }
+        }
+
         //需要进行一次全局依赖Share打包
         private List<AssetBaseBuilder> m_builderCommonList = new List<AssetBaseBuilder>();
         private List<AssetBaseBuilder> m_builderCustomList = new List<AssetBaseBuilder>();
@@ -84,7 +94,7 @@ namespace ASEditor
                 }
             }
 
-            SortedList<int, AssetBaseBuilder> sortedClassList = new SortedList<int, AssetBaseBuilder>();
+            SortedList<int, AssetBaseBuilder> sortedClassList = new SortedList<int, AssetBaseBuilder>(new BuilderComparer());
             foreach (Type item in builderClassList)
             {
                 object obj = Activator.CreateInstance(item);//创建一个obj对象

@@ -142,6 +142,14 @@ namespace ASEditor
                 return false;
 
             string checkfileSavePath = AssetProcesserConfiger.GetInstance().GetCheckfileSavePath(_progresersName, srcPath, ".asset");
+            var outName = OnCheckFileName(srcPath);
+            if (!string.IsNullOrEmpty(outName))
+            {
+                string exName = Path.GetExtension(checkfileSavePath);
+                string parentPath = Path.GetDirectoryName(checkfileSavePath);
+                checkfileSavePath = XPathTools.Combine(parentPath, string.Format("{0}{1}", outName, exName));
+            }
+
             if (!XFileTools.Exists(checkfileSavePath))
             {
                 string checkfileParentPath = Path.GetDirectoryName(checkfileSavePath);
@@ -182,42 +190,47 @@ namespace ASEditor
             List<FileInfo> procressList = new List<FileInfo>();
             foreach (var file in assetFiles)
             {
-                string realPath = XPathTools.GetRelativePath(file); //路径做Key,有的资源可能名字相同
-                string realPathLow = realPath.ToLower();
-
-                if (_assetMap.ContainsKey(realPathLow))
+                if (string.IsNullOrEmpty(file))
                     continue;
 
-                //检测可key,这么不能区分同名不同路径的情况
-                string checkKey = XStringTools.SplitPathKey(realPathLow);
-                if (!_checkSet.Contains(checkKey))
-                    _checkSet.Add(checkKey);
+                string realPath = XPathTools.GetRelativePath(file); //路径做Key,有的资源可能名字相同
+                realPath = XPathTools.NormalizePath(realPath);
 
-                AssetProcessCheckfile checkfile = LoadCheckfile(realPathLow);
-                if (!OnCheck(realPathLow, checkfile))   //如果生成的文件没了,也应该重新生成
+                if (_assetMap.ContainsKey(realPath))
+                    continue;
+
+                //如果只检测key,不能区分同名不同路径的情况(或者前缀相同,后缀不同
+                string checkKey1 = Path.GetFileNameWithoutExtension(realPath);
+                string checkKey2 = XStringTools.SplitPathKey(realPath);
+                if (!_checkSet.Contains(checkKey1))
+                    _checkSet.Add(checkKey1);
+                if (!_checkSet.Contains(checkKey2))
+                    _checkSet.Add(checkKey2);
+
+                AssetProcessCheckfile checkfile = LoadCheckfile(realPath);
+                if (!OnCheck(realPath, checkfile))   //如果生成的文件没了,也应该重新生成
                 {
                     continue;
                 }  
 
                 FileInfo fileInfo = new FileInfo();
-                fileInfo.path = realPathLow;
+                fileInfo.path = realPath;
                 fileInfo.checkfile = checkfile;
 
-                _assetMap.Add(realPathLow, fileInfo);
+                _assetMap.Add(realPath, fileInfo);
                 procressList.Add(fileInfo);
             }
 
             foreach (var doFileInfo in procressList)
             {
-                var realPathLow = doFileInfo.path;
-                OnOnce(realPathLow);
+                var realPath = doFileInfo.path;
+                OnOnce(realPath);
 
                 //保存Checkfile
-                if (_assetMap.TryGetValue(realPathLow, out var fileInfo))
+                if (_assetMap.TryGetValue(realPath, out var fileInfo))
                 {
                     var newCheckfile = OnUpdate(fileInfo.path, fileInfo.checkfile);
-                    newCheckfile = newCheckfile ?? fileInfo.checkfile;
-                    SaveCheckfile(realPathLow, newCheckfile);
+                    SaveCheckfile(fileInfo.path, newCheckfile);
                 }
             }
         }
@@ -230,11 +243,15 @@ namespace ASEditor
 
             XFolderTools.TraverseFiles(checkfileFolderPath, (fullPath) =>
             {
+                string exName = Path.GetExtension(fullPath).ToLower();
+                if (exName.Contains("meta")) return;
+
+                string realPath = XPathTools.GetRelativePath(fullPath); //路径做Key,有的资源可能名字相同
+                string realPathLow = realPath.ToLower();
                 if (isUseGUID)
                 {
-                    string srcPath = AssetDatabase.GUIDToAssetPath(fullPath);
-                    string realPath = XPathTools.GetRelativePath(srcPath); //路径做Key,有的资源可能名字相同
-                    string realPathLow = realPath.ToLower();
+                    string srcPath = AssetDatabase.GUIDToAssetPath(realPath);
+                    
                     if (string.IsNullOrEmpty(srcPath) || !_assetMap.ContainsKey(realPathLow))
                     {
                         XFileTools.Delete(fullPath);
@@ -242,8 +259,9 @@ namespace ASEditor
                 }
                 else
                 {
-                    string checkKey = XStringTools.SplitPathKey(fullPath);
-                    if (!_checkSet.Contains(checkKey))
+                    string checkKey1 = Path.GetFileNameWithoutExtension(realPath);
+                    string checkKey2 = XStringTools.SplitPathKey(realPath);
+                    if (!_checkSet.Contains(checkKey1) && !_checkSet.Contains(checkKey2))
                     {
                         XFileTools.Delete(fullPath);
                     }
@@ -254,9 +272,10 @@ namespace ASEditor
             string outputFolderPath = AssetProcesserConfiger.GetInstance().GetProcessSaveFolderPath(_progresersName);
             XFolderTools.TraverseFiles(outputFolderPath, (fullPath) =>
             {
-                string checkKey = XStringTools.SplitPathKey(fullPath);
-                //但凡在名字上有点关系都移除
-                if (!_checkSet.Contains(checkKey))
+                string checkKey1 = Path.GetFileNameWithoutExtension(fullPath);
+                string checkKey2 = XStringTools.SplitPathKey(fullPath);
+                //但凡在名字上有点关系都移除,多重key检测
+                if (!_checkSet.Contains(checkKey1) && !_checkSet.Contains(checkKey2))
                 {
                     XFileTools.Delete(fullPath);
                 }
@@ -290,6 +309,12 @@ namespace ASEditor
 
             return checkfile;
         }
+
+        protected virtual string OnCheckFileName(string srcFilePath)
+        {
+            return null;
+        }
+
         //所有待处理文件路径
         protected abstract string[] OnFiles();
 

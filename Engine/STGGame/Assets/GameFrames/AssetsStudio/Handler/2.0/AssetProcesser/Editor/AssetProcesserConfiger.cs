@@ -30,7 +30,7 @@ namespace ASEditor
         public string GetCheckfileFloderPath()
         {
             string newCheckfileFolderName = string.IsNullOrEmpty(checkfileFolderName) ? DEFAULT_MD5_FOLDER_NAME : checkfileFolderName;
-            string checkfileFolderPath = Path.Combine(GetOutputFolderPath(), newCheckfileFolderName);
+            string checkfileFolderPath = XPathTools.Combine(GetOutputFolderPath(), newCheckfileFolderName);
             return checkfileFolderPath;
         }
 
@@ -40,14 +40,14 @@ namespace ASEditor
             string checkfileSaveParentPath = checkfileFolderPath;
             if (createFolderOrAddSuffix)
             {
-                checkfileSaveParentPath = Path.Combine(checkfileFolderPath, progressName);
+                checkfileSaveParentPath = XPathTools.Combine(checkfileFolderPath, progressName);
             }
             return checkfileSaveParentPath;
         }
 
         public string GetCheckfileSavePath(string progressName, string srcFilePath, string suffix = null)
         {
-            string outputName = XStringTools.SplitPathKey(srcFilePath);
+            string outputName = Path.GetFileNameWithoutExtension(srcFilePath);      //有些可能是同一个Key,二层Key的
             string checkfileSaveParentPath = GetCheckfileSaveFolderPath(progressName);
             string cehckfileSaveName = outputName;
 
@@ -79,7 +79,7 @@ namespace ASEditor
                 cehckfileSaveName = AssetDatabase.AssetPathToGUID(srcFilePath);
             }
 
-            string md5SavePath = Path.Combine(checkfileSaveParentPath, cehckfileSaveName);
+            string md5SavePath = XPathTools.Combine(checkfileSaveParentPath, cehckfileSaveName);
 
             return md5SavePath;
         }
@@ -93,7 +93,7 @@ namespace ASEditor
             }
             else
             {
-                processFolderPath = Path.Combine(GetOutputFolderPath(), processFolderName);
+                processFolderPath = XPathTools.Combine(GetOutputFolderPath(), processFolderName);
             }
             return processFolderPath;
         }

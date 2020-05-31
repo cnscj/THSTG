@@ -74,12 +74,12 @@ namespace ASEditor
                 {
                     var buildPlatform = GetBuildPlatform();
                     string buildPlatformStr = Enum.GetName(typeof(BuildPlatform), buildPlatform);
-                    retExportPath = Path.Combine(newExportFolder, buildPlatformStr);
+                    retExportPath = XPathTools.Combine(newExportFolder, buildPlatformStr);
                 }
                 else
                 {
                     string buildPlatformStr = Enum.GetName(typeof(BuildPlatform), targetType);
-                    retExportPath = Path.Combine(newExportFolder, buildPlatformStr);
+                    retExportPath = XPathTools.Combine(newExportFolder, buildPlatformStr);
                 }
 
             }
@@ -89,7 +89,7 @@ namespace ASEditor
 
         public string GetBuildFolderPath(string builderName)
         {
-            string newExportFolderPath = Path.Combine("", builderName);
+            string newExportFolderPath = XPathTools.Combine("", builderName);
             return XPathTools.NormalizePath(newExportFolderPath).ToLower();
         }
 
@@ -104,7 +104,7 @@ namespace ASEditor
                 assetFinalName = XStringTools.SplitPathKey(assetPath);
             }
             string bundleFileName = string.Format("{0}{1}", assetFinalName, newBundleSuffix);
-            string bundleName = Path.Combine(buildFolderPath, bundleFileName);
+            string bundleName = XPathTools.Combine(buildFolderPath, bundleFileName);
             return bundleName.ToLower();
         }
 

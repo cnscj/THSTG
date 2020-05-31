@@ -17,6 +17,15 @@ namespace ASGame
         private bool m_isOptimezed;
         private HashSet<string> m_nodeNameDict;
 
+        public void AddExposeBones(List<string> bones)
+        {
+            if (bones != null && bones.Count > 0)
+            {
+                exposeBones = exposeBones ?? new List<string>();
+                exposeBones.AddRange(bones);
+            }
+        }
+
         public bool IsOptimezed()
         {
             return m_isOptimezed;
@@ -169,9 +178,10 @@ namespace ASGame
             
             if (exposeBones != null && exposeBones.Count > 0)
             {
-                foreach (var nodeName in exposeBones)
+                foreach (var nodePath in exposeBones)
                 {
                     bool isCanAdd = true;
+                    string nodeName = Path.GetFileNameWithoutExtension(nodePath);
                     if (exposeList.Contains(nodeName))
                     {
                         isCanAdd = false;
@@ -193,9 +203,10 @@ namespace ASGame
 
             if (exNodes != null && exNodes.Count > 0)
             {
-                foreach (var nodeName in exNodes)
+                foreach (var nodePath in exNodes)
                 {
                     bool isCanAdd = true;
+                    string nodeName = Path.GetFileNameWithoutExtension(nodePath);
                     if (exposeList.Contains(nodeName))
                     {
                         isCanAdd = false;

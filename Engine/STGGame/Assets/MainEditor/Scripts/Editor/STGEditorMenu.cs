@@ -8,7 +8,7 @@ namespace STGEditor
         [MenuItem("THSTG/处理并播放", false, 11)]
         public static void MenAllPlay()
         {
-            AssetProcessorMain.processManager.ProcessAll();
+            AssetProcessorMain.ProcessAll();
             EditorApplication.isPlaying = true;
         }
 
@@ -17,8 +17,8 @@ namespace STGEditor
         {
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             sw.Start();
-            AssetProcessorMain.processManager.ProcessAll();
-            AssetBuilderMain.builderManager.BuildAll();
+            AssetProcessorMain.ProcessAll();
+            AssetBuilderMain.BuildAll();
             sw.Stop();
             Debug.Log(string.Format("处理完成,耗时:{0} s", sw.ElapsedMilliseconds / 1000f));
            

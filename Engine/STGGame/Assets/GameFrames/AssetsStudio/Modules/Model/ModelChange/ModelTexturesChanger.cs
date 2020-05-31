@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ASGame
 {
-    public class ModelTextureChange : MonoBehaviour
+    public class ModelTexturesChanger : MonoBehaviour
     {
         private static string DEFAULT_KEY = "default";
         [System.Serializable]
