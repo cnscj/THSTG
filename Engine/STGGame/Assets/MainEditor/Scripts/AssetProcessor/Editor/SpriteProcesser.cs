@@ -26,7 +26,7 @@ namespace STGEditor
             return files;
         }
 
-        protected override void OnOnce(string srcFilePath)
+        protected override string[] OnOnce(string srcFilePath)
         {
             //拷贝所有文件
             string assetKey = XStringTools.SplitPathKey(srcFilePath);
@@ -34,6 +34,8 @@ namespace STGEditor
             string savePath = Path.Combine(saveFolderPath, string.Format("{0}.prefab", assetKey));
 
             AssetDatabase.CopyAsset(srcFilePath, savePath);
+
+            return new string[] { savePath };
         }
 
     }

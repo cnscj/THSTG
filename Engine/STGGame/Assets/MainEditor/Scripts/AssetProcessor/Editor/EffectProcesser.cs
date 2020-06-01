@@ -28,7 +28,7 @@ namespace STGEditor
             return files;
         }
 
-        protected override void OnOnce(string srcFilePath)
+        protected override string[] OnOnce(string srcFilePath)
         {
             GameObject srcPrefab = PrefabUtility.LoadPrefabContents(srcFilePath);
             GameObject newPrefab = Object.Instantiate(srcPrefab);
@@ -49,6 +49,8 @@ namespace STGEditor
             string savePath = Path.Combine(saveFolderPath, string.Format("{0}.prefab", prefabKey));
             PrefabUtility.SaveAsPrefabAsset(newPrefab, savePath);
             Object.DestroyImmediate(newPrefab);
+
+            return new string[] { savePath };
         }
 
     }

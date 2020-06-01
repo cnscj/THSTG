@@ -25,15 +25,16 @@ namespace STGEditor
             return files;
         }
 
-        protected override void OnOnce(string srcFilePath)
+        protected override string[] OnOnce(string srcFilePath)
         {
             //拷贝所有文件
             string fileName = Path.GetFileName(srcFilePath);
             string saveFolderPath = GetSaveFolderPath();
             string savePath = Path.Combine(saveFolderPath, fileName);
 
-            XFileTools.Copy(srcFilePath, savePath);
+            XFileTools.Copy(srcFilePath, savePath, true);
 
+            return new string[] { savePath };
             //AssetDatabase.CopyAsset(srcFilePath, savePath);   //这个函数没法拷贝纹理
         }
 

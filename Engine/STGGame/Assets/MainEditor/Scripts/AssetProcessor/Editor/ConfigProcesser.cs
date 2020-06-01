@@ -28,7 +28,7 @@ namespace STGEditor
             return files;
         }
 
-        protected override void OnOnce(string srcFilePath)
+        protected override string[] OnOnce(string srcFilePath)
         {
             string fileNameNotEx = Path.GetFileNameWithoutExtension(srcFilePath);
             string saveFolderPath = GetSaveFolderPath();
@@ -36,6 +36,8 @@ namespace STGEditor
 
             Excel2CSV converter = new Excel2CSV(srcFilePath);
             converter.Export(savePath);
+
+            return new string[] { savePath };
         }
 
         protected override AssetProcessCheckfile OnUpdate(string srcFilePath, AssetProcessCheckfile checkfile)

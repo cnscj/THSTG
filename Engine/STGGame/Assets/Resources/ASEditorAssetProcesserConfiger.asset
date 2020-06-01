@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3603b1904cc8e4926adc90f0d5b3dbd3, type: 3}
   m_Name: ASEditorAssetProcesserConfiger
   m_EditorClassIdentifier: 
-  outputFolderPath: Assets/ASOutput
+  outputFolderPath: Assets/GameAssets
   processFolderName: 
   checkfileFolderName: Checkfile
-  createFolderOrAddSuffix: 0
+  createFolderOrAddSuffix: 1
   useGUID4SaveCheckfileName: 0
