@@ -43,6 +43,12 @@ namespace ASGame
             var exposeList = GetExposeBones(nodeDict);  //父节点暴露出来,免得被优化
 
             AnimatorUtility.OptimizeTransformHierarchy(gameObject, exposeList.ToArray());
+            var animator = gameObject.GetComponent<Animator>();
+            if (animator != null)
+            {
+                animator.Update(0.001f);
+            }
+
             m_isOptimezed = true;
 
             //复原回相应的地方去
@@ -66,6 +72,11 @@ namespace ASGame
             var nodeDict = TakeOutChildren();
 
             AnimatorUtility.DeoptimizeTransformHierarchy(gameObject);
+            var animator = gameObject.GetComponent<Animator>();
+            if (animator != null)
+            {
+                animator.Update(0.001f);
+            }
             m_isOptimezed = false;
 
             //复原回相应的地方去

@@ -76,6 +76,16 @@ namespace ASGame
         }
 #endif
 
+        public GameObject GetTarget()
+        {
+            return m_targetObj;
+        }
+
+        public bool HadAttached()
+        {
+            return GetTarget() != null;
+        }
+
         public void Attach(GameObject targetObj)
         {
             if (targetObj == this)
@@ -107,9 +117,9 @@ namespace ASGame
                         }
                     }
                 }
+                m_targetObj = targetObj;
             }
 
-            m_targetObj = targetObj;
         }
 
         public void Deattach()

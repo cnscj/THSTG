@@ -9,7 +9,7 @@ namespace ASGame
     public class ModelEffectLoader : MonoBehaviour
     {
         private List<GameObject> m_effectNodes;
-
+        private bool m_isSetuped;
         public void Setup(GameObject modfxGo)
         {
             if (modfxGo == null)
@@ -18,6 +18,12 @@ namespace ASGame
             var modfx = modfxGo.GetComponent<ModelEffect>();
             Setup(modfx);
         }
+
+        public bool HadSetuped()
+        {
+            return m_isSetuped;
+        }
+
         public void Setup(ModelEffect modfx)
         {
             if (modfx == null)
@@ -39,6 +45,7 @@ namespace ASGame
                         m_effectNodes.Add(nodeEffect);
                     }
                 }
+                m_isSetuped = true;
             }
         }
 
@@ -54,6 +61,7 @@ namespace ASGame
                     }
                 }
                 m_effectNodes.Clear();
+                m_isSetuped = false;
             }
         }
 

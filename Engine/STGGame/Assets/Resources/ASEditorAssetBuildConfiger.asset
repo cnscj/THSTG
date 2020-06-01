@@ -20,7 +20,35 @@ MonoBehaviour:
   buildItemList:
   - isEnabled: 1
     builderName: Effect
-    buildSrcPath: /Users/cnscj/UnityWorkspace/THSTG/Engine/STGGame/Assets/GameAssets/Effects
+    buildSrcPath: /Users/cnscj/UnityWorkspace/THSTG/Engine/STGGame/Assets/GameAssets/Effect
+    buildSuffix: '*.prefab'
+    assetBundleNameFormat: '{buildName}/{assetKey}.ab'
+    shareBundleNameFormat: 
+    commonPrefixBuildOne: 0
+  - isEnabled: 1
+    builderName: Config
+    buildSrcPath: /Users/cnscj/UnityWorkspace/THSTG/Engine/STGGame/Assets/GameAssets/Config
+    buildSuffix: '*.csv'
+    assetBundleNameFormat: '{buildName}/{assetNameNotEx}.ab'
+    shareBundleNameFormat: 
+    commonPrefixBuildOne: 0
+  - isEnabled: 1
+    builderName: FGUI_Bytes
+    buildSrcPath: /Users/cnscj/UnityWorkspace/THSTG/Engine/STGGame/Assets/GameAssets/FGUI
+    buildSuffix: '*.bytes'
+    assetBundleNameFormat: fgui/{assetKey}_fui.ab
+    shareBundleNameFormat: 
+    commonPrefixBuildOne: 0
+  - isEnabled: 1
+    builderName: FGUI_Texture
+    buildSrcPath: /Users/cnscj/UnityWorkspace/THSTG/Engine/STGGame/Assets/GameAssets/FGUI
+    buildSuffix: '*.png'
+    assetBundleNameFormat: fgui/{assetKey}_atlas.ab
+    shareBundleNameFormat: 
+    commonPrefixBuildOne: 0
+  - isEnabled: 1
+    builderName: Sprite
+    buildSrcPath: /Users/cnscj/UnityWorkspace/THSTG/Engine/STGGame/Assets/GameAssets/Sprite
     buildSuffix: '*.prefab'
     assetBundleNameFormat: '{buildName}/{assetKey}.ab'
     shareBundleNameFormat: 
