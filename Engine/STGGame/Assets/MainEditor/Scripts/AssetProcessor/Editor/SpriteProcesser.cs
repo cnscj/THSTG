@@ -3,6 +3,7 @@ using System.Linq;
 using ASEditor;
 using STGGame;
 using UnityEditor;
+using UnityEngine;
 using XLibrary;
 
 namespace STGEditor
@@ -28,12 +29,17 @@ namespace STGEditor
 
         protected override string[] OnOnce(string srcFilePath)
         {
-            //拷贝所有文件
-            string assetKey = XStringTools.SplitPathKey(srcFilePath);
-            string saveFolderPath = GetSaveFolderPath();
-            string savePath = Path.Combine(saveFolderPath, string.Format("{0}.prefab", assetKey));
+            GameObject srcPrefab = PrefabUtility.LoadPrefabContents(srcFilePath);
+            GameObject newPrefab = Object.Instantiate(srcPrefab);
+            PrefabUtility.UnloadPrefabContents(srcPrefab);
 
-            AssetDatabase.CopyAsset(srcFilePath, savePath);
+
+            //保存
+            string saveFolderPath = GetSaveFolderPath();
+            string prefabKey = XStringTools.SplitPathKey(srcFilePath);
+            string savePath = Path.Combine(saveFolderPath, string.Format("{0}.prefab", prefabKey));
+            PrefabUtility.SaveAsPrefabAsset(newPrefab, savePath);
+            Object.DestroyImmediate(newPrefab);
 
             return new string[] { savePath };
         }

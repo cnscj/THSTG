@@ -11,7 +11,7 @@ namespace ASEditor
     {
         private ReorderableList m_itemSortedList;
         private Vector3 m_scrollPos = Vector2.zero;
-        [MenuItem("AssetsStudio/资源打包配置2", false, 3)]
+        [MenuItem("AssetsStudio/资源打包配置", false, 3)]
         static void ShowWnd()
         {
             ShowWindow("资源打包配置");

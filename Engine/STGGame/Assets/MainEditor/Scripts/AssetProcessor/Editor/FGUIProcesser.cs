@@ -35,7 +35,6 @@ namespace STGEditor
             XFileTools.Copy(srcFilePath, savePath, true);
 
             return new string[] { savePath };
-            //AssetDatabase.CopyAsset(srcFilePath, savePath);   //这个函数没法拷贝纹理
         }
 
         protected override AssetProcessCheckfile OnUpdate(string srcFilePath, AssetProcessCheckfile checkfile)
