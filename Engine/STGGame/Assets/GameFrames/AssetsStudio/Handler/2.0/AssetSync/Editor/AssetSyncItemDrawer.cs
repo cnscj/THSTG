@@ -34,7 +34,7 @@ namespace ASEditor
                 GUILayout.BeginArea(new Rect(position)
                 {
                     x = EditorGUIUtility.currentViewWidth - 105,
-                    y = position.y + 1 * EditorGUIUtility.singleLineHeight + 60,
+                    y = position.y + 1 * EditorGUIUtility.singleLineHeight + 78,
                     width = 100,
                 });
                 if (GUILayout.Button("浏览"))
@@ -58,7 +58,7 @@ namespace ASEditor
                 GUILayout.BeginArea(new Rect(position)
                 {
                     x = EditorGUIUtility.currentViewWidth - 105,
-                    y = position.y + 2 * EditorGUIUtility.singleLineHeight + 60,
+                    y = position.y + 2 * EditorGUIUtility.singleLineHeight + 78,
                     width = 100,
                 });
                 if (GUILayout.Button("浏览"))
@@ -81,7 +81,7 @@ namespace ASEditor
                 GUILayout.BeginArea(new Rect(position)
                 {
                     x = EditorGUIUtility.currentViewWidth - 105,
-                    y = position.y + 3 * EditorGUIUtility.singleLineHeight + 60,
+                    y = position.y + 3 * EditorGUIUtility.singleLineHeight + 78,
                     width = 100,
                 });
                 if (GUILayout.Button("浏览"))
@@ -103,7 +103,7 @@ namespace ASEditor
                 }, "扫描模式", (AssetSyncItem.SearchMode)searchModeProperty.enumValueIndex);
 
 
-                SerializedProperty searchKeyProperty = property.FindPropertyRelative("searchMode");
+                SerializedProperty searchKeyProperty = property.FindPropertyRelative("searchKey");
                 searchKeyProperty.enumValueIndex = (int)(AssetSyncItem.SearchKey)EditorGUI.EnumPopup(new Rect(position)
                 {
                     y = position.y + 5 * EditorGUIUtility.singleLineHeight,

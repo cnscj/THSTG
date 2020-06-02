@@ -48,7 +48,10 @@ namespace ASEditor
             GUILayout.BeginVertical();
             if (GUILayout.Button("同步")) { AssetSyncManager.GetInstance().Sync(); }
 
+            AssetSyncConfiger.GetInstance().minVersion = EditorGUILayout.IntField("最小同步版本", AssetSyncConfiger.GetInstance().minVersion);
             AssetSyncConfiger.GetInstance().repositoryRootPath = GUILayoutEx.ShowPathBar("版本库路径", AssetSyncConfiger.GetInstance().repositoryRootPath);
+
+
             m_itemSortedList.DoLayoutList();
 
             GUILayout.EndVertical();

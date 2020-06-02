@@ -9,7 +9,7 @@ namespace ASEditor
 {
     public class AssetSyncConfiger : ConfigObject<AssetSyncConfiger>
     {
-        public int maxVersion;                      //需要同步的最大版本
+        public int minVersion;                      //需要同步的最小版本
         public string repositoryRootPath;           //版本库路径
         public List<AssetSyncItem> syncItems;
 

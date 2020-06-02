@@ -23,7 +23,7 @@ namespace ASEditor
                 string repositoryPath = fullPath;
                 string versionFolderName = Path.GetFileNameWithoutExtension(fullPath);
                 int curVersion = AssetSyncConfiger.GetInstance().GetRepositoryVersion(versionFolderName);
-                if (curVersion > 0 && curVersion >= AssetSyncConfiger.GetInstance().maxVersion)
+                if (curVersion > 0 && curVersion >= AssetSyncConfiger.GetInstance().minVersion)
                 {
                     foreach(var syncItem in syncItems)
                     {
