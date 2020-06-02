@@ -33,6 +33,10 @@ namespace STGEditor
             GameObject newPrefab = Object.Instantiate(srcPrefab);
             PrefabUtility.UnloadPrefabContents(srcPrefab);
 
+            //装上box collider
+            {
+
+            }
 
             //保存
             string saveFolderPath = GetSaveFolderPath();

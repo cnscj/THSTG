@@ -41,6 +41,10 @@ namespace STGEditor
                 lenCom.Calculate();
             }
 
+            //特效分级
+            {
+
+            }
 
 
             //保存

@@ -318,7 +318,7 @@ namespace ASEditor
                     XFolderTools.DeleteDirectory(fullPath, true);
                 }
 
-            }, true);
+            });
 
             XFolderTools.TraverseFiles(outputFolderPath, (fullPath) =>
             {
@@ -335,7 +335,7 @@ namespace ASEditor
                     XFileTools.Delete(fullPath);
                 }
 
-            }, true);
+            });
 
 
             OnEnd();

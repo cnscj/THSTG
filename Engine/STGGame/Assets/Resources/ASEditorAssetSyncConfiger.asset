@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0bb827177d824a2b8fee78895e10b5a, type: 3}
   m_Name: ASEditorAssetSyncConfiger
   m_EditorClassIdentifier: 
-  maxVersion: 0
+  minVersion: 0
   repositoryRootPath: /Users/cnscj/Desktop/tretert/vv
   syncItems:
   - name: 
     srcPath: /Users/cnscj/Desktop/tretert/src
     realSearcePath: cfg
     realSyncPath: dev
-    searchMode: 0
-    searchKey: 0
+    searchMode: 1
+    searchKey: 1

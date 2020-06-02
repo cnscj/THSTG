@@ -31,24 +31,24 @@ namespace STGEditor
         protected override string[] OnOnce(string srcFilePath)
         {
             GameObject srcPrefab = PrefabUtility.LoadPrefabContents(srcFilePath);
-            GameObject newPrefab = Object.Instantiate(srcPrefab);
+            GameObject newGo = new GameObject();
+
+            ModelEffect.Make(srcPrefab, newGo); //制作一个模型特效
             PrefabUtility.UnloadPrefabContents(srcPrefab);
 
 
             //计算特效时长
             {
-                EffectLengthMono lenCom = newPrefab.GetComponent<EffectLengthMono>() ?? newPrefab.AddComponent<EffectLengthMono>();
+                EffectLengthMono lenCom = newGo.GetComponent<EffectLengthMono>() ?? newGo.AddComponent<EffectLengthMono>();
                 lenCom.Calculate();
             }
-
-
 
             //保存
             string saveFolderPath = GetSaveFolderPath();
             string prefabKey = XStringTools.SplitPathKey(srcFilePath);
             string savePath = Path.Combine(saveFolderPath, string.Format("{0}.prefab", prefabKey));
-            PrefabUtility.SaveAsPrefabAsset(newPrefab, savePath);
-            Object.DestroyImmediate(newPrefab);
+            PrefabUtility.SaveAsPrefabAsset(newGo, savePath);
+            Object.DestroyImmediate(newGo);
 
             return new string[] { savePath };
         }

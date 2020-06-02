@@ -45,9 +45,6 @@ namespace XLibrary
             bool ret = false;
             try
             {
-                srcPath = srcPath.EndsWith(@"\") ? srcPath : srcPath + @"\";
-                desPath = desPath.EndsWith(@"\") ? desPath : desPath + @"\";
-
                 if (Directory.Exists(srcPath))
                 {
                     if (Directory.Exists(desPath) == false)
@@ -56,12 +53,12 @@ namespace XLibrary
                     foreach (string fls in Directory.GetFiles(srcPath))
                     {
                         FileInfo flinfo = new FileInfo(fls);
-                        flinfo.CopyTo(desPath + flinfo.Name, overwriteexisting);
+                        flinfo.CopyTo(Path.Combine(desPath,flinfo.Name), overwriteexisting);
                     }
                     foreach (string drs in Directory.GetDirectories(srcPath))
                     {
                         DirectoryInfo drinfo = new DirectoryInfo(drs);
-                        if (CopyDirectory(drs, desPath + drinfo.Name, overwriteexisting) == false)
+                        if (CopyDirectory(drs, Path.Combine(desPath, drinfo.Name), overwriteexisting) == false)
                             ret = false;
                     }
                 }

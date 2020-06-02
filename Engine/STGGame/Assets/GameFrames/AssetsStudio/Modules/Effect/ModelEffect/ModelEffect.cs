@@ -73,6 +73,7 @@ namespace ASGame
 
                 modfxComp.nodeInfos.Add(nodeInfo);
             }
+            modfxContainer.name = modelWithEffect.name;
         }
 #endif
 

@@ -32,8 +32,9 @@ namespace ASEditor
                         string syncPath = XPathTools.Combine(repositoryPath, syncItem.realSyncPath);
                         if (XFolderTools.Exists(srcPath) && XFolderTools.Exists(searchPath) && XFolderTools.Exists(syncPath))
                         {
-                            List<string> syncList = new List<string>();
-                            if(syncItem.searchMode == AssetSyncItem.SearchMode.Forward)     //根据搜索文件找资源
+                            List<string> syncFileList = new List<string>();
+                            List<string> syncFolderList = new List<string>();
+                            if (syncItem.searchMode == AssetSyncItem.SearchMode.Forward)     //根据搜索文件找资源
                             {
                                 string srcEx = GetFolderFirstFileExtension(srcPath);
                                 XFolderTools.TraverseFiles(searchPath, (filePath) =>
@@ -51,7 +52,26 @@ namespace ASEditor
                                     string srcFilePath = XPathTools.Combine(srcPath, string.Format("{0}{1}", fileKey, srcEx));
                                     if (XFileTools.Exists(srcFilePath))
                                     {
-                                        syncList.Add(srcFilePath);
+                                        syncFileList.Add(srcFilePath);
+                                    }
+                                });
+
+                                XFolderTools.TraverseFolder(searchPath, (folderPath) =>
+                                {
+                                    string fileKey = null;
+                                    if (syncItem.searchKey == AssetSyncItem.SearchKey.AssetName)
+                                    {
+                                        fileKey = Path.GetFileNameWithoutExtension(folderPath);
+                                    }
+                                    else if (syncItem.searchKey == AssetSyncItem.SearchKey.AssetPrefix)
+                                    {
+                                        fileKey = XStringTools.SplitPathKey(folderPath);
+                                    }
+
+                                    string srcFolderPath = XPathTools.Combine(srcPath, string.Format("{0}", fileKey));
+                                    if (XFolderTools.Exists(srcFolderPath))
+                                    {
+                                        syncFolderList.Add(srcFolderPath);
                                     }
                                 });
                             }
@@ -72,13 +92,32 @@ namespace ASEditor
                                     string searchFilePath = XPathTools.Combine(searchPath, string.Format("{0}", fileKey));
                                     if (XFileTools.Exists(searchFilePath))
                                     {
-                                        syncList.Add(filePath);
+                                        syncFileList.Add(filePath);
+                                    }
+                                });
+
+                                XFolderTools.TraverseFolder(srcPath, (folderPath) =>
+                                {
+                                    string fileKey = null;
+                                    if (syncItem.searchKey == AssetSyncItem.SearchKey.AssetName)
+                                    {
+                                        fileKey = Path.GetFileNameWithoutExtension(folderPath);
+                                    }
+                                    else if (syncItem.searchKey == AssetSyncItem.SearchKey.AssetPrefix)
+                                    {
+                                        fileKey = XStringTools.SplitPathKey(folderPath);
+                                    }
+
+                                    string searchFilePath = XPathTools.Combine(searchPath, string.Format("{0}", fileKey));
+                                    if (XFileTools.Exists(searchFilePath))
+                                    {
+                                        syncFolderList.Add(folderPath);
                                     }
                                 });
                             }
 
-                            HashSet<string> syncDict = new HashSet<string>();
-                            foreach(var syncSrcFile in syncList)
+                            HashSet<string> syncFileDict = new HashSet<string>();
+                            foreach(var syncSrcFile in syncFileList)
                             {
                                 //把文件拷贝到同步目录
                                 string syncFileName = Path.GetFileName(syncSrcFile);
@@ -86,17 +125,38 @@ namespace ASEditor
                                 XFileTools.Delete(syncDestPath);
                                 XFileTools.Copy(syncSrcFile, syncDestPath);
 
-                                if (!syncDict.Contains(syncDestPath))
-                                    syncDict.Add(syncDestPath);
+                                if (!syncFileDict.Contains(syncDestPath))
+                                    syncFileDict.Add(syncDestPath);
+                            }
+
+                            HashSet<string> syncFolderDict = new HashSet<string>();
+                            foreach (var syncSrcFolder in syncFolderList)
+                            {
+                                //把文件拷贝到同步目录
+                                string syncFileName = Path.GetFileName(syncSrcFolder);
+                                string syncDestPath = XPathTools.Combine(syncPath, syncFileName);
+
+                                XFolderTools.DeleteDirectory(syncDestPath,true);
+                                XFolderTools.CopyDirectory(syncSrcFolder, syncDestPath);
+
+                                if (!syncFolderDict.Contains(syncDestPath))
+                                    syncFolderDict.Add(syncDestPath);
                             }
 
                             //移除不在同步的文件
                             XFolderTools.TraverseFiles(syncPath, (syncFullPath) =>
                             {
-                                string realPath = XPathTools.GetRelativePath(syncFullPath);
-                                if (!syncDict.Contains(realPath))
+                                if (!syncFileDict.Contains(syncFullPath))
                                 {
-                                    XFileTools.Delete(realPath);
+                                    XFileTools.Delete(syncFullPath);
+                                }
+                            });
+
+                            XFolderTools.TraverseFolder(syncPath, (syncFullPath) =>
+                            {
+                                if (!syncFolderDict.Contains(syncFullPath))
+                                {
+                                    XFolderTools.DeleteDirectory(syncFullPath, true);
                                 }
                             });
                         }
