@@ -72,7 +72,7 @@ namespace ASEditor
                 GUILayout.EndArea();
 
                 EditorGUIUtility.labelWidth = 100;
-                SerializedProperty realSyncProperty = property.FindPropertyRelative("realSyncProperty");
+                SerializedProperty realSyncProperty = property.FindPropertyRelative("realSyncPath");
                 realSyncProperty.stringValue = EditorGUI.TextField(new Rect(position)
                 {
                     y = position.y + 3 * EditorGUIUtility.singleLineHeight,

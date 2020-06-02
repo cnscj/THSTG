@@ -17,11 +17,13 @@ MonoBehaviour:
   syncItems:
   - name: 
     srcPath: /Users/cnscj/UnityWorkspace/THSTG/Game/100/d
-    destPath: d
+    realSearcePath: 
+    realSyncPath: 
     searchMode: 0
     searchKey: 0
   - name: 
     srcPath: 
-    destPath: 
+    realSearcePath: 
+    realSyncPath: 
     searchMode: 0
     searchKey: 0
