@@ -13,17 +13,11 @@ MonoBehaviour:
   m_Name: ASEditorAssetSyncConfiger
   m_EditorClassIdentifier: 
   maxVersion: 0
-  repositoryRootPath: /Users/cnscj/UnityWorkspace/THSTG/Game/Resource/pc
+  repositoryRootPath: /Users/cnscj/Desktop/tretert/vv
   syncItems:
   - name: 
-    srcPath: /Users/cnscj/UnityWorkspace/THSTG/Game/100/d
-    realSearcePath: 
-    realSyncPath: 
-    searchMode: 0
-    searchKey: 0
-  - name: 
-    srcPath: 
-    realSearcePath: 
-    realSyncPath: 
+    srcPath: /Users/cnscj/Desktop/tretert/src
+    realSearcePath: cfg
+    realSyncPath: dev
     searchMode: 0
     searchKey: 0

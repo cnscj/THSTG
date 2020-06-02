@@ -51,7 +51,7 @@ namespace ASEditor
                                     string srcFilePath = XPathTools.Combine(srcPath, string.Format("{0}{1}", fileKey, srcEx));
                                     if (XFileTools.Exists(srcFilePath))
                                     {
-                                        syncList.Add(filePath);
+                                        syncList.Add(srcFilePath);
                                     }
                                 });
                             }
@@ -77,14 +77,28 @@ namespace ASEditor
                                 });
                             }
 
-
+                            HashSet<string> syncDict = new HashSet<string>();
                             foreach(var syncSrcFile in syncList)
                             {
                                 //把文件拷贝到同步目录
                                 string syncFileName = Path.GetFileName(syncSrcFile);
                                 string syncDestPath = XPathTools.Combine(syncPath, syncFileName);
+                                XFileTools.Delete(syncDestPath);
                                 XFileTools.Copy(syncSrcFile, syncDestPath);
+
+                                if (!syncDict.Contains(syncDestPath))
+                                    syncDict.Add(syncDestPath);
                             }
+
+                            //移除不在同步的文件
+                            XFolderTools.TraverseFiles(syncPath, (syncFullPath) =>
+                            {
+                                string realPath = XPathTools.GetRelativePath(syncFullPath);
+                                if (!syncDict.Contains(realPath))
+                                {
+                                    XFileTools.Delete(realPath);
+                                }
+                            });
                         }
                     }
                 }
@@ -129,6 +143,7 @@ namespace ASEditor
                     return;
 
                 ex = Path.GetExtension(fullPath);
+                if (ex.Contains("DS_Store")) ex = "";
             });
             return ex;
         }

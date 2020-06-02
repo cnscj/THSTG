@@ -22,7 +22,7 @@ namespace ASEditor
             var prop = AddProperty("syncItems");
 
             m_itemSortedList = new ReorderableList(cfgObj, prop, true, true, true, true);
-            m_itemSortedList.elementHeight = 90;//设置单个元素的高度
+            m_itemSortedList.elementHeight = 100;//设置单个元素的高度
 
             //绘制单个元素
             m_itemSortedList.drawElementCallback = (rect, index, isActive, isFocused) =>

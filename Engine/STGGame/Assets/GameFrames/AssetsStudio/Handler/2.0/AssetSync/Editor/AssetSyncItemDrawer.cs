@@ -81,7 +81,7 @@ namespace ASEditor
                 GUILayout.BeginArea(new Rect(position)
                 {
                     x = EditorGUIUtility.currentViewWidth - 105,
-                    y = position.y + 2 * EditorGUIUtility.singleLineHeight + 60,
+                    y = position.y + 3 * EditorGUIUtility.singleLineHeight + 60,
                     width = 100,
                 });
                 if (GUILayout.Button("浏览"))
