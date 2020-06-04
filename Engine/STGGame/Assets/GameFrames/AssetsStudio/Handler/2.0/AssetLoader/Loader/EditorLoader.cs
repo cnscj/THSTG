@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Collections;
-using UnityEditor;
 using Object = UnityEngine.Object;
+using UnityEngine;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace ASGame
 {
     public class EditorLoader : BaseNextframeLoader
@@ -15,11 +20,13 @@ namespace ASGame
             handler.status = AssetLoadStatus.LOAD_FINISHED;
             handler.Callback(result);
         }
+
 #else
         protected override void OnLoadAsset(AssetLoadHandler handler)
         {
             handler.status = AssetLoadStatus.LOAD_FINISHED;
         }
+
 #endif
     }
 }

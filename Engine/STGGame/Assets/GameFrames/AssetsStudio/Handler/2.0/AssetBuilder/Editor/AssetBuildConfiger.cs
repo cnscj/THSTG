@@ -28,6 +28,7 @@ namespace ASEditor
         public string bundleSuffix = DEFAULT_BUILD_SUFFFIX;
         public string shareBundleName = DEFAULT_BUILD_SHARE_BUNDLE_NAME;
         public bool isCombinePlatformName = true;
+        public bool isRidofSpecialChar = true;
 
         public List<AssetCommonBuildItem> buildItemList = new List<AssetCommonBuildItem>();
 
