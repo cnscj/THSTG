@@ -173,9 +173,9 @@ namespace ASEditor
         public static string GetFiltrationString(string str)
         {
             string newStr = str
-                .Replace("/", "_")
-                .Replace("\\", "_")
-                .Replace(" ", "_")
+                //.Replace("/", "_")
+                //.Replace("\\", "_")
+                //.Replace(" ", "_")
                 // 下面这些符号控制台不认
                 .Replace("`", ".")
                 .Replace("~", ".")
