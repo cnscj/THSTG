@@ -163,9 +163,45 @@ namespace ASEditor
                 nameFormat = nameFormat.Replace("{assetKey}", assetKey);
                 nameFormat = nameFormat.Replace("{assetFlatPath}", assetFlatPath);
 
+                if (isRidofSpecialChar) nameFormat = GetFiltrationString(nameFormat);
+
                 return nameFormat;
             }
             return null;
+        }
+
+        public static string GetFiltrationString(string str)
+        {
+            string newStr = str
+                .Replace("/", "_")
+                .Replace("\\", "_")
+                .Replace(" ", "_")
+                // 下面这些符号控制台不认
+                .Replace("`", ".")
+                .Replace("~", ".")
+                .Replace("!", ".")
+                .Replace("#", ".")
+                .Replace("$", ".")
+                .Replace("%", ".")
+                .Replace("&", ".")
+                .Replace("*", ".")
+                .Replace("(", ".")
+                .Replace(")", ".")
+                .Replace("=", ".")
+                .Replace("[", ".")
+                .Replace("]", ".")
+                .Replace("{", ".")
+                .Replace("}", ".")
+                .Replace("、", ".")
+                .Replace("|", ".")
+                .Replace(";", ".")
+                .Replace("\"", ".")
+                .Replace("\'", ".")
+                .Replace(",", ".")
+                .Replace("<", ".")
+                .Replace(">", ".");
+                // 上面这些符号控制台不认
+            return newStr;
         }
     }
 }

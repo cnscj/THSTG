@@ -40,7 +40,7 @@ namespace ASEditor
                 }, "资源路径", srcPathProperty.stringValue);
                 GUILayout.BeginArea(new Rect(position) {
                     x = EditorGUIUtility.currentViewWidth - 105,
-                    y = position.y + 1 * EditorGUIUtility.singleLineHeight + 155,
+                    y = position.y + 1 * EditorGUIUtility.singleLineHeight + 174,
                     width = 100,
                 });
                 if (GUILayout.Button("浏览"))
@@ -70,12 +70,6 @@ namespace ASEditor
                 {
                     y = position.y + 4 * EditorGUIUtility.singleLineHeight
                 }, "公共包名(含格式化)", shareBundleNameFormat.stringValue);
-
-                //SerializedProperty prefixBuildOneProperty = property.FindPropertyRelative("commonPrefixBuildOne");
-                //prefixBuildOneProperty.boolValue = EditorGUI.Toggle(new Rect(position)
-                //{
-                //    y = position.y + 4 * EditorGUIUtility.singleLineHeight
-                //},"取相同前缀", prefixBuildOneProperty.boolValue);
             }
         }
     }

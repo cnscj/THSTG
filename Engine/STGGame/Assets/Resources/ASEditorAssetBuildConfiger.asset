@@ -17,6 +17,7 @@ MonoBehaviour:
   bundleSuffix: .unity3d
   shareBundleName: share/{assetFlatPath}{assetName}.unity3d
   isCombinePlatformName: 1
+  isRidofSpecialChar: 1
   buildItemList:
   - isEnabled: 1
     builderName: Effect
