@@ -1,12 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using XLibrary.Package;
 
-namespace ASGame
+namespace ASEditor
 {
-    //更新器
-    public class AssetUpdater : MonoBehaviour
+    public class AssetSplitePackage
     {
         
     }

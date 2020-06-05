@@ -6,34 +6,57 @@ using XLibrary.Package;
 
 namespace STGU3D
 {
-    public class AssetManager2 : MonoSingleton<AssetManager>
+    public class AssetManager2 : MonoSingleton<AssetManager2>
     {
         //可能是AB,可能是源文件
-        public void LoadModel(string uid, Action<GameObject> action)
+        public AssetLoadCallback LoadModel(string uid)
         {
             string assetPath = AssetFileBook.GetModelPath(uid);
-            AssetLoaderManager.GetInstance().LoadAsset(assetPath, action);
-
+            var callback = new AssetLoadCallback();
+            AssetLoaderManager.GetInstance().LoadAsset<GameObject>(assetPath, (obj) =>
+            {
+                callback.onSuccess?.Invoke(obj);
+            }, (reason) =>
+            {
+                callback.onFailed?.Invoke(reason);
+            });
+            return callback;
         }
 
-        public void LoadEffect(string uid, Action<GameObject> action)
+        public AssetLoadCallback LoadEffect(string uid)
         {
             string assetPath = AssetFileBook.GetEffectPath(uid);
-            AssetLoaderManager.GetInstance().LoadAsset(assetPath, action);
+            var callback = new AssetLoadCallback();
+            AssetLoaderManager.GetInstance().LoadAsset<GameObject>(assetPath, (obj) =>
+            {
+                callback.onSuccess?.Invoke(obj);
+            }, (reason) =>
+            {
+                callback.onFailed?.Invoke(reason);
+            });
+            return callback;
 
         }
 
-        public void LoadSprite(string uid, Action<GameObject> action)
+        public AssetLoadCallback LoadSprite(string uid)
         {
             string assetPath = AssetFileBook.GetSpritePath(uid);
-            AssetLoaderManager.GetInstance().LoadAsset(assetPath, action);
-
+            var callback = new AssetLoadCallback();
+            AssetLoaderManager.GetInstance().LoadAsset<GameObject>(assetPath,(obj)=>
+            {
+                callback.onSuccess?.Invoke(obj);
+            }, (reason)=>
+            {
+                callback.onFailed?.Invoke(reason);
+            });
+            return callback;
         }
 
         public void LoadUI(string module, Action<AssetBundle, AssetBundle> action)
         {
             string bytesAbPath = AssetFileBook.GetUIPath(string.Format("{0}_fgui", module));
             string textureAbPath = AssetFileBook.GetUIPath(string.Format("{0}_altas", module));
+
             AssetLoaderManager.GetInstance().LoadAsset<AssetBundle>(bytesAbPath, (bytesAb)=>
             {
                 AssetLoaderManager.GetInstance().LoadAsset<AssetBundle>(textureAbPath, (altasAb) =>
@@ -41,7 +64,6 @@ namespace STGU3D
                     action?.Invoke(bytesAb, altasAb);
                 });
             });
-
         }
 
         public void LoadConfig(string fileName, Action<string> action)

@@ -21,5 +21,39 @@ namespace ASGame
             }
             return "";
         }
+
+        public static string TrimInvalidCharacter(string str)
+        {
+            string newStr = str
+                //.Replace("/", "_")
+                //.Replace("\\", "_")
+                //.Replace(" ", "_")
+                // 下面这些符号控制台不认
+                .Replace("`", "")
+                .Replace("~", "")
+                .Replace("!", "")
+                .Replace("#", "")
+                .Replace("$", "")
+                .Replace("%", "")
+                .Replace("&", "")
+                .Replace("*", "")
+                .Replace("(", "")
+                .Replace(")", "")
+                .Replace("=", "")
+                .Replace("[", "")
+                .Replace("]", "")
+                .Replace("{", "")
+                .Replace("}", "")
+                .Replace("、", "")
+                .Replace("|", "")
+                .Replace(";", "")
+                .Replace("\"", "")
+                .Replace("\'", "")
+                .Replace(",", "")
+                .Replace("<", "")
+                .Replace(">", "");
+            // 上面这些符号控制台不认
+            return newStr;
+        }
     }
 }

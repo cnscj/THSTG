@@ -11,7 +11,7 @@ namespace ASGame
         public int status;
         public string path;
         public AssetLoadResult result;
-        public AssetLoadCallback onCallback;
+        public AssetLoadCompleted onCallback;
         public BaseLoader loader;
 
         public Timechecker timeoutChecker = new Timechecker();
@@ -51,7 +51,7 @@ namespace ASGame
             return m_parents?.ToArray();
         }
 
-        public void OnCompleted(AssetLoadCallback callback = null)
+        public void OnCompleted(AssetLoadCompleted callback = null)
         {
             if (callback != null)
             {

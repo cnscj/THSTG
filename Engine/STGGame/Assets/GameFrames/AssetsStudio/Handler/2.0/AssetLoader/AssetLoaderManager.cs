@@ -19,14 +19,21 @@ namespace ASGame
             GetOrCreateBundleLoader().LoadMainfest(mainfestPath);
         }
 
-        public int LoadAsset<T>(string path, Action<T> onSuccess = null, Action<int> onFailed = null) where T : Object
+        public AssetLoadHandler LoadAssetHandler<T>(string path) where T : Object
         {
             BaseLoader loader;
             string rightPath;
 
-            SelectLoaderAndPath<T>(path,out loader, out rightPath);
+            SelectLoaderAndPath<T>(path, out loader, out rightPath);
 
             var handler = loader.StartLoad(rightPath);
+
+            return handler;
+        }       
+
+        public int LoadAsset<T>(string path, Action<T> onSuccess = null, Action<int> onFailed = null) where T : Object
+        {
+            var handler = LoadAssetHandler<T>(path);
 
             handler.OnCompleted((AssetLoadResult result) =>
             {
@@ -42,6 +49,7 @@ namespace ASGame
             });
             return handler.id;
         }
+
 
         public void LoadAbort(int id)
         {
@@ -108,9 +116,15 @@ namespace ASGame
             }
             else
             {
-                    //是否是Asset开头的
+                //是否是Asset开头的
+                if (typeof(T) == typeof(byte[]))   //二进制加载器
+                {
+                    loader = GetOrCreateBinaryLoader();
+                    realpath = path;
+                    return;
+                }
 #if UNITY_EDITOR
-                if (path.StartsWith("assets",StringComparison.OrdinalIgnoreCase))
+                else if (path.StartsWith("assets", StringComparison.OrdinalIgnoreCase))
                 {
                     loader = GetOrCreateEditorLoader();
                     realpath = path;
