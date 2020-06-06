@@ -33,36 +33,38 @@ namespace STGU3D
             Init();
         }
 
-        public void AddView(string code, Action<GameObject> callback = null)
+        public void AddView(string code)
         {
-            GameObject showGO; 
+            AssetLoadCallback<GameObject> callback = null ;
             EEntityType entityType = EntityUtil.GetEntityTypeByCode(code);
             if (entityType == EEntityType.Hero ||
                 entityType == EEntityType.Boss
                )
             {
-                showGO = SpriteManager.GetInstance().GetOrNewSprite(code, true);
+                callback = SpriteManager.GetInstance().GetOrNewSprite(code, true);
             }
             else
             {
                 int maxCount = 50;
-                showGO = SpriteManager.GetInstance().GetOrNewSprite(code, true, maxCount);
+                callback = SpriteManager.GetInstance().GetOrNewSprite(code, true, maxCount);
             }
 
-            if (showGO != null)
+            callback?.onSuccess.Set((showGO) =>
             {
-                showGOs = showGOs ?? new List<GameObject>();
-                showGOs.Add(showGO);
+                if (showGO != null)
+                {
+                    showGOs = showGOs ?? new List<GameObject>();
+                    showGOs.Add(showGO);
 
-                showGO.transform.SetParent(body.transform, false);
+                    showGO.transform.SetParent(body.transform, false);
 
-                rendererCom.Add(showGO);
-                colliderCom.Add(showGO);
-                animatorCom.Add(showGO);
-                shaderEffectCom.Add(showGO);
-
-                callback?.Invoke(showGO);
-            }
+                    rendererCom.Add(showGO);
+                    colliderCom.Add(showGO);
+                    animatorCom.Add(showGO);
+                    shaderEffectCom.Add(showGO);
+                }
+            });
+           
         }
 
         public void Destroy()

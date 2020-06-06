@@ -6,7 +6,7 @@ namespace ASGame
 {
     public abstract class BaseExecuteInvoker : BaseLoader
     {
-        private class Nextframe
+        protected class Nextframe
         {
             public bool isExecute;
             public Action action;
@@ -18,7 +18,7 @@ namespace ASGame
             Nextframe,
         }
 
-        private class LoadNode
+        protected class LoadNode
         {
             public LoadMode loadMode;
             public Coroutine coroutine;
@@ -45,6 +45,15 @@ namespace ASGame
             m_loadNodes.Clear();
         }
 
+        protected LoadNode GetLoadNode(AssetLoadHandler handler)
+        {
+            if (m_loadNodes.ContainsKey(handler.id))
+            {
+                return m_loadNodes[handler.id];
+            }
+            return null;
+        }
+
         //如果存在加载过的,直接下一帧返回,不需要启动协程
         protected override void OnStartLoad(AssetLoadHandler handler)
         {
@@ -54,7 +63,7 @@ namespace ASGame
             if (!m_loadNodes.ContainsKey(handler.id))
             {
                 handler.loader = this;
-                var loadNode = new LoadNode();
+                var loadNode = GetOrCreateLoadNode();
                 var loadMode = OnLoadMode(handler);
 
                 if (loadMode == LoadMode.Coroutine)
@@ -101,10 +110,7 @@ namespace ASGame
             m_loadNodes.Remove(handler.id);
         }
 
-        protected virtual LoadMode OnLoadMode(AssetLoadHandler handler)
-        {
-            return LoadMode.Coroutine;
-        }
+
         ////////////
 
         private IEnumerator LoadAssetCoroutine(AssetLoadHandler handler)
@@ -163,6 +169,16 @@ namespace ASGame
                 var nextframe = m_removeQueue.Dequeue();
                 m_nextframeMap.Remove(nextframe);
             }
+        }
+
+        private LoadNode GetOrCreateLoadNode()
+        {
+            return new LoadNode();
+        }
+
+        protected virtual LoadMode OnLoadMode(AssetLoadHandler handler)
+        {
+            return LoadMode.Coroutine;
         }
 
         protected abstract IEnumerator OnLoadAsset(AssetLoadHandler handler);

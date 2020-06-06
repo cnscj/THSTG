@@ -128,7 +128,7 @@ namespace ASEditor
         }
 
 
-        private AssetProcessCheckfile LoadCheckfile(string srcPath)
+        protected AssetProcessCheckfile LoadCheckfile(string srcPath)
         {
             //没有或读取有问题则创建
             AssetProcessCheckfile checkfile;
@@ -153,7 +153,7 @@ namespace ASEditor
             return checkfile;
         }
 
-        private bool SaveCheckfile(string srcPath, AssetProcessCheckfile checkfile)
+        protected bool SaveCheckfile(string srcPath, AssetProcessCheckfile checkfile)
         {
             if (checkfile == null)
                 return false;

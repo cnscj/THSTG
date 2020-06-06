@@ -69,30 +69,6 @@ namespace STGU3D
             return ResourceLoader.GetInstance().LoadFromFile<GameObject>(resPath);
         }
 
-        public GameObject LoadSprite(string uid)
-        {
-            string resPath = Combine2FixPath(EResType.Sprite, string.Format("{0}.ab", uid), string.Format("{0}.prefab", uid));
-            return ResourceLoader.GetInstance().LoadFromFile<GameObject>(resPath);
-        }
-
-        public KeyValuePair<int, System.Object> LoadUI(string module)
-        {
-            if (ResourceLoader.GetInstance().loadMode == ResourceLoadMode.AssetBundler)
-            {
-                string descPath = Combine2FixPath(EResType.UI, string.Format("{0}_bytes.ab", module.ToLower()), string.Format(""));
-                string resPath = Combine2FixPath(EResType.UI, string.Format("{0}_atlas.ab", module.ToLower()), string.Format(""));
-
-                AssetBundle descBundle = ResourceLoader.GetInstance().LoadFromFile<AssetBundle>(descPath);
-                AssetBundle resBundle = ResourceLoader.GetInstance().LoadFromFile<AssetBundle>(resPath);
-
-                return new KeyValuePair<int, System.Object>((int)ResourceLoadMode.AssetBundler, new KeyValuePair<AssetBundle, AssetBundle>(descBundle, resBundle));
-            }
-            else
-            {
-                string uiPath = Combine2FixPath(EResType.UI, string.Format(""), string.Format("{0}", module));
-                return new KeyValuePair<int, System.Object>((int)ResourceLoadMode.Editor, uiPath);
-            }
-        }
 
         public string LoadConfig(string fileName)
         {

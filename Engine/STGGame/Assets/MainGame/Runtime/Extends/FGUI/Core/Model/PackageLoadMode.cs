@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace STGRuntime
 {
-    public enum PackageLoadMode
-    {
-       PathString,
-       AssetBundlePair,
-    }
+    //public enum PackageLoadMode
+    //{
+    //   PathString,
+    //   AssetBundlePair,
+    //}
 
 }

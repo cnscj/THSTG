@@ -122,7 +122,7 @@ namespace STGU3D
         {
             if (viewCtrl != null && entity != null)
             {
-                viewCtrl.AddView(code, callback);
+                viewCtrl.AddView(code);
             }
         }
 

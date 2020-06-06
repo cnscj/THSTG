@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using ASGame;
 using STGU3D;
 using AssetManager = STGU3D.AssetManager;
@@ -63,15 +64,14 @@ namespace STGRuntime
         {
             //设置Package的加载器
             PackageManager.GetInstance().residentTimeS = residentTimeS;
-            PackageManager.GetInstance().SetLoader((packageName) =>
+            PackageManager.GetInstance().SetLoader(new PackageCustomLoader((packageName) =>
             {
-                var pair = AssetManager.GetInstance().LoadUI(packageName);
-                PackageLoadMode mode = PackageLoadMode.PathString;
-                if (pair.Key == (int)ResourceLoadMode.Editor) mode = PackageLoadMode.PathString;
-                else if (pair.Key == (int)ResourceLoadMode.AssetBundler) mode = PackageLoadMode.AssetBundlePair;
-
-                return new KeyValuePair<PackageLoadMode, System.Object>(mode, pair.Value);
-            });
+#if !UNITY_EDITOR
+                return Path.Combine(AssetFileBook.FGUI_ROOT_SRC, string.Format("{0}", packageName));
+#else
+                return AssetManager2.GetInstance().LoadUISync(packageName);//这里要改为异步
+#endif
+            }));
 
             PackageManager.GetInstance().OnAdded((packageInfo) =>
             {

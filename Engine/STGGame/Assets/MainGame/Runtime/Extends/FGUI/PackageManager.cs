@@ -13,7 +13,7 @@ namespace STGRuntime
         public float residentTimeS = 15f;                  //默认包驻留时间
         private float m_cacheTimeTemp;
 
-        private Func<string,KeyValuePair<PackageLoadMode, System.Object>> m_loader;
+        private PackageCustomLoader m_loader = new PackageCustomLoader();
         private Dictionary<string, PackageInfo> m_packageMap = new Dictionary<string, PackageInfo>();
         private List<PackageInfo> m_invalidPackages = new List<PackageInfo>();
         private HashSet<string> m_refPackages = new HashSet<string>();
@@ -22,34 +22,9 @@ namespace STGRuntime
         {
 
         }
-
-        public void SetLoader(Func<string, KeyValuePair<PackageLoadMode, System.Object>> loader)
+        public void SetLoader(PackageCustomLoader loader)
         {
-            m_loader = loader;
-        }
-
-        public void SetLoader(Func<string, string> loader)
-        {
-            if (loader != null)
-            {
-                SetLoader((packageName) =>
-                {
-                    string packagePath = loader(packageName);
-                    return new KeyValuePair<PackageLoadMode, System.Object>(PackageLoadMode.PathString, packagePath);
-                });
-            }
-        }
-
-        public void SetLoader(Func<string, KeyValuePair<AssetBundle, AssetBundle>> loader)
-        {
-            if (loader != null)
-            {
-                SetLoader((packageName) =>
-                {
-                    KeyValuePair<AssetBundle, AssetBundle> pair = loader(packageName);
-                    return new KeyValuePair<PackageLoadMode, System.Object>(PackageLoadMode.AssetBundlePair, pair);
-                });
-            }
+            m_loader = loader ?? m_loader;
         }
 
         public void OnAdded(Action<PackageInfo> func)
@@ -64,20 +39,7 @@ namespace STGRuntime
             {
                 if (m_loader != null)
                 {
-                    UIPackage package = null;
-                    KeyValuePair<PackageLoadMode, System.Object> info = m_loader(packageName);
-                    if (info.Key == PackageLoadMode.PathString)
-                    {
-                        string uiPath = info.Value as string;
-                        package = UIPackage.AddPackage(uiPath);
-                    }
-                    else if (info.Key == PackageLoadMode.AssetBundlePair)
-                    {
-                        KeyValuePair<AssetBundle, AssetBundle> pair = (KeyValuePair<AssetBundle, AssetBundle>)info.Value;
-                        package = UIPackage.AddPackage(pair.Key, pair.Value);
-                    }
-
-
+                    UIPackage package = m_loader.Load(packageName);
                     if (package != null)
                     {
                         foreach (var depList in package.dependencies)
@@ -95,7 +57,6 @@ namespace STGRuntime
                                             Debug.LogWarning(string.Format("[PackageManager]包 {0} 引用了非常驻包 {1} 的资源", packageName, depPair.Value));
                                         }
                                     }
-                                    
                                 }
                             }
                         }

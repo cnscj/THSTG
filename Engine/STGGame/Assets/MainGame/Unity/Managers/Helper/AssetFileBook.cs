@@ -13,6 +13,7 @@ namespace STGU3D
         public static readonly string SPRITE_ROOT = Path.Combine(ED_ASSET_ROOT, "sprite");
         public static readonly string MODEL_ROOT = Path.Combine(ED_ASSET_ROOT, "model");
         public static readonly string FGUI_ROOT = Path.Combine(ED_ASSET_ROOT, "fgui");
+        public static readonly string FGUI_ROOT_SRC = "Assets/GameAssets/FGUI";
         public static readonly string CONFIG_ROOT = Path.Combine(ED_ASSET_ROOT, "config");
 
         private static string s_abAssetRootWithPlatform;

@@ -12,7 +12,7 @@ namespace ASGame
      * */
     public class ModelEffect : MonoBehaviour
     {
-        public static readonly string MODFX_NAME = "_modfx";
+        public static readonly string MODFX_NAME = "fx_";
         [System.Serializable]
         public class NodeInfo
         {
