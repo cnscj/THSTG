@@ -17,7 +17,7 @@ namespace STGU3D
         public static readonly string CONFIG_ROOT = Path.Combine(ED_ASSET_ROOT, "config");
 
         private static string s_abAssetRootWithPlatform;
-        private static string GetAbAssetRoot()
+        public static string GetAbAssetRoot()
         {
             return s_abAssetRootWithPlatform ?? Path.Combine(AB_ASSET_ROOT, AssetPathUtil.GetCurPlatformName()).ToLower();
         }
@@ -54,6 +54,13 @@ namespace STGU3D
             string abPath = Path.Combine(GetAbAssetRoot(), string.Format("{0}.ab", key));
             string assetName = Path.Combine(CONFIG_ROOT, string.Format("{0}.csv", key));
             return string.Format("{0}|{1}", abPath, assetName);
+        }
+
+        public static string GetBundleMainfest()
+        {
+            string platform = Path.GetFileNameWithoutExtension(GetAbAssetRoot());
+            string abPath = Path.Combine(GetAbAssetRoot(), string.Format("{0}.ab", platform));
+            return string.Format("{0}", abPath);
         }
     }
 }

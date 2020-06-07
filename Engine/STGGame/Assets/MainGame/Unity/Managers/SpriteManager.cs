@@ -46,7 +46,7 @@ namespace STGU3D
                         prefabInstance = GameObjectPoolManager.GetInstance().GetOrCreateGameObject(viewCode);
                         GameObject viewGO = new GameObject(viewName);
                         prefabInstance.transform.SetParent(viewGO.transform, false);
-                        callback.onSuccess?.InvokeDelay(prefabInstance);
+                        callback.onSuccess?.Invoke(prefabInstance);
                     });
                 }
                 else
@@ -54,7 +54,7 @@ namespace STGU3D
                     prefabInstance = GameObjectPoolManager.GetInstance().GetOrCreateGameObject(viewCode);
                     GameObject viewGO = new GameObject(viewName);
                     prefabInstance.transform.SetParent(viewGO.transform, false);
-                    callback.onSuccess?.InvokeDelay(prefabInstance);
+                    callback.onSuccess?.Invoke(prefabInstance);
                 }
 
             }

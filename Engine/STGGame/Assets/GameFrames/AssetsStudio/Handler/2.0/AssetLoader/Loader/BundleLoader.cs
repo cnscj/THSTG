@@ -11,7 +11,7 @@ using UnityEngine.Networking;
 namespace ASGame
 {
     //加载依赖应该返回依赖信息,包括哪些依赖文件加载失败
-    public class BundleLoader : BaseCoroutineLoader
+    public class BundleLoader : BaseAsynchLoader
     {
         public static readonly float HANDLER_BUNDLE_LOCAL_STAY_TIME = 30;       //考虑到加载场景AB估计要好久
         public static readonly float HANDLER_BUNDLE_NETWORK_STAY_TIME = 60f;    //下载网络不好估计也好好久
@@ -59,6 +59,28 @@ namespace ASGame
                 var ab = AssetBundle.LoadFromFile(mainfestPath);
                 OnLoadMainfestCallback(ab);
             }
+        }
+
+        public void LoadMainfest(AssetBundleManifest mainfest)
+        {
+            if (mainfest == null)
+            {
+                Debug.LogError(string.Format("LoadMainfest NULL error !"));
+                return;
+            }
+
+            m_dependsDataList.Clear();
+            foreach (string assetName in mainfest.GetAllAssetBundles())
+            {
+                string fullPathLow = GetAbsoluteFullPath(assetName);
+                string[] dps = mainfest.GetAllDependencies(assetName);
+                for (int i = 0; i < dps.Length; i++)
+                {
+                    dps[i] = GetAbsoluteFullPath(dps[i]);
+                }
+                m_dependsDataList.Add(fullPathLow, dps);
+            }
+            Debug.Log("AssetBundleLoadMgr dependsCount=" + m_dependsDataList.Count);
         }
 
         /// <summary>
@@ -137,27 +159,9 @@ namespace ASGame
                 return;
             }
 
-            m_dependsDataList.Clear();
             AssetBundleManifest mainfest = ab.LoadAsset("AssetBundleManifest") as AssetBundleManifest;
-            if (mainfest == null)
-            {
-                Debug.LogError(string.Format("LoadMainfest NULL error !"));
-                return;
-            }
-
-            foreach (string assetName in mainfest.GetAllAssetBundles())
-            {
-                string fullPathLow = GetAbsoluteFullPath(assetName);
-                string[] dps = mainfest.GetAllDependencies(assetName);
-                for (int i = 0; i < dps.Length; i++)
-                {
-                    dps[i] = GetAbsoluteFullPath(dps[i]);
-                }
-                m_dependsDataList.Add(fullPathLow, dps);
-            }
-
+            LoadMainfest(mainfest);
             ab.Unload(true);
-            Debug.Log("AssetBundleLoadMgr dependsCount=" + m_dependsDataList.Count);
         }
 
         private BundleObject GetBundleObject(string bundlePath)
@@ -418,16 +422,42 @@ namespace ASGame
             {
                 if (!string.IsNullOrEmpty(assetName))
                 {
-                    var loadRequest = assetBundle.LoadAssetAsync(assetName);
-                    yield return loadRequest;
+                    var loadNode = GetLoadNode(handler);
+                    if (loadNode != null && loadNode.loadMode == LoadMode.Nextframe)
+                    {
+                        var loadObj = assetBundle.LoadAsset(assetName);
+                        asset = loadObj;
+                        isDone = true;
+                    }
+                    else
+                    {
+                        var loadRequest = assetBundle.LoadAssetAsync(assetName);
+                        yield return loadRequest;
 
-                    asset = loadRequest.asset;
-                    isDone = loadRequest.isDone;
+                        asset = loadRequest.asset;
+                        isDone = loadRequest.isDone;
+                    }
                 }
             }
 
             var result = new AssetLoadResult(asset, isDone);
             LoadAssetPrimitiveCallback(handler, result);
+        }
+
+        protected override LoadMode OnLoadMode(AssetLoadHandler handler)
+        {
+            //如果缓冲池有,则下一帧回调,否则协程回调
+            string assetPath = handler.path;
+            if (handler.path.IndexOf("|") > 0)
+            {
+                string[] pathPairs = handler.path.Split('|');
+                assetPath = pathPairs[0];
+            }
+            if (GetBundleObject(assetPath) != null)
+            {
+                return LoadMode.Nextframe;
+            }
+            return LoadMode.Coroutine;
         }
     }
 }

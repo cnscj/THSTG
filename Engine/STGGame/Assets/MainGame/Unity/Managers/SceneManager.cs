@@ -22,9 +22,7 @@ namespace STGU3D
 
         public void LoadLevelScene(string uid)
         {
-            var sceneName = AssetManager.GetInstance().LoadLevel(uid);
-            UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive);
-            m_curLevel = uid;
+           
         }
     }
 }

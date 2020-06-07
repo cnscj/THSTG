@@ -23,7 +23,7 @@ namespace STGU3D
             }
             else
             {
-                content = AssetManager.GetInstance().LoadConfig(code);
+                content = AssetManager2.GetInstance().LoadConfigSync(code);
                 if (!string.IsNullOrEmpty(content))
                 {
                     m_cache.Add(code, content);

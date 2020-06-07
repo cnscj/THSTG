@@ -1,34 +1,25 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿
 using UnityEngine;
 
 namespace XLibGame
 {
-    public delegate void Invoke();
     public delegate void Invoke<T>(T obj);
-    public delegate void Invoke<T1, T2>(T1 obj1, T2 obj2);
-    public delegate void Invoke<T1, T2, T3>(T1 obj1, T2 obj2, T3 obj3);
-
     public class CallbackInvoke<T>
     {
         private Invoke<T> m_funcs;
+        private BaseRef m_baseRef;
+        public CallbackInvoke(BaseRef baseRef) { m_baseRef = baseRef; }
         public void Clear() { m_funcs = null; }
-        public void Set(Invoke<T> f) { m_funcs = f; }
-        public void Add(Invoke<T> f) { m_funcs += f; }
-        public void Sub(Invoke<T> f) { m_funcs -= f; }
-        public void Invoke(T obj) { m_funcs?.Invoke(obj); }
-        public void InvokeDelay(T obj) {
-            Timer.GetInstance().ScheduleNextFrame(() =>
-            {
-                Invoke(obj);
-            });
-        }
+        public CallbackInvoke<T> Set(Invoke<T> f) { m_funcs = f; return this; }
+        public CallbackInvoke<T> Add(Invoke<T> f) { m_funcs += f; return this; }
+        public CallbackInvoke<T> Sub(Invoke<T> f) { m_funcs -= f; return this; }
+        public void Invoke(T obj) { Timer.GetInstance().ScheduleNextFrame(() => { m_funcs?.Invoke(obj); m_baseRef?.Release(); }); }
 
-
+        public static CallbackInvoke<T> operator -(CallbackInvoke<T> left, Invoke<T> right){return left.Sub(right);}
+        public static CallbackInvoke<T> operator +(CallbackInvoke<T> left, Invoke<T> right){return left.Add(right);}
     }
 
-    public class Callback<T1,T2> : BaseRef
+    public class Callback<T1, T2> : BaseRef
     {
         public static Callback<T1, T2> GetOrNew()
         {
@@ -37,67 +28,25 @@ namespace XLibGame
             callback.Clear();
             return callback;
         }
-        public CallbackInvoke<T1> onSuccess = new CallbackInvoke<T1>();
-        public CallbackInvoke<T2> onFailed = new CallbackInvoke<T2>();
+        public CallbackInvoke<T1> onSuccess;
+        public CallbackInvoke<T2> onFailed;
 
+        public Callback()
+        {
+            Clear();
+        }
         public void Clear()
         {
-            onSuccess?.Clear();
-            onFailed?.Clear();
+            onSuccess = onSuccess ?? new CallbackInvoke<T1>(this);
+            onFailed = onFailed ?? new CallbackInvoke<T2>(this);
+            onSuccess.Clear();
+            onFailed.Clear();
         }
         protected override void OnRelease()
         {
-            base.OnRelease();
             Clear();
-            var pool = ObjectPoolManager.GetInstance().GetOrCreatePool<Callback<T1, T2>>();
-            pool.Release(this);
+            ObjectPoolManager.GetInstance().GetOrCreatePool<Callback<T1, T2>>().Release(this);
         }
     }
 
-
-    /////////////////////////////////////
-    public class CallbackInvoke<T1,T2>
-    {
-        private Invoke<T1, T2> m_funcs;
-        public void Clear() { m_funcs = null; }
-        public void Set(Invoke<T1, T2> f) { m_funcs = f; }
-        public void Add(Invoke<T1, T2> f) { m_funcs += f; }
-        public void Sub(Invoke<T1, T2> f) { m_funcs -= f; }
-        public void Invoke(T1 obj1, T2 obj2) { m_funcs?.Invoke(obj1, obj2); }
-        public void InvokeDelay(T1 obj1, T2 obj2)
-        {
-            Timer.GetInstance().ScheduleNextFrame(() =>
-            {
-                Invoke(obj1,obj2);
-            });
-        }
-
-    }
-
-    public class Callback<T1, T2, T3> : BaseRef
-    {
-        public static Callback<T1, T2, T3> GetOrNew()
-        {
-            var pool = ObjectPoolManager.GetInstance().GetOrCreatePool<Callback<T1, T2, T3>>();
-            var callback = pool.GetOrCreate();
-            callback.Clear();
-            //callback.ReleaseLater();
-            return callback;
-        }
-        public CallbackInvoke<T1, T2> onSuccess = new CallbackInvoke<T1, T2>();
-        public CallbackInvoke<T3> onFailed = new CallbackInvoke<T3>();
-
-        public void Clear()
-        {
-            onSuccess?.Clear();
-            onFailed?.Clear();
-        }
-        protected override void OnRelease()
-        {
-            base.OnRelease();
-            Clear();
-            var pool = ObjectPoolManager.GetInstance().GetOrCreatePool<Callback<T1, T2, T3>>();
-            pool.Release(this);
-        }
-    }
 }

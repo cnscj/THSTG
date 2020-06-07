@@ -19,13 +19,27 @@ namespace STGU3D
         /// <param name="onComplete"></param>
         public void PlayOnce(string code, GameObject hangNode, Vector3 position, Action onCompleted = null)
         {
+            AssetLoadCallback<GameObject> callback;
             var pool = GameObjectPoolManager.GetInstance().GetGameObjectPool(code);
             if (pool == null)
             {
-                GameObject prefab = AssetManager.GetInstance().LoadEffect(code);
-                pool = GameObjectPoolManager.GetInstance().NewGameObjectPool(code, prefab,10);
+                callback = AssetManager2.GetInstance().LoadEffect(code);
+                callback.onSuccess += (prefab) =>
+                {
+                    pool = GameObjectPoolManager.GetInstance().NewGameObjectPool(code, prefab, 10);
+                    var fxGO = pool.GetOrCreate();
+                    PlayEffect(fxGO, hangNode, position, onCompleted);
+                };
             }
-            var fxGO = pool.GetOrCreate();
+            else
+            {
+                var fxGO = pool.GetOrCreate();
+                PlayEffect(fxGO, hangNode, position, onCompleted);
+            }
+        }
+
+        private void PlayEffect(GameObject fxGO, GameObject hangNode, Vector3 position, Action onCompleted = null)
+        {
             if (fxGO)
             {
                 fxGO.transform.position = position;

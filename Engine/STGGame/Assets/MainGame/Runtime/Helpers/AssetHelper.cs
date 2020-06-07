@@ -11,14 +11,14 @@ namespace STGRuntime
             ResourceLoader.GetInstance().loadMode = ResourceLoadMode.Editor;      //加载模式
         }
 
-        public static AssetManager GetManager()
+        public static AssetManager2 GetManager()
         {
-            return AssetManager.GetInstance();
+            return AssetManager2.GetInstance();
         }
 
         public static CSVTable LoadConfig(string code)
         {
-            var content = GetManager().LoadConfig(code);
+            var content = GetManager().LoadConfigSync(code);
             return new CSVTable(content);
         }
     }

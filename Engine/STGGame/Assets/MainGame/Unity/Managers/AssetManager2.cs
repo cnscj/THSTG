@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.IO;
 using ASGame;
 using UnityEngine;
 using XLibGame;
@@ -9,6 +10,11 @@ namespace STGU3D
 {
     public class AssetManager2 : MonoSingleton<AssetManager2>
     {
+        private void Start()
+        {
+            string assetPath = AssetFileBook.GetBundleMainfest();
+            AssetLoaderManager.GetInstance().LoadBundleMainfest(assetPath);
+        }
 
         //可能是AB,可能是源文件
         public AssetLoadCallback<GameObject> LoadModel(string uid)
@@ -55,19 +61,27 @@ namespace STGU3D
             return callback as AssetLoadCallback<GameObject>;
         }
 
-        public AssetLoadCallback<AssetBundle, AssetBundle> LoadUI(string module)
+        public AssetLoadCallback<AssetBundle[]> LoadUI(string module)
         {
             string bytesAbPath = AssetFileBook.GetUIPath(string.Format("{0}_fgui", module));
             string textureAbPath = AssetFileBook.GetUIPath(string.Format("{0}_altas", module));
-            var callback = AssetLoadCallback<AssetBundle, AssetBundle>.GetOrNew();
+            var callback = AssetLoadCallback<AssetBundle[]>.GetOrNew();
             AssetLoaderManager.GetInstance().LoadAsset<AssetBundle>(bytesAbPath, (bytesAb) =>
             {
                 AssetLoaderManager.GetInstance().LoadAsset<AssetBundle>(textureAbPath, (altasAb) =>
                 {
-                    callback?.onSuccess?.Invoke(bytesAb, altasAb);
+                    callback?.onSuccess?.Invoke(new AssetBundle[] { bytesAb, altasAb });
                 }, (altasBytes) =>
                 {
-                    callback?.onFailed?.Invoke(altasBytes);
+                    if(bytesAb != null)
+                    {
+                        callback?.onSuccess?.Invoke(new AssetBundle[] { bytesAb, null });
+                    }
+                    else
+                    {
+                        callback?.onFailed?.Invoke(altasBytes);
+                    }
+
                 });
             }, (reasonBytes) =>
              {
@@ -99,5 +113,16 @@ namespace STGU3D
             });
             return callback;
         }
+        public string LoadConfigSync(string fileName)
+        {
+            string abPath = Path.Combine(AssetFileBook.GetAbAssetRoot(), string.Format("{0}.ab", fileName));
+            string assetName = Path.Combine(AssetFileBook.CONFIG_ROOT, string.Format("{0}.csv", fileName));
+
+            var ab = AssetBundle.LoadFromFile(abPath);
+            TextAsset textAsset = ab.LoadAsset<TextAsset>(assetName);
+
+            return textAsset.text;
+        }
+
     }
 }

@@ -15,8 +15,11 @@ namespace ASGame
         private BaseLoader m_bundleLoader;
         public void LoadBundleMainfest(string mainfestPath)
         {
-            //XXX:然而大多数情况下下Mainfest是加密的,可能需要先用到二进制打开
-            GetOrCreateBundleLoader().LoadMainfest(mainfestPath);
+            GetOrCreateBundleLoader().LoadMainfest(mainfestPath);//然而大多数情况下下Mainfest是加密的,可能需要先用到二进制打开
+        }
+        public void LoadBundleMainfest(AssetBundleManifest manifest)
+        {
+            GetOrCreateBundleLoader().LoadMainfest(manifest);
         }
 
         public AssetLoadHandler LoadAssetHandler<T>(string path) where T : Object

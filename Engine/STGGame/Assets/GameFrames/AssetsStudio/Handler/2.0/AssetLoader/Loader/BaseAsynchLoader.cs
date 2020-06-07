@@ -4,7 +4,7 @@ using UnityEngine;
 using IEnumerator = System.Collections.IEnumerator;
 namespace ASGame
 {
-    public abstract class BaseExecuteInvoker : BaseLoader
+    public abstract class BaseAsynchLoader : BaseLoader
     {
         protected class Nextframe
         {
@@ -33,7 +33,6 @@ namespace ASGame
         }
 
         private Dictionary<int, LoadNode> m_loadNodes = new Dictionary<int, LoadNode>();
-
         private HashSet<Nextframe> m_nextframeMap = new HashSet<Nextframe>(); //下一帧执行 
         private Queue<Nextframe> m_removeQueue = new Queue<Nextframe>();
 
@@ -102,11 +101,13 @@ namespace ASGame
         
         protected override void OnLoadSuccess(AssetLoadHandler handler)
         {
+            base.OnLoadSuccess(handler);
             m_loadNodes.Remove(handler.id);
         }
 
         protected override void OnLoadFailed(AssetLoadHandler handler)
         {
+            base.OnLoadFailed(handler);
             m_loadNodes.Remove(handler.id);
         }
 
@@ -176,11 +177,7 @@ namespace ASGame
             return new LoadNode();
         }
 
-        protected virtual LoadMode OnLoadMode(AssetLoadHandler handler)
-        {
-            return LoadMode.Coroutine;
-        }
-
+        protected abstract LoadMode OnLoadMode(AssetLoadHandler handler);
         protected abstract IEnumerator OnLoadAsset(AssetLoadHandler handler);
     }
 }

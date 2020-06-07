@@ -56,48 +56,15 @@ namespace STGU3D
             }
         }
 
-        //可能是AB,可能是源文件
-        public GameObject LoadModel(string uid)
-        {
-            string resPath = Combine2FixPath(EResType.Model, string.Format("{0}.ab", uid), string.Format("{0}.prefab", uid));
-            return ResourceLoader.GetInstance().LoadFromFile<GameObject>(resPath);
-        }
+        //public string LoadConfig(string fileName)
+        //{
+        //    string fileNameWithoutEx = Path.GetFileNameWithoutExtension(fileName);
+        //    string fileExtName = Path.GetExtension(fileName);
+        //    fileExtName = fileExtName == "" ? ".csv" : fileExtName;
+        //    string resPath = Combine2FixPath(EResType.Config, string.Format("{0}.ab", fileNameWithoutEx), string.Format("{0}{1}", fileNameWithoutEx, fileExtName));
+        //    var textAsset = ResourceLoader.GetInstance().LoadFromFile<TextAsset>(resPath);
+        //    return textAsset.text;
+        //}
 
-        public GameObject LoadEffect(string uid)
-        {
-            string resPath = Combine2FixPath(EResType.Effect, string.Format("{0}.ab", uid), string.Format("{0}.prefab", uid));
-            return ResourceLoader.GetInstance().LoadFromFile<GameObject>(resPath);
-        }
-
-
-        public string LoadConfig(string fileName)
-        {
-            string fileNameWithoutEx = Path.GetFileNameWithoutExtension(fileName);
-            string fileExtName = Path.GetExtension(fileName);
-            fileExtName = fileExtName == "" ? ".csv" : fileExtName;
-            string resPath = Combine2FixPath(EResType.Config, string.Format("{0}.ab", fileNameWithoutEx), string.Format("{0}{1}", fileNameWithoutEx, fileExtName));
-            var textAsset = ResourceLoader.GetInstance().LoadFromFile<TextAsset>(resPath);
-            return textAsset.text;
-        }
-
-        public string LoadLevel(string uid)
-        {
-            string sceneName = Combine2FixPath(EResType.Level, string.Format("{0}.ab", uid), string.Format("{0}.unity", uid));
-
-            if (ResourceLoader.GetInstance().loadMode == ResourceLoadMode.AssetBundler)
-            {
-                string resPath = Combine2FixPath(EResType.Level, string.Format("{0}.ab", uid), null);
-                var bundle = ResourceLoader.GetInstance().LoadFromFile<AssetBundle>(resPath);
-
-                if (bundle.isStreamedSceneAssetBundle)
-                {
-                    var scenePaths = bundle.GetAllScenePaths();
-                    sceneName = Path.GetFileNameWithoutExtension(scenePaths[0]);
-
-                }
-            }
-
-            return sceneName;
-        }
     }
 }

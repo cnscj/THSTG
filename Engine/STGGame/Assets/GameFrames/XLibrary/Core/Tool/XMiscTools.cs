@@ -40,19 +40,16 @@ namespace XLibrary
         /// <typeparam name="T"></typeparam>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static T CopyOjbect<T>(T obj)
+        public static T DeepCopy<T>(T src) where T : UnityEngine.Object
         {
-            //如果是字符串或值类型则直接返回
-            if (obj == null || obj is string || obj.GetType().IsValueType) return obj;
+            System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            System.Runtime.Serialization.Formatters.Binary.BinaryFormatter bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+            bf.Serialize(ms, src);
 
-            object retval = Activator.CreateInstance(obj.GetType());
-            System.Reflection.FieldInfo[] fields = obj.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
-            foreach (System.Reflection.FieldInfo field in fields)
-            {
-                try { field.SetValue(retval, CopyOjbect(field.GetValue(obj))); }
-                catch { }
-            }
-            return (T)retval;
+            ms.Seek(0, System.IO.SeekOrigin.Begin);
+            object dst = bf.Deserialize(ms);
+            ms.Close();
+            return dst as T;
         }
 
         /// <summary>
