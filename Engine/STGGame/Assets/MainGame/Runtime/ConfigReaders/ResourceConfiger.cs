@@ -1,4 +1,5 @@
-﻿using XLibrary;
+﻿using STGU3D;
+using XLibrary;
 
 namespace STGRuntime
 {
@@ -10,7 +11,7 @@ namespace STGRuntime
         {
             if (s_resTb == null)
             {
-                s_resTb = ConfigHelper.LoadConfig("G_Resource.csv");
+                s_resTb = ConfigerManager.GetInstance().LoadConfig("G_Resource.csv");
             }
             return s_resTb;
         }

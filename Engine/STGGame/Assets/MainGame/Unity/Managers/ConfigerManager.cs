@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using XLibrary;
 using XLibrary.Package;
 
 namespace STGU3D
@@ -14,7 +15,7 @@ namespace STGU3D
             m_cache = new Dictionary<string, string>();
         }
 
-        public string LoadConfig(string code)
+        public CSVTable LoadConfig(string code)
         {
             string content;
             if (m_cache.ContainsKey(code))
@@ -23,15 +24,14 @@ namespace STGU3D
             }
             else
             {
-                content = AssetManager2.GetInstance().LoadConfigSync(code);
+                content = AssetManager.GetInstance().LoadConfigSync(code);
                 if (!string.IsNullOrEmpty(content))
                 {
                     m_cache.Add(code, content);
                 }
             }
-            
 
-            return content;
+            return new CSVTable(content);
         }
     }
 }

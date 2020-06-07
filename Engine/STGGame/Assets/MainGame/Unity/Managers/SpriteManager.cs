@@ -40,7 +40,7 @@ namespace STGU3D
             {
                 if (!GameObjectPoolManager.GetInstance().HasGameObjectPool(viewCode))
                 {
-                    AssetManager2.GetInstance().LoadSprite(viewCode).onSuccess.Set((prefab)=>
+                    AssetManager.GetInstance().LoadSprite(viewCode).onSuccess.Set((prefab)=>
                     {
                         GameObjectPoolManager.GetInstance().NewGameObjectPool(viewCode, prefab, maxCount);
                         prefabInstance = GameObjectPoolManager.GetInstance().GetOrCreateGameObject(viewCode);
@@ -60,7 +60,7 @@ namespace STGU3D
             }
             else
             {
-                AssetManager2.GetInstance().LoadSprite(viewCode).onSuccess.Set((prefab)=>
+                AssetManager.GetInstance().LoadSprite(viewCode).onSuccess.Set((prefab)=>
                 {
                     if (prefab)
                     {

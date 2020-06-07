@@ -23,7 +23,7 @@ namespace STGU3D
             var pool = GameObjectPoolManager.GetInstance().GetGameObjectPool(code);
             if (pool == null)
             {
-                callback = AssetManager2.GetInstance().LoadEffect(code);
+                callback = AssetManager.GetInstance().LoadEffect(code);
                 callback.onSuccess += (prefab) =>
                 {
                     pool = GameObjectPoolManager.GetInstance().NewGameObjectPool(code, prefab, 10);

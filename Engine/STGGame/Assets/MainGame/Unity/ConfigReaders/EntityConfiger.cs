@@ -13,8 +13,8 @@ namespace STGU3D
 
         private static CSVTable LoadConfig(string code)
         {
-            var content = ConfigerManager.GetInstance().LoadConfig(code);
-            return new CSVTable(content);
+            var table = ConfigerManager.GetInstance().LoadConfig(code);
+            return table;
         }
 
         private static CSVTable GetRoleTable()

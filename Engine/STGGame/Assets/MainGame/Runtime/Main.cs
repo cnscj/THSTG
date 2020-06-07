@@ -10,7 +10,6 @@ namespace STGRuntime
         //所有业务逻辑初始化
         public static void InitAwake()
         {
-            AssetHelper.InitAwake();
             ModuleMgr.InitAwake();
             UIMgr.InitAwake();
         }

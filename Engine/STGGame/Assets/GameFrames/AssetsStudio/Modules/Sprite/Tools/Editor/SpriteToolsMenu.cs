@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using ASGame;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
@@ -27,7 +28,7 @@ namespace ASEditor
                         string fileNameNExt = Path.GetFileNameWithoutExtension(fullPath).ToLower();
                         string fileExt = Path.GetExtension(fullPath).ToLower();
 
-                        if (!ResourceUtil.IsImageFile(fullPath))
+                        if (!AssetRuntimeUtil.IsImageFile(fullPath))
                             return;
 
                         string assetPath = XPathTools.GetRelativePath(fullPath);
@@ -67,7 +68,7 @@ namespace ASEditor
                         string fileNameNExt = Path.GetFileNameWithoutExtension(fullPath).ToLower();
                         string fileExt = Path.GetExtension(fullPath).ToLower();
 
-                        if (!ResourceUtil.IsImageFile(fullPath))
+                        if (!AssetRuntimeUtil.IsImageFile(fullPath))
                             return;
 
                         string assetPath = XPathTools.GetRelativePath(fullPath);
@@ -106,7 +107,7 @@ namespace ASEditor
                         string fileNameNExt = Path.GetFileNameWithoutExtension(fullPath).ToLower();
                         string fileExt = Path.GetExtension(fullPath).ToLower();
 
-                        if (!ResourceUtil.IsImageFile(fullPath))
+                        if (!AssetRuntimeUtil.IsImageFile(fullPath))
                             return;
 
                         string assetPath = XPathTools.GetRelativePath(fullPath);
@@ -145,7 +146,7 @@ namespace ASEditor
                         string fileNameNExt = Path.GetFileNameWithoutExtension(fullPath).ToLower();
                         string fileExt = Path.GetExtension(fullPath).ToLower();
 
-                        if (!ResourceUtil.IsImageFile(fullPath))
+                        if (!AssetRuntimeUtil.IsImageFile(fullPath))
                             return;
 
                         string assetPath = XPathTools.GetRelativePath(fullPath);
@@ -198,7 +199,7 @@ namespace ASEditor
             {
                 string ctrlFilePath = XPathTools.Combine(exportRootPath, SpriteEditorTools.controllerName);
 
-                string folderId = ResourceUtil.GetFolderId(exportRootPath);
+                string folderId = XStringTools.SplitPathKey(exportRootPath);
                 string spriteSavePath = XPathTools.Combine(exportRootPath, string.Format("{0}.prefab", folderId));
                 string materialSavePath = XPathTools.Combine(exportRootPath, string.Format("{0}.mat", folderId));
                 var sprite = SpriteEditorTools.GeneratePrefabFromAnimationControllerFile(ctrlFilePath, spriteSavePath);

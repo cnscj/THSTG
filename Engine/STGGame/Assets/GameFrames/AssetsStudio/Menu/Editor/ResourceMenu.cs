@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.IO;
+using System.Text;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -30,10 +31,14 @@ namespace ASEditor
             string selectPath = AssetDatabase.GetAssetPath(selected);
             if (selectPath != "")
             {
-                string[] checkList = ResourceUtil.GetDependFiles(selectPath, new string[] { "cs" });
+                string[] checkList = AssetDatabase.GetDependencies(selectPath);
                 StringBuilder stringBuilder = new StringBuilder();
                 foreach (var filePath in checkList)
                 {
+                    string exName = Path.GetExtension(filePath).ToLower();
+                    if (exName.Contains("cs"))
+                        continue;
+
                     string code = XFileTools.GetMD5(filePath);
                     stringBuilder.Append(filePath);
                     stringBuilder.AppendLine();
