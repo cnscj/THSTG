@@ -11,7 +11,7 @@ using UnityEngine.Networking;
 namespace ASGame
 {
     //加载依赖应该返回依赖信息,包括哪些依赖文件加载失败
-    public class BundleLoader : BaseAsynchLoader
+    public class BundleLoader : BaseCoroutineLoader
     {
         public static readonly float HANDLER_BUNDLE_LOCAL_STAY_TIME = 30;       //考虑到加载场景AB估计要好久
         public static readonly float HANDLER_BUNDLE_NETWORK_STAY_TIME = 60f;    //下载网络不好估计也好好久
@@ -422,42 +422,16 @@ namespace ASGame
             {
                 if (!string.IsNullOrEmpty(assetName))
                 {
-                    var loadNode = GetLoadNode(handler);
-                    if (loadNode != null && loadNode.loadMode == LoadMode.Nextframe)
-                    {
-                        var loadObj = assetBundle.LoadAsset(assetName);
-                        asset = loadObj;
-                        isDone = true;
-                    }
-                    else
-                    {
-                        var loadRequest = assetBundle.LoadAssetAsync(assetName);
-                        yield return loadRequest;
+                    var loadRequest = assetBundle.LoadAssetAsync(assetName);
+                    yield return loadRequest;
 
-                        asset = loadRequest.asset;
-                        isDone = loadRequest.isDone;
-                    }
+                    asset = loadRequest.asset;
+                    isDone = loadRequest.isDone;
                 }
             }
 
             var result = new AssetLoadResult(asset, isDone);
             LoadAssetPrimitiveCallback(handler, result);
-        }
-
-        protected override LoadMode OnLoadMode(AssetLoadHandler handler)
-        {
-            //如果缓冲池有,则下一帧回调,否则协程回调
-            string assetPath = handler.path;
-            if (handler.path.IndexOf("|") > 0)
-            {
-                string[] pathPairs = handler.path.Split('|');
-                assetPath = pathPairs[0];
-            }
-            if (GetBundleObject(assetPath) != null)
-            {
-                return LoadMode.Nextframe;
-            }
-            return LoadMode.Coroutine;
         }
     }
 }

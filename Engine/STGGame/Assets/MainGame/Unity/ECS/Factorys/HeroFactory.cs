@@ -67,7 +67,7 @@ namespace STGU3D
 
                 {
                     entity.cage.movableArea = DirectorUtil.ScreenRectInWorld(DirectorUtil.GetScreenRect());
-                    entity.cage.bodySize = DirectorUtil.ScreenSizeInWorld(entity.entityData.entityData["hitBox"].ToVec3());
+                    entity.cage.bodySize = DirectorUtil.ScreenSizeInWorld(entity.entityData.entityData["hitBox"].ToVector3());
                 }
 
                 {

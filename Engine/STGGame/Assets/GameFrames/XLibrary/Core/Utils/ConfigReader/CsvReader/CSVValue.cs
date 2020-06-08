@@ -26,7 +26,7 @@ namespace XLibrary
         public bool ToBool() { return bool.Parse(m_content); }
         public float ToFloat() { return float.Parse(m_content); }
         public double ToDouble() { return double.Parse(m_content); }
-        public Vector3 ToVec3() {
+        public Vector3 ToVector3() {
             string []xyz = m_content.Split(',');
             Vector3 vec3 = new Vector3(
                 xyz.Length > 0 ? float.Parse(xyz[0]) : 0,

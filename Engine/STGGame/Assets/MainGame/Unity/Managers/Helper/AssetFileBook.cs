@@ -59,7 +59,7 @@ namespace STGU3D
         public static string GetBundleMainfest()
         {
             string platform = Path.GetFileNameWithoutExtension(GetAbAssetRoot());
-            string abPath = Path.Combine(GetAbAssetRoot(), string.Format("{0}.ab", platform));
+            string abPath = Path.Combine(GetAbAssetRoot(), string.Format("{0}", platform));
             return string.Format("{0}", abPath);
         }
     }

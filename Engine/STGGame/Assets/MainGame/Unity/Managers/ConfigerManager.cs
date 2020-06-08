@@ -17,21 +17,25 @@ namespace STGU3D
 
         public CSVTable LoadConfig(string code)
         {
-            string content;
+            CSVTable table = new CSVTable();
             if (m_cache.ContainsKey(code))
             {
-                content = m_cache[code];
+                string content = m_cache[code];
+                table.Parse(content);
             }
             else
             {
-                content = AssetManager.GetInstance().LoadConfigSync(code);
-                if (!string.IsNullOrEmpty(content))
+                AssetManager.GetInstance().LoadConfig(code).onSuccess += (content)=>
                 {
-                    m_cache.Add(code, content);
-                }
+                    if (!string.IsNullOrEmpty(content))
+                    {
+                        m_cache.Add(code, content);
+                        table.Parse(content);
+                    }
+                };
             }
 
-            return new CSVTable(content);
+            return table;
         }
     }
 }

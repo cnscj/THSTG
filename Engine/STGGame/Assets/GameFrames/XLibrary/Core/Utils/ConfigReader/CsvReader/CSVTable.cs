@@ -14,7 +14,7 @@ namespace XLibrary
 {
     public class CSVTable : IEnumerable
     {
-        public static readonly CSVTable empty = new CSVTable("");   //空table
+        public static readonly CSVTable Empty = new CSVTable("");   //空table
 
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace XLibrary
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        public static CSVTable Load(string content)
+        public static CSVTable LoadFromContent(string content)
         {
             CSVTable table = new CSVTable(content);
             return table;
@@ -74,12 +74,22 @@ namespace XLibrary
         /// <returns> 数据表对象 </returns>
         public CSVTable(string tableContent)
         {
+            Parse(tableContent);
+        }
+
+        /// <summary>
+        /// 将csv文本转化为CSVTable
+        /// </summary>
+        /// <param name="tableContent"></param>
+        /// <returns></returns>
+        public CSVTable Parse(string tableContent)
+        {
             string content = tableContent.Replace("\r", "");
             string[] lines = content.Split('\n');
             if (lines.Length < 2)
             {
                 //Debug.LogError("The csv file is not csv table format.");
-                return;
+                return this;
             }
 
             string keyLine = lines[0];
@@ -102,6 +112,8 @@ namespace XLibrary
                 CSVObject dataObj = new CSVObject(major, tempAttributeDic, keys);
                 this[dataObj.ID] = dataObj;
             }
+
+            return this;
         }
 
         /// <summary>

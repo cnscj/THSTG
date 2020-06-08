@@ -113,16 +113,16 @@ namespace STGU3D
             });
             return callback;
         }
-        public string LoadConfigSync(string fileName)
-        {
-            string abPath = Path.Combine(AssetFileBook.GetAbAssetRoot(), string.Format("{0}.ab", fileName));
-            string assetName = Path.Combine(AssetFileBook.CONFIG_ROOT, string.Format("{0}.csv", fileName));
+        //public string LoadConfigSync(string fileName)
+        //{
+        //    string abPath = Path.Combine(AssetFileBook.GetAbAssetRoot(), string.Format("{0}.ab", fileName));
+        //    string assetName = Path.Combine(AssetFileBook.CONFIG_ROOT, string.Format("{0}.csv", fileName));
 
-            var ab = AssetBundle.LoadFromFile(abPath);
-            TextAsset textAsset = ab.LoadAsset<TextAsset>(assetName);
+        //    var ab = AssetBundle.LoadFromFile(abPath);
+        //    TextAsset textAsset = ab.LoadAsset<TextAsset>(assetName);
 
-            return textAsset.text;
-        }
+        //    return textAsset.text;
+        //}
 
     }
 }

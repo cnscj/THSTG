@@ -4,18 +4,22 @@ using UnityEngine;
 using IEnumerator = System.Collections.IEnumerator;
 namespace ASGame
 {
-    public abstract class BaseAsynchLoader : BaseLoader
+    public abstract class BaseModeLoader : BaseLoader
     {
         protected class Nextframe
         {
-            public bool isExecute;
+            public bool isExecuted;
             public Action action;
         }
 
         protected enum LoadMode
         {
-            Coroutine,
-            Nextframe,
+            //同步
+            Immediately,    //TODO:立刻(可能无法设置回调,待讨论
+
+            //异步
+            Coroutine,      //协程
+            Nextframe,      //下一帧
         }
 
         protected class LoadNode
@@ -69,11 +73,15 @@ namespace ASGame
                 {
                     loadNode.coroutine = StartCoroutine(LoadAssetCoroutine(handler));
                 }
-                else if(loadMode == LoadMode.Nextframe)
+                else if (loadMode == LoadMode.Nextframe)
                 {
-                    loadNode.nextframe = StartNextframe(()=> { LoadAssetNextframe(handler); });
+                    loadNode.nextframe = StartNextframe(() => { LoadAssetNextframe(handler); });
                 }
-               
+                else if (loadMode == LoadMode.Immediately)
+                {
+                    OnLoadAssetSync(handler);
+                }
+
                 m_loadNodes[handler.id] = loadNode;
             }
         }
@@ -116,7 +124,7 @@ namespace ASGame
 
         private IEnumerator LoadAssetCoroutine(AssetLoadHandler handler)
         {
-            yield return OnLoadAsset(handler);
+            yield return OnLoadAssetAsync(handler);
         }
 
         private Nextframe StartNextframe(Action action)
@@ -134,7 +142,7 @@ namespace ASGame
 
         private void LoadAssetNextframe(AssetLoadHandler handler)
         {
-            OnLoadAsset(handler);
+            OnLoadAssetSync(handler);
         }
 
         protected override void OnUpdate()
@@ -150,14 +158,14 @@ namespace ASGame
             {
                 foreach (var nextframe in m_nextframeMap)
                 {
-                    if (nextframe.isExecute)
+                    if (!nextframe.isExecuted)
                     {
                         nextframe?.action();
-                        m_removeQueue.Enqueue(nextframe);
+                        nextframe.isExecuted = true;
                     }
                     else
                     {
-                        nextframe.isExecute = true;
+                        m_removeQueue.Enqueue(nextframe);
                     }
                 }
             }
@@ -178,7 +186,8 @@ namespace ASGame
         }
 
         protected abstract LoadMode OnLoadMode(AssetLoadHandler handler);
-        protected abstract IEnumerator OnLoadAsset(AssetLoadHandler handler);
+        protected abstract IEnumerator OnLoadAssetAsync(AssetLoadHandler handler);
+        protected abstract void OnLoadAssetSync(AssetLoadHandler handler);
     }
 }
 
