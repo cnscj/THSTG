@@ -31,11 +31,11 @@ namespace STGGame
         {
             if (shakerEnabled)
             {
-                if (CameraShaker.Instance)
+                if (CameraShake.Instance)
                 {
-                    CameraShaker.Instance.shakeArgs.x = shakeHeight;
-                    CameraShaker.Instance.shakeArgs.y = shakeForward;
-                    CameraShaker.Instance.shakeArgs.z = shakeRotation;
+                    CameraShake.Instance.shakeArgs.x = shakeHeight;
+                    CameraShake.Instance.shakeArgs.y = shakeForward;
+                    CameraShake.Instance.shakeArgs.z = shakeRotation;
                 }
 
             }

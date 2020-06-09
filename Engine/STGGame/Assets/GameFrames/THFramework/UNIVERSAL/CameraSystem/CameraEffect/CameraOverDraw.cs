@@ -3,7 +3,7 @@
 namespace THGame
 {
     [ExecuteInEditMode]
-    public class CameraOverDraw : MonoBehaviour
+    public class CameraOverDraw : BaseCameraEffecter
     {
         public static CameraOverDraw Instance { get; protected set; }
 

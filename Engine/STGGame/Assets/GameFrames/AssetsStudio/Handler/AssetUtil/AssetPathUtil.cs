@@ -22,6 +22,19 @@ namespace ASGame
             return "";
         }
 
+        public static int SpliteBundlePath(string srcPath, ref string assetBundelPath, ref string assetName)
+        {
+            string[] pathPairs = srcPath.Split('|');
+            assetBundelPath = pathPairs[0];
+            assetName = pathPairs[1];
+            return pathPairs.Length;
+        }
+
+        public static string CombineBundlePath(string assetBundelPath, string assetName)
+        {
+            return string.Format("{0}|{1}", assetBundelPath, assetName);
+        }
+
         public static string TrimInvalidCharacter(string str)
         {
             string newStr = str

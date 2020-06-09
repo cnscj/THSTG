@@ -4,7 +4,7 @@ using System.Collections;
 namespace THGame
 {
     [ExecuteInEditMode]
-    public class CameraBloom : MonoBehaviour
+    public class CameraBloom : BaseCameraEffecter
     {
         public static CameraBloom Instance { get; protected set; }
 

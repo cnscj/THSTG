@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ASEditor
+namespace THGame
 {
-    public class AssetPackDivideTool
+    public class BaseCameraEffecter : MonoBehaviour
     {
-
+        
     }
 }
+
