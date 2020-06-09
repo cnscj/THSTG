@@ -1,8 +1,2 @@
-# AssetStudio KIt 
-## Core介绍
-1. ResourceModule #资源工具
-2. ResourceProcesser #资源加工
-3. ResourceBuilder #资源打包
-4. ResourcenDownload #资源下载
-5. ResourcenUpdate #资源更新
-6. ResourcenLoader #资源加载
+加载流程:先从Cache中查找,找不到就从本地加载,本地没有找网络下载
+更新流程:本地对比MD5,更新分9级(包1必须进游戏前下载,其余可以边下边玩)
