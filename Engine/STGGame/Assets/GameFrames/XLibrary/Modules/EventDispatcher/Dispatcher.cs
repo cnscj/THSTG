@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using XLibrary.Package;
 
 namespace XLibGame
 {
@@ -6,9 +7,9 @@ namespace XLibGame
     /// <summary>
     /// 游戏事件分发器，用于监听、广播游戏事件。
     /// </summary>
-    public class Dispatcher
+    public class Dispatcher : Singleton<Dispatcher>
     {
-        
+
         private Dictionary<EventType, EventListener> m_listeners = new Dictionary<EventType, EventListener>();
 
         /// <summary>
@@ -19,7 +20,7 @@ namespace XLibGame
         {
             if (context == null) return;
             EventListener listener = null;
-            if (m_listeners.TryGetValue(context.type,out listener))
+            if (m_listeners.TryGetValue(context.type, out listener))
             {
                 listener.Call(context);
             }

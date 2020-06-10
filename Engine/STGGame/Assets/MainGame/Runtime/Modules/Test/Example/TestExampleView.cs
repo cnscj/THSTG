@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using THGame.UI;
 using UnityEngine;
 
 namespace STGRuntime.UI

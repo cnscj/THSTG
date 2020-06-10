@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using FairyGUI;
+using THGame.UI;
 using UnityEngine;
 
 namespace STGRuntime.UI

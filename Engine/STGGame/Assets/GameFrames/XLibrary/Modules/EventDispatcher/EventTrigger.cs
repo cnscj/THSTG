@@ -4,10 +4,6 @@ namespace XLibGame
 {
     public class EventTrigger : MonoBehaviour
     {
-        public static string defaultDispatcherName = "default";
-
-        [Header("派发器名称")]
-        public string dispatchr = defaultDispatcherName;
 
         [Header("事件类型")]
         public string evt;
@@ -15,7 +11,7 @@ namespace XLibGame
         [HideInInspector]
         private Dispatcher GetDispatcher()
         {
-            return DispatcherManager.GetInstance().GetOrNewDispatcher(dispatchr);
+            return Dispatcher.GetInstance();
         }
 
         public void DispatchEvent(int e)

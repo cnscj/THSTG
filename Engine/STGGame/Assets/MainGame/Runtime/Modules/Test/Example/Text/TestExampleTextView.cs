@@ -1,4 +1,5 @@
 ﻿using System;
+using THGame.UI;
 using UnityEngine;
 
 namespace STGRuntime.UI

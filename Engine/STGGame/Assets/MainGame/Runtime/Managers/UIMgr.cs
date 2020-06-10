@@ -2,6 +2,7 @@
 using System.IO;
 using ASGame;
 using STGU3D;
+using THGame;
 using AssetManager = STGU3D.AssetManager;
 namespace STGRuntime
 {
