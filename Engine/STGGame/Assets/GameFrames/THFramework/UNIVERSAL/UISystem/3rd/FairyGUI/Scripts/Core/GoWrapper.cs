@@ -13,6 +13,8 @@ namespace FairyGUI
         [Obsolete("No need to manually set this flag anymore, coz it will be handled automatically.")]
         public bool supportStencil;
 
+        public event Action<UpdateContext> onUpdate;
+
         protected GameObject _wrapTarget;
         protected List<RendererInfo> _renderers;
         protected Dictionary<Material, Material> _materialsBackup;
@@ -28,14 +30,6 @@ namespace FairyGUI
             public int sortingOrder;
         }
 
-        class HelperMB : MonoBehaviour
-        {
-            private void OnWillRenderObject()
-            {
-                Debug.Log("a");
-            }
-        }
-
         protected static List<Transform> helperTransformList = new List<Transform>();
 
         /// <summary>
@@ -49,7 +43,6 @@ namespace FairyGUI
             _materialsBackup = new Dictionary<Material, Material>();
 
             CreateGameObject("GoWrapper");
-            gameObject.AddComponent<HelperMB>();
         }
 
         /// <summary>
@@ -292,6 +285,9 @@ namespace FairyGUI
 
         override public void Update(UpdateContext context)
         {
+            if (onUpdate != null)
+                onUpdate(context);
+
             if (_shouldCloneMaterial)
                 CloneMaterials();
 

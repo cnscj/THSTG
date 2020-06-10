@@ -1,27 +1,19 @@
 ﻿using UnityEngine;
+using XLibrary.Package;
+using THGame.Tween;
 
-/*
+/* TODO:
  * 2d摄像机,始终对准主角
  * 存在动画效果
  * 
  */
 [RequireComponent(typeof(Camera))]
-public class CameraFollower2D : MonoBehaviour
+public class CameraFollower2D : MonoSingleton<CameraFollower2D>
 {
-    private static CameraFollower2D s_instance;
-    public static CameraFollower2D GetInstance()
-    {
-        return s_instance;
-    }
+    public Rect rangeArea = new Rect(10,10,10,10);      //跟随区域      --超过这个区域会进行跟随
+    public float reboundSpeed = 2;                      //回弹速度
 
-    public float distance = 0;          //人物到摄像机距离
-    public float maxLeftDistance = 0;   //
-    public float maxRightDistance = 0;  //
-    public float reboundSpeed = 0;      //回弹速度
-
-    public GameObject observed;         //被观察的对象
-
-
+    public GameObject observed;                         //被观察的对象
 
     public void SetTarget(GameObject target)
     {
@@ -33,22 +25,20 @@ public class CameraFollower2D : MonoBehaviour
         return observed;
     }
 
-
-    private void Awake()
-    {
-        s_instance = this;
-    }
-
     private void Update()
     {
         if (observed == null)
             return;
 
+        UpdatePosition();
+
     }
 
-    private void Tween2Target()
+    //如果目标离摄像机中心过远,将镜头拉回到人物身上
+    private void UpdatePosition()
     {
-        if (observed == null)
-            return;
+        //将人物固定会中心
+
+        //如果超出安全区,将人物拉回摄像机中心
     }
 }

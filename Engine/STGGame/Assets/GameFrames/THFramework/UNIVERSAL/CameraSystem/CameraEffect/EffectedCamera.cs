@@ -7,23 +7,45 @@ namespace THGame
 {
     public class EffectedCamera : MonoSingleton<EffectedCamera>
     {
-        [System.Serializable]
-        public class CameraGroup
+        protected class CameraMatrix
         {
-            public string key;
-            public Transform[] cameraTransform;
-            public Camera[] cameras;
+            public Vector3 localPosition;
+            public Vector3 localEulerAngles;
+
         }
-        public static readonly string DEFAULT_KEY = "default";
+        public Transform[] cameraTransform;
+        public Camera[] cameras;
 
-        public CameraGroup[] cameraGroups;
-        private Dictionary<string, CameraGroup> m_cameraGroups = new Dictionary<string, CameraGroup>();
+        private Dictionary<Transform, CameraMatrix> m_materixBackup;
 
-        void Awake()
+        //保存矩阵
+        public void SaveMatrixs()
         {
-            if (cameraGroups == null || cameraGroups.Length <= 0)
+            m_materixBackup = m_materixBackup ?? new Dictionary<Transform, CameraMatrix>();
+            foreach (var transform in cameraTransform)
             {
+                CameraMatrix matrix = new CameraMatrix();
+                matrix.localPosition = transform.localPosition;
+                matrix.localEulerAngles = transform.localEulerAngles;
 
+                m_materixBackup.Add(transform, matrix);
+            }
+        }
+
+        //还原矩阵
+        public void BackMatrixs()
+        {
+            if (m_materixBackup != null)
+            {
+                foreach(var transform in cameraTransform)
+                {
+                    if (m_materixBackup.TryGetValue(transform, out var matrix))
+                    {
+                        transform.localPosition = matrix.localPosition;
+                        transform.localEulerAngles = matrix.localEulerAngles;
+                    }
+                }
+                m_materixBackup.Clear();
             }
         }
 

@@ -422,11 +422,7 @@ namespace FairyGUI
                     InvalidateBatchingState();
                 }
 
-                if (!_textChanged)
-                {
-                    RequestText();
-                    graphics.SetMeshDirty();
-                }
+                _textChanged = true;
             }
 
             if (_textChanged)
