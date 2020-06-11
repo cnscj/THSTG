@@ -11,7 +11,7 @@ using UnityEngine.Networking;
 namespace ASGame
 {
     //加载依赖应该返回依赖信息,包括哪些依赖文件加载失败
-    public class BundleLoader : BaseCoroutineLoader
+    public class BundleLoader : BaseModeLoader
     {
         public static readonly float HANDLER_BUNDLE_LOCAL_STAY_TIME = 30;       //考虑到加载场景AB估计要好久
         public static readonly float HANDLER_BUNDLE_NETWORK_STAY_TIME = 60f;    //下载网络不好估计也好好久
@@ -275,7 +275,25 @@ namespace ASGame
             base.OnLoadFailed(handler);
         }
 
-        protected override IEnumerator OnLoadAsset(AssetLoadHandler handler)
+        protected override LoadMode OnLoadMode(AssetLoadHandler handler)
+        {
+            //如果缓冲池有,则下一帧回调,否则协程回调
+            string assetPath = handler.path;
+            if (handler.path.IndexOf("|") > 0)
+            {
+                string[] pathPairs = handler.path.Split('|');
+                assetPath = pathPairs[0];
+            }
+            if (GetBundleObject(assetPath) != null)
+            {
+                return LoadMode.Nextframe;
+            }
+            return LoadMode.Coroutine;
+
+        }
+
+        //异步的方法
+        protected override IEnumerator OnLoadAssetAsync(AssetLoadHandler handler)
         {
             //循环等待所有子加载器加载完在回调
             var children = handler.GetChildren();
@@ -289,7 +307,13 @@ namespace ASGame
                     }
                 }
             }
-            yield return LoadAssetPrimitive(handler);
+            yield return LoadAssetPrimitiveAsync(handler);
+        }
+
+        protected override void OnLoadAssetSync(AssetLoadHandler handler)
+        {
+            //TODO:同步加载需要先加载依赖循环等待所有子加载器加载完在回调
+            LoadAssetPrimitiveSync(handler);
         }
 
         //卸载
@@ -351,7 +375,7 @@ namespace ASGame
         }
 
         //加载元操作
-        private IEnumerator LoadAssetPrimitive(AssetLoadHandler handler)
+        private IEnumerator LoadAssetPrimitiveAsync(AssetLoadHandler handler)
         {
             if (string.IsNullOrEmpty(handler.path))
             {
@@ -427,6 +451,85 @@ namespace ASGame
 
                     asset = loadRequest.asset;
                     isDone = loadRequest.isDone;
+                }
+            }
+
+            var result = new AssetLoadResult(asset, isDone);
+            LoadAssetPrimitiveCallback(handler, result);
+        }
+
+        private void LoadAssetPrimitiveSync(AssetLoadHandler handler)
+        { 
+            //同步的方法
+            if (string.IsNullOrEmpty(handler.path))
+            {
+                LoadAssetPrimitiveCallback(handler, AssetLoadResult.EMPTY_RESULT);
+                return;
+            }
+
+            string assetPath = handler.path;
+            string assetName = null;
+            if (handler.path.IndexOf("|") > 0)
+            {
+                string[] pathPairs = handler.path.Split('|');
+                assetPath = pathPairs[0];
+                assetName = pathPairs[1];
+            }
+
+            Object asset = null;
+            bool isDone = false;
+
+            //是否已经在加载池中,如果是就直接返回,引用数加1
+            var bundleObject = GetBundleObject(assetPath);
+            if (bundleObject != null)
+            {
+                asset = bundleObject.assetBundle;
+                isDone = true;
+            }
+            else
+            {
+                if (assetPath.Contains("://"))
+                {
+                    handler.timeoutChecker.stayTime = HANDLER_BUNDLE_NETWORK_STAY_TIME;    //网络Handler超时时间
+                    var request = UnityWebRequestAssetBundle.GetAssetBundle(assetPath);
+                    request.timeout = (int)handler.timeoutChecker.stayTime;
+                    m_handlerWithRequestMap[handler.id] = new RequestObj()
+                    {
+                        id = handler.id,
+                        webRequest = request,
+                    };
+                    request.SendWebRequest();
+
+                    asset = DownloadHandlerAssetBundle.GetContent(request);
+                    isDone = request.isDone;
+                }
+                else
+                {
+                    handler.timeoutChecker.stayTime = HANDLER_BUNDLE_LOCAL_STAY_TIME;    //本地Handler超时时间
+                    var request = AssetBundle.LoadFromFileAsync(assetPath);
+                    m_handlerWithRequestMap[handler.id] = new RequestObj()
+                    {
+                        id = handler.id,
+                        abRequest = request,
+                    };
+
+                    asset = request.assetBundle;
+                    isDone = request.isDone;
+                }
+
+                //先把加载到的AssetBundle加入记录缓存,并且标记引用次数+1
+                //不记录Bundle为空的项
+                LoadAssetBundleCallback(handler, asset as AssetBundle);
+            }
+
+            ////////////////////////////////
+            var assetBundle = asset as AssetBundle;
+            if (assetBundle != null)
+            {
+                if (!string.IsNullOrEmpty(assetName))
+                {
+                    asset = assetBundle.LoadAsset(assetName);
+                    isDone = true;
                 }
             }
 

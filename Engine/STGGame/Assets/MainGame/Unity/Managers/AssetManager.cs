@@ -22,7 +22,7 @@ namespace STGU3D
             string assetPath = AssetFileBook.GetModelPath(uid);
             var callback = AssetLoadCallback<GameObject>.GetOrNew();
 
-            AssetLoaderManager.GetInstance().LoadAsset<GameObject>(assetPath, (obj) =>
+            AssetLoaderManager.GetInstance().LoadAssetAsync<GameObject>(assetPath, (obj) =>
             {
                 callback.onSuccess?.Invoke(obj);
             }, (reason) =>
@@ -36,7 +36,7 @@ namespace STGU3D
         {
             string assetPath = AssetFileBook.GetEffectPath(uid);
             var callback = AssetLoadCallback<GameObject>.GetOrNew();
-            AssetLoaderManager.GetInstance().LoadAsset<GameObject>(assetPath, (obj) =>
+            AssetLoaderManager.GetInstance().LoadAssetAsync<GameObject>(assetPath, (obj) =>
             {
                 callback.onSuccess?.Invoke(obj);
             }, (reason) =>
@@ -51,7 +51,7 @@ namespace STGU3D
         {
             string assetPath = AssetFileBook.GetSpritePath(uid);
             var callback = AssetLoadCallback<GameObject>.GetOrNew();
-            AssetLoaderManager.GetInstance().LoadAsset<GameObject>(assetPath, (obj) =>
+            AssetLoaderManager.GetInstance().LoadAssetAsync<GameObject>(assetPath, (obj) =>
              {
                  callback.onSuccess?.Invoke(obj);
              }, (reason) =>
@@ -66,9 +66,9 @@ namespace STGU3D
             string bytesAbPath = AssetFileBook.GetUIPath(string.Format("{0}_fgui", module));
             string textureAbPath = AssetFileBook.GetUIPath(string.Format("{0}_altas", module));
             var callback = AssetLoadCallback<AssetBundle[]>.GetOrNew();
-            AssetLoaderManager.GetInstance().LoadAsset<AssetBundle>(bytesAbPath, (bytesAb) =>
+            AssetLoaderManager.GetInstance().LoadAssetSync<AssetBundle>(bytesAbPath, (bytesAb) =>
             {
-                AssetLoaderManager.GetInstance().LoadAsset<AssetBundle>(textureAbPath, (altasAb) =>
+                AssetLoaderManager.GetInstance().LoadAssetSync<AssetBundle>(textureAbPath, (altasAb) =>
                 {
                     callback?.onSuccess?.Invoke(new AssetBundle[] { bytesAb, altasAb });
                 }, (altasBytes) =>
@@ -105,7 +105,7 @@ namespace STGU3D
         {
             string assetPath = AssetFileBook.GetConfigPath(fileName);
             var callback = AssetLoadCallback<string>.GetOrNew();
-            AssetLoaderManager.GetInstance().LoadAsset<TextAsset>(assetPath, (textAsset)=>
+            AssetLoaderManager.GetInstance().LoadAssetSync<TextAsset>(assetPath, (textAsset)=>
             {
                 callback.onSuccess?.Invoke(textAsset.text);
             },(reason) => {

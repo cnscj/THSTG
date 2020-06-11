@@ -24,9 +24,10 @@ namespace ASGame
             get { return m_loadingMap != null ? m_loadingMap.Count : 0; }
         }
 
-        public virtual AssetLoadHandler StartLoad(string path)
+        public virtual AssetLoadHandler StartLoad(string path, AssetLoadCompleted callback = null)
         {
             var handler = GetOrCreateHandler(path);
+            handler.OnCompleted(callback);
 
             //等待队列里如果有依赖加载器,会引起主加载器没法完成,造成无限等待,所以依赖加载不能走这里
             if (maxLoadingCount > 0 && LoadingCount >= maxLoadingCount)

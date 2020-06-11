@@ -15,7 +15,7 @@ namespace ASGame
         protected enum LoadMode
         {
             //同步
-            Immediately,    //TODO:立刻(可能无法设置回调,待讨论
+            Immediately,    //立刻(可能无法设置回调,待讨论
 
             //异步
             Coroutine,      //协程
@@ -67,7 +67,7 @@ namespace ASGame
             {
                 handler.loader = this;
                 var loadNode = GetOrCreateLoadNode();
-                var loadMode = OnLoadMode(handler);
+                var loadMode = GetLoadMode(handler);
 
                 if (loadMode == LoadMode.Coroutine)
                 {
@@ -183,6 +183,15 @@ namespace ASGame
         private LoadNode GetOrCreateLoadNode()
         {
             return new LoadNode();
+        }
+
+        private LoadMode GetLoadMode(AssetLoadHandler handler)
+        {
+            if (handler.onCallback != null)
+            {
+                return LoadMode.Immediately;
+            }
+            return OnLoadMode(handler);
         }
 
         protected abstract LoadMode OnLoadMode(AssetLoadHandler handler);

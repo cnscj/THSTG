@@ -22,19 +22,36 @@ namespace ASGame
             GetOrCreateBundleLoader().LoadMainfest(manifest);
         }
 
-        public AssetLoadHandler LoadAssetHandler<T>(string path) where T : Object
+        public AssetLoadHandler LoadAssetHandler<T>(string path, AssetLoadCompleted callback = null) where T : Object
         {
             BaseLoader loader;
             string rightPath;
 
             SelectLoaderAndPath<T>(path, out loader, out rightPath);
 
-            var handler = loader.StartLoad(rightPath);
+            var handler = loader.StartLoad(rightPath, callback);
 
             return handler;
-        }       
+        }
 
-        public int LoadAsset<T>(string path, Action<T> onSuccess = null, Action<int> onFailed = null) where T : Object
+        public int LoadAssetSync<T>(string path, Action<T> onSuccess = null, Action<int> onFailed = null) where T : Object
+        {
+            AssetLoadHandler handler = LoadAssetHandler<T>(path, (AssetLoadResult result) =>
+            {
+                //if (handler.status == AssetLoadStatus.LOAD_FINISHED)
+                //{
+                    onSuccess?.Invoke(result.GetAsset<T>());
+                //}
+                //else
+                //{
+                //    onFailed?.Invoke(handler.status);
+                //}
+
+            });
+            return handler.id;
+        }
+
+        public int LoadAssetAsync<T>(string path, Action<T> onSuccess = null, Action<int> onFailed = null) where T : Object
         {
             var handler = LoadAssetHandler<T>(path);
 
@@ -107,7 +124,7 @@ namespace ASGame
             //如果是双路径
             if (path.IndexOf('|') >= 0)
             {
-#if UNITY_EDITOR    //编辑器下直接加载源路径
+#if !UNITY_EDITOR    //编辑器下直接加载源路径
                 loader = GetOrCreateEditorLoader();
                 string[] pathPairs = path.Split('|');
                 string assetName = pathPairs[1];

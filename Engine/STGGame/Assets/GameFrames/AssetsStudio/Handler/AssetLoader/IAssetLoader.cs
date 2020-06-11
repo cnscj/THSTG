@@ -3,11 +3,11 @@
     public interface IAssetLoader 
     {
         /// <summary>
-        /// 开始资源加载
+        /// 开始资源加载,如果Callback有值,则为同步加载
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        AssetLoadHandler StartLoad(string path);
+        AssetLoadHandler StartLoad(string path, AssetLoadCompleted callback = null);
 
 
         /// <summary>
