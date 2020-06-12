@@ -7,21 +7,19 @@ namespace THGame
     {
         protected class CameraTrans
         {
-            public Vector3 localPosition;
-            public Vector3 localEulerAngles;
+            public Vector3 localPosition = Vector3.zero;
+            public Vector3 localEulerAngles = Vector3.zero;
 
         }
         private Vector3 m_shakeArgs = Vector3.right;
         private int m_shakeCount = 10;
         private float m_shakeDuration = 0.2f;
-        public float stayTime = 5f;
+        private float m_stayTime = 5f;
 
         private float m_lastShakeTime;
         private float m_startTick;
-        private CameraTrans m_trans;
-
-        private Vector3 m_tempLocalPosition = Vector3.zero;
-        private Vector3 m_tempLocalEulerAngles = Vector3.zero;
+        private CameraTrans m_baseTrans = new CameraTrans();
+        private CameraTrans m_tempTrans = new CameraTrans();
 
         public void Shake(CameraShaker shaker)
         {
@@ -54,7 +52,7 @@ namespace THGame
                 return;
 
             if (m_shakeDuration >= m_lastShakeTime)
-                Predo();
+                PredoShake();
 
             ApplyShake();
 
@@ -66,29 +64,36 @@ namespace THGame
                 RevertShake();
         }
 
-        void Predo()
+        void PredoShake()
         {
             RestoreVector();        //还原到起始位置
             SaveVector();           //保存起始位置信息
+
+
+
         }
 
         //TODO:插值计算
         void ApplyShake()
         {
+            //在基础值上变化
+            m_tempTrans.localPosition = m_baseTrans.localPosition;
+            m_tempTrans.localEulerAngles = m_baseTrans.localEulerAngles;
+
             //这几个值不变
-            m_tempLocalPosition.y = transform.localPosition.y;
-            m_tempLocalEulerAngles.x = transform.localEulerAngles.x;
-            m_tempLocalEulerAngles.y = transform.localEulerAngles.y;
+            m_tempTrans.localPosition.y = transform.localPosition.y;
+            m_tempTrans.localEulerAngles.x = transform.localEulerAngles.x;
+            m_tempTrans.localEulerAngles.y = transform.localEulerAngles.y;
 
             //上下震动插值
-            m_tempLocalPosition.x = 3;
+            m_tempTrans.localPosition.x = 3;
             //远近震动插值
-            m_tempLocalPosition.y = 3;
+            m_tempTrans.localPosition.y = 3;
             //摇头震动插值
-            m_tempLocalEulerAngles.x = 3;
+            m_tempTrans.localEulerAngles.x = 3;
 
-            transform.localPosition = m_tempLocalPosition;
-            transform.localEulerAngles = m_tempLocalEulerAngles;
+            transform.localPosition = m_tempTrans.localPosition;
+            transform.localEulerAngles = m_tempTrans.localEulerAngles;
 
             UpdateTick();
         }
@@ -100,9 +105,8 @@ namespace THGame
 
         void SaveVector()
         {
-            m_trans = m_trans ?? new CameraTrans();
-            m_trans.localPosition = transform.localPosition;
-            m_trans.localEulerAngles = transform.localEulerAngles;
+            m_baseTrans.localPosition = transform.localPosition;
+            m_baseTrans.localEulerAngles = transform.localEulerAngles;
         }
 
         void UpdateTick()
@@ -123,9 +127,9 @@ namespace THGame
 
         bool CheckSleep()
         {
-            if (stayTime >= 0f)
+            if (m_stayTime >= 0f)
             {
-                if (m_startTick + stayTime <= Time.realtimeSinceStartup)
+                if (m_startTick + m_stayTime <= Time.realtimeSinceStartup)
                 {
                     return true;
                 }
@@ -135,11 +139,8 @@ namespace THGame
 
         void RestoreVector()
         {
-            if (m_trans != null)
-            {
-                transform.localPosition = m_trans.localPosition;
-                transform.localEulerAngles = m_trans.localEulerAngles;
-            }
+            transform.localPosition = m_baseTrans.localPosition;
+            transform.localEulerAngles = m_baseTrans.localEulerAngles;
         }
     }
 }

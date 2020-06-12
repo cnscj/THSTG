@@ -38,14 +38,14 @@ namespace ASGame
         {
             AssetLoadHandler handler = LoadAssetHandler<T>(path, (AssetLoadResult result) =>
             {
-                //if (handler.status == AssetLoadStatus.LOAD_FINISHED)
-                //{
+                if (result.isDone)
+                {
                     onSuccess?.Invoke(result.GetAsset<T>());
-                //}
-                //else
-                //{
-                //    onFailed?.Invoke(handler.status);
-                //}
+                }
+                else
+                {
+                    onFailed?.Invoke(-1);
+                }
 
             });
             return handler.id;
@@ -124,7 +124,7 @@ namespace ASGame
             //如果是双路径
             if (path.IndexOf('|') >= 0)
             {
-#if !UNITY_EDITOR    //编辑器下直接加载源路径
+#if UNITY_EDITOR    //编辑器下直接加载源路径
                 loader = GetOrCreateEditorLoader();
                 string[] pathPairs = path.Split('|');
                 string assetName = pathPairs[1];

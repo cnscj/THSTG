@@ -185,11 +185,37 @@ namespace ASGame
             return new LoadNode();
         }
 
+        //FIXME:性能不好
         private LoadMode GetLoadMode(AssetLoadHandler handler)
         {
-            if (handler.onCallback != null)
+            //如果是依赖的加载,则模式保持与父一致
+            var parents = handler.GetParents();
+            if (parents == null || parents.Length <= 0)
             {
-                return LoadMode.Immediately;
+                if (handler.onCallback != null)
+                {
+                    return LoadMode.Immediately;
+                }
+            }
+            else
+            {
+                AssetLoadHandler topHandler = parents[0];
+                while(true)
+                {
+                    var prevParents = topHandler.GetParents();
+
+                    if (prevParents == null || prevParents.Length <= 0)
+                        break;
+
+                    topHandler = prevParents[0];
+                }
+
+                var loadMode = GetLoadMode(topHandler);
+                if (loadMode == LoadMode.Nextframe)
+                    return LoadMode.Immediately;
+
+                return loadMode;
+
             }
             return OnLoadMode(handler);
         }

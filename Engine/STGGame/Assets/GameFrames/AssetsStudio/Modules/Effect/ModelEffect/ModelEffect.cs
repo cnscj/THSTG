@@ -10,6 +10,7 @@ namespace ASGame
         包括公共的(即所有节点都相同
         私有的(节点不一定同
      * */
+    //TODO:模型特效如果在UI上显示,需要设置层级
     public class ModelEffect : MonoBehaviour
     {
         public static readonly string MODFX_NAME = "fx_";

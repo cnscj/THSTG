@@ -5,7 +5,6 @@ namespace ASGame
     {
         public static readonly AssetLoadResult EMPTY_RESULT = new AssetLoadResult(null,false);
 
-        public int status;
         public readonly Object asset;
         public readonly bool isDone;
 
