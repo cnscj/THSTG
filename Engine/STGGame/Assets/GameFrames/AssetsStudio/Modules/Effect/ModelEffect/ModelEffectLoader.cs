@@ -66,6 +66,18 @@ namespace ASGame
             }
         }
 
+        //TODO:将特效节点打包回ModelEffect
+        public ModelEffect Package()
+        {
+            return null;
+        }
+
+        //解包
+        public bool Unpackage(ModelEffect modfx)
+        {
+            return false;
+        }
+
         public void Show(bool val)
         {
             if (m_effectNodes != null && m_effectNodes.Count > 0)
