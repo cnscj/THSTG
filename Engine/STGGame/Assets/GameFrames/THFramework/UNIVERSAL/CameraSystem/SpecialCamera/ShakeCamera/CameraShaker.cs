@@ -5,11 +5,10 @@ namespace THGame
     public class CameraShaker : MonoBehaviour
     {
         // K帧属性
-        [Header("强度(上下、远近、摇头")] public Vector3 shakeArgs = Vector3.right;
+        [Header("强度(上下,远近,摇头")] public Vector3 shakeArgs = Vector3.right;
         [Header("震动次数")] public int shakeCount = 10;
         [Header("持续时间")] public float shakeDuration = 0.2f;
 
-        private float m_lastTick;
         private void Update()
         {
             if (Mathf.Approximately(shakeDuration, 0f))

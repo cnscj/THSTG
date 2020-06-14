@@ -29,9 +29,9 @@ namespace THGame
             Shake(shaker.shakeArgs, shaker.shakeDuration, shaker.shakeCount);
         }
 
-        public void Shake(Vector3 vector3, float duration, int count = 10)
+        public void Shake(Vector3 args, float duration, int count = 10)
         {
-            m_shakeArgs = vector3;
+            m_shakeArgs = args;
             m_shakeDuration = duration;
             m_shakeCount = count;
 
@@ -86,11 +86,11 @@ namespace THGame
             m_tempTrans.localEulerAngles.y = transform.localEulerAngles.y;
 
             //上下震动插值
-            m_tempTrans.localPosition.x = 3;
+            m_tempTrans.localPosition.x += 3;
             //远近震动插值
-            m_tempTrans.localPosition.y = 3;
+            m_tempTrans.localPosition.y += 0;
             //摇头震动插值
-            m_tempTrans.localEulerAngles.x = 3;
+            m_tempTrans.localEulerAngles.x += 0;
 
             transform.localPosition = m_tempTrans.localPosition;
             transform.localEulerAngles = m_tempTrans.localEulerAngles;

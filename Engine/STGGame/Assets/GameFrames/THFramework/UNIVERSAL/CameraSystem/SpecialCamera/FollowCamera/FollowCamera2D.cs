@@ -10,8 +10,8 @@ using THGame.Tween;
 public class FollowCamera2D : MonoSingleton<FollowCamera2D>
 {
     //public new Camera camera;
-    public Rect mapBound = new Rect(100, 100, 100, 100);    //摄像机可移动区域
-    public Rect rangeArea = new Rect(10,10,10,10);          //跟随区域
+    public Vector2 cameraSize = new Vector2(17, 8);      //摄像机区域尺寸
+    public Vector2 forceSize = new Vector2(5,2.7f);          //聚焦区域尺寸
     public float reboundSpeed = 3f;                         //回弹速度
 
     public GameObject observed;                             //被观察的对象
@@ -32,7 +32,6 @@ public class FollowCamera2D : MonoSingleton<FollowCamera2D>
             return;
 
         UpdatePosition();
-        UpdateDebug();
     }
 
     //采用 双向正前聚焦 模式
@@ -70,15 +69,27 @@ public class FollowCamera2D : MonoSingleton<FollowCamera2D>
 
     }
 
-    private void UpdateDebug()
-    {
-        DrawCameraRect();
-    }
-
+#if UNITY_EDITOR
     //画出摄像机范围
-    private void DrawCameraRect()
+    private void OnDrawGizmos()
     {
         //摄像机范围
-
+        DrawSize(transform.position, cameraSize, Color.red);
+        DrawSize(transform.position, forceSize, Color.yellow);
     }
+
+    private void DrawSize(Vector3 center,Vector3 size, Color color)
+    {
+        Vector3 leftTop = new Vector3(center.x - size.x / 2, center.y + size.y / 2);
+        Vector3 rightTop = new Vector3(center.x + size.x / 2, center.y + size.y / 2);
+        Vector3 leftBottom = new Vector3(center.x - size.x / 2, center.y - size.y / 2);
+        Vector3 rightBottom = new Vector3(center.x + size.x / 2, center.y - size.y / 2);
+
+        Gizmos.color = color;
+        Gizmos.DrawLine(leftTop, rightTop); // UpperLeft -> UpperRighty
+        Gizmos.DrawLine(rightTop, rightBottom); // UpperRight -> LowerRight
+        Gizmos.DrawLine(rightBottom, leftBottom); // LowerRight -> LowerLeft
+        Gizmos.DrawLine(leftBottom, leftTop); // LowerLeft -> UpperLeft
+    }
+#endif
 }
