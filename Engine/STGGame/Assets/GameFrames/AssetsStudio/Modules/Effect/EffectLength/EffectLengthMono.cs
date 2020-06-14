@@ -6,7 +6,7 @@ namespace ASGame
 {
     public class EffectLengthMono : MonoBehaviour
     {
-        public float length = -2; //-2未知,-1无限,0~Max长度
+        [Header("时长(-1循环)")]public float length = -2; //-2未知,-1无限,0~Max长度
         public Action onCompleted;
         private WaitForSeconds m_waitForSeconds;
 

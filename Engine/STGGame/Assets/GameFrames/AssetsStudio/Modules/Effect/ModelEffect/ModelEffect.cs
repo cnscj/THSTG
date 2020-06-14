@@ -10,7 +10,7 @@ namespace ASGame
         包括公共的(即所有节点都相同
         私有的(节点不一定同
      * */
-    //TODO:模型特效如果在UI上显示,需要设置层级
+    //模型特效如果在UI上显示,需要设置层级
     public class ModelEffect : MonoBehaviour
     {
         public static readonly string MODFX_NAME = "fx_";
@@ -88,7 +88,7 @@ namespace ASGame
             return GetTarget() != null;
         }
 
-        public void Attach(GameObject targetObj)
+        public void Attach(GameObject targetObj, bool isUseFullPath = true, bool isSetLayer = false)
         {
             if (targetObj == this)
                 return;
@@ -96,7 +96,7 @@ namespace ASGame
             if (m_targetObj != null)
                 Deattach();
 
-            if (nodeInfos != null && nodeInfos.Count > 0)
+            if (nodeInfos != null)
             {
                 foreach(var nodeInfo in nodeInfos)
                 {
@@ -104,6 +104,8 @@ namespace ASGame
                     if (nodeEffect != null)
                     {
                         string nodeParentPath = Path.GetDirectoryName(nodeInfo.nodePath);
+                        nodeParentPath = isUseFullPath ? nodeParentPath : Path.GetFileName(nodeParentPath);
+
                         Transform targetParentTrans = targetObj.transform.Find(nodeParentPath);
                         if (targetParentTrans != null)
                         {
@@ -112,6 +114,11 @@ namespace ASGame
                             nodeEffect.SetActive(true);
 
                             m_trgetEffects.Add(nodeEffect);
+
+                            if (isSetLayer)
+                            {
+                                XGameObjectTools.SetLayer(nodeEffect, gameObject);
+                            }
                         }
                         else
                         {
@@ -129,7 +136,7 @@ namespace ASGame
             if (m_targetObj == null)
                 return;
 
-            if (m_trgetEffects != null && m_trgetEffects.Count > 0)
+            if (m_trgetEffects != null)
             {
                 foreach (var nodeEffect in m_trgetEffects)
                 {

@@ -11,13 +11,15 @@ namespace ASGame
     {
         private List<GameObject> m_effectNodes;
         private bool m_isSetuped;
-        public void Setup(GameObject modfxGo)
+        private ModelEffect m_curModelEffect;
+
+        public void Setup(GameObject modfxGo, bool isUseFullPath, bool isSetLayer)
         {
             if (modfxGo == null)
                 return;
 
             var modfx = modfxGo.GetComponent<ModelEffect>();
-            Setup(modfx);
+            Setup(modfx, isUseFullPath, isSetLayer);
         }
 
         public bool HadSetuped()
@@ -25,34 +27,43 @@ namespace ASGame
             return m_isSetuped;
         }
 
-        public void Setup(ModelEffect modfx)
+        public bool Setup(ModelEffect modfx ,bool isUseFullPath = true, bool isSetLayer = false)
         {
             if (modfx == null)
-                return;
+                return false;
 
-            if (modfx.nodeInfos != null && modfx.nodeInfos.Count > 0)
+            if (modfx.nodeInfos == null)
+                return false;
+
+            Unsetup();
+            foreach (var nodeInfo in modfx.nodeInfos)
             {
-                Unsetup();
-                foreach (var nodeInfo in modfx.nodeInfos)
-                {
-                    string nodeParentPath = Path.GetDirectoryName(nodeInfo.nodePath);
-                    Transform targetParentTrans = gameObject.transform.Find(nodeParentPath);
-                    if (targetParentTrans != null)
-                    {
-                        var nodeEffect = Object.Instantiate(nodeInfo.nodeEffect, targetParentTrans, false);
-                        nodeEffect.name = nodeEffect.name.Replace("(Clone)", "");
+                string nodeParentPath = Path.GetDirectoryName(nodeInfo.nodePath);
+                nodeParentPath = isUseFullPath ? nodeParentPath : Path.GetFileName(nodeParentPath);
 
-                        m_effectNodes = m_effectNodes ?? new List<GameObject>();
-                        m_effectNodes.Add(nodeEffect);
+                Transform targetParentTrans = gameObject.transform.Find(nodeParentPath);
+                if (targetParentTrans != null)
+                {
+                    var nodeEffect = Object.Instantiate(nodeInfo.nodeEffect, targetParentTrans, false);
+                    nodeEffect.name = nodeEffect.name.Replace("(Clone)", "");
+
+                    m_effectNodes = m_effectNodes ?? new List<GameObject>();
+                    m_effectNodes.Add(nodeEffect);
+
+                    if (isSetLayer)
+                    {
+                        XGameObjectTools.SetLayer(nodeEffect, gameObject);
                     }
                 }
-                m_isSetuped = true;
             }
+            m_isSetuped = true;
+            return true;
+
         }
 
         public void Unsetup()
         {
-            if (m_effectNodes != null && m_effectNodes.Count > 0)
+            if (m_effectNodes != null)
             {
                 foreach (var nodeEffect in m_effectNodes)
                 {
@@ -64,18 +75,108 @@ namespace ASGame
                 m_effectNodes.Clear();
                 m_isSetuped = false;
             }
+
+            if (m_curModelEffect != null)
+            {
+                Object.Destroy(m_curModelEffect.gameObject);
+                m_curModelEffect = null;
+            }
         }
 
-        //TODO:将特效节点打包回ModelEffect
+        //将特效节点打包回ModelEffect
         public ModelEffect Package()
         {
-            return null;
+            ModelEffect modelEffect = null;
+            if (m_curModelEffect == null)//这种方式,长度,级别基本都丢失了
+            {
+                if (m_effectNodes == null)
+                    return null;
+
+                string modfxName = string.Format("{0}_modfx", gameObject.name);
+                GameObject fxInstance = new GameObject(modfxName);
+
+                modelEffect = fxInstance.AddComponent<ModelEffect>();
+                modelEffect.nodeInfos = new List<ModelEffect.NodeInfo>();
+
+                foreach (var effectGo in m_effectNodes)
+                {
+                    if (effectGo != null)
+                    {
+                        var metadate = new ModelEffect.NodeInfo();
+
+                        var nodePath = XGameObjectTools.GetPathByGameObject(effectGo, gameObject);
+                        metadate.nodePath = nodePath;
+                        metadate.nodeEffect = effectGo;
+
+                        modelEffect.nodeInfos.Add(metadate);
+
+                        effectGo.transform.SetParent(fxInstance.transform, false);
+                    }
+                }
+
+                m_effectNodes.Clear();
+            }
+            else
+            {
+                modelEffect = m_curModelEffect;
+                if (modelEffect.nodeInfos != null)
+                {
+                    foreach (var nodePair in modelEffect.nodeInfos)
+                    {
+                        var nodeEffect = nodePair.nodeEffect;
+                        if (nodeEffect != null)
+                        {
+                            nodeEffect.transform.SetParent(modelEffect.gameObject.transform, false);
+                        }
+                    }
+                }
+                m_curModelEffect = null;
+            }
+
+            return modelEffect;
         }
 
         //解包
-        public bool Unpackage(ModelEffect modfx)
+        public bool Unpackage(ModelEffect modelEffect, bool isUseFullPath = true, bool isSetLayer = false)
         {
-            return false;
+            if (modelEffect == null)
+                return false;
+
+            Unsetup();
+            foreach (var nodeInfo in modelEffect.nodeInfos)
+            {
+                var newEffectGO = nodeInfo.nodeEffect;
+                if (newEffectGO != null)
+                {
+                    string nodeParentPath = Path.GetDirectoryName(nodeInfo.nodePath);
+                    nodeParentPath = isUseFullPath ? nodeParentPath : Path.GetFileName(nodeParentPath);
+
+                    var parentNode = gameObject.transform.Find(nodeParentPath);
+                    if (parentNode != null)
+                    {
+                        newEffectGO.transform.SetParent(parentNode.transform, false);
+                        newEffectGO.name = newEffectGO.name.Replace("(Clone)", "");
+                        newEffectGO.SetActive(true);
+
+                        m_effectNodes = m_effectNodes ?? new List<GameObject>();
+                        m_effectNodes.Add(newEffectGO);
+
+                        if (isSetLayer)
+                        {
+                            XGameObjectTools.SetLayer(newEffectGO, gameObject);
+                        }
+                    }
+                    else
+                    {
+                        newEffectGO.SetActive(false);
+                    }
+                }
+            }
+
+            modelEffect.transform.SetParent(transform.parent, false);
+            m_curModelEffect = modelEffect;
+
+            return true;
         }
 
         public void Show(bool val)
@@ -97,6 +198,7 @@ namespace ASGame
         {
             Unsetup();
         }
+
     }
 
 }

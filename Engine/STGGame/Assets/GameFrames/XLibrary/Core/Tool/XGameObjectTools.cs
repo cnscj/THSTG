@@ -234,6 +234,38 @@ namespace XLibrary
             });
         }
 
+        /// <summary>
+        /// 设置层级
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="layer"></param>
+        public static void SetLayer(GameObject gameObject, int layer)
+        {
+            if (gameObject == null)
+                return;
+
+            Transform[] transforms = gameObject.GetComponentsInChildren<Transform>(true);
+            if (transforms != null && transforms.Length > 0)
+            {
+                foreach (var transform in transforms)
+                {
+                    transform.gameObject.layer = layer;
+                }
+            }
+        }
+
+        public static void SetLayer(GameObject gameObject, GameObject parentGameObject = null)
+        {
+            if (gameObject == null)
+                return;
+            parentGameObject = parentGameObject ?? gameObject.transform.parent?.gameObject;
+
+            if (parentGameObject == null)
+                return;
+
+            SetLayer(gameObject, parentGameObject.layer);
+        }
+       
     }
 
 }

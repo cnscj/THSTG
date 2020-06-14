@@ -30,15 +30,21 @@ namespace ASGame
                 var smr = gameObject.GetComponent<SkinnedMeshRenderer>();
                 if (smr != null)
                 {
-                    Material[] materials = smr.materials;
-
+                    Material[] materials = smr.sharedMaterials;
                     if (materials != null)
                     {
-                        foreach (var material in materials)
+                        MaterialPropertyBlock materialPropertyBlock = new MaterialPropertyBlock();
+                        for (int i = 0 ; i < materials.Length; i++)
                         {
-                            material.SetTexture("_MainTex", newTexInfo.mainTex);
-                            if (newTexInfo.flowTex) material.SetTexture("_FlowTex", newTexInfo.flowTex);
+                            materialPropertyBlock.Clear();
+                            smr.GetPropertyBlock(materialPropertyBlock, i);
+
+                            materialPropertyBlock.SetTexture("_MainTex", newTexInfo.mainTex);
+                            if (newTexInfo.flowTex) materialPropertyBlock.SetTexture("_FlowTex", newTexInfo.flowTex);
+
+                            smr.SetPropertyBlock(materialPropertyBlock, i);
                         }
+                        
                         m_curTexInfo = newTexInfo;
                         return oldTexInfo.name;
                     }
@@ -61,14 +67,18 @@ namespace ASGame
             var smr = gameObject.GetComponent<SkinnedMeshRenderer>();
             if (smr != null)
             {
-                Material[] materials = smr.materials;
+                Material[] materials = smr.sharedMaterials;
 
                 if (materials != null)
                 {
-                    foreach (var material in materials)
+                    MaterialPropertyBlock materialPropertyBlock = new MaterialPropertyBlock();
+                    for (int i = 0; i < materials.Length; i++)
                     {
-                        defaultTexInfo.mainTex = material.GetTexture("_MainTex");
-                        defaultTexInfo.flowTex = material.GetTexture("_FlowTex");
+                        materialPropertyBlock.Clear();
+                        smr.GetPropertyBlock(materialPropertyBlock, i);
+
+                        defaultTexInfo.mainTex = materialPropertyBlock.GetTexture("_MainTex");
+                        defaultTexInfo.flowTex = materialPropertyBlock.GetTexture("_FlowTex");
                         break;
                     }
                 }

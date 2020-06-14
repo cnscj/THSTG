@@ -9,15 +9,19 @@ namespace THGame
         [Header("震动次数")] public int shakeCount = 10;
         [Header("持续时间")] public float shakeDuration = 0.2f;
 
-        //private void Update()
-        //{
-        //    if (shakeDuration <= 0)
-        //        return;
+        private float m_lastTick;
+        private void Update()
+        {
+            if (Mathf.Approximately(shakeDuration, 0f))
+                return;
 
-        //    ShakeableCamera.GetInstance().Shake(this);
+            ShakeableCamera.GetInstance().Shake(this);
 
-        //    shakeDuration -= Time.fixedDeltaTime;
-        //    shakeDuration = Mathf.Max(0f, shakeDuration);
-        //}
+            if (shakeDuration > 0)
+            {
+                shakeDuration -= Time.deltaTime;
+                if (shakeDuration <= 0) shakeDuration = 0f;
+            }
+        }
     }
 }
