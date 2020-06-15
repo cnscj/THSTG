@@ -19,6 +19,50 @@ namespace ASGame
         private TexInfo m_curTexInfo;
         private Dictionary<string, TexInfo> m_texInfoMap;
 
+        public bool Contains(string key)
+        {
+            if (m_texInfoMap == null)
+                return false;
+
+            return m_texInfoMap.ContainsKey(key);
+        }
+
+        public bool Add(TexInfo info, bool isReplace = false)
+        {
+            if (info == null)
+                return false;
+
+            if (string.IsNullOrEmpty(info.name))
+                return false;
+
+            var texMaps = GetOrCreateMaps();
+            if (texMaps.ContainsKey(info.name))
+            {
+                if (isReplace)
+                {
+                    texMaps[info.name] = info;
+                    return true;
+                }
+                return false;
+            }
+
+            texMaps.Add(info.name, info);
+
+            return true;
+        }
+
+        public TexInfo GetTexInfo(string name)
+        {
+            if (m_texInfoMap != null)
+            {
+                if (m_texInfoMap.ContainsKey(name))
+                {
+                    return m_texInfoMap[name];
+                }
+            }
+            return null;
+        }
+
         public string Change(string name)
         {
             var texMaps = GetOrCreateMaps();

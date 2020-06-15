@@ -5,16 +5,16 @@ using THGame.Tween;
 /* TODO:
  * 2d摄像机,始终对准主角
  * 存在动画效果
- * 
+ * 能够向各个方向观察一段距离
  */
 public class FollowCamera2D : MonoSingleton<FollowCamera2D>
 {
     //public new Camera camera;
-    public Vector2 cameraSize = new Vector2(17, 8);      //摄像机区域尺寸
-    public Vector2 forceSize = new Vector2(5,2.7f);          //聚焦区域尺寸
-    public float reboundSpeed = 3f;                         //回弹速度
+    public Vector2 cameraSize = new Vector2(17, 8);             //摄像机区域尺寸
+    public Vector2 forceSize = new Vector2(5,2.7f);             //聚焦区域尺寸
+    public float reboundSpeed = 3f;                             //回弹速度
 
-    public GameObject observed;                             //被观察的对象
+    public GameObject observed;                                 //被观察的对象
 
     public void SetTarget(GameObject target)
     {
@@ -40,7 +40,7 @@ public class FollowCamera2D : MonoSingleton<FollowCamera2D>
 
     private void UpdatePosition()
     {
-        //将人物固定回中心
+        //将人物固定到聚焦区域,并缓慢拉回中心
         var destPoint = observed.transform.position;
         var srcPoint = transform.position;
         var shiftVec = destPoint - srcPoint;
@@ -55,6 +55,7 @@ public class FollowCamera2D : MonoSingleton<FollowCamera2D>
         //边界判断
 
 
+
         if (moveStepLen > shiftLen)
         {
             destPoint.z = transform.position.z;
@@ -64,7 +65,6 @@ public class FollowCamera2D : MonoSingleton<FollowCamera2D>
         {
             moveStepVec.z = 0;
             transform.position += moveStepVec;
-
         }
 
     }
@@ -74,22 +74,49 @@ public class FollowCamera2D : MonoSingleton<FollowCamera2D>
     private void OnDrawGizmos()
     {
         //摄像机范围
-        DrawSize(transform.position, cameraSize, Color.red);
-        DrawSize(transform.position, forceSize, Color.yellow);
+        DrawCameraSize(transform.position, cameraSize, Color.red);
+        DrawForceSize(transform.position, forceSize, Color.yellow);
     }
 
-    private void DrawSize(Vector3 center,Vector3 size, Color color)
+    private void DrawCameraSize(Vector3 center,Vector3 size, Color color)
     {
         Vector3 leftTop = new Vector3(center.x - size.x / 2, center.y + size.y / 2);
         Vector3 rightTop = new Vector3(center.x + size.x / 2, center.y + size.y / 2);
         Vector3 leftBottom = new Vector3(center.x - size.x / 2, center.y - size.y / 2);
         Vector3 rightBottom = new Vector3(center.x + size.x / 2, center.y - size.y / 2);
+        DrawPoints(new Vector3[] { leftTop, rightTop, rightBottom,leftBottom}, color, true);
+    }
+
+    private void DrawForceSize(Vector3 center, Vector3 size, Color color)
+    {
+        Vector3 leftTop = new Vector3(center.x - size.x / 2, center.y + size.y / 2);
+        Vector3 leftTopRight = new Vector3(center.x - size.x / 3, center.y + size.y / 2);
+        Vector3 leftBottom = new Vector3(center.x - size.x / 2, center.y - size.y / 2);
+        Vector3 leftBottomRight = new Vector3(center.x - size.x / 3, center.y - size.y / 2);
+        DrawPoints(new Vector3[] { leftTopRight, leftTop, leftBottom, leftBottomRight }, color, false);
+
+        Vector3 rightTop = new Vector3(center.x + size.x / 2, center.y + size.y / 2);
+        Vector3 rightTopLeft = new Vector3(center.x + size.x / 3, center.y + size.y / 2);
+        Vector3 rightBottom = new Vector3(center.x + size.x / 2, center.y - size.y / 2);
+        Vector3 rightBottomLeft = new Vector3(center.x + size.x / 3, center.y - size.y / 2);
+        DrawPoints(new Vector3[] { rightTopLeft, rightTop, rightBottom, rightBottomLeft }, color, false);
+    }
+
+    private void DrawPoints(Vector3[] points, Color color, bool isClose)
+    {
+        if (points == null || points.Length <= 1)
+            return;
 
         Gizmos.color = color;
-        Gizmos.DrawLine(leftTop, rightTop); // UpperLeft -> UpperRighty
-        Gizmos.DrawLine(rightTop, rightBottom); // UpperRight -> LowerRight
-        Gizmos.DrawLine(rightBottom, leftBottom); // LowerRight -> LowerLeft
-        Gizmos.DrawLine(leftBottom, leftTop); // LowerLeft -> UpperLeft
+        int i;
+        for (i = 0; i < points.Length - 1; i++)
+        {
+            Gizmos.DrawLine(points[i], points[i+1]);
+        }
+        if (isClose)
+        {
+            Gizmos.DrawLine(points[i], points[0]);
+        }
     }
 #endif
 }
