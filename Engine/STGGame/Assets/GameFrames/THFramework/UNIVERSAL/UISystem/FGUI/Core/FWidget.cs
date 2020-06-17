@@ -16,7 +16,7 @@ namespace THGame.UI
         protected bool _isAsync;                //是否异步加载
         protected float _interval = -1.0f;
         private int __scheduler = -1;
-        private List<KeyValuePair<int, EventCallback1>> __listener;
+        private List<Tuple<int, EventCallback1>> __listener;
 
         public bool isAsync { get { return _isAsync; } }
 
@@ -104,8 +104,8 @@ namespace THGame.UI
         public void AddEventListener(int eventId, EventCallback1 listener)
         {
             Dispatcher.GetInstance().AddListener(eventId, listener);
-            __listener = (__listener != null) ? __listener : new List<KeyValuePair<int, EventCallback1>>();
-            __listener.Add(new KeyValuePair<int, EventCallback1>(eventId, listener));
+            __listener = (__listener != null) ? __listener : new List<Tuple<int, EventCallback1>>();
+            __listener.Add(new Tuple<int, EventCallback1>(eventId, listener));
         }
 
         public FWidget(string packageName, string componentName)
@@ -166,7 +166,7 @@ namespace THGame.UI
             OnEnter();
         }
 
-        private void _OnEemovedFromStage()
+        private void _OnRemovedFromStage()
         {
             _RemoveEvent();
             _RemoveSchedule();
@@ -188,7 +188,7 @@ namespace THGame.UI
             {
                 foreach (var pair in __listener)
                 {
-                    Dispatcher.GetInstance().RemoveListener(pair.Key, pair.Value);
+                    Dispatcher.GetInstance().RemoveListener(pair.Item1, pair.Item2);
                 }
             }
         }
@@ -213,7 +213,7 @@ namespace THGame.UI
                 obj.onAddedToStage.Clear();
                 obj.onRemovedFromStage.Clear();
                 obj.onAddedToStage.Add(_OnAddedToStage);
-                obj.onRemovedFromStage.Add(_OnEemovedFromStage);
+                obj.onRemovedFromStage.Add(_OnRemovedFromStage);
                 
             }
             

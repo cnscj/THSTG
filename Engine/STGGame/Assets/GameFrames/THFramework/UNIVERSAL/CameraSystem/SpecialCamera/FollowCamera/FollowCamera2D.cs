@@ -37,7 +37,7 @@ public class FollowCamera2D : MonoSingleton<FollowCamera2D>
     //采用 双向正前聚焦 模式
     //如果目标离摄像机中心过远,将镜头拉回到人物身上
     //采用Vector3.SmoothDamp()平滑过渡
-
+    //为了获取更大视野,靠近最左边界时,摄像机向右移动
     private void UpdatePosition()
     {
         //将人物固定到聚焦区域,并缓慢拉回中心
