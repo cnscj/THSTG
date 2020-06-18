@@ -8,9 +8,9 @@ using Object = UnityEngine.Object;
 namespace ASGame
 {
     //不建议使用,请用AssetDownload进行资源加载
-    public class NetworkLoader : BaseCoroutineLoader
+    public class NetworkLoader : BaseLoadMethod
     {
-        protected override IEnumerator OnLoadAsset(AssetLoadHandler handler)
+        protected override IEnumerator OnLoadAssetAsync(AssetLoadHandler handler)
         {
             UnityWebRequest webRequest = UnityWebRequest.Get(handler.path);
             webRequest.timeout = 30;
@@ -41,6 +41,12 @@ namespace ASGame
                 }
             }
         }
+
+        protected override void OnLoadAssetSync(AssetLoadHandler handler)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }
 

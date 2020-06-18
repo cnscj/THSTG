@@ -29,6 +29,16 @@ namespace ASGame
             var handler = GetOrCreateHandler(path);
             handler.OnCompleted(callback);
 
+            //记录加载方式
+            if (callback == null)
+            {
+                handler.mode = AssetLoadMode.Async;
+            }
+            else
+            {
+                handler.mode = AssetLoadMode.Sync;
+            }
+
             //等待队列里如果有依赖加载器,会引起主加载器没法完成,造成无限等待,所以依赖加载不能走这里
             if (maxLoadingCount > 0 && LoadingCount >= maxLoadingCount)
             {

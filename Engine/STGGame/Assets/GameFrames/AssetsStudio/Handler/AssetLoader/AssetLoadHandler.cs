@@ -10,6 +10,7 @@ namespace ASGame
         public int id;
         public int status;
         public string path;
+        public AssetLoadMode mode;
         public AssetLoadResult result;
         public AssetLoadCompleted onCallback;
         public BaseLoader loader;
@@ -34,6 +35,8 @@ namespace ASGame
 
             if (handler.m_parents.Contains(this))
                 return;
+
+            handler.mode = mode;        //保持加载方式一致
 
             handler.Retain();
 
@@ -141,6 +144,7 @@ namespace ASGame
             result = null;
             loader = null;
             path = null;
+            mode = AssetLoadMode.Async;
 
             onCallback = null;
 

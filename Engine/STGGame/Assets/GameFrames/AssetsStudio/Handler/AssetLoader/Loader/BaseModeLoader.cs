@@ -4,7 +4,7 @@ using UnityEngine;
 using IEnumerator = System.Collections.IEnumerator;
 namespace ASGame
 {
-    public abstract class BaseModeLoader : BaseLoader
+    public abstract class BaseLoadMethod : BaseLoader
     {
         protected class Nextframe
         {
@@ -12,7 +12,7 @@ namespace ASGame
             public Action action;
         }
 
-        protected enum LoadMode
+        protected enum LoadMethod
         {
             //同步
             Immediately,    //立刻(可能无法设置回调,待讨论
@@ -24,13 +24,13 @@ namespace ASGame
 
         protected class LoadNode
         {
-            public LoadMode loadMode;
+            public LoadMethod loadMethod;
             public Coroutine coroutine;
             public Nextframe nextframe;
 
             public void Reset()
             {
-                loadMode = LoadMode.Coroutine;
+                loadMethod = LoadMethod.Coroutine;
                 coroutine = null;
                 nextframe = null;
             }
@@ -67,17 +67,17 @@ namespace ASGame
             {
                 handler.loader = this;
                 var loadNode = GetOrCreateLoadNode();
-                var loadMode = GetLoadMode(handler);
+                var loadMethod = GetLoadMethod(handler);
 
-                if (loadMode == LoadMode.Coroutine)
+                if (loadMethod == LoadMethod.Coroutine)
                 {
                     loadNode.coroutine = StartCoroutine(LoadAssetCoroutine(handler));
                 }
-                else if (loadMode == LoadMode.Nextframe)
+                else if (loadMethod == LoadMethod.Nextframe)
                 {
                     loadNode.nextframe = StartNextframe(() => { LoadAssetNextframe(handler); });
                 }
-                else if (loadMode == LoadMode.Immediately)
+                else if (loadMethod == LoadMethod.Immediately)
                 {
                     OnLoadAssetSync(handler);
                 }
@@ -94,11 +94,11 @@ namespace ASGame
             if (m_loadNodes.ContainsKey(handler.id))
             {
                 var loadNode = m_loadNodes[handler.id];
-                if (loadNode.loadMode == LoadMode.Coroutine)
+                if (loadNode.loadMethod == LoadMethod.Coroutine)
                 {
                     StopCoroutine(loadNode.coroutine);
                 }
-                else if (loadNode.loadMode == LoadMode.Nextframe)
+                else if (loadNode.loadMethod == LoadMethod.Nextframe)
                 {
                     StopNextframe(loadNode.nextframe);
                 }
@@ -185,42 +185,16 @@ namespace ASGame
             return new LoadNode();
         }
 
-        //FIXME:性能不好
-        private LoadMode GetLoadMode(AssetLoadHandler handler)
+        private LoadMethod GetLoadMethod(AssetLoadHandler handler)
         {
-            //如果是依赖的加载,则模式保持与父一致
-            var parents = handler.GetParents();
-            if (parents == null || parents.Length <= 0)
+            if (handler.mode == AssetLoadMode.Sync)
             {
-                if (handler.onCallback != null)
-                {
-                    return LoadMode.Immediately;
-                }
+                return LoadMethod.Immediately;
             }
-            else
-            {
-                AssetLoadHandler topHandler = parents[0];
-                while(true)
-                {
-                    var prevParents = topHandler.GetParents();
-
-                    if (prevParents == null || prevParents.Length <= 0)
-                        break;
-
-                    topHandler = prevParents[0];
-                }
-
-                var loadMode = GetLoadMode(topHandler);
-                if (loadMode == LoadMode.Nextframe)
-                    return LoadMode.Immediately;
-
-                return loadMode;
-
-            }
-            return OnLoadMode(handler);
+            return OnLoadMethod(handler);
         }
 
-        protected abstract LoadMode OnLoadMode(AssetLoadHandler handler);
+        protected virtual LoadMethod OnLoadMethod(AssetLoadHandler handler) { return LoadMethod.Coroutine; }
         protected abstract IEnumerator OnLoadAssetAsync(AssetLoadHandler handler);
         protected abstract void OnLoadAssetSync(AssetLoadHandler handler);
     }

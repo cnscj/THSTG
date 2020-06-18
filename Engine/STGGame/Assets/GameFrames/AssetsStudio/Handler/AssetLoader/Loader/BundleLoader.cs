@@ -11,7 +11,7 @@ using UnityEngine.Networking;
 namespace ASGame
 {
     //加载依赖应该返回依赖信息,包括哪些依赖文件加载失败
-    public class BundleLoader : BaseModeLoader
+    public class BundleLoader : BaseLoadMethod
     {
         public static readonly float HANDLER_BUNDLE_LOCAL_STAY_TIME = 30;       //考虑到加载场景AB估计要好久
         public static readonly float HANDLER_BUNDLE_NETWORK_STAY_TIME = 60f;    //下载网络不好估计也好好久
@@ -276,7 +276,7 @@ namespace ASGame
             base.OnLoadFailed(handler);
         }
 
-        protected override LoadMode OnLoadMode(AssetLoadHandler handler)
+        protected override LoadMethod OnLoadMethod(AssetLoadHandler handler)
         {
             //如果缓冲池有,则下一帧回调,否则协程回调
             string assetPath = handler.path;
@@ -287,9 +287,9 @@ namespace ASGame
             }
             if (GetBundleObject(assetPath) != null)
             {
-                return LoadMode.Nextframe;
+                return LoadMethod.Nextframe;
             }
-            return LoadMode.Coroutine;
+            return LoadMethod.Coroutine;
 
         }
 

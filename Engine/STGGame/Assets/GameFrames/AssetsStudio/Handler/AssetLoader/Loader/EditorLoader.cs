@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using Object = UnityEngine.Object;
-using UnityEngine;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -9,10 +7,17 @@ using UnityEditor;
 
 namespace ASGame
 {
-    public class EditorLoader : BaseNextframeLoader
+    public class EditorLoader : BaseLoadMethod
     {
 #if UNITY_EDITOR
-        protected override void OnLoadAsset(AssetLoadHandler handler)
+        protected override IEnumerator OnLoadAssetAsync(AssetLoadHandler handler)
+        {
+            yield return null;  //保证下一帧
+
+            OnLoadAssetSync(handler);
+        }
+
+        protected override void OnLoadAssetSync(AssetLoadHandler handler)
         {
             Object obj = AssetDatabase.LoadAssetAtPath<Object>(handler.path);
             var result = new AssetLoadResult(obj, true);
@@ -21,13 +26,24 @@ namespace ASGame
             handler.Callback(result);
         }
 
-#else
-        protected override void OnLoadAsset(AssetLoadHandler handler)
+        protected override LoadMethod OnLoadMethod(AssetLoadHandler handler)
         {
-            handler.status = AssetLoadStatus.LOAD_FINISHED;
+            return LoadMethod.Nextframe;    //改用下一帧执行,减少协程调用
+        }
+
+#else
+        protected override IEnumerator OnLoadAssetAsync(AssetLoadHandler handler)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void OnLoadAssetSync(AssetLoadHandler handler)
+        {
+            throw new NotImplementedException();
         }
 
 #endif
+
     }
 }
 

@@ -5,9 +5,15 @@ using System.IO;
 namespace ASGame
 {
     //异步加载二进制文件
-    public class BinarylLoader : BaseCoroutineLoader
+    public class BinarylLoader : BaseLoadMethod
     {
-        protected override IEnumerator OnLoadAsset(AssetLoadHandler handler)
+        protected override IEnumerator OnLoadAssetAsync(AssetLoadHandler handler)
+        {
+            OnLoadAssetSync(handler);
+            yield break;
+        }
+
+        protected override void OnLoadAssetSync(AssetLoadHandler handler)
         {
             string filePath = handler.path;
 
@@ -20,7 +26,7 @@ namespace ASGame
                 fs.Read(buff, 0, Convert.ToInt32(fs.Length));
                 fs.Close();
 
-      
+
                 handler.result = new AssetLoadResult(buff, true);
                 handler.status = AssetLoadStatus.LOAD_FINISHED;
                 handler.Callback();
@@ -32,7 +38,6 @@ namespace ASGame
                 handler.Callback();
             }
 
-            yield break;
         }
     }
 }
