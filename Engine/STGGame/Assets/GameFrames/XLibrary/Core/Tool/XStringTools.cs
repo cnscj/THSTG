@@ -119,6 +119,16 @@ namespace XLibrary
             return pathModule;
         }
 
-
+        /// <summary>
+        /// 移除括号及括号内容
+        /// </summary>
+        /// <param name="str">字符串</param>
+        /// <returns></returns>
+        public static string RemoveBracket(string str)
+        {
+            var normalStr = str.Replace("（", "(").Replace("）", ")");
+            var resultStr = Regex.Replace(normalStr, @"\([^\(]*\)", "");
+            return resultStr;
+        }
     }
 }
