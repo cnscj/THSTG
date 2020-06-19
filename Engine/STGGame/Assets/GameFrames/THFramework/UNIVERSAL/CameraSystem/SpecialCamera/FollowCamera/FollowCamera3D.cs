@@ -3,9 +3,8 @@ using XLibrary.Package;
 using THGame.Tween;
 
 /* TODO:
- * 2d摄像机,始终对准主角
- * 存在动画效果
- * 
+ * 不管怎么旋转,挪动相机,镜头都要对准主角
+ * 都是跟在主角身后,不因主角靠近而变化
  */
 public class FollowCamera3D : MonoSingleton<FollowCamera3D>
 {
