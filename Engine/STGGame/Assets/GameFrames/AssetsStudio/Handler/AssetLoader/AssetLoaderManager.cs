@@ -1,9 +1,8 @@
 ﻿
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using XLibrary.Package;
-using Object = UnityEngine.Object;
+
 namespace ASGame
 {
     public class AssetLoaderManager : MonoSingleton<AssetLoaderManager>
@@ -22,7 +21,7 @@ namespace ASGame
             GetOrCreateBundleLoader().LoadMainfest(manifest);
         }
 
-        public AssetLoadHandler LoadAssetHandler<T>(string path, AssetLoadCompleted callback = null) where T : Object
+        public AssetLoadHandler LoadAssetHandler<T>(string path, AssetLoadCompleted callback = null) where T : class
         {
             BaseLoader loader;
             string rightPath;
@@ -34,7 +33,7 @@ namespace ASGame
             return handler;
         }
 
-        public int LoadAssetSync<T>(string path, Action<T> onSuccess = null, Action<int> onFailed = null) where T : Object
+        public int LoadAssetSync<T>(string path, Action<T> onSuccess = null, Action<int> onFailed = null) where T : class
         {
             AssetLoadHandler handler = LoadAssetHandler<T>(path, (AssetLoadResult result) =>
             {
@@ -51,7 +50,7 @@ namespace ASGame
             return handler.id;
         }
 
-        public int LoadAssetAsync<T>(string path, Action<T> onSuccess = null, Action<int> onFailed = null) where T : Object
+        public int LoadAssetAsync<T>(string path, Action<T> onSuccess = null, Action<int> onFailed = null) where T : class
         {
             var handler = LoadAssetHandler<T>(path);
 
@@ -118,7 +117,7 @@ namespace ASGame
             return loader;
         }
 
-        private void SelectLoaderAndPath<T>(string path, out BaseLoader loader, out string realpath) where T: Object
+        private void SelectLoaderAndPath<T>(string path, out BaseLoader loader, out string realpath) where T: class
         {
 
             //如果是双路径

@@ -405,7 +405,7 @@ namespace ASGame
             }
             else
             {
-                if (assetPath.Contains("://"))
+                if (assetPath.Contains("://"))  //XXX:是否为网络路径,此处不准
                 {
                     handler.timeoutChecker.stayTime = HANDLER_BUNDLE_NETWORK_STAY_TIME;    //网络Handler超时时间
                     var request = UnityWebRequestAssetBundle.GetAssetBundle(assetPath);

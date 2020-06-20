@@ -10,12 +10,11 @@ function M.hotfixEx( ... )
     return XLuaUtil.hotfix_ex(...)
 end
 
---扩展C#类成员变量或方法，就是在构造函数里设置新的metatable，不要直接修改类，只能修改构造函数之后的实例。
 function M.extendMember(csClass, stateTb)
     xlua.hotfix(csClass, 
     {
-        ['.ctor'] = function(csobj)
-            return XLuaUtil.state(csobj, stateTb)
+        ['.ctor'] = function(self)
+            return XLuaUtil.state(self, stateTb)
         end,
     })
 end
@@ -26,8 +25,37 @@ function M.extendInstanceMember(csInstance, stateTb)
 end
 
 --类本身有一个metatable，可以直接修改静态函数和静态变量，跟实例无关，所以可以改
-function M.extendStaticMember(csClass, stateTb)
+ function M.extendStaticMember(csClass, stateTb)
     XLuaUtil.state(csClass, stateTb)
+end
+
+--扩展 MonoBehaviour
+--csClass: 类的完整路径，如 CS.GYGame.ModelFxLoader
+--stateTb: 扩展的变量和函数集合
+ function M.extendMonoBehaviour(csClass, stateTb)
+    --创建测试实例
+    local go = CSharp.GameObject()
+    local comp = go:AddComponent(typeof(csClass))
+    --拿到实例的公有metatable
+    local csobj_mt = getmetatable(comp)
+
+    --修改公有metatable
+    local oldIndex = rawget(csobj_mt, "__index")
+    local oldNewIndex = rawget(csobj_mt, "__newindex")
+
+    rawset(csobj_mt, "__index", function(t, k)
+        return rawget(stateTb, k) or oldIndex(t, k)
+    end)
+    rawset(csobj_mt, "__newindex", function(t, k, v)
+        if rawget(stateTb, k) ~= nil then
+            rawset(stateTb, k, v)
+        else
+            oldNewIndex(t, k, v)
+        end
+    end)
+
+    --用完删除测试实例
+    CSharp.GameObject.Destroy(go)
 end
 
 rawset(_G, "XLuaUtil", M)

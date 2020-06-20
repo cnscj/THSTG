@@ -9,6 +9,8 @@ namespace ASGame
     {
         protected override IEnumerator OnLoadAssetAsync(AssetLoadHandler handler)
         {
+            yield return null;  //保证下一帧
+
             OnLoadAssetSync(handler);
             yield break;
         }

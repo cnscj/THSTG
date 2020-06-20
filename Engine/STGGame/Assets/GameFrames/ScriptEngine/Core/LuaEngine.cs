@@ -156,8 +156,8 @@ namespace SEGame
             return fullPath;
         }
 
-        //TODO:注入调试方法:U9,如果在特定目录有这个脚本,优先用这个脚本,否则用原来的(先加载luaU,在加载先加载luaS
-        //不能通过IO方式去判断,效率低
+        //注入调试方法:U9,如果在特定目录有这个脚本,优先用这个脚本,否则用原来的(先加载luaU,在加载先加载luaS
+        //XXX:不能通过IO方式去判断,效率低
         //内置库不能通过路劲去搞,还得判断内置库
         private string GetScriptPath(string filePath)
         {
