@@ -9,12 +9,13 @@ using THGame.Tween;
  */
 public class FollowCamera2D : MonoSingleton<FollowCamera2D>
 {
-    //public new Camera camera;
+    public new Camera camera;                                   //有必要
     public Vector2 cameraSize = new Vector2(17, 8);             //摄像机区域尺寸
     public Vector2 forceSize = new Vector2(5,2.7f);             //聚焦区域尺寸
     public float reboundSpeed = 3f;                             //回弹速度
 
     public GameObject observed;                                 //被观察的对象
+
 
     public void SetTarget(GameObject target)
     {
@@ -25,6 +26,15 @@ public class FollowCamera2D : MonoSingleton<FollowCamera2D>
     {
         return observed;
     }
+
+    private void Start()
+    {
+        if(camera != null)
+        {
+
+        }
+    }
+
 
     private void Update()
     {
