@@ -1,0 +1,1285 @@
+fileFormatVersion: 2
+guid: 4b796f690f48c0e4f9beaaf03c3bb52c
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: Unitychan_Hundgun1_6
+    21300002: Unitychan_Soard_Combo_9
+    21300004: Unitychan_Hundgun1_1
+    21300006: Unitychan_Soard_Combo_6
+    21300008: Unitychan_Soard_Combo_10
+    21300010: Unitychan_Soard_Combo_8
+    21300012: Unitychan_Hundgun4_6
+    21300014: Unitychan_Hundgun1_4
+    21300016: Unitychan_Hundgun1_9
+    21300018: Unitychan_SpecialAttack_11
+    21300020: Unitychan_Soard_Combo_22
+    21300022: Unitychan_SpecialAttack_20
+    21300024: Unitychan_Hundgun2_6
+    21300026: Unitychan_Soard_Combo_3
+    21300028: Unitychan_Hundgun1_3
+    21300030: Unitychan_Soard_Combo_21
+    21300032: Unitychan_Hundgun3_6
+    21300034: Unitychan_Soard_Combo_1
+    21300036: Unitychan_Hundgun4_8
+    21300038: Unitychan_Hundgun1_7
+    21300040: Unitychan_SpecialAttack_14
+    21300042: Unitychan_Soard_Combo_12
+    21300044: Unitychan_Hundgun4_7
+    21300046: Unitychan_Soard_Combo_15
+    21300048: Unitychan_Hundgun3_9
+    21300050: Unitychan_Hundgun1_8
+    21300052: Unitychan_Hundgun4_5
+    21300054: Unitychan_Soard_Combo_4
+    21300056: Unitychan_Soard_Combo_14
+    21300058: Unitychan_Hundgun2_9
+    21300060: Unitychan_Soard_Combo_23
+    21300062: Unitychan_SpecialAttack_18
+    21300064: Unitychan_Soard_Combo_13
+    21300066: Unitychan_Hundgun3_7
+    21300068: Unitychan_Hundgun2_8
+    21300070: Unitychan_Soard_Combo_25
+    21300072: Unitychan_Hundgun1_5
+    21300074: Unitychan_SpecialAttack_8
+    21300076: Unitychan_SpecialAttack_21
+    21300078: Unitychan_Hundgun3_8
+    21300080: Unitychan_Soard_Combo_7
+    21300082: Unitychan_Soard_Combo_5
+    21300084: Unitychan_SpecialAttack_22
+    21300086: Unitychan_Hundgun2_5
+    21300088: Unitychan_Hundgun2_7
+    21300090: Unitychan_Soard_Combo_2
+    21300092: Unitychan_Soard_Combo_18
+    21300094: Unitychan_Soard_Combo_19
+    21300096: Unitychan_Soard_Combo_11
+    21300098: Unitychan_Hundgun3_5
+    21300100: Unitychan_Soard_Combo_16
+    21300102: Unitychan_SpecialAttack_19
+    21300104: Unitychan_Soard_Combo_24
+    21300106: Unitychan_Soard_Combo_20
+    21300108: Unitychan_Soard_Combo_17
+    21300110: Unitychan_Hundgun1_2
+    21300112: Unitychan_Hundgun4_9
+  externalObjects: {}
+  serializedVersion: 9
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: -1
+    aniso: -1
+    mipBias: -100
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  platformSettings:
+  - serializedVersion: 2
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Unitychan_Hundgun1_6
+      rect:
+        serializedVersion: 2
+        x: 970
+        y: 400
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2c130774afbad324c9748028ad45a544
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_9
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 194
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4208a0542d9d93748b3d627f0f64156a
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun1_1
+      rect:
+        serializedVersion: 2
+        x: 970
+        y: 560
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 08a1405aa8416b548a8436aa6f5fd1cd
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 582
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 408fe4710ba22e14e9354b46813c0934
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_10
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 776
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4379943a3fb68ff41a751d64176a90f7
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_8
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 0
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e56567056b5cde64aa539e17bc554741
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun4_6
+      rect:
+        serializedVersion: 2
+        x: 970
+        y: 800
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 937c2b4f3b5db294386cbbbd93679a88
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun1_4
+      rect:
+        serializedVersion: 2
+        x: 970
+        y: 240
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f9a095a8669064e419786331c700c941
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun1_9
+      rect:
+        serializedVersion: 2
+        x: 1290
+        y: 0
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a4a2252d7f3ee784ca03a17bacb68e00
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_SpecialAttack_11
+      rect:
+        serializedVersion: 2
+        x: 1370
+        y: 0
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be387165e388689498aa01ef5bb6b040
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_22
+      rect:
+        serializedVersion: 2
+        x: 388
+        y: 0
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 97a48f5c3e81c6343ab930dc97c7aa3a
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_SpecialAttack_20
+      rect:
+        serializedVersion: 2
+        x: 1690
+        y: 0
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4d111ebcc49352e45b059dc68de17b0e
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun2_6
+      rect:
+        serializedVersion: 2
+        x: 1770
+        y: 0
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 86357e5bb06c98543b682d9c12126f94
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 388
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7dbce6d1b18c14c48a826c29af03cc7a
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun1_3
+      rect:
+        serializedVersion: 2
+        x: 1850
+        y: 0
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4342124cbcf6818478451223294c2c69
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_21
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 582
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d424b4e371cb9734fb5e3a78b90526bd
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun3_6
+      rect:
+        serializedVersion: 2
+        x: 1930
+        y: 0
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 11d9cb645eb4d8349ae477bc475f5abb
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_1
+      rect:
+        serializedVersion: 2
+        x: 388
+        y: 194
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 294fa893d6d36e84ba516b03f0ca8d99
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun4_8
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 160
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b5775c4b2ddfd5142b70ac6d392121cd
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun1_7
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 320
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 65edf0a064426b745baf6e973f495e17
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_SpecialAttack_14
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 400
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2afedccde33c9804baf2d54354fd4ddb
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 764cd53ad4a94c64ba473171f4e85854
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun4_7
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 480
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 20f9974c84dd11b48b6f0c8dc32a24ed
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_15
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 776
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 85a284c35c4bc144e9a22a18e9cd24eb
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun3_9
+      rect:
+        serializedVersion: 2
+        x: 970
+        y: 0
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 61b2c5eca719714499197a093c919d63
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun1_8
+      rect:
+        serializedVersion: 2
+        x: 970
+        y: 80
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 534da40f8aaa28b42ab86f86fb333b1f
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun4_5
+      rect:
+        serializedVersion: 2
+        x: 970
+        y: 160
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9c6713557f615b042ab6396af9a515f2
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_4
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 194
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bd716bc1d65c7f44589cddfe7e199872
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_14
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 388
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8332f1f3ee4135a43b3b4c9b2877522a
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun2_9
+      rect:
+        serializedVersion: 2
+        x: 970
+        y: 320
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4a6f6544382ff4543a9b6f0c55ac56eb
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_23
+      rect:
+        serializedVersion: 2
+        x: 388
+        y: 388
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 265cd3cfa999bbd41975fde57aa2bdb8
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_SpecialAttack_18
+      rect:
+        serializedVersion: 2
+        x: 970
+        y: 480
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fadd99dbd42a2ba43bb81a961191d033
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_13
+      rect:
+        serializedVersion: 2
+        x: 388
+        y: 582
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 88ed9981d43da05479276f75846bd680
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun3_7
+      rect:
+        serializedVersion: 2
+        x: 970
+        y: 640
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2d4edca0626cb4947a7b5347b78bdb03
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun2_8
+      rect:
+        serializedVersion: 2
+        x: 970
+        y: 720
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8d4be837910114d45aa22bce04d92f8c
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_25
+      rect:
+        serializedVersion: 2
+        x: 388
+        y: 776
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ba29da3c12f91f469602c2a94954e33
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun1_5
+      rect:
+        serializedVersion: 2
+        x: 970
+        y: 880
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 837cd4585dd8bdd4eb175b201ed47f97
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_SpecialAttack_8
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 0
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d36a80d68ffb5264f941dabb4f71d20c
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_SpecialAttack_21
+      rect:
+        serializedVersion: 2
+        x: 1130
+        y: 0
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 655bb678917ebde4bb10669129457876
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun3_8
+      rect:
+        serializedVersion: 2
+        x: 1210
+        y: 0
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7c1cf2529949a1043866fbd221058fac
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_7
+      rect:
+        serializedVersion: 2
+        x: 582
+        y: 0
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 732e10f4afbd5244b9d08d276d0f385d
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_5
+      rect:
+        serializedVersion: 2
+        x: 582
+        y: 194
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 144e7321d1f526644979c2a8448c4c76
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_SpecialAttack_22
+      rect:
+        serializedVersion: 2
+        x: 1450
+        y: 0
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5f51d9ec319e3e44fade18ba28677afd
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun2_5
+      rect:
+        serializedVersion: 2
+        x: 1530
+        y: 0
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 08b618f77eb48124c929a694986d80a1
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun2_7
+      rect:
+        serializedVersion: 2
+        x: 1610
+        y: 0
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 78d88016ad3530e4fad960b0c075b064
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_2
+      rect:
+        serializedVersion: 2
+        x: 582
+        y: 388
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d03a4442c86da6842909fd59b0ca381f
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_18
+      rect:
+        serializedVersion: 2
+        x: 582
+        y: 582
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1575c4614b2bc414eb3dd4854fcf3c20
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_19
+      rect:
+        serializedVersion: 2
+        x: 582
+        y: 776
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2dc65356180f8224a8adeaa259a16a32
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_11
+      rect:
+        serializedVersion: 2
+        x: 776
+        y: 0
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0f508c9963c57c440971318647a3c199
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun3_5
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 80
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 21bcebc60731f79418dd19448ce44cd7
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_16
+      rect:
+        serializedVersion: 2
+        x: 776
+        y: 194
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3b212be26ba72494ab058d612c9a5f07
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_SpecialAttack_19
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 240
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1bc1b96f2933f6645a86b67bb7f471be
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_24
+      rect:
+        serializedVersion: 2
+        x: 776
+        y: 388
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4b1bb9093058a5940848ecb49fdd78c9
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_20
+      rect:
+        serializedVersion: 2
+        x: 776
+        y: 582
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5aac6f8d4a0384f44830debdaf78a2f0
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Soard_Combo_17
+      rect:
+        serializedVersion: 2
+        x: 776
+        y: 776
+        width: 194
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.1735}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb12dc1df0774314f8a39e0febe8641d
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun1_2
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 560
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9eb94f2a7f6689147a0628f389b64d81
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unitychan_Hundgun4_9
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 640
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.41}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 62c9a495c7416de4992326078211a8ab
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
