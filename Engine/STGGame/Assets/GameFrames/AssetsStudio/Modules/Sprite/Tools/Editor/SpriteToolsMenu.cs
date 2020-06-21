@@ -130,6 +130,45 @@ namespace ASEditor
 
         }
 
+        [MenuItem("Assets/ASEditor/资源工具/精灵菜单/图集/打包图集")]
+        public static void GenTexturePackage()
+        {
+            var selecteds = Selection.objects;
+            List<string> texPathList = new List<string>();
+            foreach (var selected in selecteds)
+            {
+                string selectPath = AssetDatabase.GetAssetPath(selected);
+                string fileExName = Path.GetExtension(selectPath).ToLower();
+                if (fileExName.Contains("png") || fileExName.Contains("jpg") || fileExName.Contains("tga"))
+                {
+                    texPathList.Add(selectPath);
+                }
+            }
+
+            List<Texture2D> texList = new List<Texture2D>();
+            foreach(var texPath in texPathList)
+            {
+                var texture = AssetDatabase.LoadAssetAtPath<Texture2D>(texPath);
+                texList.Add(texture);
+            }
+
+            string firstFile = texPathList[0];
+            string parentRoot = Path.GetDirectoryName(firstFile);
+            string savePath = Path.Combine(parentRoot, string.Format("altas.png"));
+            
+            SpriteEditorTools.TexturePackage(texList.ToArray(), savePath);
+        }
+
+        [MenuItem("Assets/ASEditor/资源工具/精灵菜单/图集/解包图集")]
+        public static void GenTextureUnPackage()
+        {
+            var selected = Selection.activeObject;
+            string selectPath = AssetDatabase.GetAssetPath(selected);
+
+            var altasTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(selectPath);
+            SpriteEditorTools.TextureUnpackage(altasTexture);
+        }
+
         [MenuItem("Assets/ASEditor/资源工具/精灵菜单/动画/生成动画及控制器")]
         public static void MenuGenAnimaAndController()
         {

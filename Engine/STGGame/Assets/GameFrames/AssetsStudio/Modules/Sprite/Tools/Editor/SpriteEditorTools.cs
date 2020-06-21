@@ -607,6 +607,142 @@ namespace ASEditor
         }
 
         ////
+        public static void TexturePackage(Texture2D [] textures, string savePath)
+        {
+            if (textures != null && textures.Length > 0)
+            {
+                Dictionary<string, bool> importDict = new Dictionary<string, bool>();
+                //需要设置Import属性
+                {
+                    foreach(var tex in textures)
+                    {
+                        var texPath = AssetDatabase.GetAssetPath(tex);
+                        if (!string.IsNullOrEmpty(texPath))
+                        {
+                            var texImport = AssetImporter.GetAtPath(texPath) as TextureImporter;
+                            importDict[texPath] = texImport.isReadable;
+
+                            texImport.isReadable = true;
+                            texImport.textureCompression = TextureImporterCompression.Uncompressed; //不压缩ARGB32
+                            texImport.SaveAndReimport();
+                        }
+                    }
+
+                }
+
+                //XXX:计算所有纹理大小,选择最接近2次幂打包
+                //如果太大,分页
+                Texture2D altas = new Texture2D(2048, 2048);
+                Rect[] rects = altas.PackTextures(textures, 0, 2048);   //这里输出UV坐标,要转换
+
+                if (rects != null && rects.Length > 0)
+                {
+                    byte[] buffer = altas.EncodeToPNG();
+                    File.WriteAllBytes(savePath, buffer);
+                    AssetDatabase.Refresh();
+                
+                    //设置图集sprite
+                    {
+                        var altasImport = AssetImporter.GetAtPath(savePath) as TextureImporter;
+                        altasImport.textureType = TextureImporterType.Sprite;
+                        altasImport.spriteImportMode = SpriteImportMode.Multiple;
+
+                        var altasTex = AssetDatabase.LoadAssetAtPath<Texture2D>(savePath);
+                        List<SpriteMetaData> spriteDataList = new List<SpriteMetaData>();
+                        for(int i = 0 ;i < rects.Length; i++)
+                        {
+                            Rect rect = rects[i];
+                            Texture2D texture2D = textures[i];
+                            var texPath = AssetDatabase.GetAssetPath(texture2D);
+                            var texImport = AssetImporter.GetAtPath(texPath) as TextureImporter;
+
+                            SpriteMetaData md = new SpriteMetaData();
+
+                            int width = (int)(rect.width * altasTex.width);
+                            int height = (int)(rect.height * altasTex.height);
+                            int x = (int)(rect.x * altasTex.width);
+                            int y = (int)(rect.y * altasTex.height);
+
+                            md.rect = new Rect(x, y, width, height);
+                            md.pivot = texImport != null ? texImport.spritePivot : md.rect.center;
+                            md.name = texture2D != null ? texture2D.name : string.Format("sprite_{0}",i);
+
+                            spriteDataList.Add(md);
+                        }
+
+
+                        altasImport.spritesheet = spriteDataList.ToArray();
+                        altasImport.SaveAndReimport();
+
+                    }
+                }
+
+                //还原设置Import属性
+                foreach (var tex in textures)
+                {
+                    var texPath = AssetDatabase.GetAssetPath(tex);
+                    if (!string.IsNullOrEmpty(texPath))
+                    {
+                        var texImport = AssetImporter.GetAtPath(texPath) as TextureImporter;
+                        texImport.isReadable = importDict[texPath];
+                        texImport.SaveAndReimport();
+                    }
+                }
+
+                Debug.LogFormat("Make Altas Success : {0}", savePath);
+            }
+        }
+
+
+        public static void TextureUnpackage(Texture2D altsTexture,string saveFolder = null)
+        {
+            if (altsTexture == null)
+                return;
+
+            string texturePath = AssetDatabase.GetAssetPath(altsTexture);
+            string textureRootPath = Path.GetDirectoryName(texturePath);
+            saveFolder = string.IsNullOrEmpty(saveFolder) ? textureRootPath : saveFolder;
+            var altasImport = AssetImporter.GetAtPath(texturePath) as TextureImporter;
+
+            if (altasImport.spriteImportMode == SpriteImportMode.Multiple)
+            {
+                var oldReadable = altasImport.isReadable;
+                altasImport.isReadable = true;
+                altasImport.SaveAndReimport();
+
+                var spritesheets = altasImport.spritesheet;
+                foreach(var metaData in spritesheets)
+                {
+                    var spriteRect = metaData.rect;
+                    var targetTex = new Texture2D((int)spriteRect.width, (int)spriteRect.height);
+                    var pixels = altsTexture.GetPixels(
+                        (int)spriteRect.x,
+                        (int)spriteRect.y,
+                        (int)spriteRect.width,
+                        (int)spriteRect.height);
+                    targetTex.SetPixels(pixels);
+                    targetTex.Apply();
+
+                    string savePath = Path.Combine(saveFolder, string.Format("{0}.png", metaData.name));
+                    byte[] buffer = targetTex.EncodeToPNG();
+                    File.WriteAllBytes(savePath, buffer);
+
+                    AssetDatabase.Refresh();
+
+                    var spriteTextureImport = AssetImporter.GetAtPath(savePath) as TextureImporter;
+                    spriteTextureImport.textureType = TextureImporterType.Sprite;
+                    spriteTextureImport.SaveAndReimport();
+                }
+
+                altasImport.isReadable = oldReadable;
+                altasImport.SaveAndReimport();
+
+                Debug.LogFormat("Make Sprite Success : {0}", saveFolder);
+            }
+
+
+        }
+
         ///
 
         public static string GroupName2Path(string groupName)
