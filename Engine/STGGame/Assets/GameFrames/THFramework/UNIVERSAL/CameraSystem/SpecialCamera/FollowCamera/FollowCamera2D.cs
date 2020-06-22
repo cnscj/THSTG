@@ -9,7 +9,7 @@ using THGame.Tween;
  */
 public class FollowCamera2D : MonoSingleton<FollowCamera2D>
 {
-    public new Camera camera;                                   //有必要
+    public new Camera camera;                                   //非必要
     public Vector2 cameraSize = new Vector2(17, 8);             //摄像机区域尺寸
     public Vector2 forceSize = new Vector2(5,2.7f);             //聚焦区域尺寸
     public float reboundSpeed = 3f;                             //回弹速度
@@ -29,10 +29,7 @@ public class FollowCamera2D : MonoSingleton<FollowCamera2D>
 
     private void Start()
     {
-        if(camera != null)
-        {
-
-        }
+        Calculate();
     }
 
 
@@ -66,6 +63,8 @@ public class FollowCamera2D : MonoSingleton<FollowCamera2D>
 
 
 
+        //平滑过渡
+
         if (moveStepLen > shiftLen)
         {
             destPoint.z = transform.position.z;
@@ -77,6 +76,68 @@ public class FollowCamera2D : MonoSingleton<FollowCamera2D>
             transform.position += moveStepVec;
         }
 
+    }
+
+    [ContextMenu("Calculate")]
+    private void Calculate()
+    {
+        //自动设置CameraSize
+        if (camera == null)
+        {
+            Debug.LogError("[FollowCamera] Must need a camera");
+            return;
+        }
+            
+
+        var corners = GetCorners(camera, 10f);
+        cameraSize.x = corners[1].x - corners[0].x;
+        cameraSize.y = corners[0].y - corners[2].y;
+    }
+
+    Vector3[] GetCorners(Camera theCamera, float distance)
+    {
+        if (theCamera == null)
+            return null;
+
+        Transform tx = theCamera.transform;
+        Vector3[] corners = new Vector3[4];
+
+        float height = 0f;
+        bool orthographic = theCamera.orthographic;  //是否是正交相机
+        if (orthographic)
+        {
+            height = theCamera.orthographicSize;
+        }
+        else
+        {
+            float halfFOV = (theCamera.fieldOfView * 0.5f) * Mathf.Deg2Rad;
+            height = distance * Mathf.Tan(halfFOV);
+        }
+
+        float aspect = theCamera.aspect;
+        float width = height * aspect;
+
+        // UpperLeft
+        corners[0] = tx.position - (tx.right * width);
+        corners[0] += tx.up * height;
+        corners[0] += tx.forward * distance;
+
+        // UpperRight
+        corners[1] = tx.position + (tx.right * width);
+        corners[1] += tx.up * height;
+        corners[1] += tx.forward * distance;
+
+        // LowerLeft
+        corners[2] = tx.position - (tx.right * width);
+        corners[2] -= tx.up * height;
+        corners[2] += tx.forward * distance;
+
+        // LowerRight
+        corners[3] = tx.position + (tx.right * width);
+        corners[3] -= tx.up * height;
+        corners[3] += tx.forward * distance;
+
+        return corners;
     }
 
 #if UNITY_EDITOR
