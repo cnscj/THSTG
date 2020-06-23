@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace XLibrary
 {
-    public static class XDrawTools
+    public static class Drawer
     {
         /// <summary>
         /// When called from an OnDrawGizmos() function it will draw a curved path through the provided array of Vector3s.

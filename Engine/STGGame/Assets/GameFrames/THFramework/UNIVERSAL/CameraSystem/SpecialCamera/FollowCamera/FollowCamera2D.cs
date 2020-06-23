@@ -7,31 +7,25 @@ using THGame.Tween;
  * 存在动画效果
  * 能够向各个方向观察一段距离
  */
-public class FollowCamera2D : MonoSingleton<FollowCamera2D>
+public class FollowCamera2D : MonoBehaviour
 {
     public new Camera camera;                                   //非必要
     public Vector2 cameraSize = new Vector2(17, 8);             //摄像机区域尺寸
     public Vector2 forceSize = new Vector2(5,2.7f);             //聚焦区域尺寸
     public float reboundSpeed = 3f;                             //回弹速度
 
-    public GameObject observed;                                 //被观察的对象
+    public Transform observed;                                 //被观察的对象
 
 
-    public void SetTarget(GameObject target)
+    public void SetTarget(Transform target)
     {
         observed = target;
     }
 
-    public GameObject GetTarget()
+    public Transform GetTarget()
     {
         return observed;
     }
-
-    private void Start()
-    {
-        Calculate();
-    }
-
 
     private void Update()
     {
@@ -65,6 +59,7 @@ public class FollowCamera2D : MonoSingleton<FollowCamera2D>
 
         //平滑过渡
 
+
         if (moveStepLen > shiftLen)
         {
             destPoint.z = transform.position.z;
@@ -78,16 +73,16 @@ public class FollowCamera2D : MonoSingleton<FollowCamera2D>
 
     }
 
+    
     [ContextMenu("Calculate")]
     private void Calculate()
     {
         //自动设置CameraSize
         if (camera == null)
         {
-            Debug.LogError("[FollowCamera] Must need a camera");
+            Debug.Log("[FollowCamera] Must need a camera");
             return;
         }
-            
 
         var corners = GetCorners(camera, 10f);
         cameraSize.x = corners[1].x - corners[0].x;
