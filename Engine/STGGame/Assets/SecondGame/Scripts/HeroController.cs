@@ -65,7 +65,8 @@ namespace UCGame
             if (Input.GetKeyDown(KeyCode.W))
             {
                 _jumping = true;
-            }else
+            }
+            else
             {
                 //如果再次回到平台上,表示跳跃结束
             }
@@ -78,9 +79,9 @@ namespace UCGame
                 return;
 
             
-            if (_curSpeed < 0)
+            if (_curSpeed < 0f)
                 renderer.flipX = true;
-            else if(_curSpeed > 0)
+            else if(_curSpeed > 0f)
                 renderer.flipX = false;
         }
 
@@ -88,10 +89,6 @@ namespace UCGame
         {
             if (animator == null)
                 return;
-
-            //animator.SetInteger("speed", (int)_curSpeed);
-            //animator.SetBool("jumping", _jumping);
-            //animator.SetBool("running", _running);
 
             if (Mathf.Approximately(_curSpeed, 0f))
             {
