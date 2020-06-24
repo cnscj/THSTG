@@ -16,6 +16,8 @@ namespace THGame.UI
         protected bool _isAsync;                //是否异步加载
         protected float _interval = -1.0f;
         private int __scheduler = -1;
+        private bool __isDisposed;
+        private bool __isCreating;
         private List<Tuple<int, EventCallback1>> __listener;
 
         public bool isAsync { get { return _isAsync; } }
@@ -44,8 +46,16 @@ namespace THGame.UI
 
                 if (widget.isAsync)
                 {
+                    widget.__isCreating = true;
                     UIPackage.CreateObjectAsync(widget.package, widget.component, (obj) =>
                     {
+                        if (widget.__isDisposed)
+                        {
+                            widget.__isCreating = false;
+                            widget.__isDisposed = false;
+                            obj.Dispose();
+                            return;
+                        }
                         OnCreateSuccess(obj, widget, args);
                     });
                 }
@@ -79,6 +89,7 @@ namespace THGame.UI
             }
 
             //
+            widget.__isCreating = false;
             widget.SetArgs(args);
             widget.InitWithObj(obj);
 
@@ -117,9 +128,22 @@ namespace THGame.UI
         //
         public override void Dispose()
         {
-            base.Dispose();
-            ReleasePackage(this);
+            if (_obj == null)
+            {
+                __isDisposed = true;
+            }
+            else
+            {
+                base.Dispose();
+                ReleasePackage(this);
+            }
         }
+
+        public bool IsCreated()
+        {
+            return _obj != null;
+        }
+
         //
         public void SetArgs(object args)
         {

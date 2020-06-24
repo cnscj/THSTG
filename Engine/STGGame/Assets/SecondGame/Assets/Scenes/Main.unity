@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074, b: 0.35872698, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -112,6 +112,33 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &462938917 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3248735494121928965, guid: 51ea51b5d577eb74c899b6203eca4a1b,
+    type: 3}
+  m_PrefabInstance: {fileID: 2428201603068941163}
+  m_PrefabAsset: {fileID: 0}
+--- !u!50 &462938920
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 462938917}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!1 &987994164
 GameObject:
   m_ObjectHideFlags: 0
@@ -164,7 +191,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 3
+  orthographic size: 1
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -242,7 +269,7 @@ MonoBehaviour:
   camera: {fileID: 987994166}
   cameraSize: {x: 10.666667, y: 6}
   forceSize: {x: 2.04, y: 1.3}
-  reboundSpeed: 3
+  reboundTime: 0.5
   observed: {fileID: 1356390947}
 --- !u!114 &1163165920
 MonoBehaviour:
@@ -257,7 +284,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   camera: {fileID: 987994166}
-  maxDeep: 1.5
+  maxDeep: 0.6
 --- !u!1 &1297784541
 GameObject:
   m_ObjectHideFlags: 0
@@ -302,11 +329,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3248735494121928965, guid: 51ea51b5d577eb74c899b6203eca4a1b,
-        type: 3}
-      propertyPath: m_Name
-      value: Unitychan
-      objectReference: {fileID: 0}
     - target: {fileID: 1538756238332751426, guid: 51ea51b5d577eb74c899b6203eca4a1b,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -362,15 +384,15 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3860222532714297246, guid: 51ea51b5d577eb74c899b6203eca4a1b,
+    - target: {fileID: 3248735494121928965, guid: 51ea51b5d577eb74c899b6203eca4a1b,
         type: 3}
-      propertyPath: m_SortingLayerID
-      value: -52113833
+      propertyPath: m_Name
+      value: Unitychan
       objectReference: {fileID: 0}
-    - target: {fileID: 3860222532714297246, guid: 51ea51b5d577eb74c899b6203eca4a1b,
+    - target: {fileID: 7320702588917585550, guid: 51ea51b5d577eb74c899b6203eca4a1b,
         type: 3}
-      propertyPath: m_SortingLayer
-      value: 2
+      propertyPath: m_IsTrigger
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 51ea51b5d577eb74c899b6203eca4a1b, type: 3}
