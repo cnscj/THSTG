@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using XLibrary.Package;
-using THGame.Tween;
 
 /* TODO:
  * 2d摄像机,始终对准主角
@@ -12,10 +11,11 @@ public class FollowCamera2D : MonoBehaviour
     public new Camera camera;                                   //非必要
     public Vector2 cameraSize = new Vector2(17, 8);             //摄像机区域尺寸
     public Vector2 forceSize = new Vector2(5,2.7f);             //聚焦区域尺寸
-    public float reboundSpeed = 3f;                             //回弹速度
+    public float reboundTime = 0.5f;                            //回弹时间
 
-    public Transform observed;                                 //被观察的对象
+    public Transform observed;                                  //被观察的对象
 
+    private Vector3 m_velocity;                                 //
 
     public void SetTarget(Transform target)
     {
@@ -27,7 +27,7 @@ public class FollowCamera2D : MonoBehaviour
         return observed;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (observed == null)
             return;
@@ -41,36 +41,27 @@ public class FollowCamera2D : MonoBehaviour
     //为了获取更大视野,靠近最左边界时,摄像机向右移动
     private void UpdatePosition()
     {
-        //将人物固定到聚焦区域,并缓慢拉回中心
-        var destPoint = observed.transform.position;
-        var srcPoint = transform.position;
-        var shiftVec = destPoint - srcPoint;
-        var shiftLen = shiftVec.magnitude;
-        var moveStepVec = shiftVec.normalized * reboundSpeed;
-        var moveStepLen = moveStepVec.magnitude;
+        ////将人物固定到聚焦区域,并缓慢拉回中心
+        //var destPoint = observed.transform.position;
+        //var srcPoint = transform.position;
+        //var shiftVec = destPoint - srcPoint;
+        //var shiftLen = shiftVec.magnitude;
+        //var moveStepVec = shiftVec.normalized * reboundSpeed;
+        //var moveStepLen = moveStepVec.magnitude;
 
-        //如果超出安全区,将人物拉回摄像机中心
-        if (Mathf.Approximately(shiftLen, moveStepLen))
-            return;
+        ////如果超出安全区,将人物拉回摄像机中心
+        //if (Mathf.Approximately(shiftLen, moveStepLen))
+        //    return;
 
-        //边界判断
-
-
-
-        //平滑过渡
+        ////边界判断
 
 
-        if (moveStepLen > shiftLen)
-        {
-            destPoint.z = transform.position.z;
-            transform.position = destPoint;
-        }
-        else
-        {
-            moveStepVec.z = 0;
-            transform.position += moveStepVec;
-        }
 
+        //平滑过渡,这里如果速度过快会发生抖动
+        transform.position = new Vector3(
+            Mathf.SmoothDamp(transform.position.x, observed.position.x, ref m_velocity.x, reboundTime),
+            Mathf.SmoothDamp(transform.position.y, observed.position.y, ref m_velocity.y, reboundTime),
+           transform.position.z);
     }
 
     
