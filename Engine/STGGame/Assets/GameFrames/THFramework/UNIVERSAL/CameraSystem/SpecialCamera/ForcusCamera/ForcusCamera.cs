@@ -12,6 +12,10 @@ namespace THGame
         public new Camera camera;   //摄像机
         public float maxDeep;       //最大深度
 
+
+        public Vector3 forcusPoint;   //焦点坐标
+        public float forcusRadius;   //聚焦半径
+
         private float m_oriZVal;
         private TweenScript m_tweener;
 
@@ -23,11 +27,12 @@ namespace THGame
 
         public void Start()
         {
+
             camera = camera ?? Camera.main;
-            Svae();
+            SvaeDeep();
         }
 
-        public void Svae()
+        public void SvaeDeep()
         {
             if (camera == null)
                 return;
@@ -42,6 +47,11 @@ namespace THGame
             }
         }
 
+        public float LoadDeep()
+        {
+            return m_oriZVal;
+        }
+
         public void Force(float deep)
         {
             if (camera == null)
@@ -49,22 +59,10 @@ namespace THGame
 
             //保存属性变更
             StopAllTweener();
-            if (camera.orthographic) //正交相机通过修改size达到深度
+            m_tweener = TweenUtil.CustomTweenFloat((val) =>
             {
-                m_tweener = TweenUtil.CustomTweenFloat((val) =>
-                {
-                    camera.orthographicSize = val;
-                }, m_oriZVal, deep, FORCE_TIME).SetEase(Ease.OutCubic);
-            }
-            else //透视相机修改Z轴坐标
-            {
-                m_tweener = TweenUtil.CustomTweenFloat((val) =>
-                {
-                    var localPosition = camera.transform.localPosition;
-                    localPosition.z = val;
-                    camera.transform.localPosition = localPosition;
-                }, m_oriZVal, deep, FORCE_TIME).SetEase(Ease.OutCubic);
-            }
+                SetForcus(val);
+            }, LoadDeep(), deep, FORCE_TIME).SetEase(Ease.OutCubic);
         }
 
         //失焦还原回去
@@ -72,23 +70,25 @@ namespace THGame
         public void Defocus()
         {
             StopAllTweener();
-            if (camera.orthographic)
+            m_tweener = TweenUtil.CustomTweenFloat((val) =>
             {
-                var oldVal = camera.orthographicSize;
-                m_tweener = TweenUtil.CustomTweenFloat((val) =>
-                {
-                    camera.orthographicSize = val;
-                }, oldVal, m_oriZVal, FORCE_TIME).SetEase(Ease.OutCubic);
-            }
-            else
+                SetForcus(val);
+            }, GetForcus(), LoadDeep(), FORCE_TIME).SetEase(Ease.OutCubic);
+        }
+
+        protected void FixedUpdate()
+        {
+            if (Mathf.Approximately(forcusRadius, 0f))
+                return;
+
+            //根据聚焦半径平滑过渡到最大聚焦深度
+            var displacement = forcusPoint - transform.position;
+            var displacementLen = displacement.magnitude;
+            var dLen = forcusRadius - displacementLen;
+            if (dLen >= 0f)  //表示已经在范围内
             {
-                var oldVal = camera.transform.localPosition.z;
-                m_tweener = TweenUtil.CustomTweenFloat((val) =>
-                {
-                    var localPosition = camera.transform.localPosition;
-                    localPosition.z = val;
-                    camera.transform.localPosition = localPosition;
-                }, oldVal, m_oriZVal, FORCE_TIME).SetEase(Ease.OutCubic);
+                float val = Mathf.SmoothStep(LoadDeep(), maxDeep, (dLen / forcusRadius));
+                SetForcus(val);
             }
         }
 
@@ -99,6 +99,37 @@ namespace THGame
                 TweenUtil.StopAnim(m_tweener);
                 m_tweener = null;
             }
+        }
+
+        public void SetForcus(float deep)
+        {
+            if (camera.orthographic)
+            {
+                camera.orthographicSize = deep;
+            }
+            else
+            {
+                var localPosition = camera.transform.localPosition;
+                localPosition.z = deep;
+                camera.transform.localPosition = localPosition;
+            }
+        }
+
+        public float GetForcus()
+        {
+            if (camera.orthographic)
+            {
+                return camera.orthographicSize;
+            }
+            else
+            {
+                return camera.transform.localPosition.z;
+            }
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.DrawWireSphere(forcusPoint, forcusRadius);
         }
     }
 
