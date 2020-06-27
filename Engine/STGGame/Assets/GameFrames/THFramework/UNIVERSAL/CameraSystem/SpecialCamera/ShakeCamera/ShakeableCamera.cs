@@ -21,14 +21,13 @@ namespace THGame
 
         //插值参数
         private Vector3 m_shakeArgs = Vector3.right;
-        private int m_shakeCount = 10;
         private float m_shakeDuration = 0.2f;
 
         //估值参数
         private AnimationCurve[] m_shakeCurves;    //震屏曲线
 
         private ShakeType m_type;
-        private float m_stayTime = 5f;
+        private float m_stayTime = -1f;
         private float m_maxDuration;
         private float m_lastShakeTime;
         private float m_startTick;
@@ -40,14 +39,13 @@ namespace THGame
             if (shaker == null)
                 return;
 
-            Shake(shaker.shakeArgs, shaker.shakeDuration, shaker.shakeCount);
+            Shake(shaker.shakeArgs, shaker.shakeDuration);
         }
 
-        public void Shake(Vector3 args, float duration, int count = 10)
+        public void Shake(Vector3 args, float duration)
         {
             m_shakeArgs = args;
             m_shakeDuration = duration;
-            m_shakeCount = count;
             m_type = ShakeType.Args;
 
             AwakeSleep();
@@ -132,17 +130,16 @@ namespace THGame
         void ApplyShakeByArgs()
         {
             //频率
-            float noiseFrequency = m_shakeCount / m_maxDuration;
             float timeX = m_shakeDuration;
-            Debug.Log(timeX);
+
             //上下震动插值
-            var curPosXVal = ShakeEvaluate(timeX, m_shakeArgs.x, noiseFrequency);
+            var curPosXVal = ShakeEvaluate2(timeX, m_shakeArgs.x);
             m_tempTrans.localPosition.x += curPosXVal;
             //远近震动插值
-            var curPosYVal = ShakeEvaluate(timeX, m_shakeArgs.y, noiseFrequency);
+            var curPosYVal = ShakeEvaluate2(timeX, m_shakeArgs.y);
             m_tempTrans.localPosition.y += curPosYVal;
             //摇头震动插值
-            var curRotZVal = ShakeEvaluate(timeX, m_shakeArgs.z, noiseFrequency);
+            var curRotZVal = ShakeEvaluate2(timeX, m_shakeArgs.z);
             m_tempTrans.localEulerAngles.z += curRotZVal;
 
         }
@@ -223,51 +220,11 @@ namespace THGame
             transform.localEulerAngles = m_baseTrans.localEulerAngles;
         }
 
-        /// <summary>
-        /// 整点曲线估值函数
-        /// </summary>
-        /// <param name="time">估值时间</param>
-        /// <param name="amplitude">摇摆的幅度[Range(0, 100)]</param>
-        /// <param name="frequency">频率[Range(0.00001f, 0.99999f)]</param>
-        /// <param name="octaves">频程迭代次数[Range(1, 4)]</param>
-        /// <param name="holding">保持(限制)效果[Range(0.00001f, 5)]</param>
-        /// <returns></returns>
-        float ShakeEvaluate(float time ,float amplitude, float frequency, int octaves = 2, float holding = 0.2f)
+        float ShakeEvaluate2(float time, float shakeStrength)
         {
-            float valX = 0;
-
-            float iAmplitude = 1;
-            float iFrequency = frequency;
-            float maxAmplitude = 0;
-            float lacunarity = 20;
-
-            for (int i = 0; i < octaves; i++)
-            {
-                //计算频率
-                float noiseFrequency = time / (1 - iFrequency) / 10;
-
-                //采样x和y的值
-                float perlinValueX = Mathf.PerlinNoise(noiseFrequency, 0.5f);
-
-                //*2 - 1 是为了保持参数范围是从 -1 到 1.
-                perlinValueX = perlinValueX * 2 - 1;
-
-                valX += perlinValueX * iAmplitude;
-
-                //振幅，计算最大振幅以便归一化
-                maxAmplitude += iAmplitude;
-
-                iAmplitude *= holding;
-                iFrequency *= lacunarity;
-            }
-
-            //归一化
-            valX /= maxAmplitude;
-
-            //扩大幅度
-            valX *= amplitude;
-
-            return valX;
+            shakeStrength = Mathf.Abs(shakeStrength);
+            var max = Mathf.SmoothStep(0, shakeStrength, time);
+            return Random.Range(-max, max);
         }
     }
 }

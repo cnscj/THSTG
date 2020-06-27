@@ -10,14 +10,16 @@ namespace THGame
         public static float FORCE_TIME = 0.618f;
 
         public new Camera camera;   //摄像机
+        public Transform observed;  //
         public float maxDeep;       //最大深度
 
 
         public Vector3 forcusPoint;   //焦点坐标
-        public float forcusRadius;   //聚焦半径
+        public float forcusRadius;    //聚焦半径
 
         private float m_oriZVal;
         private TweenScript m_tweener;
+
 
         [ContextMenu("Forcus")]
         public void Forcus()
@@ -27,8 +29,8 @@ namespace THGame
 
         public void Start()
         {
-
             camera = camera ?? Camera.main;
+            observed = (observed != null) ? observed : (camera ? camera.transform : null);
             SvaeDeep();
         }
 
@@ -76,20 +78,31 @@ namespace THGame
             }, GetForcus(), LoadDeep(), FORCE_TIME).SetEase(Ease.OutCubic);
         }
 
-        protected void FixedUpdate()
+        protected void LateUpdate()
         {
+            if (observed == null)
+                return;
+
             if (Mathf.Approximately(forcusRadius, 0f))
                 return;
 
+            //XXX:这里摄像机的焦点有可能不在中心,应该以主角为主
+
             //根据聚焦半径平滑过渡到最大聚焦深度
-            var displacement = forcusPoint - transform.position;
+            var displacement = forcusPoint - observed.position;
             var displacementLen = displacement.magnitude;
             var dLen = forcusRadius - displacementLen;
-            if (dLen >= 0f)  //表示已经在范围内
-            {
-                float val = Mathf.SmoothStep(LoadDeep(), maxDeep, (dLen / forcusRadius));
-                SetForcus(val);
-            }
+
+            //范围外
+            if (dLen < 0f)
+                return;
+
+            //TODO:将焦点拉回到镜头中心
+
+
+            float val = Mathf.SmoothStep(LoadDeep(), maxDeep, 0.5f*(dLen / forcusRadius));
+            SetForcus(val);
+            
         }
 
         private void StopAllTweener()
