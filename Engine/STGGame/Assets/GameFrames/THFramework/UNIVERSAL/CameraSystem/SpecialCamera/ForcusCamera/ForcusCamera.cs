@@ -19,7 +19,7 @@ namespace THGame
 
         private float m_oriZVal;
         private TweenScript m_tweener;
-
+        private Vector3 m_velocitv = Vector3.zero;
 
         [ContextMenu("Forcus")]
         public void Forcus()
@@ -86,8 +86,6 @@ namespace THGame
             if (Mathf.Approximately(forcusRadius, 0f))
                 return;
 
-            //XXX:这里摄像机的焦点有可能不在中心,应该以主角为主
-
             //根据聚焦半径平滑过渡到最大聚焦深度
             var displacement = forcusPoint - observed.position;
             var displacementLen = displacement.magnitude;
@@ -97,9 +95,13 @@ namespace THGame
             if (dLen < 0f)
                 return;
 
-            //TODO:将焦点拉回到镜头中心
+            //将焦点拉回到镜头中心
+            var position = transform.position;
+            position.x = Mathf.SmoothDamp(position.x, forcusPoint.x, ref m_velocitv.x, 99999f);
+            position.y = Mathf.SmoothDamp(position.y, forcusPoint.y, ref m_velocitv.y, 99999f);
+            transform.position = position;
 
-
+            //
             float val = Mathf.SmoothStep(LoadDeep(), maxDeep, 0.5f*(dLen / forcusRadius));
             SetForcus(val);
             
