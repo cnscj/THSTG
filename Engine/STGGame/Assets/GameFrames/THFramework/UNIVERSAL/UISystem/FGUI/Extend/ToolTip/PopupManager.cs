@@ -6,7 +6,7 @@ using XLibrary.Package;
 namespace THGame.UI
 {
 
-    public class PopupManager : Singleton<PopUpManager>
+    public class PopupManager : Singleton<PopupManager>
     {
         public void RegisterTip(string tipType, Type tipClass)
         {
@@ -18,7 +18,7 @@ namespace THGame.UI
             return null;
         }
 
-        public int Show(PopUpParams args)
+        public int Show(PopupParams args)
         {
             return 0;
         }
