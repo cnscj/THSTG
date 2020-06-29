@@ -10,7 +10,7 @@ namespace THGame
         public static float FORCE_TIME = 0.618f;
 
         public new Camera camera;   //摄像机
-        public Transform observed;  //
+        public Transform observed;  //观察对象
         public float maxDeep;       //最大深度
 
 
@@ -97,12 +97,12 @@ namespace THGame
 
             //将焦点拉回到镜头中心
             var position = transform.position;
-            position.x = Mathf.SmoothDamp(position.x, forcusPoint.x, ref m_velocitv.x, 99999f);
-            position.y = Mathf.SmoothDamp(position.y, forcusPoint.y, ref m_velocitv.y, 99999f);
+            position.x = Mathf.SmoothDamp(position.x, forcusPoint.x, ref m_velocitv.x, 0.618f);
+            position.y = Mathf.SmoothDamp(position.y, forcusPoint.y, ref m_velocitv.y, 0.618f);
             transform.position = position;
 
             //
-            float val = Mathf.SmoothStep(LoadDeep(), maxDeep, 0.5f*(dLen / forcusRadius));
+            float val = Mathf.SmoothStep(LoadDeep(), maxDeep, (dLen / forcusRadius));
             SetForcus(val);
             
         }

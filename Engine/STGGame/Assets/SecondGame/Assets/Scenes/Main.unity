@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.49641287, b: 0.5748173, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -271,15 +271,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   camera: {fileID: 987994166}
+  observed: {fileID: 1356390947}
   forcusRect:
     serializedVersion: 2
     x: 0
     y: -0.22
     width: 0.98
     height: 0.61
-  isWideAngle: 0
+  forcusDistance: 0
   reboundTime: 0.5
-  observed: {fileID: 1356390947}
 --- !u!114 &1163165920
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -359,6 +359,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Unitychan
       objectReference: {fileID: 0}
+    - target: {fileID: 3248735494121928965, guid: 51ea51b5d577eb74c899b6203eca4a1b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1538756238332751426, guid: 51ea51b5d577eb74c899b6203eca4a1b,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -432,6 +437,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Yuko
+      objectReference: {fileID: 0}
+    - target: {fileID: 7322602233315129167, guid: a40213694247d8c4c89bd128ee27f58a,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7715985295890651021, guid: a40213694247d8c4c89bd128ee27f58a,
         type: 3}
