@@ -15,6 +15,7 @@ namespace THGame.UI
         protected object _args;                 //参数
         protected bool _isAsync;                //是否异步加载
         protected float _interval = -1.0f;
+
         private int __scheduler = -1;
         private bool __isDisposed;
         private bool __isCreating;

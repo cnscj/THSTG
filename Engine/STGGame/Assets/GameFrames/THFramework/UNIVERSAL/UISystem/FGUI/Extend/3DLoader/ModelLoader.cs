@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace THGame.UI
 {
-    public class Model : FWidget
+    public class ModelLoader : Base3DLoader
     {
-        public Model(string packageName, string componentName) : base(packageName, componentName)
+        public ModelLoader(string packageName, string componentName) : base(packageName, componentName)
         {
 
         }

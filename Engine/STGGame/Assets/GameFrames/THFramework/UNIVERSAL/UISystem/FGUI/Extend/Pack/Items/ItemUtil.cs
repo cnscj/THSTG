@@ -8,7 +8,7 @@ namespace THGame.UI
     {
         public static bool IsStone(ItemData data)
         {
-            return data != null ? (data.GetCategory() == ItemCategory.Props && data.GetType() == ItemType.Stone) : false ;
+            return data != null ? (data.GetCategory() == ItemCategory.Prop && data.GetType() == PropType.Stone) : false ;
         }
     }
 

@@ -7,22 +7,24 @@ namespace THGame.UI
     public class ItemData
     {
         ItemMetadata __itemMetadata;
-        PackType __packType;
+        int __packType;
 
-        public ItemData(string code)
+        public ItemData(ItemArgs args)
         {
 
         }
 
-        public ItemCategory GetCategory()
+        public int GetCategory()
         {
-            return ItemCategory.Props;
+            return 0;
         }
 
-        public new ItemType GetType()
+        public new int GetType()
         {
-            return ItemType.Stone;
+            return 0;
         }
+
+
     }
 
 }

@@ -20,8 +20,7 @@ namespace UnityEngine
             return ret;
         }
 
-        public static void SetParentGameObject(this GameObject _this, GameObject parent,
-            bool worldPositionStays = false)
+        public static void SetParentGameObject(this GameObject _this, GameObject parent, bool worldPositionStays = false)
         {
             if (parent == null)
             {
@@ -48,6 +47,11 @@ namespace UnityEngine
         public static string GetLayerName(this GameObject _this)
         {
             return LayerMask.LayerToName(_this.layer);
+        }
+
+        public static bool IsNull(this UnityEngine.Object unityObject)
+        {
+            return unityObject == null;
         }
     }
 

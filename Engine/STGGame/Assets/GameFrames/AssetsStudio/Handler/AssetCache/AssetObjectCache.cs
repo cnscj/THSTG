@@ -1,12 +1,16 @@
 ﻿
 using System.Collections.Generic;
-using Object = UnityEngine.Object;
+using UnityEngine;
+using Object = System.Object;
 namespace ASGame
 {
     public class AssetObjectCache : AssetBaseCache
     {
+        public float checkFrequency = 5f;      //检查评论
+
         private Dictionary<string, AssetObjectCacheObject> m_cacheObject = new Dictionary<string, AssetObjectCacheObject>();
         private Queue<string> m_releaseQueue = new Queue<string>();
+        private float m_lastCheckTime;
 
         public bool Has(string key)
         {
@@ -20,7 +24,7 @@ namespace ASGame
 
             if (!m_cacheObject.ContainsKey(key))
             {
-                AssetObjectCacheObject cacheObj = new AssetObjectCacheObject(cacheName, key, obj);
+                AssetObjectCacheObject cacheObj = AssetObjectCacheObject.Create(cacheName, key, obj, transform);
 
                 cacheObj.UpdateTick();
                 m_cacheObject.Add(key, cacheObj);
@@ -29,7 +33,9 @@ namespace ASGame
             {
                 if (isReplace)
                 {
-                    AssetObjectCacheObject cacheObj = new AssetObjectCacheObject(cacheName, key, obj);
+                    Remove(key);
+
+                    AssetObjectCacheObject cacheObj = AssetObjectCacheObject.Create(cacheName, key, obj, transform);
                     m_cacheObject[key] = cacheObj;
                     return;
                 }
@@ -39,8 +45,9 @@ namespace ASGame
 
         public override void Remove(string key)
         {
-            if (m_cacheObject.ContainsKey(key))
+            if (m_cacheObject.TryGetValue(key,out var cacheObj))
             {
+                Destroy(cacheObj.gameObject);
                 m_cacheObject.Remove(key);
             }
         }
@@ -54,14 +61,28 @@ namespace ASGame
 
                 return cacheObj.GetObject<T>();
             }
-            return null;
+            return default;
         }
 
         public override void Clear()
         {
+            foreach(var cacheObj in m_cacheObject.Values)
+            {
+                Destroy(cacheObj.gameObject);
+            }
             m_cacheObject.Clear();
         }
 
+        public AssetObjectCacheObject GetCacheObject(string key)
+        {
+            if (m_cacheObject.TryGetValue(key, out var cacheObj))
+            {
+                return cacheObj;
+            }
+            return default;
+        }
+
+        //
         private void Update()
         {
             UpdateCheck();
@@ -70,13 +91,18 @@ namespace ASGame
 
         private void UpdateCheck()
         {
+            if (Time.realtimeSinceStartup - m_lastCheckTime < checkFrequency)
+                return;
+
             foreach (var cachePair in m_cacheObject)
             {
-                if (cachePair.Value.CheckRemove())
+                var cacheObj = cachePair.Value;
+                if (cacheObj.CheckRemove())
                 {
                     m_releaseQueue.Enqueue(cachePair.Key);
                 }
             }
+            m_lastCheckTime = Time.realtimeSinceStartup;
         }
 
         private void UpdateRelease()
@@ -84,7 +110,7 @@ namespace ASGame
             while (m_releaseQueue.Count > 0)
             {
                 var objKey = m_releaseQueue.Dequeue();
-                m_cacheObject.Remove(objKey);
+                Remove(objKey);
             }
         }
     }

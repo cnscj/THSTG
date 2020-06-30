@@ -1,12 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace THGame.UI
+﻿namespace THGame.UI
 {
-    public enum PackType
+    public static class PackType
     {
-        Item = 1,
+        public static readonly int Item = 1;       //物品背包
         
     }
 

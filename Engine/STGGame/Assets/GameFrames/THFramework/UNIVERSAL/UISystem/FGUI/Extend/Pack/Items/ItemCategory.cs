@@ -1,13 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
+﻿
 namespace THGame.UI
 {
-    public enum ItemCategory
+    public static class ItemCategory
     {
-        Money = 10,
-        Props = 20,
+        public static readonly int Money = 1;               //货币
+        public static readonly int Prop = 2;                //道具
     }
 
 }

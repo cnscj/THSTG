@@ -6,7 +6,7 @@ namespace UCGame
 {
     public class HeroController : MonoBehaviour
     {
-        public SpriteRenderer renderer;
+        public new Renderer renderer;
         public Animator animator;
 
         public float moveSpeed;
@@ -27,6 +27,7 @@ namespace UCGame
             UpdateState();
 
             UpdatePosition();
+            UpdateScale();
             UpdateRenderer();
             UpdateAniation();
 
@@ -36,6 +37,22 @@ namespace UCGame
         void UpdatePosition()
         {
             transform.Translate(new Vector3(_curSpeed * Time.deltaTime, 0, 0));
+
+        }
+        void UpdateScale()
+        {
+            if (_curSpeed < 0f)
+            {
+                var oldLocalScale = transform.localScale;
+                oldLocalScale.x = -Mathf.Abs(oldLocalScale.x);
+                transform.localScale = oldLocalScale;
+            } 
+            else if (_curSpeed > 0f)
+            {
+                var oldLocalScale = transform.localScale;
+                oldLocalScale.x = Mathf.Abs(oldLocalScale.x);
+                transform.localScale = oldLocalScale;
+            }
 
         }
 
@@ -78,11 +95,6 @@ namespace UCGame
             if (renderer == null)
                 return;
 
-            
-            if (_curSpeed < 0f)
-                renderer.flipX = true;
-            else if(_curSpeed > 0f)
-                renderer.flipX = false;
         }
 
         void UpdateAniation()

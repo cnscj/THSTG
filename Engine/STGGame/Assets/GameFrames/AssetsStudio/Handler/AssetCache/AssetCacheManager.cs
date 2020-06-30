@@ -1,9 +1,7 @@
 ﻿
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
 using XLibrary.Package;
-using Object = UnityEngine.Object;
+using Object = System.Object;
 namespace ASGame
 {
     public class AssetCacheManager : MonoSingleton<AssetCacheManager>
@@ -48,7 +46,16 @@ namespace ASGame
             }
         }
 
-        public void Dispose()
+        public void RemoveCache(string cacheName)
+        {
+            if (m_cachesMap.TryGetValue(cacheName, out var cache))
+            {
+                Destroy(cache.gameObject);
+                m_cachesMap.Remove(cacheName);
+            }
+        }
+
+        public void DisposeAll()
         {
             foreach(var cache in m_cachesMap.Values)
             {
@@ -57,15 +64,15 @@ namespace ASGame
             m_cachesMap.Clear();
         }
 
-        public T GetObject<T>(string objKey) where T : Object
+        ///////
+        public T GetObject<T>(string objKey)
         {
             if (m_cachesMap.TryGetValue(DEFAULT_CACHE, out var cache))
             {
                 return cache.Get<T>(objKey);
             }
-            return null;
+            return default;
         }
-        ///////
 
         public void AddObject(string objKey, Object obj, bool isReplace = false)
         {
@@ -81,12 +88,9 @@ namespace ASGame
             }
         }
 
-        public void DisposeObjects()
+        public void ClearObjects()
         {
-            if (m_cachesMap.TryGetValue(DEFAULT_CACHE, out var cache))
-            {
-                cache.Clear();
-            }
+            ClearCache(DEFAULT_CACHE);
         }
 
     }

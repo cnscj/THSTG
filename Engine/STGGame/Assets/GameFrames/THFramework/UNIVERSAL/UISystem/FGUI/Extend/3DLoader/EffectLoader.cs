@@ -4,12 +4,13 @@ using UnityEngine;
 
 namespace THGame.UI
 {
-    public class Effect : FWidget
+    public class EffectLoader : Base3DLoader
     {
-        public Effect(string packageName, string componentName):base(packageName, componentName)
+        public EffectLoader(string packageName, string componentName):base(packageName, componentName)
         {
 
         }
+
     }
 
 }
