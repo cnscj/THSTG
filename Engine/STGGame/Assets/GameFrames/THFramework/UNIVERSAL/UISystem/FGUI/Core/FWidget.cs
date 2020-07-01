@@ -124,6 +124,18 @@ namespace THGame.UI
         {
             package = packageName;
             component = componentName;
+
+            if (string.IsNullOrEmpty(packageName))
+            {
+                var emptyObj = new GComponent();
+                if (!string.IsNullOrEmpty(componentName))
+                {
+                    emptyObj.name = componentName;
+                    emptyObj.gameObjectName = componentName;
+                }
+                
+                InitWithObj(emptyObj);
+            }
         }
 
         //

@@ -8,6 +8,11 @@ namespace THGame.UI
 
     public class PopupManager : Singleton<PopupManager>
     {
+        public PopupManager()
+        {
+
+        }
+
         public void RegisterTip(string tipType, Type tipClass)
         {
 

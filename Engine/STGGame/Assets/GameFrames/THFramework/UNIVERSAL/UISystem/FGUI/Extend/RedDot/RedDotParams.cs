@@ -4,7 +4,7 @@ namespace THGame.UI
 {
     public class RedDotParams
     {
-        public string[] keys = new string[6];   //默认6个
+        public string[] keys;   //默认6个
 
         public RedDotParams(params string[] args)
         {
@@ -13,16 +13,20 @@ namespace THGame.UI
 
         public override string ToString()
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < keys.Length; i++)
+            if (keys != null && keys.Length > 0)
             {
-                if (!string.IsNullOrEmpty(keys[i]))
+                StringBuilder stringBuilder = new StringBuilder();
+                for (int i = 0; i < keys.Length; i++)
                 {
-                    stringBuilder.Append(string.Format("{0}_", keys[i]));
+                    if (!string.IsNullOrEmpty(keys[i]))
+                    {
+                        stringBuilder.Append(string.Format("{0}_", keys[i]));
+                    }
                 }
+                stringBuilder = stringBuilder.Length > 0 ? stringBuilder.Remove(stringBuilder.Length - 1, 1) : stringBuilder;
+                return stringBuilder.ToString();
             }
-            stringBuilder = stringBuilder.Length > 0 ? stringBuilder.Remove(stringBuilder.Length - 1, 1) : stringBuilder;
-            return stringBuilder.ToString();
+            return string.Empty;
         }
     }
 }

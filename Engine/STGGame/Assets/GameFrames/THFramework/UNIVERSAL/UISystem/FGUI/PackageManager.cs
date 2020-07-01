@@ -34,6 +34,9 @@ namespace THGame
 
         public PackageInfo AddPackage(string packageName)
         {
+            if (string.IsNullOrEmpty(packageName))
+                return null;
+
             PackageInfo packageInfo = null;
             if (!m_packageMap.TryGetValue(packageName, out packageInfo))
             {
@@ -162,6 +165,9 @@ namespace THGame
 
         private void __RetainPackage(string packageName)
         {
+            if (string.IsNullOrEmpty(packageName))
+                return;
+
             PackageInfo packageInfo = null;
             if (m_packageMap.TryGetValue(packageName, out packageInfo))
             {
@@ -189,6 +195,9 @@ namespace THGame
         }
         private void __ReleasePackage(string packageName)
         {
+            if (string.IsNullOrEmpty(packageName))
+                return;
+
             PackageInfo packageInfo = null;
             if (m_packageMap.TryGetValue(packageName, out packageInfo))
             {

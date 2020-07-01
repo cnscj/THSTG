@@ -1,7 +1,4 @@
 ﻿using FairyGUI;
-using THGame.UI;
-using System;
-using UnityEngine;
 
 namespace THGame
 {

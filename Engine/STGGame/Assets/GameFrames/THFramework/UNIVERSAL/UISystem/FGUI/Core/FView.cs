@@ -76,6 +76,16 @@ namespace THGame.UI
             return this;
         }
 
+        protected virtual void OnShowAnimation()
+        {
+
+        }
+
+        protected virtual void OnHideAnimation()
+        {
+
+        }
+
         private void DoCreated()
         {
             if (_onCreated != null)

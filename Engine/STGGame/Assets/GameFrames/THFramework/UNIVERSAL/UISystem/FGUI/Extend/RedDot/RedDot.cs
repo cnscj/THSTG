@@ -6,29 +6,55 @@ namespace THGame.UI
 {
     public class RedDot : FWidget
     {
-        private RedDotParams m_redDotParams;
-        public RedDot(string packageName, string componentName):base(packageName, componentName)
-        {
+        private string[] m_keys;
 
+        private FGraph m_graph;
+        public RedDot():base(null, "RedDot")
+        {
+            GetObject().onRemovedFromStage.Add(OnRemove);
         }
-        public void SetKeys(RedDotParams redDotParams)
+
+        public void SetKeys(params string[] args)
         {
             //反注册
-            RedDotManager.GetInstance();
+            RedDotManager.GetInstance().Unregister(OnCall, m_keys);
             //注册
+            RedDotManager.GetInstance().Register(OnCall, args);
 
-            m_redDotParams = redDotParams;
+            m_keys = args;
         }
 
-        public RedDotParams GetKeys()
+        public string[] GetKeys()
         {
-            return m_redDotParams;
+            return m_keys;
         }
 
-        private void OnCall()
+        protected override void OnInitUI()
         {
+            //生成相应的组件
+            m_graph = Create<FGraph>(new FairyGUI.GGraph());
+            m_graph.DrawEllipse(16, 16, Color.red);
+            AddChild(m_graph);
 
         }
+
+        protected virtual void OnCall(int status)
+        {
+            if (status == RedDotStatus.Hide)
+            {
+                SetVisible(false);
+            }
+            else
+            {
+                SetVisible(true);
+            }
+        }
+
+        private void OnRemove()
+        {
+            RedDotManager.GetInstance().Unregister(OnCall, m_keys);
+        }
+
 
     }
 

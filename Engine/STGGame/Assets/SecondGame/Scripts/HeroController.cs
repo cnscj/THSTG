@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace UCGame
 {
@@ -8,18 +6,21 @@ namespace UCGame
     {
         public new Renderer renderer;
         public Animator animator;
+        public new Rigidbody rigidbody;
 
-        public float moveSpeed;
-        public float runSpeed;
+        public float moveSpeed; //移动速度
+        public float runSpeed;  //奔跑速度
+        public float jumpForce; //跳跃力
 
-        private float _curSpeed;
+        private Vector3 _curSpeed;
         private bool _jumping;
         private bool _running;
 
         void Start()
         {
             animator = animator ??  GetComponent<Animator>();
-            renderer = renderer ?? GetComponent<SpriteRenderer>();
+            renderer = renderer ?? GetComponent<Renderer>();
+            rigidbody = rigidbody ?? GetComponent<Rigidbody>();
         }
 
         void Update()
@@ -28,6 +29,8 @@ namespace UCGame
 
             UpdatePosition();
             UpdateScale();
+
+            UpdateRigidbody();
             UpdateRenderer();
             UpdateAniation();
 
@@ -36,18 +39,20 @@ namespace UCGame
 
         void UpdatePosition()
         {
-            transform.Translate(new Vector3(_curSpeed * Time.deltaTime, 0, 0));
+            var newSpeed = _curSpeed * Time.deltaTime;
+            transform.Translate(newSpeed);
 
         }
+
         void UpdateScale()
         {
-            if (_curSpeed < 0f)
+            if (_curSpeed.x < 0f)
             {
                 var oldLocalScale = transform.localScale;
                 oldLocalScale.x = -Mathf.Abs(oldLocalScale.x);
                 transform.localScale = oldLocalScale;
             } 
-            else if (_curSpeed > 0f)
+            else if (_curSpeed.x > 0f)
             {
                 var oldLocalScale = transform.localScale;
                 oldLocalScale.x = Mathf.Abs(oldLocalScale.x);
@@ -70,12 +75,12 @@ namespace UCGame
 
             if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
             {
-                _curSpeed = runSpeed * moveDir;
+                _curSpeed.x = runSpeed * moveDir;
                 _running = true;
             }
             else
             {
-                _curSpeed = moveSpeed * moveDir;
+                _curSpeed.x = moveSpeed * moveDir;
                 _running = false;
             }
 
@@ -89,7 +94,15 @@ namespace UCGame
             }
 
         }
-       
+
+        void UpdateRigidbody()
+        {
+            if (rigidbody == null)
+                return;
+
+
+        }
+
         void UpdateRenderer()
         {
             if (renderer == null)
@@ -102,7 +115,7 @@ namespace UCGame
             if (animator == null)
                 return;
 
-            if (Mathf.Approximately(_curSpeed, 0f))
+            if (Mathf.Approximately(_curSpeed.x, 0f))
             {
                 animator.Play("Idle");
             }
