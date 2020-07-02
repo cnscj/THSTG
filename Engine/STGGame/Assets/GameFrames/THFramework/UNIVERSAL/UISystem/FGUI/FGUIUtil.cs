@@ -1,95 +1,118 @@
 ﻿using FairyGUI;
+using UnityEngine;
 
 namespace THGame.UI
 {
     /// <summary>
-    /// 这个类的作用是封装一些Fgui的方法，避免在lua端大量调用fgui接口的操作。主要是针对Stage和GRoot，这2个类特别庞大，能不用wrap就不用。
+    /// 这个类的作用是封装一些Fgui的方法，
     /// </summary>
     public static class FGUIUtil
     {
-        public static DisplayObject stageFocus
+        public class BaseArgs
         {
-            get { return Stage.inst.focus; }
-            set { Stage.inst.focus = value; }
+            public Vector2 xy = new Vector2(0,0);
+            public Vector2 pivot = new Vector2(0,0);
+            public bool pivotAsAnchor = false;
+            public Vector2 scale = new Vector2(1, 1);
+            public float alpha = 1f;
+            public bool center = false;
+
+            public FComponent parent = UIManager.GetInstance().Root;
         }
 
-        public static GComponent CreateLayerObject(int sortingOrder, string layerName = null)
+        public class LabelArgs : BaseArgs
         {
-            var obj = new GComponent();
-            obj.sortingOrder = sortingOrder;
-            obj.SetSize(GRoot.inst.width, GRoot.inst.height);
-            obj.AddRelation(GRoot.inst, RelationType.Size);
-            GRoot.inst.AddChild(obj);
-
-            if (!string.IsNullOrEmpty(layerName))
+            public class Style
             {
-                obj.rootContainer.gameObject.name = layerName;
+                public Color color = Color.black;
+                public int size = 20;
+                public string font = "";
+                public bool underline = false;
             }
-
-            return obj;
+            public Style style = new Style();
         }
 
-        // Stage
-        public static void AddStageOnTouchBegin(EventCallback1 callback1)
+        public class GraphArgs : BaseArgs
         {
-            Stage.inst.onTouchBegin.Add(callback1);
-        }
-        public static void RemoveStageOnTouchBegin(EventCallback1 callback1)
-        {
-            Stage.inst.onTouchBegin.Remove(callback1);
+
         }
 
-        public static void AddStageOnTouchBeginCapture(EventCallback1 callback1)
+        public class ButtonArgs : BaseArgs
         {
-            Stage.inst.onTouchBegin.AddCapture(callback1);
+
         }
 
-        public static void RemoveStageOnTouchBeginCapture(EventCallback1 callback1)
+        public class RichTextArgs : BaseArgs
         {
-            Stage.inst.onTouchBegin.RemoveCapture(callback1);
+
+        }
+        ///////////////////////////
+        
+        public static FComponent NewComponent(BaseArgs baseArgs)
+        {
+            var fComponent = NewT<FComponent, GComponent>(baseArgs);
+            return fComponent;
         }
 
-        public static void AddStageOnTouchEndCapture(EventCallback1 callback1)
+        public static FButton NewButton(ButtonArgs buttonArgs)
         {
-            Stage.inst.onTouchEnd.AddCapture(callback1);
+            var fButton = NewT<FButton, GButton>(buttonArgs);
+            return fButton;
         }
 
-        public static void RemoveStageOnTouchEndCapture(EventCallback1 callback1)
+        public static FGraph NewGraph(GraphArgs graphArgs)
         {
-            Stage.inst.onTouchEnd.RemoveCapture(callback1);
+            var fGraph = NewT<FGraph, GGraph>(graphArgs);
+            return fGraph;
         }
 
-        public static void SetStageOnKeyDown(EventCallback1 callback1)
+        public static FLabel NewLabel(LabelArgs labelArgs)
         {
-            Stage.inst.onKeyDown.Set(callback1);
+            var fLabel = NewT<FLabel, GLabel>(labelArgs);
+            fLabel.SetColor(labelArgs.style.color);
+
+
+            return fLabel;
         }
 
-        public static void ClearStageOnKeyDown()
+        public static FRichText NewRichText(RichTextArgs richTextArgs)
         {
-            Stage.inst.onKeyDown.Clear();
+            var fRichText = NewT<FRichText, GRichTextField>(richTextArgs);
+           
+            return fRichText;
         }
 
-        public static void GetStageWidthAndHeight(out float width, out float height)
+
+        private static T1 NewT<T1, T2>(BaseArgs baseArgs) where T1 : FComponent, new() where T2 : GObject, new()
         {
-            width = Stage.inst.size.x;
-            height = Stage.inst.size.y;
+            var fCompomnet = FComponent.Create<T1>(new T2());
+            InitBaseArgs(fCompomnet, baseArgs);
+
+            return fCompomnet;
         }
 
-        //GRoot
-        public static void SetRootContentScaleFactor(int width, int height)
+        /// <summary>
+        /// 初始化基准组件
+        /// </summary>
+        /// <param name="fComponent"></param>
+        /// <param name="baseArgs"></param>
+        private static void InitBaseArgs(FComponent fComponent, BaseArgs baseArgs)
         {
-            GRoot.inst.SetContentScaleFactor(width, height);
-        }
+            if (fComponent == null)
+                return;
 
-        public static void AddRootOnSizeChanged(EventCallback0 callback0)
-        {
-            GRoot.inst.onSizeChanged.Add(callback0);
-        }
+            if (baseArgs == null)
+                return;
 
-        public static void RemoveRootOnSizeChanged(EventCallback0 callback0)
-        {
-            GRoot.inst.onSizeChanged.Remove(callback0);
-        }
+            fComponent.SetXY(baseArgs.xy);
+            fComponent.SetPivot(baseArgs.pivot.x, baseArgs.pivot.y, baseArgs.pivotAsAnchor);
+            fComponent.SetScale(baseArgs.scale.x, baseArgs.scale.y);
+            fComponent.SetAlpha(baseArgs.alpha);
 
+            if (baseArgs.parent != null)
+            {
+                baseArgs.parent.AddChild(fComponent);
+            }
+        }
     }
 }

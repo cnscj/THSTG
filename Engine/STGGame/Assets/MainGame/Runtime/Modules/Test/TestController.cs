@@ -12,7 +12,7 @@ namespace STGRuntime
     {
         protected override void OnAdded()
         {
-            FGUIUtil.SetStageOnKeyDown((context) =>
+            UIManager.GetInstance().SetStageOnKeyDown((context) =>
             {
                 OnKeyDown(context);
             });

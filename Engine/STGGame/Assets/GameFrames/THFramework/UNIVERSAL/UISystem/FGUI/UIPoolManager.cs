@@ -1,7 +1,6 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using THGame.UI;
 using UnityEngine;
 using XLibrary.Package;
 
@@ -13,7 +12,7 @@ namespace THGame.UI
         {
             public class PoolObject 
             {
-                public FObject obj;
+                public FComponent obj;
                 public float stayTime = -1;
                 private float m_tick;
 
@@ -36,19 +35,19 @@ namespace THGame.UI
 
             }
 
-            public static readonly Action<FObject> DEFAULT_CREATE_CALL = (obj) =>
+            public static readonly Action<FComponent> DEFAULT_CREATE_CALL = (obj) =>
             {
 
             };
-            public static readonly Action<FObject> DEFAULT_GET_CALL = (obj) =>
+            public static readonly Action<FComponent> DEFAULT_GET_CALL = (obj) =>
             {
                 obj?.SetVisible(true);
             };
-            public static readonly Action<FObject> DEFAULT_RELEASE_CALL = (obj) =>
+            public static readonly Action<FComponent> DEFAULT_RELEASE_CALL = (obj) =>
             {
                 obj?.SetVisible(false);
             };
-            public static readonly Action<FObject> DEFAULT_DISPOSE_CALL = (obj) =>
+            public static readonly Action<FComponent> DEFAULT_DISPOSE_CALL = (obj) =>
             {
                 obj?.Dispose();
             };
@@ -57,10 +56,10 @@ namespace THGame.UI
             public Type fComponent;
             public int maxCount = 50;
             public float checkFrequence = 1f;
-            public Action<FObject> onCreate = DEFAULT_CREATE_CALL;
-            public Action<FObject> onGet = DEFAULT_GET_CALL;
-            public Action<FObject> onRelease = DEFAULT_RELEASE_CALL;
-            public Action<FObject> onDispose = DEFAULT_DISPOSE_CALL;
+            public Action<FComponent> onCreate = DEFAULT_CREATE_CALL;
+            public Action<FComponent> onGet = DEFAULT_GET_CALL;
+            public Action<FComponent> onRelease = DEFAULT_RELEASE_CALL;
+            public Action<FComponent> onDispose = DEFAULT_DISPOSE_CALL;
 
             private LinkedList<PoolObject> m_availableObjs;
             private float m_lastCheckTic;
@@ -82,7 +81,7 @@ namespace THGame.UI
             public int MaxCount { get { return maxCount; } }
             public int AvailableCount { get { return m_availableObjs != null ? m_availableObjs.Count : 0; } }
 
-            public FObject GetOrCreate()
+            public FComponent GetOrCreate()
             {
                 var poolList = GetObjectList();
                 if (poolList.Count <= 0)
@@ -100,7 +99,7 @@ namespace THGame.UI
                 return uiObj;
             }
 
-            public void Release(FObject uiObj)
+            public void Release(FComponent uiObj)
             {
                 if (uiObj == null)
                     return;
@@ -150,12 +149,12 @@ namespace THGame.UI
                 UIPoolManager.GetInstance().RemovePool(name);
             }
 
-            private PoolObject CreatePoolObj(FObject uiObj = null)
+            private PoolObject CreatePoolObj(FComponent uiObj = null)
             {
                 var newFobj = uiObj;
                 if (newFobj == null)
                 {
-                    newFobj = (FObject)System.Activator.CreateInstance(fComponent);
+                    newFobj = (FComponent)System.Activator.CreateInstance(fComponent);
                     onCreate?.Invoke(newFobj);
                 }
                 var newPoolObj = new PoolObject();
@@ -201,7 +200,7 @@ namespace THGame.UI
 
         private Dictionary<string, UIPool> m_poolDict;
 
-        public UIPool GetOrCreatePool<T>() where T : FObject ,new()
+        public UIPool GetOrCreatePool<T>() where T : FComponent ,new()
         {
             var type = typeof(T);
             var poolName = type.FullName;

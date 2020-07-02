@@ -1,12 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-
 namespace THGame.UI
 {
 
     public class FLabel : FComponent
     {
-
         public new string GetText()
         {
             return _obj.asTextField.text;

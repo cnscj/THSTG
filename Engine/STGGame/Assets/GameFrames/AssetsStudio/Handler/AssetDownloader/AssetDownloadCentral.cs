@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using XLibrary;
-using XLibrary.Network;
 
 namespace ASGame
 {

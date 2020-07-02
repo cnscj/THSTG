@@ -14,7 +14,7 @@ using UnityEngine;
 //  功能描述                ：Http 下载管理器的接口类
 //
 ///////////////////////////////////////////////////////////
-namespace XLibrary.Network
+namespace ASGame
 {
     public class DownResInfo
     {

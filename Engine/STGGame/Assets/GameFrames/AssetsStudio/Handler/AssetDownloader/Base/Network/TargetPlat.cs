@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-namespace XLibrary.Network
+namespace ASGame
 {
     // 目前只定义几个主要的平台，更多的平台请查看帮助，关键字：Platform Dependent Compilation
     public enum PALT_TYPE

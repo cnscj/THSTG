@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace XLibrary.Network
+namespace ASGame
 {
     ///////////////////////////////////////////////////////////
     //

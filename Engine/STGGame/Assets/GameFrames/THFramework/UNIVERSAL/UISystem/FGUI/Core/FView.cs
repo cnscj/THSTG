@@ -76,6 +76,7 @@ namespace THGame.UI
             return this;
         }
 
+        //TODO:
         protected virtual void OnShowAnimation()
         {
 
