@@ -1,6 +1,6 @@
 ﻿using FairyGUI;
 
-namespace THGame
+namespace THGame.UI
 {
     /// <summary>
     /// 这个类的作用是封装一些Fgui的方法，避免在lua端大量调用fgui接口的操作。主要是针对Stage和GRoot，这2个类特别庞大，能不用wrap就不用。

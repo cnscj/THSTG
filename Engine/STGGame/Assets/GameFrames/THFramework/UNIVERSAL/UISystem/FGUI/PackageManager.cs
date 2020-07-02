@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 
-namespace THGame
+namespace THGame.UI
 {
     public class PackageManager : MonoSingleton<PackageManager>
     {

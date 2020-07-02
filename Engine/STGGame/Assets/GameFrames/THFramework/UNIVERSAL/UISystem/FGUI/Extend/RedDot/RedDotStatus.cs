@@ -3,6 +3,6 @@
     public static class RedDotStatus
     {
         public static readonly int Hide = 0;
-        public static readonly int Red = 2^1;
+        public static readonly int Red = 1<<1;
     }
 }

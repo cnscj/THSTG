@@ -6,7 +6,7 @@ namespace ASGame
 {
     public class AssetObjectCache : AssetBaseCache
     {
-        public float checkFrequency = 5f;      //检查评论
+        public float checkFrequency = 5f;      //检查频度
 
         private Dictionary<string, AssetObjectCacheObject> m_cacheObject = new Dictionary<string, AssetObjectCacheObject>();
         private Queue<string> m_releaseQueue = new Queue<string>();

@@ -5,7 +5,7 @@ using THGame.UI;
 using UnityEngine;
 using XLibrary.Package;
 
-namespace THGame
+namespace THGame.UI
 {
     public class UIPoolManager : MonoSingleton<UIPoolManager>
     {

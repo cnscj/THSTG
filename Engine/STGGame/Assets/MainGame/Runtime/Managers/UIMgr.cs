@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.IO;
-using ASGame;
-using STGU3D;
 using THGame;
+using THGame.UI;
 using AssetManager = STGU3D.AssetManager;
 namespace STGRuntime
 {

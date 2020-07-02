@@ -38,9 +38,9 @@ namespace THGame.UI
 
         }
 
-        protected virtual void OnCall(int status)
+        protected virtual void OnCall(RedDotData date)
         {
-            if (status == RedDotStatus.Hide)
+            if (date.curStatus == RedDotStatus.Hide)
             {
                 SetVisible(false);
             }

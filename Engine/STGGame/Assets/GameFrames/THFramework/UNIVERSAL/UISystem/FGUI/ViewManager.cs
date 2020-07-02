@@ -7,7 +7,7 @@ using THGame.UI;
 using UnityEngine;
 
 
-namespace THGame
+namespace THGame.UI
 {
     public class ViewManager : MonoSingleton<ViewManager>
     {

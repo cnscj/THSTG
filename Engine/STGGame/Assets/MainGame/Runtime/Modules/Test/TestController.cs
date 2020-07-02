@@ -3,7 +3,7 @@
 using FairyGUI;
 using STGRuntime.MVC;
 using STGU3D;
-using THGame;
+using THGame.UI;
 using UnityEngine;
 
 namespace STGRuntime
