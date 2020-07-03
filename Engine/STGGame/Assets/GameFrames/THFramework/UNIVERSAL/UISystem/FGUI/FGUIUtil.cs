@@ -62,6 +62,11 @@ namespace THGame.UI
             public FList.ItemStateFuncT0 onState;
             public EventCallback1 onClickItem;
         }
+
+        public class LoaderArgs : BaseArgs
+        {
+
+        }
         ///////////////////////////
 
         public static FComponent NewComponent(BaseArgs baseArgs)
@@ -107,6 +112,12 @@ namespace THGame.UI
             return fTextInput;
         }
 
+        public static FLoader NewLoader(LoaderArgs loaderArgs)
+        {
+            var fLoader = NewT<FLoader, GLoader>(loaderArgs);
+            return fLoader;
+        }
+
         //TODO:
         public static FList NewList(ListArgs listArgs)
         {
@@ -148,6 +159,12 @@ namespace THGame.UI
 
             if (baseArgs.center) fComponent.Center();
             if (baseArgs.parent != null) baseArgs.parent.AddChild(fComponent);
+        }
+
+        ///////////////////////////
+        public static string GetUIUrl(string package, string component)
+        {
+            return UIPackage.GetItemURL(package, component);
         }
     }
 }

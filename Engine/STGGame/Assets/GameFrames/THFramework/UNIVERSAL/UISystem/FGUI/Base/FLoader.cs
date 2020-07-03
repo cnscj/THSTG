@@ -13,7 +13,7 @@ namespace THGame.UI
             set { _isAsyncLoading = value; }
         }
 
-        public void SetItemUrl(string package, string component)
+        public void SetUIUrl(string package, string component)
         {
             string url = UIPackage.GetItemURL(package, component);
             _obj.asLoader.url = url;

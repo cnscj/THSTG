@@ -1,4 +1,5 @@
 ﻿
+using System;
 using FairyGUI;
 using UnityEngine;
 using XLibrary.Package;
@@ -101,6 +102,16 @@ namespace THGame.UI
         public void RemoveRootOnSizeChanged(EventCallback0 callback0)
         {
             GRoot.inst.onSizeChanged.Remove(callback0);
+        }
+
+        //UIObjectFactory
+        public void SetLoaderExtension(Type type)
+        {
+            UIObjectFactory.SetLoaderExtension(type);
+        }
+        public void SetPackageItemExtension(string url,Type type)
+        {
+            UIObjectFactory.SetPackageItemExtension(url,type);
         }
     }
 }

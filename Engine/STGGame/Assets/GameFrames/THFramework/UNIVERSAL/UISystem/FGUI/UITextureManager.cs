@@ -158,6 +158,18 @@ namespace THGame.UI
                 return m_texturesDict.Remove(key);
             }
 
+            public void Dispose(string key)
+            {
+                if (string.IsNullOrEmpty(key))
+                    return;
+
+                if (m_texturesDict == null)
+                    return;
+
+                var releaseQueue = GetReleaseQueue();
+                releaseQueue.Enqueue(key);
+            }
+
             public void Clear()
             {
                 if (m_texturesDict == null)
@@ -340,7 +352,7 @@ namespace THGame.UI
                 if (TryGetLoadedBundle(abPath, out var bundleInfo))
                 {
                     var ab = bundleInfo.assetBundle;
-                    ab.Unload(true);
+                    ab.Unload(false);
 
                     Debug.LogFormat("[TextureManager]The AssetBundle '{0}' had been unload!", abPath);
                     GetLoadedBundleDict().Remove(abPath);
@@ -524,6 +536,12 @@ namespace THGame.UI
 
         public bool AddTexture(string key, Texture2D texture2D)
         {
+            if (string.IsNullOrEmpty(key))
+                return false;
+
+            if (texture2D == null)
+                return false;
+
             var cache = GetTextureCache();
             var textureInfo = cache.Add(key, texture2D);
             textureInfo.isAddByManager = true;
@@ -532,8 +550,23 @@ namespace THGame.UI
             return textureInfo != null;
         }
 
+        public void RemoveTexture(string key)
+        {
+            if (string.IsNullOrEmpty(key))
+                return;
+
+            if (m_u3dTexCache == null)
+                return;
+
+            m_u3dTexCache.Dispose(key);
+        }
+
         public void LoadTexture(string path, bool isAsync, Action<TextureCache.TextureInfo> callback)
         {
+            if (string.IsNullOrEmpty(path))
+                return;
+
+            path = path.ToLower();  //全部转为小写
             if (m_u3dTexCache != null)
             {
                 var tetureInfo = m_u3dTexCache.GetTextureInfo(path);

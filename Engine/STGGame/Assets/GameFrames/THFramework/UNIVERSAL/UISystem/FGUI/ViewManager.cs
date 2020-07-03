@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using XLibrary.Package;
+﻿using XLibrary.Package;
 using System.Collections.Generic;
 using System;
 using FairyGUI;
-using THGame.UI;
 using UnityEngine;
 
 
