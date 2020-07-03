@@ -13,7 +13,7 @@ namespace THGame.UI
             public class PoolObject 
             {
                 public FComponent obj;
-                public float stayTime = -1;
+                public float stayTime = 60;
                 private float m_tick;
 
                 public bool CheckDispose()
@@ -55,6 +55,7 @@ namespace THGame.UI
             public string poolName;
             public Type fComponent;
             public int maxCount = 50;
+            public int minCount = 0;
             public float checkFrequence = 1f;
             public Action<FComponent> onCreate = DEFAULT_CREATE_CALL;
             public Action<FComponent> onGet = DEFAULT_GET_CALL;
@@ -183,6 +184,9 @@ namespace THGame.UI
                     return;
 
                 if (Time.realtimeSinceStartup - m_lastCheckTic < checkFrequence)
+                    return;
+
+                if (AvailableCount <= minCount)
                     return;
 
                 for (LinkedListNode<PoolObject> iterNode = m_availableObjs.Last; iterNode != null; iterNode = iterNode.Previous)

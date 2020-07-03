@@ -450,6 +450,12 @@ namespace THGame.UI
         {
             _obj.Center();
         }
+
+        public void MakeFullScreen()
+        {
+            _obj.MakeFullScreen();
+        }
+
         public virtual void Dispose()
         {
             if (_obj != null)

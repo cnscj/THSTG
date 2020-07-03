@@ -200,12 +200,6 @@ namespace THGame.UI
             return _obj.asCom.viewHeight;
         }
 
-        public void FullScene()
-        {
-            SetSize(Stage.inst.size.x, Stage.inst.size.y);
-            AddRelation(GetParent(), FairyGUI.RelationType.Size);
-        }
-
     }
 
 }

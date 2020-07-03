@@ -18,12 +18,12 @@ namespace THGame.UI
         // FontManager
         public void RegisterFont(BaseFont font)
         {
-
+            FontManager.RegisterFont(font);
         }
 
         public void UnregisterFont(BaseFont font)
         {
-
+            FontManager.UnregisterFont(font);
         }
 
         // ViewManager

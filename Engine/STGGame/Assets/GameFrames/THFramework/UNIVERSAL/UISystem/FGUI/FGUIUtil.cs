@@ -1,4 +1,5 @@
-﻿using FairyGUI;
+﻿using System;
+using FairyGUI;
 using UnityEngine;
 
 namespace THGame.UI
@@ -16,6 +17,7 @@ namespace THGame.UI
             public Vector2 scale = new Vector2(1, 1);
             public float alpha = 1f;
             public bool center = false;
+            public string title;
 
             public FComponent parent = UIManager.GetInstance().Root;
         }
@@ -39,15 +41,29 @@ namespace THGame.UI
 
         public class ButtonArgs : BaseArgs
         {
-
+            public EventCallback1 onClick;
         }
 
         public class RichTextArgs : BaseArgs
         {
 
         }
-        ///////////////////////////
+
+        public class TextInputArgs : BaseArgs
+        {
+            public string promptText;
+        }
         
+
+
+        public class ListArgs : BaseArgs
+        {
+            public FComponent template;
+            public FList.ItemStateFuncT0 onState;
+            public EventCallback1 onClickItem;
+        }
+        ///////////////////////////
+
         public static FComponent NewComponent(BaseArgs baseArgs)
         {
             var fComponent = NewT<FComponent, GComponent>(baseArgs);
@@ -57,6 +73,8 @@ namespace THGame.UI
         public static FButton NewButton(ButtonArgs buttonArgs)
         {
             var fButton = NewT<FButton, GButton>(buttonArgs);
+            if (buttonArgs.onClick != null) fButton.OnClick(buttonArgs.onClick);
+
             return fButton;
         }
 
@@ -80,6 +98,24 @@ namespace THGame.UI
             var fRichText = NewT<FRichText, GRichTextField>(richTextArgs);
            
             return fRichText;
+        }
+
+        public static FTextInput NewTextInput(TextInputArgs textInputArgs)
+        {
+            var fTextInput = NewT<FTextInput, GTextInput>(textInputArgs);
+            fTextInput.SetPlaceHolder(textInputArgs.promptText);
+            return fTextInput;
+        }
+
+        //TODO:
+        public static FList NewList(ListArgs listArgs)
+        {
+            var fList = NewT <FList, GList>(listArgs);
+            if (listArgs.onState != null) fList.SetState(listArgs.onState);
+            if (listArgs.onClickItem != null) fList.OnClickItem(listArgs.onClickItem);
+
+
+            return fList;
         }
 
 
@@ -108,11 +144,10 @@ namespace THGame.UI
             fComponent.SetPivot(baseArgs.pivot.x, baseArgs.pivot.y, baseArgs.pivotAsAnchor);
             fComponent.SetScale(baseArgs.scale.x, baseArgs.scale.y);
             fComponent.SetAlpha(baseArgs.alpha);
+            fComponent.SetText(baseArgs.title);
 
-            if (baseArgs.parent != null)
-            {
-                baseArgs.parent.AddChild(fComponent);
-            }
+            if (baseArgs.center) fComponent.Center();
+            if (baseArgs.parent != null) baseArgs.parent.AddChild(fComponent);
         }
     }
 }

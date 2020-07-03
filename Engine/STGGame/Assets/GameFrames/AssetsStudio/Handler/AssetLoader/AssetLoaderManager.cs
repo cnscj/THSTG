@@ -33,6 +33,16 @@ namespace ASGame
             return handler;
         }
 
+        public T LoadAssetSync<T>(string path) where T : class
+        {
+            T asset = null;
+            LoadAssetSync<T>(path, (obj) =>
+            {
+                asset = obj;
+            });
+            return asset;
+        }
+
         public int LoadAssetSync<T>(string path, Action<T> onSuccess = null, Action<int> onFailed = null) where T : class
         {
             AssetLoadHandler handler = LoadAssetHandler<T>(path, (AssetLoadResult result) =>
