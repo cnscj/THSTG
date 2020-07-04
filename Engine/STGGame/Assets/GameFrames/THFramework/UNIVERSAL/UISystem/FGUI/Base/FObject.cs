@@ -39,6 +39,11 @@ namespace THGame.UI
             return __parent;
         }
 
+        public virtual void RemoveFromParent()
+        {
+            _obj.RemoveFromParent();
+        }
+
         public void SetX(float x)
         {
             _obj.x = x;

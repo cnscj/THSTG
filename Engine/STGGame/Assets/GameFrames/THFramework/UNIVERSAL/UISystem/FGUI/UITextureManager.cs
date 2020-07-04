@@ -31,7 +31,7 @@ namespace THGame.UI
 
                 public void UpdateVisitTime()
                 {
-                    m_disposeTime = -1;
+                    m_disposeTime = -1f;
                     lastVisitTime = Time.realtimeSinceStartup;
                 }
 
@@ -52,7 +52,7 @@ namespace THGame.UI
                     if (isResident)
                         return false;
 
-                    if (m_disposeTime > 0)
+                    if (m_disposeTime > 0f)
                     {
                         if (Time.realtimeSinceStartup >= m_disposeTime)
                         {
@@ -62,8 +62,8 @@ namespace THGame.UI
                     else
                     {
                         var newUsedTimes = usedTimes;
-                        if (isAddByManager) newUsedTimes--;
-                        if (newUsedTimes <= 0) //1是Cache的引用
+                        if (isAddByManager) newUsedTimes--; //1是Cache的引用
+                        if (newUsedTimes <= 0)
                         {
                             var timeMs = UnityEngine.Random.Range(1, 6000);
                             m_disposeTime = Time.realtimeSinceStartup + timeMs / 1000;
@@ -352,7 +352,7 @@ namespace THGame.UI
                 if (TryGetLoadedBundle(abPath, out var bundleInfo))
                 {
                     var ab = bundleInfo.assetBundle;
-                    ab.Unload(false);
+                    ab.Unload(false);   //有的纹理可能加载了,但是没受池管理,不理它
 
                     Debug.LogFormat("[TextureManager]The AssetBundle '{0}' had been unload!", abPath);
                     GetLoadedBundleDict().Remove(abPath);
@@ -665,6 +665,11 @@ namespace THGame.UI
                 m_u3dTexCache = cacheGobj.AddComponent<TextureCache>();
             }
             return m_u3dTexCache;
+        }
+
+        private string CombinePath(string abPath,string assetName)
+        {
+            return string.Format("{0}|{1}", abPath, assetName);
         }
 
         private int SplitePath(string path,out string abPath,out string assetName)

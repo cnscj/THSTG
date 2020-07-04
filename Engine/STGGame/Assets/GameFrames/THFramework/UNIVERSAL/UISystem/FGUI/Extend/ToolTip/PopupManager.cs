@@ -5,15 +5,9 @@ using XLibrary.Package;
 
 namespace THGame.UI
 {
-
-    public class PopupManager : Singleton<PopupManager>
+    public class PopupManager : MonoSingleton<PopupManager>
     {
         public PopupManager()
-        {
-
-        }
-
-        public void RegisterTip(string tipType, Type tipClass)
         {
 
         }
@@ -23,17 +17,22 @@ namespace THGame.UI
             return null;
         }
 
-        public int Show(PopupParams args)
+        public int Show<T>(ToolTipData data) where T : ToolTipBase, new()
         {
-            return 0;
+            var toolTip = GetOrCreateToolTip<T>();
+            toolTip.SetToolTipData(data);
+
+            UIManager.GetInstance().ShowPopup(toolTip);
+
+            return -1;
         }
 
-        public void Hide(int toolTipId)
+        public void Hide<T>() where T : ToolTipBase
         {
 
         }
 
-        public void IsShow(int toolTipId)
+        public void IsShow<T>() where T : ToolTipBase
         {
 
         }
@@ -47,6 +46,20 @@ namespace THGame.UI
         {
 
         }
+
+        private T GetOrCreateToolTip<T>() where T : ToolTipBase, new()
+        {
+            Type toolTipType = typeof(T);
+            string poolName = toolTipType.FullName;
+
+            var pool = UIPoolManager.GetInstance().GetPool(poolName);
+            if (pool == null)
+            {
+                pool = UIPoolManager.GetInstance().CreatePool(poolName, toolTipType);
+            }
+            return pool.GetOrCreate() as T;
+        }
+
     }
 }
 

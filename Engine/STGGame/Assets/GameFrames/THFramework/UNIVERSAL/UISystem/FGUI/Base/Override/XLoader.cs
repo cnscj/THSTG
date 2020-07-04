@@ -23,12 +23,27 @@ namespace THGame.UI
             string srcUrl = url;
             UITextureManager.GetInstance().LoadTexture(srcUrl, true, (textureInfo) =>
             {
-                string curUrl = url;
-                if (string.Compare(srcUrl, curUrl) != 0)
+                bool isError = false;
+                do
                 {
-                    textureInfo.Release();
+                    if (isDisposed)
+                    {
+                        isError = true;
+                        break;
+                    }
+
+                    string curUrl = url;
+                    if (string.Compare(srcUrl, curUrl) != 0)
+                    {
+                        isError = true;
+                        break;
+                    }
+
+                } while (false);
+                
+
+                if (isError)
                     return;
-                }
 
                 _textureInfo = textureInfo;
                 _textureInfo.Retain();

@@ -9,12 +9,8 @@ namespace THGame.UI
     //TODO:
     public class UIManager : MonoSingleton<UIManager>
     {
-        
-        private FComponent m_root;
-        public FComponent Root
-        {
-            get { return (m_root = m_root ?? FComponent.Create(GRoot.inst)); }
-        }
+        public FRoot Root => FRoot.GetInstance();
+
 
         private void Awake()
         {
@@ -107,6 +103,16 @@ namespace THGame.UI
         public void RemoveRootOnSizeChanged(EventCallback0 callback0)
         {
             GRoot.inst.onSizeChanged.Remove(callback0);
+        }
+
+        public void ShowPopup(FObject obj)
+        {
+            Root.ShowPopup(obj);
+        }
+
+        public void HidePopup(FObject obj)
+        {
+            Root.HidePopup(obj);
         }
 
         //UIObjectFactory

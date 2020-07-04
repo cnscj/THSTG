@@ -116,10 +116,6 @@ namespace THGame.UI
             _obj.asCom.RemoveChildren(0, -1, isDisposed);
             __children?.Clear();
         }
-        public virtual void RemoveFromParent()
-        {
-            _obj.asCom.RemoveFromParent();
-        }
 
         public void SetChildIndexBefore(FComponent child, int index)
         {
