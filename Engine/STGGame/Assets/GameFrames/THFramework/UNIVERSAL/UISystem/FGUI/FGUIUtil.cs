@@ -65,7 +65,7 @@ namespace THGame.UI
 
         public class LoaderArgs : BaseArgs
         {
-
+            public string url;
         }
         ///////////////////////////
 
@@ -78,7 +78,10 @@ namespace THGame.UI
         public static FButton NewButton(ButtonArgs buttonArgs)
         {
             var fButton = NewT<FButton, GButton>(buttonArgs);
-            if (buttonArgs.onClick != null) fButton.OnClick(buttonArgs.onClick);
+            if (buttonArgs != null)
+            {
+                if (buttonArgs.onClick != null) fButton.OnClick(buttonArgs.onClick);
+            }
 
             return fButton;
         }
@@ -86,14 +89,20 @@ namespace THGame.UI
         public static FGraph NewGraph(GraphArgs graphArgs)
         {
             var fGraph = NewT<FGraph, GGraph>(graphArgs);
+            if (graphArgs != null)
+            {
+
+            }
             return fGraph;
         }
 
         public static FLabel NewLabel(LabelArgs labelArgs)
         {
             var fLabel = NewT<FLabel, GLabel>(labelArgs);
-            fLabel.SetColor(labelArgs.style.color);
-
+            if (labelArgs != null)
+            {
+                fLabel.SetColor(labelArgs.style.color);
+            }
 
             return fLabel;
         }
@@ -101,35 +110,57 @@ namespace THGame.UI
         public static FRichText NewRichText(RichTextArgs richTextArgs)
         {
             var fRichText = NewT<FRichText, GRichTextField>(richTextArgs);
-           
+            if (richTextArgs != null)
+            {
+
+            }
             return fRichText;
         }
 
         public static FTextInput NewTextInput(TextInputArgs textInputArgs)
         {
             var fTextInput = NewT<FTextInput, GTextInput>(textInputArgs);
-            fTextInput.SetPlaceHolder(textInputArgs.promptText);
+            if (textInputArgs != null)
+            {
+                fTextInput.SetPlaceHolder(textInputArgs.promptText);
+            }
+            
             return fTextInput;
         }
 
         public static FLoader NewLoader(LoaderArgs loaderArgs)
         {
-            var fLoader = NewT<FLoader, GLoader>(loaderArgs);
+            var fLoader = NewT<FLoader>(UIObjectFactory.NewObject(ObjectType.Loader), loaderArgs);
+            InitBaseArgs(fLoader, loaderArgs);
+            if (loaderArgs != null)
+            {
+                if (!string.IsNullOrEmpty(loaderArgs.url)) fLoader.SetUrl(loaderArgs.url);
+            }
+            
             return fLoader;
         }
 
         //TODO:
         public static FList NewList(ListArgs listArgs)
         {
-            var fList = NewT <FList, GList>(listArgs);
-            if (listArgs.onState != null) fList.SetState(listArgs.onState);
-            if (listArgs.onClickItem != null) fList.OnClickItem(listArgs.onClickItem);
+            var fList = NewT<FList, GList>(listArgs);
+            if (listArgs != null)
+            {
+                if (listArgs.onState != null) fList.SetState(listArgs.onState);
+                if (listArgs.onClickItem != null) fList.OnClickItem(listArgs.onClickItem);
+            }
+
 
 
             return fList;
         }
 
-
+        private static T NewT<T>(GObject fguiObj, BaseArgs baseArgs) where T : FComponent, new()
+        {
+            var fCompomnet = FComponent.Create<T>(fguiObj);
+            InitBaseArgs(fCompomnet, baseArgs);
+            return fCompomnet;
+        }
         private static T1 NewT<T1, T2>(BaseArgs baseArgs) where T1 : FComponent, new() where T2 : GObject, new()
         {
             var fCompomnet = FComponent.Create<T1>(new T2());

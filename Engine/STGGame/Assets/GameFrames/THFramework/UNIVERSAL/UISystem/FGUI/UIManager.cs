@@ -16,6 +16,11 @@ namespace THGame.UI
             get { return (m_root = m_root ?? FComponent.Create(GRoot.inst)); }
         }
 
+        private void Awake()
+        {
+            SetLoaderExtension(typeof(XLoader));
+        }
+
         // FontManager
         public void RegisterFont(BaseFont font)
         {
@@ -112,6 +117,12 @@ namespace THGame.UI
         public void SetPackageItemExtension(string url,Type type)
         {
             UIObjectFactory.SetPackageItemExtension(url,type);
+        }
+
+        //
+        public string GetUIUrl(string package,string component)
+        {
+            return UIPackage.GetItemURL(package, component);
         }
     }
 }
