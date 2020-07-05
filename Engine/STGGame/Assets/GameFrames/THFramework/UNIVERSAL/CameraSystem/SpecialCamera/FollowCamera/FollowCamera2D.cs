@@ -44,7 +44,7 @@ public class FollowCamera2D : MonoBehaviour
     {
         ////将人物固定到聚焦区域,并缓慢拉回中心
         var observedPosition = observed.transform.position;
-        var destPosition = new Vector3(observedPosition.x - forcusRect.x, observedPosition.y - forcusRect.y, observedPosition.z);
+        var destPosition = new Vector3(observedPosition.x + forcusRect.x, observedPosition.y + forcusRect.y, observedPosition.z);
         var srcPoint = transform.position;
 
         //边界判断,越界就不用再平滑了

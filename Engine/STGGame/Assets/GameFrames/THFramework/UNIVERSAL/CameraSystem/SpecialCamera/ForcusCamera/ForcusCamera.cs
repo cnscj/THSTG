@@ -9,10 +9,10 @@ namespace THGame
     {
         public static float FORCE_TIME = 0.618f;
 
-        public new Camera camera;   //摄像机
-        public Transform observed;  //观察对象
-        public float maxDeep;       //最大深度
-
+        public new Camera camera;       //摄像机
+        public Transform observed;      //观察对象
+        public float minDepth;          //最小深度
+        public float forcusTime = 0.2f; //聚焦耗时
 
         public Vector3 forcusPoint;   //焦点坐标
         public float forcusRadius;    //聚焦半径
@@ -20,11 +20,12 @@ namespace THGame
         private float m_oriZVal;
         private TweenScript m_tweener;
         private Vector3 m_velocitv = Vector3.zero;
+        private float m_cameraVelocity;
 
         [ContextMenu("Forcus")]
         public void Forcus()
         {
-            Force(maxDeep);
+            Force(minDepth);
         }
 
         public void Start()
@@ -91,18 +92,25 @@ namespace THGame
             var displacementLen = displacement.magnitude;
             var dLen = forcusRadius - displacementLen;
 
-            //范围外
-            if (dLen < 0f)
-                return;
 
             //将焦点拉回到镜头中心
-            var position = transform.position;
-            position.x = Mathf.SmoothDamp(position.x, forcusPoint.x, ref m_velocitv.x, 0.618f);
-            position.y = Mathf.SmoothDamp(position.y, forcusPoint.y, ref m_velocitv.y, 0.618f);
-            transform.position = position;
+            //TODO:与跟随镜头存在冲突
+            if (dLen > 0f)
+            {
+                var position = transform.position;
+                position.x = Mathf.SmoothDamp(position.x, forcusPoint.x, ref m_velocitv.x, 0.618f);
+                position.y = Mathf.SmoothDamp(position.y, forcusPoint.y, ref m_velocitv.y, 0.618f);
+                transform.position = position;
+            }
 
-            //
-            float val = Mathf.SmoothStep(LoadDeep(), maxDeep, (dLen / forcusRadius));
+
+
+            //缩放缓动
+            var maxDepth = LoadDeep();
+            var newDepth = maxDepth - ((maxDepth - minDepth) * (dLen / forcusRadius));
+            newDepth = Mathf.Max(newDepth, minDepth);
+            newDepth = Mathf.Min(newDepth, maxDepth);
+            float val = Mathf.SmoothDamp(GetForcus(), newDepth, ref m_cameraVelocity, forcusTime);
             SetForcus(val);
             
         }

@@ -6,7 +6,7 @@ namespace UCGame
     {
         public new Renderer renderer;
         public Animator animator;
-        public new Rigidbody rigidbody;
+        public new Rigidbody2D rigidbody;
 
         public float moveSpeed; //移动速度
         public float runSpeed;  //奔跑速度
@@ -18,9 +18,9 @@ namespace UCGame
 
         void Start()
         {
-            animator = animator ??  GetComponent<Animator>();
-            renderer = renderer ?? GetComponent<Renderer>();
-            rigidbody = rigidbody ?? GetComponent<Rigidbody>();
+            animator = animator == null ? GetComponentInChildren<Animator>() : animator;
+            renderer = renderer == null ? GetComponentInChildren<Renderer>(): renderer;
+            rigidbody = rigidbody == null ? GetComponentInChildren<Rigidbody2D>(): rigidbody;
         }
 
         void Update()
