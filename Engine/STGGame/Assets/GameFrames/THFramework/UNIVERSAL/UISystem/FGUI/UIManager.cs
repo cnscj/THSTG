@@ -49,6 +49,7 @@ namespace THGame.UI
         {
             Stage.inst.onTouchBegin.Add(callback1);
         }
+
         public void RemoveStageOnTouchBegin(EventCallback1 callback1)
         {
             Stage.inst.onTouchBegin.Remove(callback1);
@@ -113,6 +114,11 @@ namespace THGame.UI
         public void HidePopup(FObject obj)
         {
             Root.HidePopup(obj);
+        }
+
+        public void HidePopup()
+        {
+            Root.HidePopup();
         }
 
         //UIObjectFactory

@@ -1,19 +1,19 @@
-﻿using System.Collections;
+﻿
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
-
 namespace XLibGame
 {
-    public class RequestForm
+    public class HttpForm
     {
         private Dictionary<string, object> m_params;
 
-        public RequestForm()
+        public HttpForm()
         {
             m_params = new Dictionary<string, object>();
         }
 
-        public RequestForm(Dictionary<string, object> form)
+        public HttpForm(Dictionary<string, object> form)
         {
             m_params = new Dictionary<string, object>();
             if (form != null)
@@ -26,7 +26,7 @@ namespace XLibGame
 
         }
 
-        public RequestForm(RequestForm form):this(form.m_params)
+        public HttpForm(HttpForm form) : this(form.m_params)
         {
 
         }
@@ -34,7 +34,8 @@ namespace XLibGame
         public object this[string key]
         {
             get => m_params != null ? m_params[key] : null;
-            set {
+            set
+            {
 
                 m_params = m_params ?? new Dictionary<string, object>();
                 m_params[key] = value;
@@ -72,7 +73,36 @@ namespace XLibGame
             return m_params.Count;
         }
 
-        public override string ToString()
+        public string ToGetData(string url)
+        {
+            string ret = url;
+            StringBuilder data = new StringBuilder();
+
+            if (m_params != null && m_params.Count > 0)
+            {
+                foreach (var item in m_params)
+                {
+                    data.Append(item.Key + "=");
+                    data.Append(item.Value.ToString() + "&");
+                }
+                data.Remove(data.Length - 1, 1);
+            }
+
+            if (url.IndexOf("?") == -1)
+            {
+                url += "?";
+            }
+            else
+            {
+                url += "&";
+            }
+
+            ret = url + data.ToString();
+
+            return ret;
+        }
+
+        public WWWForm ToPostData(string url)
         {
             WWWForm ret = new WWWForm();
             if (m_params != null && m_params.Count > 0)
@@ -85,14 +115,14 @@ namespace XLibGame
                         ret.AddField(item.Key, item.Value.ToString());
                 }
             }
-            return ret.ToString();
+            return ret;
         }
+
 
         public Dictionary<string, object> GetParams()
         {
             return m_params;
-            
+
         }
     }
 }
-

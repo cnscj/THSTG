@@ -5,7 +5,7 @@ using UnityEngine;
 namespace THGame.UI
 {
 
-    public class ToolTipBase : FWidget
+    public abstract class ToolTipBase : FWidget
     {
         ToolTipData _toolTipData;
         public ToolTipBase(string package,string component):base(package, component)

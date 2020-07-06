@@ -12,6 +12,7 @@ namespace THGame.UI
         public class BaseArgs
         {
             public Vector2 xy = new Vector2(0,0);
+            public Vector2 size = new Vector2(100, 100);
             public Vector2 pivot = new Vector2(0,0);
             public bool pivotAsAnchor = false;
             public Vector2 scale = new Vector2(1, 1);
@@ -182,7 +183,9 @@ namespace THGame.UI
             if (baseArgs == null)
                 return;
 
+
             fComponent.SetXY(baseArgs.xy);
+            fComponent.SetSize(baseArgs.size);
             fComponent.SetPivot(baseArgs.pivot.x, baseArgs.pivot.y, baseArgs.pivotAsAnchor);
             fComponent.SetScale(baseArgs.scale.x, baseArgs.scale.y);
             fComponent.SetAlpha(baseArgs.alpha);

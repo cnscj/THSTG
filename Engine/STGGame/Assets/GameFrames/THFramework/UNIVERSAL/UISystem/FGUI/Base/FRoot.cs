@@ -38,7 +38,6 @@ namespace THGame.UI
         {
             _root.ShowPopup(popup.GetObject(), target.GetObject(), dir, closeUntilUpEvent);
         }
-
         public void HidePopup()
         {
             _root.HidePopup();

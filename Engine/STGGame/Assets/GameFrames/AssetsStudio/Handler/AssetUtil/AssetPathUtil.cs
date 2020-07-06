@@ -22,17 +22,30 @@ namespace ASGame
             return "";
         }
 
-        public static int SpliteBundlePath(string srcPath, ref string assetBundelPath, ref string assetName)
+
+        public static string SpliteBundlePath(string abPath, string assetName)
         {
-            string[] pathPairs = srcPath.Split('|');
-            assetBundelPath = pathPairs[0];
-            assetName = pathPairs[1];
-            return pathPairs.Length;
+            return string.Format("{0}|{1}", abPath, assetName);
         }
 
-        public static string CombineBundlePath(string assetBundelPath, string assetName)
+        public static int SpliteBundlePath(string path, out string abPath, out string assetName)
         {
-            return string.Format("{0}|{1}", assetBundelPath, assetName);
+            abPath = path;
+            assetName = null;
+
+            if (string.IsNullOrEmpty(path))
+                return -1;
+
+            if (path.IndexOf("|") > 0)
+            {
+                string[] pathPairs = path.Split('|');
+                abPath = pathPairs[0];
+                assetName = pathPairs[1];
+
+                return pathPairs.Length;
+            }
+
+            return 0;
         }
 
         public static string TrimInvalidCharacter(string str)

@@ -46,6 +46,7 @@ namespace THGame.UI
             public static readonly Action<FComponent> DEFAULT_RELEASE_CALL = (obj) =>
             {
                 obj?.SetVisible(false);
+                obj?.RemoveFromParent();
             };
             public static readonly Action<FComponent> DEFAULT_DISPOSE_CALL = (obj) =>
             {
@@ -62,6 +63,7 @@ namespace THGame.UI
             public Action<FComponent> onRelease = DEFAULT_RELEASE_CALL;
             public Action<FComponent> onDispose = DEFAULT_DISPOSE_CALL;
 
+            private Dictionary<FComponent,PoolObject> m_recordObjs;
             private LinkedList<PoolObject> m_availableObjs;
             private float m_lastCheckTic;
 
@@ -108,6 +110,7 @@ namespace THGame.UI
                 if (AvailableCount >= MaxCount)
                 {
                     onDispose?.Invoke(uiObj);
+                    m_recordObjs?.Remove(uiObj);
                 }
                 else
                 {
@@ -137,12 +140,16 @@ namespace THGame.UI
                 if (m_availableObjs == null)
                     return;
 
-                foreach(var poolObj in m_availableObjs)
+                if (m_recordObjs == null)
+                    return;
+
+                foreach (var poolObj in m_availableObjs)
                 {
                     var uiObj = poolObj.obj;
                     onDispose?.Invoke(uiObj);
                 }
                 m_availableObjs.Clear();
+                m_recordObjs.Clear();
             }
 
             public void RemoveFromParent()
@@ -158,8 +165,13 @@ namespace THGame.UI
                     newFobj = (FComponent)System.Activator.CreateInstance(fComponent);
                     onCreate?.Invoke(newFobj);
                 }
-                var newPoolObj = new PoolObject();
+
+                var recordDict = GetObjectDict();
+                PoolObject newPoolObj = null;
+                if (!recordDict.ContainsKey(uiObj)) recordDict[uiObj] = new PoolObject();
+                newPoolObj = recordDict[uiObj];
                 newPoolObj.obj = newFobj;
+                newPoolObj.UpdateTick();
 
                 return newPoolObj;
             }
@@ -168,6 +180,11 @@ namespace THGame.UI
             {
                 m_availableObjs = m_availableObjs ?? new LinkedList<PoolObject>();
                 return m_availableObjs;
+            }
+            private Dictionary<FComponent,PoolObject> GetObjectDict()
+            {
+                m_recordObjs = m_recordObjs ?? new Dictionary<FComponent, PoolObject>();
+                return m_recordObjs;
             }
 
             private void Update()
