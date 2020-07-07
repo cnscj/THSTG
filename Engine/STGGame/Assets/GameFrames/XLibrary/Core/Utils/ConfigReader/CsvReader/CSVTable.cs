@@ -9,6 +9,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 
 namespace XLibrary
 {
@@ -57,10 +58,17 @@ namespace XLibrary
         }
 
         /// <summary>
+        /// 空表
+        /// </summary>
+        public CSVTable()
+        {
+
+        }
+        /// <summary>
         /// 构造方法
         /// </summary>
         /// <param name="attributeKeys"> 属性表 </param>
-        public CSVTable(string[] attributeKeys = null)
+        public CSVTable(string[] attributeKeys)
         {
             // init 
             _atrributeKeys = new List<string>(attributeKeys);
@@ -84,19 +92,27 @@ namespace XLibrary
         /// <returns></returns>
         public CSVTable Parse(string tableContent)
         {
+            if (string.IsNullOrEmpty(tableContent))
+            {
+                Debug.LogError("The csv file is error or empty.");
+                return this;
+            }
+
             string content = tableContent.Replace("\r", "");
             string[] lines = content.Split('\n');
             if (lines.Length < 2)
             {
-                //Debug.LogError("The csv file is not csv table format.");
+                Debug.LogError("The csv file is not csv table format.");
                 return this;
             }
 
             string keyLine = lines[0];
             string[] keys = SplitStringByComma(keyLine);
 
-            _atrributeKeys = new List<string>(keys);
-            _dataObjDic = new Dictionary<string, CSVObject>();
+            _atrributeKeys = _atrributeKeys ?? new List<string>(keys);
+            _dataObjDic = _dataObjDic ?? new Dictionary<string, CSVObject>();
+            _atrributeKeys.Clear();
+            _dataObjDic.Clear();
 
             for (int i = 1; i < lines.Length; i++)
             {
@@ -150,19 +166,19 @@ namespace XLibrary
         {
             if (dataMajorKey != value.ID)
             {
-                //Debug.LogError("所设对象的主键值与给定主键值不同！设置失败！");
+                Debug.LogError("所设对象的主键值与给定主键值不同！设置失败！");
                 return;
             }
 
             if (value.GetFormat() != GetFormat())
             {
-                //Debug.LogError("所设对象的的签名与表的签名不同！设置失败！");
+                Debug.LogError("所设对象的的签名与表的签名不同！设置失败！");
                 return;
             }
 
             if (_dataObjDic.ContainsKey(dataMajorKey))
             {
-                //Debug.LogError("表中已经存在主键为 '" + dataMajorKey + "' 的对象！设置失败！");
+                Debug.LogError("表中已经存在主键为 '" + dataMajorKey + "' 的对象！设置失败！");
                 return;
             }
 
@@ -176,12 +192,14 @@ namespace XLibrary
         /// <returns> 数据对象 </returns>
         private CSVObject GetDataObject(string dataMajorKey)
         {
-            CSVObject data = null;
-
-            if (_dataObjDic.ContainsKey(dataMajorKey))
-                data = _dataObjDic[dataMajorKey];
-            //else
-                //Debug.LogError("The table not include data of this key.");
+            CSVObject data = CSVObject.Empty;
+            if (_dataObjDic != null)
+            {
+                if (_dataObjDic.ContainsKey(dataMajorKey))
+                    data = _dataObjDic[dataMajorKey];
+                else
+                    Debug.LogError("The table not include data of this key.");
+            }
 
             return data;
         }
@@ -194,8 +212,8 @@ namespace XLibrary
         {
             if (_dataObjDic.ContainsKey(dataMajorKey))
                 _dataObjDic.Remove(dataMajorKey);
-            //else
-                //Debug.LogError("The table not include the key.");
+            else
+                Debug.LogError("The table not include the key.");
         }
 
         /// <summary>
@@ -222,7 +240,7 @@ namespace XLibrary
 
             if (_dataObjDic.Count == 0)
             {
-                //Debug.LogWarning("The table is empty, fuction named 'GetContent()' will just retrun key's list.");
+                Debug.LogWarning("The table is empty, fuction named 'GetContent()' will just retrun key's list.");
                 return content;
             }
 
@@ -247,7 +265,7 @@ namespace XLibrary
         {
             if (_dataObjDic == null)
             {
-                //Debug.LogWarning("The table is empty.");
+                Debug.LogWarning("The table is empty.");
                 yield break;
             }
 

@@ -24,35 +24,40 @@ namespace STGU3D
 
         public static string GetEffectPath(string key)
         {
-            string abPath = Path.Combine(GetAbAssetRoot(), string.Format("{0}.ab", key));
-            string assetName = Path.Combine(EFFECT_ROOT, string.Format("{0}.prefab",key));
+            string fileName = Path.GetFileNameWithoutExtension(key);
+            string abPath = Path.Combine(GetAbAssetRoot(), string.Format("{0}.ab", fileName));
+            string assetName = Path.Combine(EFFECT_ROOT, string.Format("{0}.prefab", fileName));
             return string.Format("{0}|{1}", abPath, assetName);
         }
 
         public static string GetSpritePath(string key)
         {
-            string abPath = Path.Combine(GetAbAssetRoot(), string.Format("{0}.ab", key));
-            string assetName = Path.Combine(SPRITE_ROOT, string.Format("{0}.prefab", key));
+            string fileName = Path.GetFileNameWithoutExtension(key);
+            string abPath = Path.Combine(GetAbAssetRoot(), string.Format("{0}.ab", fileName));
+            string assetName = Path.Combine(SPRITE_ROOT, string.Format("{0}.prefab", fileName));
             return string.Format("{0}|{1}", abPath, assetName);
         }
 
         public static string GetModelPath(string key)
         {
-            string abPath = Path.Combine(GetAbAssetRoot(), string.Format("{0}.ab", key));
-            string assetName = Path.Combine(MODEL_ROOT, string.Format("{0}.prefab", key));
+            string fileName = Path.GetFileNameWithoutExtension(key);
+            string abPath = Path.Combine(GetAbAssetRoot(), string.Format("{0}.ab", fileName));
+            string assetName = Path.Combine(MODEL_ROOT, string.Format("{0}.prefab", fileName));
             return string.Format("{0}|{1}", abPath, assetName);
         }
 
         public static string GetUIPath(string key)
         {
-            string abPath = Path.Combine(GetAbAssetRoot(), string.Format("{0}.ab", key));
+            string fileName = Path.GetFileNameWithoutExtension(key);
+            string abPath = Path.Combine(GetAbAssetRoot(), string.Format("{0}.ab", fileName));
             return string.Format("{0}", abPath);
         }
 
         public static string GetConfigPath(string key)
         {
-            string abPath = Path.Combine(GetAbAssetRoot(), string.Format("{0}.ab", key));
-            string assetName = Path.Combine(CONFIG_ROOT, string.Format("{0}.csv", key));
+            string fileName = Path.GetFileNameWithoutExtension(key);
+            string abPath = Path.Combine(GetAbAssetRoot(), string.Format("{0}.ab", fileName));
+            string assetName = Path.Combine(CONFIG_ROOT, string.Format("{0}.csv", fileName));
             return string.Format("{0}|{1}", abPath, assetName);
         }
 

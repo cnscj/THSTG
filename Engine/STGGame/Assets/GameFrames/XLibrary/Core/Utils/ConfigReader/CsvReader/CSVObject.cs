@@ -14,6 +14,7 @@ namespace XLibrary
 {
     public class CSVObject : IEnumerable
     {
+        public static readonly CSVObject Empty = new CSVObject("",new Dictionary<string, CSVValue>(), null);
         /// <summary>
         /// 此值作为数据对象的唯一标识，只能通过此属性获取到唯一标识
         /// 无法通过 '数据对象[主键名]' 的方式来获取

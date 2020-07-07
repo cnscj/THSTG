@@ -47,13 +47,13 @@ namespace ASGame
         {
             AssetLoadHandler handler = LoadAssetHandler<T>(path, (AssetLoadResult result) =>
             {
-                if (result.isDone)
+                if (result.isDone && result.asset != null)
                 {
                     onSuccess?.Invoke(result.GetAsset<T>());
                 }
                 else
                 {
-                    onFailed?.Invoke(-1);
+                    onFailed?.Invoke(AssetLoadStatus.LOAD_ERROR);
                 }
 
             });

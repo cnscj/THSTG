@@ -35,7 +35,7 @@ namespace STGU3D
 
         public void AddView(string code)
         {
-            AssetLoadCallback<GameObject> callback = null ;
+            Callback<GameObject, int> callback = null ;
             EEntityType entityType = EntityUtil.GetEntityTypeByCode(code);
             if (entityType == EEntityType.Hero ||
                 entityType == EEntityType.Boss

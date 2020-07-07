@@ -20,11 +20,11 @@ namespace STGU3D
             [EEntityType.Boss] = new PoolInfo(),
         };
 
-        public AssetLoadCallback<GameObject> GetOrNewSprite(string viewCode, bool usePool = false, int maxCount = 20)
+        public Callback<GameObject, int> GetOrNewSprite(string viewCode, bool usePool = false, int maxCount = 20)
         {
             string viewName = null;
             GameObject prefabInstance = null;
-            var callback = AssetLoadCallback<GameObject>.GetOrNew();
+            var callback = Callback<GameObject, int>.GetOrNew();
 
             if (!usePool)
             {

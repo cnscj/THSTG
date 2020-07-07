@@ -19,7 +19,7 @@ namespace STGU3D
         /// <param name="onComplete"></param>
         public void PlayOnce(string code, GameObject hangNode, Vector3 position, Action onCompleted = null)
         {
-            AssetLoadCallback<GameObject> callback;
+            Callback<GameObject,int> callback;
             var pool = GameObjectPoolManager.GetInstance().GetGameObjectPool(code);
             if (pool == null)
             {
