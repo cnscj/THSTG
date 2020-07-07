@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using FairyGUI;
 using System.Collections.Generic;
+using System;
 
 namespace THGame.UI
 {
@@ -18,22 +19,66 @@ namespace THGame.UI
 
         public static T Create<T>(GObject obj) where T : FComponent, new()
         {
-            if (obj != null)
+            T com = new T();
+            if (com != null)
             {
-                T com = new T();
-                if (com != null)
+                if (obj != null)
                 {
                     com.InitWithObj(obj);
                 }
-
-                return com;
             }
-            return null;
+            return com;
         }
 
         public static new FComponent Create(GObject obj)
         {
             return Create<FComponent>(obj);
+        }
+
+        public static T Create<T>(string packageName, string copmonentName, bool isAsync = false, Action<FComponent> callback = null) where T : FComponent, new()
+        {
+            if (string.IsNullOrEmpty(packageName))
+                return default;
+
+            //加载包
+            if (PackageManager.GetInstance().GetPackageInfo(packageName) == null)
+            {
+                var packageInfo = PackageManager.GetInstance().AddPackage(packageName);
+
+                if (packageInfo == null)
+                {
+                    Debug.LogError(string.Format("{0} => package not found | 没有加载到包", packageName));
+                    return default;
+                }
+            }
+
+            var fObj = Create<T>(null);
+            if (isAsync)
+            {
+                UIPackage.CreateObjectAsync(packageName, copmonentName, (obj) =>
+                {
+                    if (obj == null)
+                    {
+                        Debug.LogError(string.Format("{0} {1} => component not found | 没有加载到组件", packageName, copmonentName));
+                        return;
+                    }
+                    fObj.InitWithObj(obj);
+                    callback?.Invoke(fObj);
+                });
+            }
+            else
+            {
+                GObject obj = UIPackage.CreateObject(packageName, copmonentName);
+                if (obj == null)
+                {
+                    Debug.LogError(string.Format("{0} {1} => component not found | 没有加载到组件", packageName, copmonentName));
+                    return default;
+                }
+                fObj.InitWithObj(obj);
+                callback?.Invoke(fObj);
+            }
+            
+            return fObj;
         }
 
         public T GetChild<T>(string name) where T : FComponent, new()

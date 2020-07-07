@@ -36,7 +36,6 @@ namespace XLibGame
             get => m_params != null ? m_params[key] : null;
             set
             {
-
                 m_params = m_params ?? new Dictionary<string, object>();
                 m_params[key] = value;
             }
@@ -73,9 +72,9 @@ namespace XLibGame
             return m_params.Count;
         }
 
-        public string ToGetData(string url)
+        public string ToGetData(string url = null)
         {
-            string ret = url;
+            string ret = string.IsNullOrEmpty(url) ? "" : url;
             StringBuilder data = new StringBuilder();
 
             if (m_params != null && m_params.Count > 0)
@@ -102,7 +101,7 @@ namespace XLibGame
             return ret;
         }
 
-        public WWWForm ToPostData(string url)
+        public WWWForm ToPostData(string url = null)
         {
             WWWForm ret = new WWWForm();
             if (m_params != null && m_params.Count > 0)

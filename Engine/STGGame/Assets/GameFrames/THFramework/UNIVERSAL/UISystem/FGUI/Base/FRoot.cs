@@ -16,7 +16,7 @@ namespace THGame.UI
             return s_instance;
         }
 
-        public FRoot()
+        protected FRoot()
         {
             InitWithObj(GRoot.inst);
             _root = GRoot.inst;

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace ASGame.UI
+namespace THGame.EUI
 {
     public class BaseUI : MonoBehaviour
     {

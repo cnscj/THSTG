@@ -54,17 +54,18 @@ namespace THGame.UI
             if (isNeedCreate)
             {
                 //加载View
-                FView.Create(type,args).OnCreated((view) =>
+                FView.Create(type, (fWidget) =>
                 {
+                    FView fView = (FView)fWidget;
                     viewInfo = new ViewInfo();
-                    viewInfo.view = view;
+                    viewInfo.view = fView;
 
-                    GRoot.inst.AddChild(view.GetObject());
+                    GRoot.inst.AddChild(fView.GetObject());
 
                     m_viewsMap[type] = viewInfo;
 
                     m_onCreated?.Invoke(viewInfo);
-                });
+                } ,args);
             }
         }
 

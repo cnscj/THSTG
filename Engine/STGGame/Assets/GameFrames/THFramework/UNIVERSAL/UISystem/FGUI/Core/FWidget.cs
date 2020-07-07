@@ -24,7 +24,7 @@ namespace THGame.UI
         public bool isAsync { get { return _isAsync; } }
 
         //不受ViewManager管理
-        public static FWidget Create(Type cls, object args = null)
+        public static FWidget Create(Type cls, Action<FWidget> callback ,object args = null)
         {
             System.Reflection.Assembly asm = System.Reflection.Assembly.GetExecutingAssembly();
             FWidget widget = asm.CreateInstance(cls.FullName) as FWidget;
@@ -33,39 +33,19 @@ namespace THGame.UI
                 string packageName = widget.package;
                 string componentName = widget.component;
 
-                //加载包
-                if (PackageManager.GetInstance().GetPackageInfo(packageName) == null)
+                widget.__isCreating = true;
+                FComponent.Create<FComponent>(packageName, componentName, widget.isAsync, (fComponent) =>
                 {
-                    var packageInfo = PackageManager.GetInstance().AddPackage(packageName);
-
-                    if (packageInfo == null)
+                    widget.__isCreating = false;
+                    if (widget.__isDisposed)
                     {
-                        Debug.LogError(string.Format("{0} => package not found | 没有加载到包", widget.package));
-                        return null;
+                        widget.__isDisposed = false;
+                        fComponent.Dispose();
+                        return;
                     }
-                }
-
-                if (widget.isAsync)
-                {
-                    widget.__isCreating = true;
-                    UIPackage.CreateObjectAsync(widget.package, widget.component, (obj) =>
-                    {
-                        if (widget.__isDisposed)
-                        {
-                            widget.__isCreating = false;
-                            widget.__isDisposed = false;
-                            obj.Dispose();
-                            return;
-                        }
-                        OnCreateSuccess(obj, widget, args);
-                    });
-                }
-                else
-                {
-                    GObject obj = UIPackage.CreateObject(widget.package, widget.component);
-                    OnCreateSuccess(obj, widget, args);
-                }
-
+                    OnCreateSuccess(fComponent.GetObject(), widget, args);
+                    callback?.Invoke(widget);
+                });
             }
 
             return widget;
@@ -73,7 +53,7 @@ namespace THGame.UI
 
         public static T Create<T>(FWidget parent = null, object args = null) where T : FWidget, new()
         {
-            T view = Create(typeof(T), args) as T;
+            T view = Create(typeof(T), null, args) as T;
             if (parent != null)
             {
                 parent.AddChild(view);
@@ -85,12 +65,9 @@ namespace THGame.UI
         {
             if (obj == null)
             {
-                Debug.LogError(string.Format("{0} {1} => component not found | 没有加载到组件", widget.package, widget.component));
                 return;
             }
 
-            //
-            widget.__isCreating = false;
             widget.SetArgs(args);
             widget.InitWithObj(obj);
 
@@ -120,7 +97,7 @@ namespace THGame.UI
             __listener.Add(new Tuple<int, EventCallback1>(eventId, listener));
         }
 
-        public FWidget(string packageName, string componentName)
+        public FWidget(string packageName = null, string componentName = null)
         {
             package = packageName;
             component = componentName;

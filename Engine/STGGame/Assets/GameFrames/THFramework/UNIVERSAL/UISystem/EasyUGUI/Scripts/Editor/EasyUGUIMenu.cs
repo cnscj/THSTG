@@ -1,10 +1,9 @@
 ﻿using System;
-using ASGame.UI;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace ASEditor.UI
+namespace THGame.EUI
 {
     public static class EasyUGUIMenu
     {

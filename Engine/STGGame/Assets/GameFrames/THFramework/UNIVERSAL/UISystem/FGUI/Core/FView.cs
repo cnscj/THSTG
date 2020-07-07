@@ -9,31 +9,11 @@ namespace THGame.UI
         protected int _layerOrder = 0;          //层
         protected bool _isFullScreen;           //是否全屏
 
-        protected Action<FView> _onCreated;     //创建回调
-
         public int layerOrder { get { return _layerOrder; } }
 
-        public static new FView Create(Type cls, object args = null)
-        {
-            return FWidget.Create(cls, args) as FView;
-        }
-
-        public FView(string package, string component):base(package, component)
+        public FView(string package, string component) : base(package, component)
         {
 
-        }
-
-        public FView OnCreated(Action<FView> onFunc)
-        {
-            _onCreated = onFunc;
-            if(_obj != null)
-            {
-                if (!_isAsync)
-                {
-                    DoCreated();
-                }
-            }
-            return this;
         }
 
         public virtual void Close(bool isDisposed = true)
@@ -61,10 +41,7 @@ namespace THGame.UI
         public override Wrapper<GObject> InitWithObj(GObject obj)
         {
             base.InitWithObj(obj);
-            if (_isAsync)
-            {
-                DoCreated();
-            }
+
             if (_isFullScreen)
             {
                 SetSize(GetParent().GetWidth(), GetParent().GetHeight());
@@ -85,15 +62,6 @@ namespace THGame.UI
         protected virtual void OnHideAnimation()
         {
 
-        }
-
-        private void DoCreated()
-        {
-            if (_onCreated != null)
-            {
-                _onCreated(this);
-                _onCreated = null;
-            }
         }
     }
 

@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace ASGame.UI
+namespace THGame.EUI
 {
     public class EventNode : MonoBehaviour
     {

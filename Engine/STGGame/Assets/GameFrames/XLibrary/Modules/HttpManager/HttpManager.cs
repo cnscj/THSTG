@@ -34,6 +34,15 @@ namespace XLibGame
             }
         }
 
+        public void Clear()
+        {
+            foreach(var coroutine in m_coroutines.Values)
+            {
+                StopCoroutine(coroutine);
+            }
+            m_coroutines.Clear();
+        }
+
         private int StartRequest(bool isPost, HttpParams args)
         {
             if (args == null)

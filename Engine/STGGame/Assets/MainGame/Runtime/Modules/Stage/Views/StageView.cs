@@ -1,7 +1,5 @@
 ﻿
 
-using ASGame.UI;
-
 namespace STGRuntime.UI
 {
     public class StageView

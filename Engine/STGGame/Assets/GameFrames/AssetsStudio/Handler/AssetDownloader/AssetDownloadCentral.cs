@@ -51,20 +51,21 @@ namespace ASGame
 
         /////////////////////////////////////
 
-        public AssetDownloadTask NewTask(string urlPath, string storePath)
+        public AssetDownloadTask NewTask(string[] urlPaths, string storePath)
         {
-            if (!string.IsNullOrEmpty(urlPath) && !string.IsNullOrEmpty(storePath))
+            if (urlPaths != null && urlPaths.Length > 0 && !string.IsNullOrEmpty(storePath))
             {
-                if (m_tasksMap != null && m_tasksMap.TryGetValue(urlPath, out var taskInMap))
+                var taskKey = GetTaskKey(urlPaths);
+                if (m_tasksMap != null && m_tasksMap.TryGetValue(taskKey, out var taskInMap))
                 {
                     return taskInMap;
                 }
 
                 var task = GetOrCreateTask();
-                task.urlPath = urlPath;
+                task.urlPaths = urlPaths;
                 task.storePath = storePath;
                 task.createTime = XTimeTools.NowTimeStampMs();
-                GetTaskMap().Add(urlPath, task);
+                GetTaskMap().Add(taskKey, task);
 
                 //默认全部送到暂停队列,方便以后开启空闲下载
                 GetPauseMap().Add(task);
@@ -109,10 +110,11 @@ namespace ASGame
 
             if (m_tasksMap != null)
             {
-                if (m_tasksMap.ContainsKey(task.urlPath))
+                var taskKey = GetTaskKey(task.urlPaths);
+                if (m_tasksMap.ContainsKey(taskKey))
                 {
                     DisactiveTask(task);
-                    m_tasksMap.Remove(task.urlPath);
+                    m_tasksMap.Remove(taskKey);
                 }
                 
             }
@@ -271,9 +273,15 @@ namespace ASGame
                 var task = m_releaseQueue.Last.Value;
                 m_releaseQueue.RemoveLast();
 
-                m_tasksMap.Remove(task.urlPath);
+                var taskKey = GetTaskKey(task.urlPaths);
+                m_tasksMap.Remove(taskKey);
                 ReleaseTask(task);
             }
+        }
+
+        private string GetTaskKey(string[] urlPaths)
+        {
+            return string.Format("{0}", urlPaths.GetHashCode());
         }
 
         private void Update()

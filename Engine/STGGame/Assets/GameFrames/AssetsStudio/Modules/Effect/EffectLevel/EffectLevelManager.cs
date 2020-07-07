@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace ASGame
 {
-    public class EffectLevelManager :Singleton<EffectLevelManager>
+    public class EffectLevelManager : Singleton<EffectLevelManager>
     {
         private HashSet<EffectLevelController> m_allCtrls;
 

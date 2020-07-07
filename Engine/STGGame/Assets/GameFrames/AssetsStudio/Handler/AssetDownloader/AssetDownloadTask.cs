@@ -9,7 +9,7 @@ namespace ASGame
     {
         public int id;              
         public int status;                          //状态
-        public string urlPath;                      //源路径
+        public string[] urlPaths;                   //源路径
         public string storePath;                    //储存路径
 
         public long createTime;                     //创建时间
@@ -25,7 +25,7 @@ namespace ASGame
         {
             id = 0;
             status = 0;
-            urlPath = string.Empty;
+            urlPaths = null;
             storePath = string.Empty;
 
             createTime = -1;

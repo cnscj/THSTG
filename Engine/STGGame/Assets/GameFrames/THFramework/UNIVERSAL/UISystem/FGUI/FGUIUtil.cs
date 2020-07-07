@@ -11,6 +11,9 @@ namespace THGame.UI
     {
         public class BaseArgs
         {
+            public string packageName;
+            public string componentName;
+
             public Vector2 xy = new Vector2(0,0);
             public Vector2 size = new Vector2(100, 100);
             public Vector2 pivot = new Vector2(0,0);
@@ -158,16 +161,24 @@ namespace THGame.UI
 
         private static T NewT<T>(GObject fguiObj, BaseArgs baseArgs) where T : FComponent, new()
         {
-            var fCompomnet = FComponent.Create<T>(fguiObj);
-            InitBaseArgs(fCompomnet, baseArgs);
-            return fCompomnet;
+            T fComponent = null;
+            if (string.IsNullOrEmpty(baseArgs.packageName))
+            {
+                fComponent = FComponent.Create<T>(baseArgs.packageName, baseArgs.componentName);
+            }
+            else
+            {
+                fComponent = FComponent.Create<T>(fguiObj);
+            }
+            InitBaseArgs(fComponent, baseArgs);
+            return fComponent;
         }
         private static T1 NewT<T1, T2>(BaseArgs baseArgs) where T1 : FComponent, new() where T2 : GObject, new()
         {
-            var fCompomnet = FComponent.Create<T1>(new T2());
-            InitBaseArgs(fCompomnet, baseArgs);
+            var fComponent = NewT<T1>(new T2(), baseArgs);
+            InitBaseArgs(fComponent, baseArgs);
 
-            return fCompomnet;
+            return fComponent;
         }
 
         /// <summary>
@@ -182,7 +193,6 @@ namespace THGame.UI
 
             if (baseArgs == null)
                 return;
-
 
             fComponent.SetXY(baseArgs.xy);
             fComponent.SetSize(baseArgs.size);

@@ -115,14 +115,19 @@ namespace THGame.UI
                             return;
                         }
                         
-                        var newView = FView.Create(newData.cls, newData.args) as FView;
-                        ViewInfo newViewInfo = new ViewInfo();
-                        newViewInfo.view = newView;
-                        newViewInfo.viewParams = newData;
+                        FView.Create(newData.cls, (fWidget) =>
+                        {
+                            var fView = (FView)fWidget;
+                            ViewInfo newViewInfo = new ViewInfo();
+                            newViewInfo.view = fView;
+                            newViewInfo.viewParams = newData;
 
-                        _children[curIndex] = newViewInfo;
+                            _children[curIndex] = newViewInfo;
 
-                        AddChild(newView);
+                            AddChild(fView);
+
+                        },newData.args);
+
                     }
 
                 });

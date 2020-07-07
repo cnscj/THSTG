@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 
-namespace ASGame.UI
+namespace THGame.EUI
 {
     public class UIManager : EventNode
     {

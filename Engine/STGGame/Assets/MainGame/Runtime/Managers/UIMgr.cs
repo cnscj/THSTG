@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using STGU3D;
 using THGame;
 using THGame.UI;
 using AssetManager = STGU3D.AssetManager;
@@ -65,7 +67,7 @@ namespace STGRuntime
             PackageManager.GetInstance().residentTimeS = residentTimeS;
             PackageManager.GetInstance().SetLoader(new PackageCustomLoader((packageName) =>
             {
-#if !UNITY_EDITOR
+#if UNITY_EDITOR
                 return Path.Combine(AssetFileBook.FGUI_ROOT_SRC, string.Format("{0}", packageName));
 #else
                 return AssetManager.GetInstance().LoadUISync(packageName);//这里要改为异步
