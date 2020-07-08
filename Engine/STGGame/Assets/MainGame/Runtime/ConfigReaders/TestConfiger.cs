@@ -19,7 +19,8 @@ namespace STGRuntime
         public static string GetResSrc(string key)
         {
             var tb = _GetOriTable();
-            return tb[key]["姓名"];
+            //return tb[key]["姓名"];
+            return string.Empty;
 
         }
 

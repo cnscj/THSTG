@@ -25,14 +25,12 @@ namespace STGU3D
             }
             else
             {
-                AssetManager.GetInstance().LoadConfig(code).onSuccess += (content)=>
+                var content = AssetManager.GetInstance().LoadConfig(code);
+                if (!string.IsNullOrEmpty(content))
                 {
-                    if (!string.IsNullOrEmpty(content))
-                    {
-                        m_cache.Add(code, content);
-                        table.Parse(content);
-                    }
-                };
+                    m_cache.Add(code, content);
+                    table.Parse(content);
+                }
             }
 
             return table;

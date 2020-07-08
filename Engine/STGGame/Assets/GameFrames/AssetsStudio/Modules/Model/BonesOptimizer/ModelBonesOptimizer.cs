@@ -126,13 +126,20 @@ namespace ASGame
         {
             Dictionary<ModelBonesOptimizer, GameObject> nodeDict = new Dictionary<ModelBonesOptimizer, GameObject>();
             var children = GetOptimizerNodeInChildren();
-            var parentNode = transform.parent;
+            //var parentNode = transform.parent;
             foreach(var child in children)
             {
                 var childParent = child.transform.parent;
-                nodeDict.Add(child, childParent.gameObject);
+                var chuldParentNode = childParent != null ? childParent.gameObject : null;
+                if (chuldParentNode != null)
+                {
+                    var nodeMark = chuldParentNode.GetComponent<NodeMark>();
+                    if (nodeMark == null)
+                        chuldParentNode.AddComponent<NodeMark>();
+                }
+                nodeDict.Add(child, chuldParentNode);
 
-                child.transform.SetParent(parentNode?.transform, false);
+                child.transform.SetParent(null, false);
             }
             return nodeDict;
         }
@@ -149,7 +156,15 @@ namespace ASGame
                     var node = dictPair.Key;
                     if (node != null)
                     {
-                        node.transform.SetParent(parentNode.transform, false);
+                        var parentTrans = parentNode != null ? parentNode.transform : null;
+                        node.transform.SetParent(parentTrans, false);
+                        if (parentNode != null)
+                        {
+                            var nodeMark = parentNode.GetComponent<NodeMark>();
+                            if (nodeMark != null)
+                                Destroy(nodeMark);
+                        }
+
                         nodeList.Add(node);
                     }
                 }

@@ -103,25 +103,19 @@ namespace STGU3D
         }
 
         
-        public Callback<string, int> LoadConfig(string fileName)
+        public string LoadConfig(string fileName)
         {
+            string content = null;
             string assetPath = AssetFileBook.GetConfigPath(fileName);
             var callback = Callback<string,int >.GetOrNew();
             AssetLoaderManager.GetInstance().LoadAssetSync<TextAsset>(assetPath, (textAsset)=>
             {
-                if (textAsset != null)
-                {
-                    callback.onSuccess?.Invoke(textAsset.text);
-                }
-                else
-                {
-                    callback.onFailed?.Invoke(-1);
-                }
+                content = textAsset.text;
             },  (reason) =>
             {
                 callback.onFailed?.Invoke(reason);
             });
-            return callback;
+            return content;
         }
         //public string LoadConfigSync(string fileName)
         //{

@@ -15,7 +15,7 @@ namespace XLibrary
 {
     public class CSVTable : IEnumerable
     {
-        public static readonly CSVTable Empty = new CSVTable("");   //空table
+        public static readonly CSVTable Empty = new CSVTable();   //空table
 
 
         /// <summary>
@@ -109,10 +109,8 @@ namespace XLibrary
             string keyLine = lines[0];
             string[] keys = SplitStringByComma(keyLine);
 
-            _atrributeKeys = _atrributeKeys ?? new List<string>(keys);
-            _dataObjDic = _dataObjDic ?? new Dictionary<string, CSVObject>();
-            _atrributeKeys.Clear();
-            _dataObjDic.Clear();
+            _atrributeKeys = new List<string>(keys);
+            _dataObjDic = new Dictionary<string, CSVObject>();
 
             for (int i = 1; i < lines.Length; i++)
             {
@@ -192,7 +190,7 @@ namespace XLibrary
         /// <returns> 数据对象 </returns>
         private CSVObject GetDataObject(string dataMajorKey)
         {
-            CSVObject data = CSVObject.Empty;
+            CSVObject data = null;
             if (_dataObjDic != null)
             {
                 if (_dataObjDic.ContainsKey(dataMajorKey))

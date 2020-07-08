@@ -5,6 +5,7 @@ using UnityEngine;
 using Object = UnityEngine.Object;
 namespace XLibGame
 {
+    //TODO:要重写,需要以LinkList方式存储
     public class GameObjectPool : MonoBehaviour
     {
         public enum ActiveOperate
@@ -28,11 +29,15 @@ namespace XLibGame
         /// <summary>
         /// 如超过gc时间仍空闲,则移除池
         /// </summary>
-        public float stayTime = 3000f;
+        public float stayTime = 60f;
         /// <summary>
         /// 对象池中存放最大数量
         /// </summary>
         public int maxCount = 20;
+        /// <summary>
+        /// 对象池中存放最小数量
+        /// </summary>
+        //public int minCount = 0;    //TODO:
         /// <summary>
         /// 默认初始容量
         /// </summary>

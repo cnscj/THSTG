@@ -42,11 +42,12 @@ namespace XLibGame
         public ObjectPool<T> GetOrCreatePool<T>(int defaultNum = 0) where T : class, new()
         {
             Type type = typeof(T);
+            string poolKey = type.FullName;
             BaseObjectPool poolObj;
-            if (!m_objPool.TryGetValue(type.Name, out poolObj))
+            if (!m_objPool.TryGetValue(poolKey, out poolObj))
             {
                 poolObj = new ObjectPool<T>(defaultNum);
-                m_objPool.Add(type.Name, poolObj);
+                m_objPool.Add(poolKey, poolObj);
             }
             return poolObj as ObjectPool<T>;
         }
