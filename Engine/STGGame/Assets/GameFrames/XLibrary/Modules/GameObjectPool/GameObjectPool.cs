@@ -5,7 +5,6 @@ using UnityEngine;
 using Object = UnityEngine.Object;
 namespace XLibGame
 {
-    //TODO:要重写,需要以LinkList方式存储
     public class GameObjectPool : MonoBehaviour
     {
         public enum ActiveOperate
@@ -37,17 +36,15 @@ namespace XLibGame
         /// <summary>
         /// 对象池中存放最小数量
         /// </summary>
-        //public int minCount = 0;    //TODO:
+        public int minCount = 0;
         /// <summary>
         /// 默认初始容量
         /// </summary>
         public int defaultCount = 0;
-
         /// <summary>
         /// 满池时不会生成
         /// </summary>
         public bool fixedSize = false;
-
         /// <summary>
         ///释放模式
         /// </summary>
@@ -57,80 +54,58 @@ namespace XLibGame
         /// <summary>
         /// 队列，存放对象池中没有用到的对象，即可分配对象
         /// </summary>
-        protected Queue m_queue;
+        protected LinkedList<GameObjectPoolObject> m_queue;
         protected float m_startTick;
         protected int m_totalCount;
         protected int m_disposeTimes;
 
         public GameObjectPool()
         {
-            m_queue = new Queue();
+            m_queue = new LinkedList<GameObjectPoolObject>();
             m_totalCount = 0;
         }
 
         /// <summary>
         /// 获取一个对象
         /// </summary>
-        /// <param name="lifetime">对象存在的时间</param>
+        /// <param name="lifeTime">对象存在的时间</param>
         /// <returns>生成的对象</returns>
-        public GameObject GetOrCreate(float lifetime = 0f)
+        public GameObject GetOrCreate(float lifeTime = 0f)
         {
-            m_startTick = Time.realtimeSinceStartup;
+            UpdateTick();
 
             bool isAlreadyInPool = false;
-            GameObject returnObj;
+            GameObjectPoolObject poolObj;
             if (m_queue.Count > 0)
             {
                 //池中有待分配对象
-                returnObj = (GameObject)m_queue.Dequeue();
+                poolObj = m_queue.Last.Value;
+                m_queue.RemoveLast();
                 isAlreadyInPool = true;
             }
             else
             {
                 if (prefab == null) return null;
-                if (fixedSize) return null;
+                if (fixedSize)
+                {
+                    return Instantiate(prefab);
+                }
                 //池中没有可分配对象了，新生成一个
-                returnObj = Object.Instantiate(prefab) as GameObject;
-                returnObj.transform.SetParent(gameObject.transform);
-                returnObj.SetActive(false);
-                
-            }
-            //使用PrefabInfo脚本保存returnObj的一些信息
-            GameObjectPoolObject info = returnObj.GetComponent<GameObjectPoolObject>();
-            if (info == null)
-            {
-                info = returnObj.AddComponent<GameObjectPoolObject>();
-            }
-            info.postTimes = m_disposeTimes;
-            info.poolObj = this;
-            if (lifetime > 0)
-            {
-                info.lifetime = lifetime;
+                poolObj = CreatePoolObject();
+                if (poolObj == null)
+                    return null;
+
+                m_queue.AddLast(poolObj);
             }
 
-            switch (activeOperate)
-            {
-                case ActiveOperate.Enabled:
-                    returnObj.SetActive(true);
-                    break;
-                case ActiveOperate.Sight:
-                    {
-                        if (isAlreadyInPool)
-                        {
-                            var position = returnObj.transform.position;
-                            position.z -= -1000f;
-                            returnObj.transform.position = position;
-                        }
-                        else
-                        {
-                            returnObj.SetActive(true);
-                        }
-                    }
-                    break;
-                case ActiveOperate.Custom:
-                    activeCustomFunc?.Invoke(returnObj,true);
-                    break;
-            }
+            poolObj.postTimes = m_disposeTimes;
+            poolObj.poolObj = this;
+            if (lifeTime > 0) poolObj.lifeTime = lifeTime;
+            poolObj.UpdateTick();
+
+            var returnObj = poolObj.gameObject;
+            SetGameObjectActive(returnObj, isAlreadyInPool);
+
             return returnObj;
         }
 
@@ -138,63 +113,53 @@ namespace XLibGame
         /// “删除对象”放入对象池
         /// </summary>
         /// <param name="obj">对象</param>
-        public void Release(GameObject obj)
+        public void Release(GameObject gobj)
         {
-            if (obj == null)
+            if (gobj == null)
                 return;
       
-            //待分配对象已经在对象池中  
-            if (m_queue.Contains(obj))
-            {
-                return;
-            }
             if (m_queue.Count > maxCount)
             {
                 //当前池中object数量已满，直接销毁
-                Object.Destroy(obj);
+                Object.Destroy(gobj);
                 return;
             }
 
-            GameObjectPoolObject goPo = obj.GetComponent<GameObjectPoolObject>();
-            if (goPo)
+            GameObjectPoolObject poolObj = gobj.GetComponent<GameObjectPoolObject>();
+            if (poolObj != null)
             {
-                if (goPo.postTimes < m_disposeTimes)
+                if (poolObj.postTimes < m_disposeTimes)
                 {
-                    Object.Destroy(obj);
+                    Object.Destroy(gobj);
                     return;
                 }
             }
+            else
+            {
+                poolObj = CreatePoolObject(gobj);
+            }
+            poolObj.UpdateTick();
 
             //放入对象池，入队
-            m_startTick = Time.realtimeSinceStartup;
-            m_queue.Enqueue(obj);
+            m_queue.AddLast(poolObj);
             m_totalCount = Mathf.Max(m_totalCount, m_queue.Count);
 
-            obj.transform.SetParent(transform, false); //不改变Transform
-            switch (activeOperate)
-            {
-                case ActiveOperate.Enabled:
-                    obj.SetActive(false);
-                    break;
-                case ActiveOperate.Sight:
-                    {
-                        var position = obj.transform.position;
-                        position.z += -1000f;
-                        obj.transform.position = position;
-                    }
-                    break;
-                case ActiveOperate.Custom:
-                    activeCustomFunc?.Invoke(obj, false);
-                    break;
-            }
+            gobj.transform.SetParent(transform, false); //不改变Transform
+            SetGameObjectDeactive(gobj);
             
+            UpdateTick();
         }
 
+        /// <summary>
+        /// 释放
+        /// </summary>
         public void Dispose()
         {
             while(m_queue.Count > 0)
             {
-                var go = (GameObject)m_queue.Dequeue();
+                var go = m_queue.Last.Value;
+                m_queue.RemoveLast();
+
                 Object.Destroy(go);
             }
             m_disposeTimes++;
@@ -235,14 +200,47 @@ namespace XLibGame
             }
         }
 
+        private GameObjectPoolObject CreatePoolObject(GameObject go = null)
+        {
+            GameObject returnObj = null;
+            if (go != null)
+            {
+                returnObj = go;
+            }
+            else
+            {
+                if (prefab != null)
+                {
+                    returnObj = Instantiate(prefab);
+                }else
+                {
+                    return null;
+                }
+            }
+            returnObj.transform.SetParent(gameObject.transform);
+            returnObj.SetActive(false);
+
+            //使用PrefabInfo脚本保存returnObj的一些信息
+            GameObjectPoolObject poolObj = returnObj.GetComponent<GameObjectPoolObject>();
+            if (poolObj == null)
+            {
+                poolObj = returnObj.AddComponent<GameObjectPoolObject>();
+            }
+            return poolObj;
+        }
+
+        private void UpdateTick()
+        {
+            m_startTick = Time.realtimeSinceStartup;
+        }
+
         /// <summary>
         /// 将自己加入到对象池管理中去
         /// </summary>
         private void Awake()
         {
-           
             Init();
-            m_startTick = Time.realtimeSinceStartup;
+            UpdateTick();
         }
 
         /// <summary>
@@ -266,6 +264,65 @@ namespace XLibGame
 
         private void Update()
         {
+            UpdatePool();
+            UpdatePoolObjects();
+        }
+
+        private void SetGameObjectActive(GameObject gobj, bool isAlreadyInPool)
+        {
+            if (gobj == null)
+                return;
+
+            switch (activeOperate)
+            {
+                case ActiveOperate.Enabled:
+                    gobj.SetActive(true);
+                    break;
+                case ActiveOperate.Sight:
+                    {
+                        if (isAlreadyInPool)
+                        {
+                            var position = gobj.transform.position;
+                            position.z -= -1000f;
+                            gobj.transform.position = position;
+                        }
+                        else
+                        {
+                            gobj.SetActive(true);
+                        }
+                    }
+                    break;
+                case ActiveOperate.Custom:
+                    activeCustomFunc?.Invoke(gobj, true);
+                    break;
+            }
+        }
+
+        private void SetGameObjectDeactive(GameObject gobj)
+        {
+            if (gobj == null)
+                return;
+
+            switch (activeOperate)
+            {
+                case ActiveOperate.Enabled:
+                    gobj.SetActive(false);
+                    break;
+                case ActiveOperate.Sight:
+                    {
+                        var position = gobj.transform.position;
+                        position.z += -1000f;
+                        gobj.transform.position = position;
+                    }
+                    break;
+                case ActiveOperate.Custom:
+                    activeCustomFunc?.Invoke(gobj, false);
+                    break;
+            }
+        }
+
+        private void UpdatePool()
+        {
             if (stayTime > 0f)
             {
                 if (m_queue.Count >= m_totalCount)
@@ -279,7 +336,27 @@ namespace XLibGame
                 {
                     m_startTick = Time.realtimeSinceStartup;
                 }
-                
+
+            }
+        }
+
+        private void UpdatePoolObjects()
+        {
+            if (m_queue.Count <= minCount)
+                return;
+
+            for (LinkedListNode<GameObjectPoolObject> iterNode = m_queue.Last; iterNode != null; iterNode = iterNode.Previous)
+            {
+                var poolObj = iterNode.Value;
+                if (poolObj != null)
+                {
+                    if (poolObj.CheckTick())
+                    {
+                        var returnObj = poolObj.gameObject;
+                        Object.Destroy(returnObj);
+                        m_queue.Remove(iterNode);
+                    }
+                }
             }
         }
     }

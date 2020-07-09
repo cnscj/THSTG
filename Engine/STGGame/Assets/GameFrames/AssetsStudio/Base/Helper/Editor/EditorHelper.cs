@@ -62,10 +62,8 @@ namespace ASEditor
         /// <param name="suffixs"></param>
         /// <param name="isTrans"></param>
         /// <returns></returns>
-        public static string[] GetPathsBySelections(string suffixs = "*.*", bool isTraverse = false)
+        public static string[] GetPathsBySelections(string[] suffixs = null, bool isTraverse = false)
         {
-            suffixs = string.IsNullOrEmpty(suffixs) ? "*.*" : suffixs;
-            suffixs = suffixs.ToLower();
             var selectedObjs = Selection.objects;
             List<string> retPathList = new List<string>();
             if (selectedObjs != null && selectedObjs.Length > 0)
@@ -89,13 +87,34 @@ namespace ASEditor
                 }
 
                 //筛选
-                foreach(var path in filePathList)
+                HashSet<string> suffixSet = null;
+                if (suffixs != null && suffixs.Length > 0)
                 {
-                    string fileExtName = Path.GetExtension(path).ToLower();
-                    if (Regex.Match(fileExtName, suffixs).Success)  //TODO:没验证过
+                    suffixSet = new HashSet<string>();
+                    foreach(var suffix in suffixs)
+                    {
+                        string lowSuffix = suffix.ToLower();
+                        if (!suffixSet.Contains(lowSuffix))
+                            suffixSet.Add(lowSuffix);
+                    }
+                }
+
+
+                foreach (var path in filePathList)
+                {
+                    if (suffixSet != null)
+                    {
+                        string fileExtName = Path.GetExtension(path).ToLower();
+                        if (suffixSet.Contains(fileExtName))
+                        {
+                            retPathList.Add(path);
+                        }
+                    }
+                    else
                     {
                         retPathList.Add(path);
                     }
+
                 }
             }
             return retPathList.ToArray();
