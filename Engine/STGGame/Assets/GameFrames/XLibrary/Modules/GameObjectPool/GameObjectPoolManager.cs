@@ -41,7 +41,7 @@ namespace XLibGame
         /// </summary>
         /// <param name="poolName">对象池名称，唯一id</param>
         /// <returns>对象池对象</returns>
-        public GameObjectPool NewGameObjectPool(string poolName, GameObject prefab = null, int maxCount = 20, int defaultCount = 0)
+        public GameObjectPool NewPool(string poolName, GameObject prefab = null, int maxCount = 20, int defaultCount = 0)
         {
             if (string.IsNullOrEmpty(poolName))
             {
@@ -77,7 +77,7 @@ namespace XLibGame
         /// 添加一个对象池
         /// </summary>
         /// <param name="pool"></param>
-        public bool AddGameObjectPool(GameObjectPool pool)
+        public bool AddPool(GameObjectPool pool)
         {
             if (pool == null)
             {
@@ -108,11 +108,11 @@ namespace XLibGame
         /// 销毁对象池
         /// </summary>
         /// <param name="poolName"></param>
-        public void DestroyGameObjectPool(string poolName)
+        public void DestroyPool(string poolName)
         {
             if (m_poolDic.TryGetValue(poolName, out var pool))
             {
-                pool.Destroy();
+                UnityEngine.Object.Destroy(pool.gameObject);
                 m_poolDic.Remove(poolName);
             }
         }
@@ -122,7 +122,7 @@ namespace XLibGame
         /// </summary>
         /// <param name="poolName"></param>
         /// <returns></returns>
-        public GameObjectPool GetGameObjectPool(string poolName)
+        public GameObjectPool GetPool(string poolName)
         {
             if (m_poolDic.TryGetValue(poolName, out var pool))
             {
@@ -136,7 +136,7 @@ namespace XLibGame
         /// </summary>
         /// <param name="poolName"></param>
         /// <returns></returns>
-        public bool HasGameObjectPool(string poolName)
+        public bool HasPool(string poolName)
         {
             return m_poolDic.ContainsKey(poolName);
         }
@@ -185,7 +185,7 @@ namespace XLibGame
             if (go == null)
                 return;
 
-            var pool = GetGameObjectPool(poolName);
+            var pool = GetPool(poolName);
             if (pool)
             {
                 pool.Release(go);
@@ -195,7 +195,7 @@ namespace XLibGame
                 if (isForce)
                 {
                     //新创建一个GameGojectPool
-                    pool = NewGameObjectPool(poolName);
+                    pool = NewPool(poolName);
                     pool.Release(go);
                 }
                 else

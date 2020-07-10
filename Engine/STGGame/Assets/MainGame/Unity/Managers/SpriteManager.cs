@@ -38,11 +38,11 @@ namespace STGU3D
 
             if (usePool)
             {
-                if (!GameObjectPoolManager.GetInstance().HasGameObjectPool(viewCode))
+                if (!GameObjectPoolManager.GetInstance().HasPool(viewCode))
                 {
                     AssetManager.GetInstance().LoadSprite(viewCode).onSuccess.Set((prefab)=>
                     {
-                        GameObjectPoolManager.GetInstance().NewGameObjectPool(viewCode, prefab, maxCount);
+                        GameObjectPoolManager.GetInstance().NewPool(viewCode, prefab, maxCount);
                         prefabInstance = GameObjectPoolManager.GetInstance().GetOrCreateGameObject(viewCode);
                         GameObject viewGO = new GameObject(viewName);
                         prefabInstance.transform.SetParent(viewGO.transform, false);

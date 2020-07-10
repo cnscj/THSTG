@@ -20,13 +20,13 @@ namespace STGU3D
         public void PlayOnce(string code, GameObject hangNode, Vector3 position, Action onCompleted = null)
         {
             Callback<GameObject,int> callback;
-            var pool = GameObjectPoolManager.GetInstance().GetGameObjectPool(code);
+            var pool = GameObjectPoolManager.GetInstance().GetPool(code);
             if (pool == null)
             {
                 callback = AssetManager.GetInstance().LoadEffect(code);
                 callback.onSuccess += (prefab) =>
                 {
-                    pool = GameObjectPoolManager.GetInstance().NewGameObjectPool(code, prefab, 10);
+                    pool = GameObjectPoolManager.GetInstance().NewPool(code, prefab, 10);
                     var fxGO = pool.GetOrCreate();
                     PlayEffect(fxGO, hangNode, position, onCompleted);
                 };

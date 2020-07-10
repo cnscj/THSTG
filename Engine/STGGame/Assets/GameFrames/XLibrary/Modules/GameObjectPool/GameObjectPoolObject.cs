@@ -19,7 +19,7 @@ namespace XLibGame
         /// <summary>
         /// 在池中的存活时间
         /// </summary>
-        public float stayTime;
+        public float stayTime = -1f;
 
         /// <summary>
         /// 所属对象池
@@ -41,7 +41,7 @@ namespace XLibGame
 
         public bool CheckTick()
         {
-            if (stayTime > 0)
+            if (stayTime >= 0)
             {
                 if (Time.realtimeSinceStartup - m_stayTick >= stayTime)
                 {

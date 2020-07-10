@@ -94,8 +94,6 @@ namespace XLibGame
                 poolObj = CreatePoolObject();
                 if (poolObj == null)
                     return null;
-
-                m_queue.AddLast(poolObj);
             }
 
             poolObj.postTimes = m_disposeTimes;
@@ -170,7 +168,7 @@ namespace XLibGame
         /// </summary>
         public void Destroy()
         {
-            Object.Destroy(gameObject);
+            mgrObj?.DestroyPool(poolName);
         }
 
         /// <summary>
@@ -189,7 +187,7 @@ namespace XLibGame
                 {
                     if (prefab != null)
                     {
-                        GameObject availableGameObject = Object.Instantiate(prefab) as GameObject;
+                        GameObject availableGameObject = Object.Instantiate(prefab);
                         Release(availableGameObject);   //放回池中待利用
                     }
                     else
@@ -334,7 +332,7 @@ namespace XLibGame
                 }
                 else
                 {
-                    m_startTick = Time.realtimeSinceStartup;
+                    UpdateTick();
                 }
 
             }
