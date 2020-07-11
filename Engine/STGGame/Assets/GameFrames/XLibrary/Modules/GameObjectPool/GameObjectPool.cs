@@ -65,12 +65,7 @@ namespace XLibGame
             m_totalCount = 0;
         }
 
-        /// <summary>
-        /// 获取一个对象
-        /// </summary>
-        /// <param name="lifeTime">对象存在的时间</param>
-        /// <returns>生成的对象</returns>
-        public GameObject GetOrCreate(float lifeTime = 0f)
+        public GameObjectPoolObject GetPoolObject()
         {
             UpdateTick();
 
@@ -86,10 +81,8 @@ namespace XLibGame
             else
             {
                 if (prefab == null) return null;
-                if (fixedSize)
-                {
-                    return Instantiate(prefab);
-                }
+                if (fixedSize) return null;
+                    
                 //池中没有可分配对象了，新生成一个
                 poolObj = CreatePoolObject();
                 if (poolObj == null)
@@ -98,13 +91,36 @@ namespace XLibGame
 
             poolObj.postTimes = m_disposeTimes;
             poolObj.poolObj = this;
-            if (lifeTime > 0) poolObj.lifeTime = lifeTime;
+            
             poolObj.UpdateTick();
 
             var returnObj = poolObj.gameObject;
             SetGameObjectActive(returnObj, isAlreadyInPool);
 
-            return returnObj;
+            return poolObj;
+        }
+
+        /// <summary>
+        /// 获取一个对象
+        /// </summary>
+        /// <param name="lifeTime">对象存在的时间</param>
+        /// <returns>生成的对象</returns>
+        public GameObject GetOrCreate(float lifeTime = 0)
+        {
+            var poolObj = GetPoolObject();
+            if (poolObj != null)
+            {
+                if (lifeTime > 0) poolObj.lifeTime = lifeTime;
+                return poolObj.gameObject;
+            }
+            else
+            {
+                if (prefab != null)
+                {
+                    return Instantiate(prefab);
+                }
+            }
+            return null;
         }
 
         /// <summary>
