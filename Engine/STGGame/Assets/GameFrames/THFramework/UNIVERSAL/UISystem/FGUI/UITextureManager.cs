@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using FairyGUI;
 using UnityEngine;
 using XLibrary.Package;
 
@@ -27,7 +28,7 @@ namespace THGame.UI
 
                 private float m_disposeTime;    //释放时间
 
-                public Texture2D texture;
+                public Texture texture;
 
                 public void UpdateVisitTime()
                 {
@@ -85,7 +86,7 @@ namespace THGame.UI
             private Queue<string> m_releaseQueue;
             private float m_lastCheckTic;
 
-            public TextureInfo Add(string key, Texture2D texture, bool isReplace = false)
+            public TextureInfo Add(string key, Texture texture, bool isReplace = false)
             {
                 if (string.IsNullOrEmpty(key))
                     return null;
@@ -127,7 +128,7 @@ namespace THGame.UI
                 return textureInfo;
             }
 
-            public Texture2D Get(string key)
+            public Texture Get(string key)
             {
                 var textureInfo = GetTextureInfo(key);
                 if (textureInfo == null)
@@ -514,19 +515,274 @@ namespace THGame.UI
             }
 
         }
+
+        //TODO:NTex的对象池
+        public class NTexturePool : MonoBehaviour
+        {
+            public class PoolGroup
+            {
+                public class NTextureInfo
+                {
+                    public NTexture ntexture;
+                    
+                
+                }
+                
+                public float stayTime = 60f;
+                private LinkedList<NTextureInfo> m_availableTexs;
+                private float m_visitTickTime;
+
+                public int Count()
+                {
+                    if (m_availableTexs == null)
+                        return 0;
+
+                    return m_availableTexs.Count;
+                }
+
+                public NTexture Get()
+                {
+                    if (m_availableTexs == null)
+                        return null;
+
+                    if (m_availableTexs.Count <= 0)
+                        return null;
+
+                    var ntextureInfo = m_availableTexs.Last.Value;
+                    m_availableTexs.RemoveLast();
+
+                    UpdateTick();
+                    return ntextureInfo.ntexture;
+                }
+
+                public bool Add(NTexture ntexture)
+                {
+                    if (ntexture == null)
+                        return false;
+
+                    var ntextureInfo = CreateNTexture(ntexture);
+                    if (ntextureInfo == null)
+                        return false;
+
+                    GetAvailableList().AddLast(ntextureInfo);
+
+                    UpdateTick();
+                    return true;
+                }
+
+                public void Release(NTexture ntexture)
+                {
+                    UpdateTick();
+                }
+
+                public void Dispose()
+                {
+                    if (m_availableTexs == null)
+                        return;
+
+                    m_availableTexs.Clear();
+                }
+
+                public void Update()
+                {
+                   // UpdateInvalid();
+                }
+
+                public bool CheckDispose()
+                {
+                    if (Time.realtimeSinceStartup - m_visitTickTime < stayTime)
+                        return false;
+
+                    return true;
+                }
+
+                public void UpdateTick()
+                {
+                    m_visitTickTime = Time.realtimeSinceStartup;
+                }
+
+                private void UpdateInvalid()
+                {
+                    if (m_availableTexs == null)
+                        return;
+
+                    for (LinkedListNode<NTextureInfo> iterNode = m_availableTexs.Last; iterNode != null; iterNode = iterNode.Previous)
+                    {
+                        var ntextureInfo = iterNode.Value;
+                        if(ntextureInfo.ntexture == null)
+                        {
+                            m_availableTexs.Remove(iterNode);
+                        }
+
+                    }
+                }
+
+                private NTextureInfo CreateNTexture(NTexture ntexture)
+                {
+                    NTextureInfo ntextureInfo = new NTextureInfo();
+                    ntextureInfo.ntexture = ntexture;
+
+                    return ntextureInfo;
+                }
+
+                private LinkedList<NTextureInfo> GetAvailableList()
+                {
+                    m_availableTexs = m_availableTexs ?? new LinkedList<NTextureInfo>();
+                    return m_availableTexs;
+                }
+            }
+            private static Dictionary<string, string> s_nameMap = new Dictionary<string, string>();
+            private Dictionary<string, PoolGroup> m_poolGroups;
+            private Queue<string> m_removeQueue;
+
+            public NTexture Get(string key)
+            {
+                if (m_poolGroups == null)
+                    return null;
+
+                if (!m_poolGroups.ContainsKey(key))
+                    return null;
+
+                var poolGroup = m_poolGroups[key];
+                if (poolGroup.Count() <= 0)
+                    return null;
+
+                return poolGroup.Get();
+            }
+
+            public bool Add(string key, NTexture ntexture)
+            {
+                if (string.IsNullOrEmpty(key))
+                    return false;
+
+                if (ntexture == null)
+                    return false;
+
+                var ret = GetOrCreatePoolGroup(key).Add(ntexture);
+                if (ret)
+                {
+                    if (s_nameMap.ContainsKey(key))
+                        s_nameMap.Remove(key);
+  
+                    s_nameMap.Add(TransNTextureKey(ntexture), key);
+                }
+                return ret;
+            }
+            public bool Add(string key, Texture texture) { return Add(key, new NTexture(texture)); }
+            public bool Add(string key, Texture texture, Rect rect) { return Add(key, new NTexture(texture, rect)); }
+            public bool Add(string key, Sprite sprite) { return Add(key, new NTexture(sprite)); }
+
+            public void Release(NTexture ntexture)
+            {
+                if (m_poolGroups == null)
+                    return;
+
+                string key = GetNTextureKey(ntexture);
+
+                if (!m_poolGroups.ContainsKey(key))
+                    return;
+
+                var poolGroup = m_poolGroups[key];
+
+                poolGroup.Release(ntexture);
+                s_nameMap.Remove(TransNTextureKey(ntexture));
+            }
+
+            private PoolGroup GetOrCreatePoolGroup(string key)
+            {
+                var poolGroups = GetPoolGroups();
+                if (!poolGroups.ContainsKey(key))
+                {
+                    poolGroups[key] = new PoolGroup();
+                }
+                var poolGroup = poolGroups[key];
+                return poolGroup;
+            }
+
+            private Dictionary<string, PoolGroup> GetPoolGroups()
+            {
+                m_poolGroups = m_poolGroups ?? new Dictionary<string, PoolGroup>();
+                return m_poolGroups;
+            }
+            private Queue<string> GetRemoveQueue()
+            {
+                m_removeQueue = m_removeQueue ?? new Queue<string>();
+                return m_removeQueue;
+            }
+            private string TransNTextureKey(NTexture ntexture)
+            {
+                if (ntexture == null)
+                    return string.Empty;
+
+                return string.Format("{0}", ntexture.GetHashCode());
+            }
+
+            private string GetNTextureKey(NTexture ntexture)
+            {
+                var key = TransNTextureKey(ntexture);
+                if (s_nameMap.TryGetValue(key,out var name))
+                {
+                    return name;
+                }
+                return string.Empty;
+            }
+
+            private void Update()
+            {
+                UpdateGroup();
+                UpdateRemove();
+            }
+            private void UpdateGroup()
+            {
+                if (m_poolGroups == null)
+                    return;
+
+                foreach(var itPair in m_poolGroups)
+                {
+                    var poolGroup = itPair.Value;
+                    poolGroup.Update();
+                    if (poolGroup.CheckDispose())
+                    {
+                        GetRemoveQueue().Enqueue(itPair.Key);
+                    }
+                }
+            }
+
+            private void UpdateRemove()
+            {
+                if (m_removeQueue == null)
+                    return;
+
+                if (m_poolGroups == null)
+                    return;
+
+                while (m_removeQueue.Count > 0)
+                {
+                    var itKey = m_removeQueue.Dequeue();
+                    if (m_poolGroups.TryGetValue(itKey,out var poolGroup))
+                    {
+                        poolGroup.Dispose();
+                        m_poolGroups.Remove(itKey);
+                    }
+                }
+            }
+        }
+
         ///////////////
         private TextureCache m_u3dTexCache;
         private BundleManager m_bundleManager;
-        private Func<string, Texture2D> m_customLoaderSync;              //自定义同步加载器
-        private Action<string, Action<Texture2D>> m_customLoaderAsync;   //自定义异步加载器
+        private NTexturePool m_ntexturePool;
+        //TODO:小图图集打包
+        private Func<string, Texture> m_customLoaderSync;              //自定义同步加载器
+        private Action<string, Action<Texture>> m_customLoaderAsync;   //自定义异步加载器
 
-        public void SetCustomLoader(Func<string, Texture2D> syncFunc, Action<string, Action<Texture2D>> asyncFunc)
+        public void SetCustomLoader(Func<string, Texture> syncFunc, Action<string, Action<Texture>> asyncFunc)
         {
             m_customLoaderSync = syncFunc;
             m_customLoaderAsync = asyncFunc;
         }
 
-        public Texture2D GetTexture(string key)
+        public Texture GetTexture(string key)
         {
             if (m_u3dTexCache == null)
                 return null;
@@ -534,16 +790,16 @@ namespace THGame.UI
             return m_u3dTexCache.Get(key);
         }
 
-        public bool AddTexture(string key, Texture2D texture2D)
+        public bool AddTexture(string key, Texture texture)
         {
             if (string.IsNullOrEmpty(key))
                 return false;
 
-            if (texture2D == null)
+            if (texture == null)
                 return false;
 
             var cache = GetTextureCache();
-            var textureInfo = cache.Add(key, texture2D);
+            var textureInfo = cache.Add(key, texture);
             textureInfo.isAddByManager = true;
             textureInfo.Retain();  //强引用
 
@@ -559,6 +815,43 @@ namespace THGame.UI
                 return;
 
             m_u3dTexCache.Dispose(key);
+        }
+
+        public void GetOrCreateNTexture(string path, bool isAsync, Action<NTexture> callback)
+        {
+            var ntexturePool = GetNTexturePool();
+            var ntexture = ntexturePool.Get(path);
+            if (ntexture != null)
+            {
+                callback?.Invoke(ntexture);
+            }
+            else
+            {
+                var texture = GetTexture(path);
+                if (texture != null)
+                {
+                    ntexturePool.Add(path, texture);
+                    ntexture = ntexturePool.Get(path);
+                    callback?.Invoke(ntexture);
+                }
+                else
+                {
+                    LoadTexture(path, isAsync, (textureInfo) =>
+                    {
+                        texture = textureInfo.texture;
+                        ntexturePool.Add(path, texture);
+                        ntexture = ntexturePool.Get(path);
+                        callback?.Invoke(ntexture);
+                    });
+                }
+    
+            }
+        }
+
+        public void ReleaseNTexture(NTexture ntexture)
+        {
+            var ntexturePool = GetNTexturePool();
+            ntexturePool.Release(ntexture);
         }
 
         public void LoadTexture(string path, bool isAsync, Action<TextureCache.TextureInfo> callback)
@@ -587,7 +880,7 @@ namespace THGame.UI
                 {
                     if (SplitePath(path, out var abPath,out var assetName) >= 0)
                     {
-                        GetBundleManager().LoadAsync<Texture2D>(abPath, assetName, (texture2d) =>
+                        GetBundleManager().LoadAsync<Texture>(abPath, assetName, (texture2d) =>
                         {
                             var textureInfo = OnLoadCallback(path, texture2d, callback);
                             OnManagerCallback(path, textureInfo);
@@ -606,7 +899,7 @@ namespace THGame.UI
                 {
                     if (SplitePath(path, out var abPath, out var assetName) >= 0)
                     {
-                        var texture2d = GetBundleManager().LoadSync<Texture2D>(abPath, assetName);
+                        var texture2d = GetBundleManager().LoadSync<Texture>(abPath, assetName);
                         
                         var textureInfo = OnLoadCallback(path, texture2d, callback);
                         OnManagerCallback(path, textureInfo);
@@ -615,7 +908,7 @@ namespace THGame.UI
             }
         }
 
-        private TextureCache.TextureInfo OnLoadCallback(string path, Texture2D texture2d, Action<TextureCache.TextureInfo> action)
+        private TextureCache.TextureInfo OnLoadCallback(string path, Texture texture2d, Action<TextureCache.TextureInfo> action)
         {
             if (texture2d == null)
                 return null;
@@ -701,6 +994,17 @@ namespace THGame.UI
                 m_bundleManager = managerGobj.AddComponent<BundleManager>();
             }
             return m_bundleManager;
+        }
+
+        private NTexturePool GetNTexturePool()
+        {
+            if (m_ntexturePool == null)
+            {
+                GameObject managerGobj = new GameObject("NTexturePool");
+                managerGobj.transform.SetParent(transform, false);
+                m_ntexturePool = managerGobj.AddComponent<NTexturePool>();
+            }
+            return m_ntexturePool;
         }
     }
 

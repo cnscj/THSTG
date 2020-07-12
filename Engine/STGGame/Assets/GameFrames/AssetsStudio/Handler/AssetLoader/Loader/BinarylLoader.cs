@@ -9,10 +9,36 @@ namespace ASGame
     {
         protected override IEnumerator OnLoadAssetAsync(AssetLoadHandler handler)
         {
-            yield return null;  //保证下一帧
+            string filePath = handler.path;
 
-            OnLoadAssetSync(handler);
-            yield break;
+            FileInfo fi = new FileInfo(filePath);
+            if (fi.Exists)
+            {
+                byte[] buff = new byte[fi.Length];
+
+                FileStream fs = fi.OpenRead();
+                bool isCompleted = false;
+                AsyncCallback callBack = new AsyncCallback((ar) =>
+                {
+                    isCompleted = true;
+
+                    handler.result = new AssetLoadResult(buff, true);
+                    handler.status = AssetLoadStatus.LOAD_FINISHED;
+                    handler.Callback();
+                });
+
+                fs.BeginRead(buff, 0, buff.Length, callBack, null);
+                fs.Close();
+
+                while (!isCompleted) yield return null;
+            }
+            else
+            {
+                handler.result = AssetLoadResult.EMPTY_RESULT;
+                handler.status = AssetLoadStatus.LOAD_ERROR;
+                handler.Callback();
+                yield break;
+            }
         }
 
         protected override void OnLoadAssetSync(AssetLoadHandler handler)
@@ -41,6 +67,7 @@ namespace ASGame
             }
 
         }
+
     }
 }
 

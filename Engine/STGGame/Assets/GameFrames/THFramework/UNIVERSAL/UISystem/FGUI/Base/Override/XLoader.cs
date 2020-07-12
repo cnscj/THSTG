@@ -48,7 +48,7 @@ namespace THGame.UI
                 _textureInfo = textureInfo;
                 _textureInfo.Retain();
 
-                Texture2D tex = _textureInfo.texture;
+                Texture tex = _textureInfo.texture;
                 if (tex != null)
                     onExternalLoadSuccess(new NTexture(tex));
                 else

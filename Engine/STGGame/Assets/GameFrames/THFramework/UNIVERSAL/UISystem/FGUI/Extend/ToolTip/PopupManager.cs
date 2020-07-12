@@ -22,7 +22,7 @@ namespace THGame.UI
 
         public void Show<T>(PopupParams args) where T : ToolTipBase, new()
         {
-            //如果上一次的和本次一样的话,就不需要再弹了
+            //TODO:如果上一次的和本次一样的话,就不需要再弹了
             var tipCom = GetOrCreateToolTip<T>();
 
             if (args != null)

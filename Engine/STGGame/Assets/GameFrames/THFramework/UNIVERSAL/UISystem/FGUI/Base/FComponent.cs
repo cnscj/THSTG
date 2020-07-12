@@ -17,22 +17,9 @@ namespace THGame.UI
         private Dictionary<string, FController> __controllers;
         private Dictionary<string, FTransition> __transitions;
 
-        public static T Create<T>(GObject obj) where T : FComponent, new()
+        public static new FComponent Create(GObject gObj)
         {
-            T com = new T();
-            if (com != null)
-            {
-                if (obj != null)
-                {
-                    com.InitWithObj(obj);
-                }
-            }
-            return com;
-        }
-
-        public static new FComponent Create(GObject obj)
-        {
-            return Create<FComponent>(obj);
+            return Create<FComponent>(gObj);
         }
 
         public static T Create<T>(string packageName, string copmonentName, bool isAsync = false, Action<FComponent> callback = null) where T : FComponent, new()
@@ -55,26 +42,26 @@ namespace THGame.UI
             var fObj = Create<T>(null);
             if (isAsync)
             {
-                UIPackage.CreateObjectAsync(packageName, copmonentName, (obj) =>
+                UIPackage.CreateObjectAsync(packageName, copmonentName, (gObj) =>
                 {
-                    if (obj == null)
+                    if (gObj == null)
                     {
                         Debug.LogError(string.Format("{0} {1} => component not found | 没有加载到组件", packageName, copmonentName));
                         return;
                     }
-                    fObj.InitWithObj(obj);
+                    fObj.InitWithObj(gObj);
                     callback?.Invoke(fObj);
                 });
             }
             else
             {
-                GObject obj = UIPackage.CreateObject(packageName, copmonentName);
-                if (obj == null)
+                GObject gObj = UIPackage.CreateObject(packageName, copmonentName);
+                if (gObj == null)
                 {
                     Debug.LogError(string.Format("{0} {1} => component not found | 没有加载到组件", packageName, copmonentName));
                     return default;
                 }
-                fObj.InitWithObj(obj);
+                fObj.InitWithObj(gObj);
                 callback?.Invoke(fObj);
             }
             

@@ -16,7 +16,7 @@ namespace THGame.UI
         public virtual void SetToolTipData(ToolTipData data)
         {
             _toolTipData = data;
-            OnState(data);
+            OnData(data);
         }
 
         public ToolTipData GetToolTipData()
@@ -25,7 +25,7 @@ namespace THGame.UI
         }
 
         ///
-        protected virtual void OnState(ToolTipData data)
+        protected virtual void OnData(ToolTipData data)
         {
 
         }

@@ -339,7 +339,7 @@ namespace XLibGame
         {
             if (stayTime > 0f)
             {
-                if (m_queue.Count >= m_totalCount)
+                if (m_queue.Count >= m_totalCount)  //XXX:这里有可能不还回池
                 {
                     if (m_startTick + stayTime <= Time.realtimeSinceStartup)
                     {
