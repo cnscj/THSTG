@@ -30,7 +30,6 @@ namespace THGame.UI
                 tipCom.SetToolTipData(args.tipData);
 
             }
-
             UIManager.GetInstance().ShowPopup(tipCom);
         }
 
@@ -100,9 +99,12 @@ namespace THGame.UI
                         var dict = GetToolTipDict();
                         var key = GetToolTipKey<T>();
                         dict.Remove(key);
+
+                        pool.Release(tipCom);
                     });
 
                 };
+                pool.onRelease = (fObj) => { };
             }
             return pool.GetOrCreate() as T;
         }

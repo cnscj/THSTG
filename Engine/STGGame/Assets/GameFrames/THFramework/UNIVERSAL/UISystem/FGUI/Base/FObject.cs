@@ -488,7 +488,7 @@ namespace THGame.UI
         // 获取parent
         public bool HasParent()
         {
-            return (GetParent() != null);
+            return _obj.parent != null;
         }
 
         public bool IsDisposed()

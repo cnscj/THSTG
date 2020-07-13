@@ -41,12 +41,14 @@ namespace THGame.UI
             };
             public static readonly Action<FComponent> DEFAULT_GET_CALL = (obj) =>
             {
-                obj?.SetVisible(true);
+
             };
             public static readonly Action<FComponent> DEFAULT_RELEASE_CALL = (obj) =>
             {
-                obj?.SetVisible(false);
-                obj?.RemoveFromParent();
+                if (obj != null && obj.HasParent())
+                {
+                    obj.RemoveFromParent();
+                }
             };
             public static readonly Action<FComponent> DEFAULT_DISPOSE_CALL = (obj) =>
             {
@@ -168,8 +170,9 @@ namespace THGame.UI
 
                 var recordDict = GetObjectDict();
                 PoolObject newPoolObj = null;
-                if (!recordDict.ContainsKey(uiObj)) recordDict[uiObj] = new PoolObject();
-                newPoolObj = recordDict[uiObj];
+
+                if (!recordDict.ContainsKey(newFobj)) recordDict[newFobj] = new PoolObject();
+                newPoolObj = recordDict[newFobj];
                 newPoolObj.obj = newFobj;
                 newPoolObj.UpdateTick();
 
@@ -211,6 +214,7 @@ namespace THGame.UI
                     var poolObj = iterNode.Value;
                     if (poolObj.CheckDispose())
                     {
+                        onDispose?.Invoke(poolObj.obj);
                         m_availableObjs.Remove(iterNode);
                     }
                 }

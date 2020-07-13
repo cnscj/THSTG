@@ -82,8 +82,11 @@ namespace THGame.UI
         private void OnRemovedFromStage(EventContext context)
         {
             var gObj = context.sender as GObject;
+            if (gObj.isDisposed)
+            {
+                Remove(gObj);
+            }
 
-            Remove(gObj);
         }
     }
 }

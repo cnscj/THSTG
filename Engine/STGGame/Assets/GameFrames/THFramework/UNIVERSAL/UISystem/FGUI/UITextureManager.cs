@@ -524,8 +524,8 @@ namespace THGame.UI
                 public class NTextureInfo
                 {
                     public NTexture ntexture;
+                    public Action onDispose;
                     
-                
                 }
                 
                 public float stayTime = 60f;
@@ -540,7 +540,7 @@ namespace THGame.UI
                     return m_availableTexs.Count;
                 }
 
-                public NTexture Get()
+                public NTextureInfo Get()
                 {
                     if (m_availableTexs == null)
                         return null;
@@ -552,34 +552,37 @@ namespace THGame.UI
                     m_availableTexs.RemoveLast();
 
                     UpdateTick();
-                    return ntextureInfo.ntexture;
+                    return ntextureInfo;
                 }
 
-                public bool Add(NTexture ntexture)
+                public NTextureInfo Add(NTexture ntexture)
                 {
                     if (ntexture == null)
-                        return false;
+                        return null;
 
                     var ntextureInfo = CreateNTexture(ntexture);
                     if (ntextureInfo == null)
-                        return false;
+                        return null;
 
                     GetAvailableList().AddLast(ntextureInfo);
 
                     UpdateTick();
-                    return true;
+                    return ntextureInfo;
                 }
 
                 public void Release(NTexture ntexture)
                 {
-                    UpdateTick();
+                    Add(ntexture);
                 }
 
                 public void Dispose()
                 {
                     if (m_availableTexs == null)
                         return;
-
+                    foreach(var ntextureInfo in m_availableTexs)
+                    {
+                        ntextureInfo.onDispose?.Invoke();
+                    }
                     m_availableTexs.Clear();
                 }
 
@@ -635,7 +638,7 @@ namespace THGame.UI
             private Dictionary<string, PoolGroup> m_poolGroups;
             private Queue<string> m_removeQueue;
 
-            public NTexture Get(string key)
+            public PoolGroup.NTextureInfo Get(string key)
             {
                 if (m_poolGroups == null)
                     return null;
@@ -650,16 +653,16 @@ namespace THGame.UI
                 return poolGroup.Get();
             }
 
-            public bool Add(string key, NTexture ntexture)
+            public PoolGroup.NTextureInfo Add(string key, NTexture ntexture)
             {
                 if (string.IsNullOrEmpty(key))
-                    return false;
+                    return null;
 
                 if (ntexture == null)
-                    return false;
+                    return null;
 
                 var ret = GetOrCreatePoolGroup(key).Add(ntexture);
-                if (ret)
+                if (ret != null)
                 {
                     if (s_nameMap.ContainsKey(key))
                         s_nameMap.Remove(key);
@@ -668,9 +671,9 @@ namespace THGame.UI
                 }
                 return ret;
             }
-            public bool Add(string key, Texture texture) { return Add(key, new NTexture(texture)); }
-            public bool Add(string key, Texture texture, Rect rect) { return Add(key, new NTexture(texture, rect)); }
-            public bool Add(string key, Sprite sprite) { return Add(key, new NTexture(sprite)); }
+            public PoolGroup.NTextureInfo Add(string key, Texture texture) { return Add(key, new NTexture(texture)); }
+            public PoolGroup.NTextureInfo Add(string key, Texture texture, Rect rect) { return Add(key, new NTexture(texture, rect)); }
+            public PoolGroup.NTextureInfo Add(string key, Sprite sprite) { return Add(key, new NTexture(sprite)); }
 
             public void Release(NTexture ntexture)
             {
@@ -817,31 +820,32 @@ namespace THGame.UI
             m_u3dTexCache.Dispose(key);
         }
 
-        public void GetOrCreateNTexture(string path, bool isAsync, Action<NTexture> callback)
+        public void GetOrCreateNTexture(string key, bool isAsync, Action<NTexture> callback)
         {
             var ntexturePool = GetNTexturePool();
-            var ntexture = ntexturePool.Get(path);
-            if (ntexture != null)
+            var ntextureInfo = ntexturePool.Get(key);
+            if (ntextureInfo != null)
             {
-                callback?.Invoke(ntexture);
+                callback?.Invoke(ntextureInfo.ntexture);
             }
             else
             {
-                var texture = GetTexture(path);
+                var texture = GetTexture(key);
                 if (texture != null)
                 {
-                    ntexturePool.Add(path, texture);
-                    ntexture = ntexturePool.Get(path);
-                    callback?.Invoke(ntexture);
+                    ntextureInfo = ntexturePool.Add(key, texture);
+                    callback?.Invoke(ntextureInfo.ntexture);
                 }
                 else
                 {
-                    LoadTexture(path, isAsync, (textureInfo) =>
+                    LoadTexture(key, isAsync, (textureInfo) =>
                     {
                         texture = textureInfo.texture;
-                        ntexturePool.Add(path, texture);
-                        ntexture = ntexturePool.Get(path);
-                        callback?.Invoke(ntexture);
+                        textureInfo.Retain();   //XXX:
+
+                        ntextureInfo = ntexturePool.Add(key, texture);
+                        ntextureInfo.onDispose = () => { textureInfo.Release(); };
+                        callback?.Invoke(ntextureInfo.ntexture);
                     });
                 }
     
@@ -863,8 +867,11 @@ namespace THGame.UI
             if (m_u3dTexCache != null)
             {
                 var tetureInfo = m_u3dTexCache.GetTextureInfo(path);
-                OnLoadCallback(path, tetureInfo.texture, callback);
-                return;
+                if (tetureInfo != null)
+                {
+                    OnLoadCallback(path, tetureInfo.texture, callback);
+                    return;
+                }
             }
 
             if (isAsync)

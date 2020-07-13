@@ -162,7 +162,7 @@ namespace THGame.UI
         private static T NewT<T>(GObject fguiObj, BaseArgs baseArgs) where T : FComponent, new()
         {
             T fComponent = null;
-            if (string.IsNullOrEmpty(baseArgs.packageName))
+            if (!string.IsNullOrEmpty(baseArgs.packageName))
             {
                 fComponent = FComponent.Create<T>(baseArgs.packageName, baseArgs.componentName);
             }
