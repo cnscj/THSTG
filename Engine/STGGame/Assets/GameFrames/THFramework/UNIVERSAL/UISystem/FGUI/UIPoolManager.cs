@@ -14,15 +14,29 @@ namespace THGame.UI
             {
                 public FComponent obj;
                 public float stayTime = 60;
-                private float m_tick;
+                public float delayTimeMs = 6000;
+                private float m_disposeTime;
+                private float m_visitTick;
 
                 public bool CheckDispose()
                 {
                     if (stayTime > 0)
                     {
-                        if (Time.realtimeSinceStartup - m_tick >= stayTime)
+                        if (Time.realtimeSinceStartup - m_visitTick >= stayTime)
                         {
-                            return true;
+                            if (m_disposeTime > 0 )
+                            {
+                                if (Time.realtimeSinceStartup >= m_disposeTime)
+                                {
+                                    return true;
+                                }  
+                            }
+                            else
+                            {
+                                var timeMs = UnityEngine.Random.Range(0, delayTimeMs);
+                                m_disposeTime = Time.realtimeSinceStartup + timeMs/1000;
+                            }
+                            
                         }
                     }
                     return false;
@@ -30,7 +44,8 @@ namespace THGame.UI
 
                 public void UpdateTick()
                 {
-                    m_tick = Time.realtimeSinceStartup;
+                    m_visitTick = Time.realtimeSinceStartup;
+                    m_disposeTime = -1;
                 }
 
             }

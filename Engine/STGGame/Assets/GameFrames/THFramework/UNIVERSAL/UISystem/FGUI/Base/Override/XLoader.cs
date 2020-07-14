@@ -6,8 +6,6 @@ namespace THGame.UI
 {
     public class XLoader : GLoader
     {
-        UITextureManager.TextureCache.TextureInfo _textureInfo;
-
         protected override void LoadExternal()
         {
             /*
@@ -21,7 +19,7 @@ namespace THGame.UI
             这种情况下应该放弃调用OnExternalLoadSuccess或OnExternalLoadFailed。
             */
             string srcUrl = url;
-            UITextureManager.GetInstance().LoadTexture(srcUrl, true, (textureInfo) =>
+            UITextureManager.GetInstance().GetOrCreateNTexture(srcUrl, true, (ntexture) =>
             {
                 bool isError = false;
                 do
@@ -45,12 +43,9 @@ namespace THGame.UI
                 if (isError)
                     return;
 
-                _textureInfo = textureInfo;
-                _textureInfo.Retain();
-
-                Texture tex = _textureInfo.texture;
-                if (tex != null)
-                    onExternalLoadSuccess(new NTexture(tex));
+                NTexture ntex = ntexture;
+                if (ntexture != null)
+                    onExternalLoadSuccess(ntexture);
                 else
                     onExternalLoadFailed();
 
@@ -60,8 +55,7 @@ namespace THGame.UI
         protected override void FreeExternal(NTexture texture)
         {
             //释放外部载入的资源
-            _textureInfo?.Release();
-            _textureInfo = null;
+            UITextureManager.GetInstance().ReleaseNTexture(texture);
         }
     }
 
