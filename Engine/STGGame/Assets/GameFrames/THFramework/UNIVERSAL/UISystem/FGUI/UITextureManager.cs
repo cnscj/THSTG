@@ -248,6 +248,35 @@ namespace THGame.UI
             }
         }
 
+        //用于加载网络资源
+        //TODO:
+        public class NetworkCentral : MonoBehaviour
+        {
+            private int m_id;
+            public int Load(string url,Action<byte[]> callback)
+            {
+                return -1;
+            }
+
+            public int LoadTexture(string url, Action<Texture> callback)
+            {
+                return Load(url, (data) =>
+                {
+
+                });
+            }
+
+            public void Stop(int id)
+            {
+
+            }
+
+            private void OnCallback()
+            {
+
+            }
+        }
+
         //AB包计数支持释放
         //不支持依赖加载
         public class BundleManager : MonoBehaviour
@@ -529,6 +558,7 @@ namespace THGame.UI
                 }
                 
                 public float stayTime = 120f;
+                private int maxCount = 50;
                 private Dictionary<int, NTextureInfo> m_ntextureMapper;
                 private LinkedList<NTextureInfo> m_availableTexs;
                 private float m_visitTickTime;
@@ -575,7 +605,11 @@ namespace THGame.UI
 
                 public void Release(NTexture ntexture)
                 {
+                    if (Count() > maxCount)
+                        return;
+
                     var ntextureMap = GetNTextureMap();
+
                     var code = TransNTextureID(ntexture);
                     if (ntextureMap.TryGetValue(code, out var ntextureInfo))
                     {
@@ -824,6 +858,7 @@ namespace THGame.UI
 
         ///////////////
         private TextureCache m_u3dTexCache;
+        private NetworkCentral m_networkCentral;
         private BundleManager m_bundleManager;
         private NTexturePool m_ntexturePool;
         //TODO:小图图集打包
@@ -935,45 +970,58 @@ namespace THGame.UI
                 }
             }
 
-            if (isAsync)
+            if (IsUrl(path))
             {
-                if (m_customLoaderAsync != null)
+                GetNetworkCentral().LoadTexture(path, (texture2d) =>
                 {
-                    m_customLoaderAsync(path, (texture2d) =>
-                    {
-                        OnLoadCallback(path, texture2d, callback);
-                    });
-                }
-                else
-                {
-                    if (SplitePath(path, out var abPath,out var assetName) >= 0)
-                    {
-                        GetBundleManager().LoadAsync<Texture>(abPath, assetName, (texture2d) =>
-                        {
-                            var textureInfo = OnLoadCallback(path, texture2d, callback);
-                            OnManagerCallback(path, textureInfo);
-                        });
-                    }
-                }
+                    var textureInfo = OnLoadCallback(path, texture2d, callback);
+                    OnManagerCallback(path, textureInfo);
+                });
             }
             else
             {
-                if (m_customLoaderSync != null)
+                if (isAsync)
                 {
-                    var texture2d = m_customLoaderSync(path);
-                    OnLoadCallback(path, texture2d, callback);
+                    if (m_customLoaderAsync != null)
+                    {
+                        m_customLoaderAsync(path, (texture2d) =>
+                        {
+                            OnLoadCallback(path, texture2d, callback);
+                        });
+                    }
+                    else
+                    {
+                        if (SplitePath(path, out var abPath, out var assetName) >= 0)
+                        {
+                            GetBundleManager().LoadAsync<Texture>(abPath, assetName, (texture2d) =>
+                            {
+                                var textureInfo = OnLoadCallback(path, texture2d, callback);
+                                OnManagerCallback(path, textureInfo);
+                            });
+                        }
+                    }
                 }
                 else
                 {
-                    if (SplitePath(path, out var abPath, out var assetName) >= 0)
+                    if (m_customLoaderSync != null)
                     {
-                        var texture2d = GetBundleManager().LoadSync<Texture>(abPath, assetName);
-                        
-                        var textureInfo = OnLoadCallback(path, texture2d, callback);
-                        OnManagerCallback(path, textureInfo);
+                        var texture2d = m_customLoaderSync(path);
+                        OnLoadCallback(path, texture2d, callback);
+                    }
+                    else
+                    {
+                        if (SplitePath(path, out var abPath, out var assetName) >= 0)
+                        {
+                            var texture2d = GetBundleManager().LoadSync<Texture>(abPath, assetName);
+
+                            var textureInfo = OnLoadCallback(path, texture2d, callback);
+                            OnManagerCallback(path, textureInfo);
+                        }
                     }
                 }
             }
+
+            
         }
 
         private TextureCache.TextureInfo OnLoadCallback(string path, Texture texture2d, Action<TextureCache.TextureInfo> action)
@@ -1051,6 +1099,30 @@ namespace THGame.UI
             }
 
             return 0;
+        }
+
+        public static bool IsUrl(string str)
+        {
+            try
+            {
+                string Url = @"^http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?$";
+                return System.Text.RegularExpressions.Regex.IsMatch(str, Url);
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        private NetworkCentral GetNetworkCentral()
+        {
+            if (m_networkCentral == null)
+            {
+                GameObject newworkGobj = new GameObject("NetworkCentral");
+                newworkGobj.transform.SetParent(transform, false);
+                m_networkCentral = newworkGobj.AddComponent<NetworkCentral>();
+            }
+            return m_networkCentral;
         }
 
         private BundleManager GetBundleManager()

@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace ASGame
@@ -20,6 +22,19 @@ namespace ASGame
                     return "ios";
             }
             return "";
+        }
+
+        public static bool IsUrl(string str)
+        {
+            try
+            {
+                string Url = @"^http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?$";
+                return Regex.IsMatch(str, Url);
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
 

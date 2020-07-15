@@ -68,8 +68,8 @@ namespace XLibGame
 
         IEnumerator OnPostCoroutine(int id, HttpParams args)
         {
-            var newUrl = args.data.ToGetData(args.url);
-            var request = UnityWebRequest.Get(newUrl);
+            var wwwForm = (args.data != null) ? args.data.ToPostData(args.url) : null;
+            var request = UnityWebRequest.Post(args.url, wwwForm);
             InitRequest(request, args);
 
             yield return request.SendWebRequest();
@@ -78,8 +78,8 @@ namespace XLibGame
 
         IEnumerator OnGetCoroutine(int id, HttpParams args)
         {
-            var wwwForm = args.data.ToPostData(args.url);
-            var request = UnityWebRequest.Post(args.url, wwwForm);
+            var newUrl = (args.data != null) ? args.data.ToGetData(args.url): args.url;
+            var request = UnityWebRequest.Get(newUrl);
             InitRequest(request, args);
 
             yield return request.SendWebRequest();

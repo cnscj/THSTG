@@ -49,5 +49,23 @@ namespace XLibrary
         {
             return Regex.IsMatch(StrSource, @"^[0-9]*$");
         }
+
+        /// <summary>
+        /// 是否是URL
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static bool IsUrl(string str)
+        {
+            try
+            {
+                string Url = @"^http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?$";
+                return Regex.IsMatch(str, Url);
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
     }
 }

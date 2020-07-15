@@ -1,6 +1,7 @@
 ﻿
 using UnityEngine;
 using UnityEngine.Networking;
+using XLibrary;
 
 namespace XLibGame
 {
@@ -18,7 +19,13 @@ namespace XLibGame
         public byte[] ToBytes()
         {
             return _webRequest.downloadHandler.data;
+        }
 
+        public byte[] ToUnzipBytes()
+        {
+            var oriData = ToBytes();
+            var unzipData = ZipUtility.DecompressDeflate(oriData);
+            return unzipData;
         }
     }
 }

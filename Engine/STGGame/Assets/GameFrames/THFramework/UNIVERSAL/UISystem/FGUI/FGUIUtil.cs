@@ -73,13 +73,13 @@ namespace THGame.UI
         }
         ///////////////////////////
 
-        public static FComponent NewComponent(BaseArgs baseArgs)
+        public static FComponent NewComponent(BaseArgs baseArgs = null)
         {
             var fComponent = NewT<FComponent, GComponent>(baseArgs);
             return fComponent;
         }
 
-        public static FButton NewButton(ButtonArgs buttonArgs)
+        public static FButton NewButton(ButtonArgs buttonArgs = null)
         {
             var fButton = NewT<FButton, GButton>(buttonArgs);
             if (buttonArgs != null)
@@ -90,7 +90,7 @@ namespace THGame.UI
             return fButton;
         }
 
-        public static FGraph NewGraph(GraphArgs graphArgs)
+        public static FGraph NewGraph(GraphArgs graphArgs = null)
         {
             var fGraph = NewT<FGraph, GGraph>(graphArgs);
             if (graphArgs != null)
@@ -100,7 +100,7 @@ namespace THGame.UI
             return fGraph;
         }
 
-        public static FLabel NewLabel(LabelArgs labelArgs)
+        public static FLabel NewLabel(LabelArgs labelArgs = null)
         {
             var fLabel = NewT<FLabel, GLabel>(labelArgs);
             if (labelArgs != null)
@@ -111,7 +111,7 @@ namespace THGame.UI
             return fLabel;
         }
 
-        public static FRichText NewRichText(RichTextArgs richTextArgs)
+        public static FRichText NewRichText(RichTextArgs richTextArgs = null)
         {
             var fRichText = NewT<FRichText, GRichTextField>(richTextArgs);
             if (richTextArgs != null)
@@ -121,7 +121,7 @@ namespace THGame.UI
             return fRichText;
         }
 
-        public static FTextInput NewTextInput(TextInputArgs textInputArgs)
+        public static FTextInput NewTextInput(TextInputArgs textInputArgs = null)
         {
             var fTextInput = NewT<FTextInput, GTextInput>(textInputArgs);
             if (textInputArgs != null)
@@ -132,7 +132,7 @@ namespace THGame.UI
             return fTextInput;
         }
 
-        public static FLoader NewLoader(LoaderArgs loaderArgs)
+        public static FLoader NewLoader(LoaderArgs loaderArgs = null)
         {
             var fLoader = NewT<FLoader>(UIObjectFactory.NewObject(ObjectType.Loader), loaderArgs);
             InitBaseArgs(fLoader, loaderArgs);
@@ -162,7 +162,8 @@ namespace THGame.UI
         private static T NewT<T>(GObject fguiObj, BaseArgs baseArgs) where T : FComponent, new()
         {
             T fComponent = null;
-            if (!string.IsNullOrEmpty(baseArgs.packageName))
+ 
+            if (baseArgs != null && !string.IsNullOrEmpty(baseArgs.packageName))
             {
                 fComponent = FComponent.Create<T>(baseArgs.packageName, baseArgs.componentName);
             }
