@@ -88,30 +88,18 @@ namespace THGame.UI
                 func?.Invoke(index, (T1)_dataProvider[index], (T2)fComp);
             });
         }
-        public void SetState<T1>(ItemStateFuncT1<T1> func)
+        public void SetState<T1>(ItemStateFuncT1<T1> func) where T1 : new()
         {
-            _obj.asList.itemRenderer = new ListItemRenderer((index, obj) =>
+            SetState<T1, FComponent>((index,data,comp) =>
             {
-                FComponent fComp = null;
-                if (!_dataTemplate.TryGetValue(obj, out fComp))
-                {
-                    fComp = FComponent.Create(obj);
-                    _dataTemplate[obj] = fComp;
-                }
-                func?.Invoke(index, (T1)_dataProvider[index], fComp);
+                func?.Invoke(index, data, comp);
             });
         }
         public void SetState(ItemStateFuncT0 func)
         {
-            _obj.asList.itemRenderer = new ListItemRenderer((index, obj) =>
+            SetState<object, FComponent>((index, data, comp) =>
             {
-                FComponent fComp = null;
-                if (!_dataTemplate.TryGetValue(obj, out fComp))
-                {
-                    fComp = FComponent.Create(obj);
-                    _dataTemplate[obj] = fComp;
-                }
-                func?.Invoke(index, _dataProvider[index], fComp);
+                func?.Invoke(index, data, comp);
             });
         }
 

@@ -133,7 +133,10 @@ namespace THGame.UI
         {
             return _obj != null;
         }
-
+        public bool IsCreating()
+        {
+            return __isCreating;
+        }
         //
         public void SetArgs(object args)
         {
