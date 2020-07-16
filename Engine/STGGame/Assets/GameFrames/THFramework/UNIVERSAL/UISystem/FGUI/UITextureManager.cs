@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using FairyGUI;
 using UnityEngine;
+using UnityEngine.Networking;
 using XLibrary.Package;
 
 namespace THGame.UI
@@ -219,11 +220,11 @@ namespace THGame.UI
                 if (m_releaseQueue == null)
                     return;
 
-                if (m_texturesDict == null || m_texturesDict.Count <= 0)
-                    return;
-
                 while (m_releaseQueue.Count > 0)
                 {
+                    if (m_texturesDict == null || m_texturesDict.Count <= 0)
+                        continue;
+
                     var key = m_releaseQueue.Dequeue();
                     var textureInfo = GetTextureInfo(key);
                     if (textureInfo == null)
@@ -249,31 +250,159 @@ namespace THGame.UI
         }
 
         //用于加载网络资源
-        //TODO:
         public class NetworkCentral : MonoBehaviour
         {
-            private int m_id;
-            public int Load(string url,Action<byte[]> callback)
+            public class TaskInfo
             {
-                return -1;
+                public int id;
+                public string path;
+                public Coroutine coroutine;
+                public Action<object> onSuccess;
             }
+            private int m_id;
+            private Dictionary<int, TaskInfo> m_taskDict;
+            private Queue<int> m_removeQueue;
 
-            public int LoadTexture(string url, Action<Texture> callback)
+            public int Load(string url, Action<object> callback)
             {
-                return Load(url, (data) =>
-                {
+                //Url地址严格大小写
+                if (string.IsNullOrEmpty(url))
+                    return -1;
 
-                });
+                var taskInfo = NewTask(url, callback);
+                StartTask(taskInfo);
+
+                GetTaskDict().Add(taskInfo.id, taskInfo);
+                return taskInfo.id;
             }
 
             public void Stop(int id)
             {
+                if (m_taskDict == null)
+                    return;
 
+                if (m_taskDict.TryGetValue(id, out var taskInfo))
+                {
+                    StopTask(taskInfo);
+                    RemoveTask(taskInfo);
+                }
             }
 
-            private void OnCallback()
+            public int LoadTexture(string url, Action<Texture> callback)
             {
+                return Load(url, (obj) =>
+                {
+                    var data = (byte[])obj;
+                    var texture = new Texture2D(100, 100);
+                    var ret = texture.LoadImage(data);
+                    if(!ret)
+                    {
+                        Debug.LogWarningFormat("[TextureNew]url {0} load error", url);
+                        return;
+                    }
+                    callback?.Invoke(texture);
+                });
+            }
 
+            //private void Update()
+            //{
+            //    UpdateRemove();
+            //}
+
+            private void Remove(int id)
+            {
+                if (m_taskDict == null)
+                    return;
+
+                m_taskDict.Remove(id);
+            }
+
+            private void UpdateRemove()
+            {
+                if (m_removeQueue == null)
+                    return;
+
+                while(m_removeQueue.Count > 0)
+                {
+                    var id = m_removeQueue.Dequeue();
+                    if (m_taskDict == null || m_taskDict.Count <= 0)
+                        continue;
+
+                    if (m_taskDict.TryGetValue(id, out var taskInfo))
+                    {
+                        StopTask(taskInfo);
+                        RemoveTask(taskInfo);
+                    }
+                }
+            }
+
+            private TaskInfo NewTask(string path, Action<object> callback)
+            {
+                var id = ++m_id;
+                var taskInfo = new TaskInfo();
+
+                taskInfo.id = id;
+                taskInfo.path = path;
+                taskInfo.onSuccess = callback;
+
+                return taskInfo;
+            }
+
+            private void StartTask(TaskInfo taskInfo)
+            {
+                taskInfo.coroutine = StartCoroutine(OnGetCoroutine(taskInfo));
+            }
+
+            private void StopTask(TaskInfo taskInfo)
+            {
+                StopCoroutine(taskInfo.coroutine);
+            }
+
+            private void RemoveTask(TaskInfo taskInfo)
+            {
+                if (m_taskDict == null)
+                    return;
+
+                m_taskDict.Remove(taskInfo.id);
+            } 
+
+            private IEnumerator OnGetCoroutine(TaskInfo taskInfo)
+            {
+                var newUrl = taskInfo.path;
+                var request = UnityWebRequest.Get(newUrl);
+                request.timeout = 15;
+
+                yield return request.SendWebRequest();
+                OnRequestCallback(taskInfo, request);
+            }
+
+            private void OnRequestCallback(TaskInfo taskInfo, UnityWebRequest webRequest)
+            {
+                Remove(taskInfo.id);
+
+                if (webRequest.isNetworkError || webRequest.isHttpError)
+                    return;
+                
+                if (!webRequest.isDone)
+                    return;
+
+                if (webRequest.responseCode != 200)
+                    return;
+
+                var data = webRequest.downloadHandler.data;
+                taskInfo.onSuccess?.Invoke(data);
+            }
+
+            private Queue<int> GetRemoveQueue()
+            {
+                m_removeQueue = m_removeQueue ?? new Queue<int>();
+                return m_removeQueue;
+            }
+
+            private Dictionary<int, TaskInfo> GetTaskDict()
+            {
+                m_taskDict = m_taskDict ?? new Dictionary<int, TaskInfo>();
+                return m_taskDict;
             }
         }
 
@@ -841,12 +970,12 @@ namespace THGame.UI
                 if (m_removeQueue == null)
                     return;
 
-                if (m_poolGroups == null)
-                    return;
-
                 while (m_removeQueue.Count > 0)
                 {
                     var itKey = m_removeQueue.Dequeue();
+                    if (m_poolGroups == null || m_poolGroups.Count <= 0)
+                        continue;
+
                     if (m_poolGroups.TryGetValue(itKey,out var poolGroup))
                     {
                         poolGroup.Dispose();
@@ -911,8 +1040,6 @@ namespace THGame.UI
             if (string.IsNullOrEmpty(key))
                 return;
 
-            key = key.ToLower();  //全部转为小写
-
             var ntexturePool = GetNTexturePool();
             var ntextureInfo = ntexturePool.Get(key);
             if (ntextureInfo != null)
@@ -959,13 +1086,12 @@ namespace THGame.UI
             if (string.IsNullOrEmpty(path))
                 return;
 
-            path = path.ToLower();  //全部转为小写
             if (m_u3dTexCache != null)
             {
                 var tetureInfo = m_u3dTexCache.GetTextureInfo(path);
                 if (tetureInfo != null)
                 {
-                    OnLoadCallback(path, tetureInfo.texture, callback);
+                    OnLoadCallback(true, path, tetureInfo.texture, callback);
                     return;
                 }
             }
@@ -974,8 +1100,8 @@ namespace THGame.UI
             {
                 GetNetworkCentral().LoadTexture(path, (texture2d) =>
                 {
-                    var textureInfo = OnLoadCallback(path, texture2d, callback);
-                    OnManagerCallback(path, textureInfo);
+                    OnLoadCallback(false, path, texture2d, callback);
+                    return;
                 });
             }
             else
@@ -986,7 +1112,7 @@ namespace THGame.UI
                     {
                         m_customLoaderAsync(path, (texture2d) =>
                         {
-                            OnLoadCallback(path, texture2d, callback);
+                            OnLoadCallback(true, path, texture2d, callback);
                         });
                     }
                     else
@@ -995,7 +1121,7 @@ namespace THGame.UI
                         {
                             GetBundleManager().LoadAsync<Texture>(abPath, assetName, (texture2d) =>
                             {
-                                var textureInfo = OnLoadCallback(path, texture2d, callback);
+                                var textureInfo = OnLoadCallback(true, path, texture2d, callback);
                                 OnManagerCallback(path, textureInfo);
                             });
                         }
@@ -1006,7 +1132,7 @@ namespace THGame.UI
                     if (m_customLoaderSync != null)
                     {
                         var texture2d = m_customLoaderSync(path);
-                        OnLoadCallback(path, texture2d, callback);
+                        OnLoadCallback(true, path, texture2d, callback);
                     }
                     else
                     {
@@ -1014,25 +1140,27 @@ namespace THGame.UI
                         {
                             var texture2d = GetBundleManager().LoadSync<Texture>(abPath, assetName);
 
-                            var textureInfo = OnLoadCallback(path, texture2d, callback);
+                            var textureInfo = OnLoadCallback(true, path, texture2d, callback);
                             OnManagerCallback(path, textureInfo);
                         }
                     }
                 }
             }
-
-            
         }
 
-        private TextureCache.TextureInfo OnLoadCallback(string path, Texture texture2d, Action<TextureCache.TextureInfo> action)
+        private TextureCache.TextureInfo OnLoadCallback(bool isUseCache, string path, Texture texture2d, Action<TextureCache.TextureInfo> action)
         {
             if (texture2d == null)
                 return null;
 
             var cache = GetTextureCache();
+            TextureCache.TextureInfo textureInfo = null;
             cache.Add(path, texture2d);
-
-            var textureInfo = cache.GetTextureInfo(path);
+            textureInfo = cache.GetTextureInfo(path);
+            if (!isUseCache)
+            {
+                cache.Remove(path);
+            }
 
             action?.Invoke(textureInfo);
 
