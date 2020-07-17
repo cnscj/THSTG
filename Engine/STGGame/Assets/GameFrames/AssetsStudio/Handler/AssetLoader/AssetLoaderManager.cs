@@ -129,42 +129,49 @@ namespace ASGame
 
         private void SelectLoaderAndPath<T>(string path, out BaseLoader loader, out string realpath) where T: class
         {
-
-            //如果是双路径
-            if (path.IndexOf('|') >= 0)
+            if (AssetPathUtil.IsUrl(path))
             {
+                loader = GetOrCreateNetworkLoader();
+                realpath = path;
+            }
+            else
+            {
+                //如果是双路径
+                if (path.IndexOf('|') >= 0)
+                {
 #if UNITY_EDITOR    //编辑器下直接加载源路径
-                loader = GetOrCreateEditorLoader();
-                string[] pathPairs = path.Split('|');
-                string assetName = pathPairs[1];
-                realpath = assetName;
+                    loader = GetOrCreateEditorLoader();
+                    string[] pathPairs = path.Split('|');
+                    string assetName = pathPairs[1];
+                    realpath = assetName;
 #else
                 loader =  GetOrCreateBundleLoader();
                 realpath = path;
 #endif
-            }
-            else
-            {
-                //是否是Asset开头的
-                if (typeof(T) == typeof(byte[]))   //二进制加载器
-                {
-                    loader = GetOrCreateBinaryLoader();
-                    realpath = path;
-                    return;
                 }
+                else
+                {
+                    //是否是Asset开头的
+                    if (typeof(T) == typeof(byte[]))   //二进制加载器
+                    {
+                        loader = GetOrCreateBinaryLoader();
+                        realpath = path;
+                        return;
+                    }
 #if UNITY_EDITOR
-                else if (path.StartsWith("assets", StringComparison.OrdinalIgnoreCase))
-                {
-                    loader = GetOrCreateEditorLoader();
-                    realpath = path;
-                    return;
-                }
+                    else if (path.StartsWith("assets", StringComparison.OrdinalIgnoreCase))
+                    {
+                        loader = GetOrCreateEditorLoader();
+                        realpath = path;
+                        return;
+                    }
 #endif
+
+                }
                 //最后采用ResourceLoader
                 loader = GetOrCreateResourceeLoader();
                 realpath = path;
             }
-            
         }
     }
 

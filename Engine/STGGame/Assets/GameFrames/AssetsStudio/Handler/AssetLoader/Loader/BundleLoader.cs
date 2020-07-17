@@ -203,12 +203,8 @@ namespace ASGame
         {
             var mainHandler = handler;
             string assetPath = mainHandler.path;
+            AssetPathUtil.SpliteBundlePath(handler.path, out assetPath, out _);
 
-            if (handler.path.IndexOf("|") > 0)
-            {
-                string[] pathPairs = handler.path.Split('|');
-                assetPath = pathPairs[0];
-            }
 
             //加载顺序决定是否能完全卸载,如果先加载依赖,在加载自己,就能够完全释放(这个与释放顺序无关
             var mainDependencies = GetBundleDependencies(assetPath, false);
@@ -237,12 +233,8 @@ namespace ASGame
             if (!string.IsNullOrEmpty(path))
             {
                 string assetPath = path;
-                if (path.IndexOf("|") > 0)
-                {
-                    string[] pathPairs = path.Split('|');
-                    assetPath = pathPairs[0];
-                }
-
+                AssetPathUtil.SpliteBundlePath(path, out assetPath, out _);
+                
                 if (m_bundlesMap.TryGetValue(assetPath, out var bundleObj))
                 {
                     UnloadBundleObject(bundleObj);
@@ -280,11 +272,8 @@ namespace ASGame
         {
             //如果缓冲池有,则下一帧回调,否则协程回调
             string assetPath = handler.path;
-            if (handler.path.IndexOf("|") > 0)
-            {
-                string[] pathPairs = handler.path.Split('|');
-                assetPath = pathPairs[0];
-            }
+            AssetPathUtil.SpliteBundlePath(handler.path, out assetPath, out _);
+            
             if (GetBundleObject(assetPath) != null)
             {
                 return LoadMethod.Nextframe;
@@ -386,12 +375,7 @@ namespace ASGame
 
             string assetPath = handler.path;
             string assetName = null;
-            if (handler.path.IndexOf("|") > 0)
-            {
-                string[] pathPairs = handler.path.Split('|');
-                assetPath = pathPairs[0];
-                assetName = pathPairs[1];
-            }
+            AssetPathUtil.SpliteBundlePath(handler.path, out assetPath, out assetName);
 
             Object asset = null;
             bool isDone = false;
@@ -405,7 +389,7 @@ namespace ASGame
             }
             else
             {
-                if (assetPath.Contains("://"))  //XXX:是否为网络路径,此处不准
+                if (AssetPathUtil.IsUrl(assetPath))  //是否为网络路径
                 {
                     handler.timeoutChecker.stayTime = HANDLER_BUNDLE_NETWORK_STAY_TIME;    //网络Handler超时时间
                     var request = UnityWebRequestAssetBundle.GetAssetBundle(assetPath);
@@ -470,12 +454,7 @@ namespace ASGame
 
             string assetPath = handler.path;
             string assetName = null;
-            if (handler.path.IndexOf("|") > 0)
-            {
-                string[] pathPairs = handler.path.Split('|');
-                assetPath = pathPairs[0];
-                assetName = pathPairs[1];
-            }
+            AssetPathUtil.SpliteBundlePath(handler.path, out assetPath, out assetName);
 
             Object asset = null;
             bool isDone = false;
@@ -490,7 +469,7 @@ namespace ASGame
             else
             {
                 //不支持同步的网络下载
-                if (assetPath.Contains("://"))
+                if (AssetPathUtil.IsUrl(assetPath))
                 {
                     asset = null;
                     isDone = false;

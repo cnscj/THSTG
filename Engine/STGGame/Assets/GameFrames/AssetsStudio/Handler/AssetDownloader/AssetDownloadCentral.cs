@@ -64,7 +64,6 @@ namespace ASGame
                 var task = GetOrCreateTask();
                 task.urlPaths = urlPaths;
                 task.storePath = storePath;
-                task.createTime = XTimeTools.NowTimeStampMs();
                 GetTaskMap().Add(taskKey, task);
 
                 //默认全部送到暂停队列,方便以后开启空闲下载

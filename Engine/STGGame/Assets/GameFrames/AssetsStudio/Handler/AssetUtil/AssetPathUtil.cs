@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -24,22 +25,36 @@ namespace ASGame
             return "";
         }
 
-        public static bool IsUrl(string str)
+        public static bool IsUrl(string path)
         {
             try
             {
                 string Url = @"^http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?$";
-                return Regex.IsMatch(str, Url);
+                return Regex.IsMatch(path, Url);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
         }
 
+        public static bool IsAssetPath(string path)
+        {
+            return path.StartsWith("assets", StringComparison.OrdinalIgnoreCase);
+        }
 
+        public static bool IsLocalPath(string path)
+        {
+            string reg = @"^(?<fpath>([a-zA-Z]:\\)([\s\.\-\w]+\\)*)(?<fname>[\w]+.[\w]+)";  //Win下路径
+            return Regex.IsMatch(path, reg);
+        }
+    
         public static string SpliteBundlePath(string abPath, string assetName)
         {
+            if (string.IsNullOrEmpty(assetName))
+            {
+                return string.Format("{0}", abPath);
+            }
             return string.Format("{0}|{1}", abPath, assetName);
         }
 
