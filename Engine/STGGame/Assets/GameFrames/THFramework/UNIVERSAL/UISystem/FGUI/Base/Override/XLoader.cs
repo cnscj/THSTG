@@ -49,7 +49,7 @@ namespace THGame.UI
                 else
                     onExternalLoadFailed();
 
-            });
+            }, null);
         }
 
         protected override void FreeExternal(NTexture texture)

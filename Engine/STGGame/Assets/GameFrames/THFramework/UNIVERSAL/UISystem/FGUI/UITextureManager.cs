@@ -14,6 +14,15 @@ namespace THGame.UI
     //离散释放,如果一次加载太多又同时释放会卡
     public class UITextureManager : MonoSingleton<UITextureManager>
     {
+        public static class LoadStatus
+        {
+            public static readonly int LOAD_ERROR = -1;
+            public static readonly int NETWORK_ERROR = -2;
+            public static readonly int NETWORK_TIMEOUT = -3;
+            public static readonly int URL_ERROR = -4;
+            public static readonly int DATA_ERROR = -5;
+
+        }
         public class TextureCache : MonoBehaviour
         {
             public class TextureInfo
@@ -36,7 +45,6 @@ namespace THGame.UI
                     m_disposeTime = -1f;
                     lastVisitTime = Time.realtimeSinceStartup;
                 }
-
 
                 public void Retain()
                 {
@@ -258,18 +266,23 @@ namespace THGame.UI
                 public string path;
                 public Coroutine coroutine;
                 public Action<object> onSuccess;
+                public Action<int> onFailed;
             }
             private int m_id;
             private Dictionary<int, TaskInfo> m_taskDict;
             private Queue<int> m_removeQueue;
 
-            public int Load(string url, Action<object> callback)
+            public int Load(string url, Action<object> onSuccess, Action<int> onFailed)
             {
                 //Url地址严格大小写
                 if (string.IsNullOrEmpty(url))
+                {
+                    onFailed?.Invoke(LoadStatus.URL_ERROR);
                     return -1;
+                }
 
-                var taskInfo = NewTask(url, callback);
+
+                var taskInfo = NewTask(url, onSuccess, onFailed);
                 StartTask(taskInfo);
 
                 GetTaskDict().Add(taskInfo.id, taskInfo);
@@ -288,7 +301,7 @@ namespace THGame.UI
                 }
             }
 
-            public int LoadTexture(string url, Action<Texture> callback)
+            public int LoadTexture(string url, Action<Texture> onSuccess, Action<int> onFailed)
             {
                 return Load(url, (obj) =>
                 {
@@ -298,10 +311,11 @@ namespace THGame.UI
                     if(!ret)
                     {
                         Debug.LogWarningFormat("[TextureNew]url {0} load error", url);
+                        onFailed?.Invoke(LoadStatus.DATA_ERROR);
                         return;
                     }
-                    callback?.Invoke(texture);
-                });
+                    onSuccess?.Invoke(texture);
+                }, onFailed);
             }
 
             //private void Update()
@@ -336,15 +350,15 @@ namespace THGame.UI
                 }
             }
 
-            private TaskInfo NewTask(string path, Action<object> callback)
+            private TaskInfo NewTask(string path, Action<object> onSuccess, Action<int> onFailed)
             {
                 var id = ++m_id;
                 var taskInfo = new TaskInfo();
 
                 taskInfo.id = id;
                 taskInfo.path = path;
-                taskInfo.onSuccess = callback;
-
+                taskInfo.onSuccess = onSuccess;
+                taskInfo.onFailed = onFailed;
                 return taskInfo;
             }
 
@@ -381,13 +395,25 @@ namespace THGame.UI
                 Remove(taskInfo.id);
 
                 if (webRequest.isNetworkError || webRequest.isHttpError)
+                {
+                    taskInfo.onFailed?.Invoke(LoadStatus.NETWORK_ERROR);
                     return;
+                }
+
                 
                 if (!webRequest.isDone)
+                {
+                    taskInfo.onFailed?.Invoke(LoadStatus.LOAD_ERROR);
                     return;
+                }
+
 
                 if (webRequest.responseCode != 200)
+                {
+                    taskInfo.onFailed?.Invoke(LoadStatus.LOAD_ERROR);
                     return;
+                }
+
 
                 var data = webRequest.downloadHandler.data;
                 taskInfo.onSuccess?.Invoke(data);
@@ -483,7 +509,7 @@ namespace THGame.UI
                 return OnSyncLoad<T>(abPath, assetName);
             }
 
-            public void LoadAsync<T>(string abPath, string assetName, Action<T> action) where T : UnityEngine.Object
+            public void LoadAsync<T>(string abPath, string assetName, Action<T> onSuccess , Action<int> onFailed) where T : UnityEngine.Object
             {
                 if (string.IsNullOrEmpty(abPath))
                     return;
@@ -492,12 +518,12 @@ namespace THGame.UI
                 if (TryGetLoadingBundle(abPath, out var loadingInfo))
                 {
                     //回调合并
-                    loadingInfo.Add(assetName,(obj) => { action?.Invoke(obj as T); });
+                    loadingInfo.Add(assetName,(obj) => { onSuccess?.Invoke(obj as T); });
                     return;
                 }
 
                 loadingInfo = new LoadingInfo();
-                loadingInfo.Add(assetName, (obj) => { action?.Invoke(obj as T); });
+                loadingInfo.Add(assetName, (obj) => { onSuccess?.Invoke(obj as T); });
                 GetLoadingBundleDict().Add(abPath, loadingInfo);
 
                 StartCoroutine(OnAsyncLoad<T>(abPath, assetName));
@@ -986,6 +1012,9 @@ namespace THGame.UI
         }
 
         ///////////////
+
+        public static readonly string DEFAULT_TEXTURE_KEY = "_DefaultTexture_";
+
         private TextureCache m_u3dTexCache;
         private NetworkCentral m_networkCentral;
         private BundleManager m_bundleManager;
@@ -993,6 +1022,21 @@ namespace THGame.UI
         //TODO:小图图集打包
         private Func<string, Texture> m_customLoaderSync;              //自定义同步加载器
         private Action<string, Action<Texture>> m_customLoaderAsync;   //自定义异步加载器
+
+        private Texture m_defaultTexture;
+        public Texture DefaultTexture
+        {
+            get
+            {
+                return m_defaultTexture;
+            }
+
+            set
+            {
+                m_defaultTexture = value;
+                AddTexture(DEFAULT_TEXTURE_KEY, m_defaultTexture, true);
+            }
+        }                    //默认纹理                
 
         public void SetCustomLoader(Func<string, Texture> syncFunc, Action<string, Action<Texture>> asyncFunc)
         {
@@ -1008,7 +1052,7 @@ namespace THGame.UI
             return m_u3dTexCache.Get(key);
         }
 
-        public bool AddTexture(string key, Texture texture)
+        public bool AddTexture(string key, Texture texture,bool isReplace = false)
         {
             if (string.IsNullOrEmpty(key))
                 return false;
@@ -1017,7 +1061,7 @@ namespace THGame.UI
                 return false;
 
             var cache = GetTextureCache();
-            var textureInfo = cache.Add(key, texture);
+            var textureInfo = cache.Add(key, texture, isReplace);
             textureInfo.isAddByManager = true;
             textureInfo.Retain();  //强引用
 
@@ -1035,7 +1079,7 @@ namespace THGame.UI
             m_u3dTexCache.Dispose(key);
         }
 
-        public void GetOrCreateNTexture(string key, bool isAsync, Action<NTexture> callback)
+        public void GetOrCreateNTexture(string key, bool isAsync, Action<NTexture> onSuccess, Action<int> onFailed)
         {
             if (string.IsNullOrEmpty(key))
                 return;
@@ -1044,7 +1088,7 @@ namespace THGame.UI
             var ntextureInfo = ntexturePool.Get(key);
             if (ntextureInfo != null)
             {
-                callback?.Invoke(ntextureInfo.ntexture);
+                onSuccess?.Invoke(ntextureInfo.ntexture);
             }
             else
             {
@@ -1053,7 +1097,7 @@ namespace THGame.UI
                 {
                     ntexturePool.Add(key, texture);
                     ntextureInfo = ntexturePool.Get(key);
-                    callback?.Invoke(ntextureInfo.ntexture);
+                    onSuccess?.Invoke(ntextureInfo.ntexture);
                 }
                 else
                 {
@@ -1068,7 +1112,10 @@ namespace THGame.UI
                         {
                             textureInfo.Release();
                         };
-                        callback?.Invoke(ntextureInfo.ntexture);
+                        onSuccess?.Invoke(ntextureInfo.ntexture);
+                    },(reason) =>
+                    {
+                        onFailed?.Invoke(reason);
                     });
                 }
     
@@ -1081,7 +1128,7 @@ namespace THGame.UI
             ntexturePool.Release(ntexture);
         }
 
-        public void LoadTexture(string path, bool isAsync, Action<TextureCache.TextureInfo> callback)
+        public void LoadTexture(string path, bool isAsync, Action<TextureCache.TextureInfo> onSuccess, Action<int> onFailed)
         {
             if (string.IsNullOrEmpty(path))
                 return;
@@ -1091,7 +1138,7 @@ namespace THGame.UI
                 var tetureInfo = m_u3dTexCache.GetTextureInfo(path);
                 if (tetureInfo != null)
                 {
-                    OnLoadCallback(true, path, tetureInfo.texture, callback);
+                    OnLoadCallbackSuccess(true, path, tetureInfo.texture, onSuccess);
                     return;
                 }
             }
@@ -1100,8 +1147,10 @@ namespace THGame.UI
             {
                 GetNetworkCentral().LoadTexture(path, (texture2d) =>
                 {
-                    OnLoadCallback(false, path, texture2d, callback);
-                    return;
+                    OnLoadCallbackSuccess(false, path, texture2d, onSuccess);
+                },(reason) =>
+                {
+                    OnLoadCallbackFailed(reason, onFailed, onSuccess);
                 });
             }
             else
@@ -1112,7 +1161,7 @@ namespace THGame.UI
                     {
                         m_customLoaderAsync(path, (texture2d) =>
                         {
-                            OnLoadCallback(true, path, texture2d, callback);
+                            OnLoadCallbackSuccess(true, path, texture2d, onSuccess);
                         });
                     }
                     else
@@ -1121,8 +1170,11 @@ namespace THGame.UI
                         {
                             GetBundleManager().LoadAsync<Texture>(abPath, assetName, (texture2d) =>
                             {
-                                var textureInfo = OnLoadCallback(true, path, texture2d, callback);
+                                var textureInfo = OnLoadCallbackSuccess(true, path, texture2d, onSuccess);
                                 OnManagerCallback(path, textureInfo);
+                            },(reason) =>
+                            {
+                                OnLoadCallbackFailed(reason, onFailed, onSuccess);
                             });
                         }
                     }
@@ -1132,7 +1184,7 @@ namespace THGame.UI
                     if (m_customLoaderSync != null)
                     {
                         var texture2d = m_customLoaderSync(path);
-                        OnLoadCallback(true, path, texture2d, callback);
+                        OnLoadCallbackSuccess(true, path, texture2d, onSuccess);
                     }
                     else
                     {
@@ -1140,7 +1192,7 @@ namespace THGame.UI
                         {
                             var texture2d = GetBundleManager().LoadSync<Texture>(abPath, assetName);
 
-                            var textureInfo = OnLoadCallback(true, path, texture2d, callback);
+                            var textureInfo = OnLoadCallbackSuccess(true, path, texture2d, onSuccess);
                             OnManagerCallback(path, textureInfo);
                         }
                     }
@@ -1148,7 +1200,7 @@ namespace THGame.UI
             }
         }
 
-        private TextureCache.TextureInfo OnLoadCallback(bool isUseCache, string path, Texture texture2d, Action<TextureCache.TextureInfo> action)
+        private TextureCache.TextureInfo OnLoadCallbackSuccess(bool isUseCache, string path, Texture texture2d, Action<TextureCache.TextureInfo> onSuccess)
         {
             if (texture2d == null)
                 return null;
@@ -1162,9 +1214,23 @@ namespace THGame.UI
                 cache.Remove(path);
             }
 
-            action?.Invoke(textureInfo);
+            onSuccess?.Invoke(textureInfo);
 
             return textureInfo;
+        }
+
+        private void OnLoadCallbackFailed(int reason, Action<int> onFailed, Action<TextureCache.TextureInfo> onSuccess)
+        {
+            if (DefaultTexture == null)
+            {
+                onFailed?.Invoke(reason);
+            }
+            else//使用默认贴图
+            {
+                var cache = GetTextureCache();
+                TextureCache.TextureInfo  textureInfo = cache.GetTextureInfo(DEFAULT_TEXTURE_KEY);
+                onSuccess?.Invoke(textureInfo);
+            }
         }
 
         private void OnManagerCallback(string path, TextureCache.TextureInfo textureInfo)
@@ -1191,17 +1257,6 @@ namespace THGame.UI
                 GetBundleManager().RemoveDepend(abPath, assetName);
                 GetBundleManager().TryUnload(abPath);
             }
-        }
-
-        private TextureCache GetTextureCache()
-        {
-            if (m_u3dTexCache == null)
-            {
-                GameObject cacheGobj = new GameObject("TextureCache");
-                cacheGobj.transform.SetParent(transform, false);
-                m_u3dTexCache = cacheGobj.AddComponent<TextureCache>();
-            }
-            return m_u3dTexCache;
         }
 
         private string CombinePath(string abPath,string assetName)
@@ -1236,10 +1291,21 @@ namespace THGame.UI
                 string Url = @"^http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?$";
                 return System.Text.RegularExpressions.Regex.IsMatch(str, Url);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
+        }
+
+        private TextureCache GetTextureCache()
+        {
+            if (m_u3dTexCache == null)
+            {
+                GameObject cacheGobj = new GameObject("TextureCache");
+                cacheGobj.transform.SetParent(transform, false);
+                m_u3dTexCache = cacheGobj.AddComponent<TextureCache>();
+            }
+            return m_u3dTexCache;
         }
 
         private NetworkCentral GetNetworkCentral()
