@@ -5,6 +5,10 @@ using FairyGUI.Utils;
 using UnityEngine;
 using XLibrary.Package;
 
+/*
+ * GComponent 1615行插入 THGame.UI.UIPropertyManager.GetInstance().RegisterGObject(this,key,value);
+ * 
+ * */
 namespace THGame.UI
 {
     public class UIPropertyManager : Singleton<UIPropertyManager>
@@ -55,10 +59,12 @@ namespace THGame.UI
 
         public bool IsEnabled { get; set; }
         public bool IsUseId { get; set; }
+        public bool IsRemoveFree { get; set; }
 
         public UIPropertyManager()
         {
             IsEnabled = true;
+            IsRemoveFree = true;
         }
         public void RegisterGObject(GObject gObj)
         {
@@ -73,7 +79,7 @@ namespace THGame.UI
             if (!masterDict.ContainsKey(masterKey))
             {
                 gObj.onAddedToStage.Add(OnAddedToStage);
-                gObj.onRemovedFromStage.Add(OnRemovedFromStage);
+                if (IsRemoveFree) gObj.onRemovedFromStage.Add(OnRemovedFromStage);
                 masterDict[masterKey] = new CustomData();
             }
             return;
@@ -142,7 +148,7 @@ namespace THGame.UI
             var masterDict = GetMasterDict();
             if (!masterDict.ContainsKey(masterKey))
             {
-                gObj.onRemovedFromStage.Add(OnRemovedFromStage);
+                if (IsRemoveFree) gObj.onRemovedFromStage.Add(OnRemovedFromStage);
             }
             AddProperty(masterKey, key, value);
         }
