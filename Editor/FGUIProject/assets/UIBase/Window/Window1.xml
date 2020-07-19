@@ -10,8 +10,10 @@
     <component id="n5_logx" name="closeButton" src="vd2z1" fileName="Button/ButtonClose1.xml" xy="592,25">
       <relation target="" sidePair="right-right,top-top"/>
     </component>
-    <richtext id="n6_logx" name="title" xy="319,25" pivot="0.5,0.5" anchor="true" size="41,25" touchable="false" fontSize="18" align="center" vAlign="middle" text="标题">
+    <richtext id="n6_logx" name="title" xy="319,25" pivot="0.5,0.5" anchor="true" size="40,26" touchable="false" fontSize="18" align="center" vAlign="middle" text="标题">
       <relation target="" sidePair="center-center,top-top"/>
     </richtext>
   </displayList>
+  <customProperty target="codeX" propertyId="0"/>
+  <customProperty target="coddd" propertyId="0"/>
 </component>

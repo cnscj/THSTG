@@ -9,6 +9,9 @@ namespace XLibrary
         //平台统一路径
         public static string NormalizePath(string path)
         {
+            if (string.IsNullOrEmpty(path))
+                return path;
+
             return path.Replace(@"\", "/");
         }
 

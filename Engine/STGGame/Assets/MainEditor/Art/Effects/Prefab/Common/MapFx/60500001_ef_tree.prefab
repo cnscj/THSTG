@@ -12,9 +12,8 @@ GameObject:
   - component: {fileID: 7475655677034986247}
   - component: {fileID: 2076304110694719481}
   - component: {fileID: 1324653897135442363}
-  - component: {fileID: 9101191996139319922}
   m_Layer: 0
-  m_Name: 600001_bomb_01
+  m_Name: 60500001_ef_tree
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -197,21 +196,3 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &9101191996139319922
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9101191996139319921}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f2eb8b36d33044063b288c2961ae8f1d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  shakeUpDown: 0
-  shakeLeftRight: 0
-  shakeHead: 2
-  shakePeriod: 0.12
-  shakeCount: 6
-  shake: 1

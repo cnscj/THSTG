@@ -11,7 +11,6 @@ namespace STGRuntime
         {
             EventHelper.Dispatch(EventType.TEST_EVENT, this , "string12312");
 
-            UnityEngine.Debug.Log(ResourceConfiger.GetResSrc("1001"));
             UnityEngine.Debug.Log(TestConfiger.GetResSrc("reimu"));
         }
 

@@ -45,6 +45,7 @@ namespace ASGame
 
         public int LoadAssetSync<T>(string path, Action<T> onSuccess = null, Action<int> onFailed = null) where T : class
         {
+            path = AssetPathUtil.NormalizePath(path);
             AssetLoadHandler handler = LoadAssetHandler<T>(path, (AssetLoadResult result) =>
             {
                 if (result.isDone && result.asset != null)
@@ -62,6 +63,7 @@ namespace ASGame
 
         public int LoadAssetAsync<T>(string path, Action<T> onSuccess = null, Action<int> onFailed = null) where T : class
         {
+            path = AssetPathUtil.NormalizePath(path);
             var handler = LoadAssetHandler<T>(path);
 
             handler.OnCompleted((AssetLoadResult result) =>
@@ -166,11 +168,11 @@ namespace ASGame
                         return;
                     }
 #endif
-
+                    //最后采用ResourceLoader
+                    loader = GetOrCreateResourceeLoader();
+                    realpath = path;
                 }
-                //最后采用ResourceLoader
-                loader = GetOrCreateResourceeLoader();
-                realpath = path;
+
             }
         }
     }
