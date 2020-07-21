@@ -48,7 +48,10 @@ namespace UnityEngine
         {
             return LayerMask.LayerToName(_this.layer);
         }
+    }
 
+    public static class ObjectExtensions
+    {
         public static bool IsNull(this UnityEngine.Object unityObject)
         {
             return unityObject == null;

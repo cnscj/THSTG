@@ -20,12 +20,7 @@ namespace STGRuntime.UI
             btn3 = GetChild<FButton>("n5");
             btn1.OnClick((context) =>
             {
-                UIPropertyManager.GetInstance().ParseGObject(btn3.GetObject());
-                Debug.Log(UIPropertyManager.GetInstance().GetProperty(btn2.GetObject(), "codea"));
-                Debug.Log(UIPropertyManager.GetInstance().GetProperty(btn2.GetObject(), "codeb"));
-
-                Debug.Log(UIPropertyManager.GetInstance().GetProperty(btn3.GetObject(), "codea"));
-                Debug.Log(UIPropertyManager.GetInstance().GetProperty(btn3.GetObject(), "codeb"));
+               
                 Close();
             });
         }

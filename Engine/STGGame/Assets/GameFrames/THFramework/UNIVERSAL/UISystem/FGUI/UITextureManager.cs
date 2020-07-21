@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using FairyGUI;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -1022,8 +1023,9 @@ namespace THGame.UI
         //TODO:小图图集打包
         private Func<string, Texture> m_customLoaderSync;              //自定义同步加载器
         private Action<string, Action<Texture>> m_customLoaderAsync;   //自定义异步加载器
-
+        private Dictionary<string, string> m_pathDict;
         private Texture m_defaultTexture;
+
         public Texture DefaultTexture
         {
             get
@@ -1118,8 +1120,48 @@ namespace THGame.UI
                         onFailed?.Invoke(reason);
                     });
                 }
-    
             }
+        }
+
+        public string ParseFormatPath(string srcUrl)
+        {
+            if (m_pathDict == null)
+                return srcUrl;
+
+            if (string.IsNullOrEmpty(srcUrl))
+                return srcUrl;
+
+            int protocolStartPos = srcUrl.IndexOf("://");
+            if (protocolStartPos <= 0)
+                return srcUrl;
+
+            int protocolEndPos = protocolStartPos + "://".Length;
+            string protocolStr = srcUrl.Substring(0, protocolStartPos);
+
+            if (m_pathDict.TryGetValue(protocolStr,out var format))
+            {
+                string assetPath = srcUrl.Substring(protocolEndPos, srcUrl.Length - protocolEndPos);
+                string buildStr = format;
+
+                string parentPath = Path.GetDirectoryName(assetPath);
+                string fineNameNotEx = Path.GetFileNameWithoutExtension(assetPath);
+
+                buildStr = buildStr.Replace("{path}", assetPath);
+                buildStr = buildStr.Replace("{folder}", parentPath);
+                buildStr = buildStr.Replace("{fileNameNotEx}", fineNameNotEx);
+                buildStr = buildStr.Replace("{protocol}", protocolStr);
+                return buildStr;
+            }
+            return srcUrl;
+        }
+
+        public void AddFormatPath(string prefix, string format)
+        {
+            if (string.IsNullOrEmpty(prefix))
+                return;
+
+            m_pathDict = m_pathDict ?? new Dictionary<string, string>();
+            m_pathDict[prefix] = format;
         }
 
         public void ReleaseNTexture(NTexture ntexture)

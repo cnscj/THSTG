@@ -18,6 +18,7 @@ namespace THGame.UI
             如果不相符，表示loader已经被修改了。
             这种情况下应该放弃调用OnExternalLoadSuccess或OnExternalLoadFailed。
             */
+            url = UITextureManager.GetInstance().ParseFormatPath(url);
             string srcUrl = url;
             UITextureManager.GetInstance().GetOrCreateNTexture(srcUrl, true, (ntexture) =>
             {
