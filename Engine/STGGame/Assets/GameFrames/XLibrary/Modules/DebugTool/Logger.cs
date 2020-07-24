@@ -85,26 +85,26 @@ namespace XLibGame.Debugger
             }
         }
 
-        void OnReceiveLogMsg(string condition, string stackTrace, LogType type)
+        void OnReceiveLogMsg(string condition, string stackTrace, UnityEngine.LogType type)
         {
             bool isDetail = true;
             string typeStr = "";
             switch (type)
             {
-                case LogType.Error:
+                case UnityEngine.LogType.Error:
                     typeStr = "Error";
                     break;
-                case LogType.Assert:
+                case UnityEngine.LogType.Assert:
                     typeStr = "Assert";
                     break;
-                case LogType.Warning:
+                case UnityEngine.LogType.Warning:
                     typeStr = "Warning";
                     break;
-                case LogType.Log:
+                case UnityEngine.LogType.Log:
                     typeStr = "Log";
                     isDetail = false;
                     break;
-                case LogType.Exception:
+                case UnityEngine.LogType.Exception:
                     typeStr = "Exception";
                     break;
                 default:
