@@ -1,4 +1,4 @@
-﻿namespace XLibGame
+﻿namespace THGame
 {
     public static class LogTag
     {

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using UnityEngine;
+using XLibGame;
 
-namespace XLibGame
+namespace THGame
 {
     public class RollingFileAppender : AsyncTask, ILogAppender
     {

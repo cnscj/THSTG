@@ -2,11 +2,12 @@
 using System;
 using UnityEngine;
 
-namespace XLibGame
+namespace THGame
 {
     public class Logger : BaseLog
     {
         private static Logger s_instance;
+        private bool m_captureUnityLog;
 
         public Logger GetInstance()
         {
@@ -19,12 +20,18 @@ namespace XLibGame
 
         public bool CaptureUnityLog
         {
+            get { return m_captureUnityLog; }
             set
             {
+                if (m_captureUnityLog == value)
+                    return;
+                
                 if (value)
                     Application.logMessageReceivedThreaded += OnReceiveLogMsg;  //日志监听
                 else
                     Application.logMessageReceivedThreaded -= OnReceiveLogMsg;  //移除监听
+
+                m_captureUnityLog = value;
             }
         }
 

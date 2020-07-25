@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace XLibGame
+namespace THGame
 {
     /// <summary>
     /// Log的具体内容

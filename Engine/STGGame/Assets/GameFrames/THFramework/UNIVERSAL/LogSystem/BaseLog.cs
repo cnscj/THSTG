@@ -2,7 +2,7 @@
 using System;
 using System.Text;
 
-namespace XLibGame
+namespace THGame
 {
     public abstract class BaseLog
     {

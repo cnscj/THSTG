@@ -10,7 +10,22 @@ namespace ASGame
     //提供 静默下载 一个开关
     public class AssetDownloadManager : MonoSingleton<AssetDownloadManager>
     {
- 
+        private AssetDownloadCentral m_foregroundCentral;           //前台下载
+        private AssetDownloadCentral m_backgroundCentral;           //后台下载
+
+
+
+        private AssetDownloadCentral GetForegroundCentral()
+        {
+            m_foregroundCentral = m_foregroundCentral ?? new AssetDownloadCentral();
+            return m_foregroundCentral;
+        }
+
+        private AssetDownloadCentral GetBackgroundCentral()
+        {
+            m_backgroundCentral = m_backgroundCentral ?? new AssetDownloadCentral();
+            return m_backgroundCentral;
+        }
     }
 
 }

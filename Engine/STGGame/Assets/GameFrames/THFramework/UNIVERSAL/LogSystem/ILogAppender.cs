@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-namespace XLibGame
+namespace THGame
 {
     /// <summary>
     /// 日志Appender

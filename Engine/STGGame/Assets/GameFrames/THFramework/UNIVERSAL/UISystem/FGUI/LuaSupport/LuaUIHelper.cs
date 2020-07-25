@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using FairyGUI.Utils;
 using XLua;
 using UnityEngine;
+using FairyGUI;
 
-namespace FairyGUI
+namespace THGame.UI
 {
     /// <summary>
     /// 
@@ -24,19 +25,13 @@ namespace FairyGUI
                 return gcom;
             });
         }
-        [CSharpCallLua]
-        public interface ILuaComponent
-        {
-            void Init();
-        }
-
 
         [XLua.BlackList]
         public static LuaTable ConnectLua(GComponent gcom)
         {
             LuaTable _peerTable = null;
             LuaFunction extendFunction = gcom.data as LuaFunction;
-            if (extendFunction!=null)
+            if (extendFunction != null)
             {
                 gcom.data = null;
 
@@ -44,30 +39,59 @@ namespace FairyGUI
                 _peerTable = obj[0] as LuaTable;
                 _peerTable.Set("csuserdata", gcom);
             }
-            ILuaComponent c = _peerTable.Cast<ILuaComponent>();
-            c.Init();
+
             return _peerTable;
         }
+    }
+
+    [CSharpCallLua]
+    public interface ILuaComponent
+    {
+        void Init();
+        void Free();
     }
 
     public class GLuaComponent : GComponent
     {
         public LuaTable Lua;
+        ILuaComponent callback;
 
         [XLua.BlackList]
         public override void ConstructFromXML(XML xml)
         {
             base.ConstructFromXML(xml);
+
             Lua = LuaUIHelper.ConnectLua(this);
+
+            callback = Lua.Cast<ILuaComponent>();
+            if (callback != null)
+            {
+                callback.Init();
+            }
+            else
+            {
+                Debug.LogWarningFormat("Can't cast LuaTable to ILuaComponent");
+            }
         }
 
         public override void Dispose()
         {
             base.Dispose();
+
+            // 析构函数，调完就可以清空了
+            if (callback != null)
+            {
+                callback.Free();
+                callback = null;
+            }
+
+
             if (Lua != null)
             {
                 Lua.Dispose();
+                Lua = null;
             }
+
         }
     }
 
@@ -185,6 +209,7 @@ namespace FairyGUI
         void DoShowAnimation();
         void OnShown();
         void OnHide();
+        void OnFree();
     }
     public class LuaWindow : Window
     {
@@ -201,9 +226,16 @@ namespace FairyGUI
         {
             base.Dispose();
 
+            if (callback != null)
+            {
+                callback.OnFree();
+                callback = null;
+            }
+
             if (_peerTable != null)
             {
                 _peerTable.Dispose();
+                _peerTable = null;
             }
         }
 
