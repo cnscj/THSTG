@@ -14,14 +14,13 @@ namespace ASGame
         private AssetDownloadCentral m_backgroundCentral;           //后台下载
 
 
-
-        private AssetDownloadCentral GetForegroundCentral()
+        public AssetDownloadCentral GetForegroundCentral()
         {
             m_foregroundCentral = m_foregroundCentral ?? new AssetDownloadCentral();
             return m_foregroundCentral;
         }
 
-        private AssetDownloadCentral GetBackgroundCentral()
+        public AssetDownloadCentral GetBackgroundCentral()
         {
             m_backgroundCentral = m_backgroundCentral ?? new AssetDownloadCentral();
             return m_backgroundCentral;

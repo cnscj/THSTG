@@ -12,8 +12,8 @@ namespace ASGame
         //全局限速
         //全局最大任务下载数
         //定时任务
-        public int maxCount = -1;
-        public float limidSpeed = -1f;
+        public int maxCount = 6;                                                //最大同时下载任务个数
+        public float limidSpeed = -1f;                                          //全局限速
 
         private Dictionary<string, AssetDownloadTask> m_tasksMap;               //所有任务列表
         private SortedSet<AssetDownloadTask> m_queueMap;                        //排队队列(含优先级
@@ -153,7 +153,7 @@ namespace ASGame
         /////////////////////////////////////
         private AssetDownloadTask GetOrCreateTask()
         {
-            var task = AssetDownloadTaskManager.GetInstance().GetOrCreateTask();
+            var task = new AssetDownloadTask();
             return task;
         }
 
@@ -274,7 +274,6 @@ namespace ASGame
 
                 var taskKey = GetTaskKey(task.urlPaths);
                 m_tasksMap.Remove(taskKey);
-                ReleaseTask(task);
             }
         }
 
@@ -305,11 +304,6 @@ namespace ASGame
         private void DisactiveTask(AssetDownloadTask task)
         {
 
-        }
-
-        private void ReleaseTask(AssetDownloadTask task)
-        {
-            AssetDownloadTaskManager.GetInstance().RecycleTask(task);
         }
 
         //Android目录下,下载中的存放路径必须在Application.dataPath,下载完成在拷贝到Application.persistentDataPath
