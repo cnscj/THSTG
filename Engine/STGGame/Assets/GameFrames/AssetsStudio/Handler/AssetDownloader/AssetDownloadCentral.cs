@@ -51,9 +51,9 @@ namespace ASGame
 
         /////////////////////////////////////
 
-        public AssetDownloadTask NewTask(string[] urlPaths, string storePath)
+        public AssetDownloadTask NewTask(string[] urlPaths, string savePath)
         {
-            if (urlPaths != null && urlPaths.Length > 0 && !string.IsNullOrEmpty(storePath))
+            if (urlPaths != null && urlPaths.Length > 0 && !string.IsNullOrEmpty(savePath))
             {
                 var taskKey = GetTaskKey(urlPaths);
                 if (m_tasksMap != null && m_tasksMap.TryGetValue(taskKey, out var taskInMap))
@@ -63,7 +63,7 @@ namespace ASGame
 
                 var task = GetOrCreateTask();
                 task.urlPaths = urlPaths;
-                task.storePath = storePath;
+                task.savePath = savePath;
                 GetTaskMap().Add(taskKey, task);
 
                 //默认全部送到暂停队列,方便以后开启空闲下载

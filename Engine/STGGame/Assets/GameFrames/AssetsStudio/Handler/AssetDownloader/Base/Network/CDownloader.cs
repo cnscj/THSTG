@@ -30,28 +30,41 @@ namespace ASGame
         public FileStream file;
     }
 
-    public class CHttpDownMng
+    public delegate void DownloadProgress(long curSize, long totalSize, int curCount, int totalCount);  //TODO
+    public delegate void DownloadFinish(string url,bool isSuc, DownResFile resFile);
+
+    public class CDownloader
     {
         List<DownResInfo> m_DownList;
-        int m_nNextDownIndex = 0;
-        int m_nDownCount = 0;
+        int m_nNextDownIndex = 0;           //当前下载下标
+        int m_nTotalDownCount = 0;          //下载总数量
+
         int m_nDownThreadNumb = 0; // 下载线程数量
         int m_nWriteThreadNumb = 0;
         bool m_bNeedStop = false;
         Thread[] m_runThreads;
         Thread m_runWriteThread;
 
+        int m_nSuccessCount = 0;    //成功个数
+        int m_nFailedCount = 0;     //失败个数
         long m_nDownSize; // 当前下载的大小
         long m_nTotalDownSize; // 当前总的下载大小
         long m_nTotalNeedDownSize; // 当前下载总的下载量
         long m_nLimitDownSize; // 每秒限制下载的大小
         long m_nLastTime; // 上一次统计的时间点
 
+
+        DownloadFinish m_downloadFinish;
+        DownloadProgress m_downloadProgress;
+
         string m_szLocalSavePath;
+
+        public long TotalDownSize { get { return m_nTotalDownSize; } }
+        public long TotalNeedDownSize { get { return m_nTotalNeedDownSize; } }
 
         // 功能：开启多线程下载
         // 参数：downList - 下载列表
-        //       nDownThreadNumb - 下载线程数量
+        //      nDownThreadNumb - 下载线程数量
         public void StartDown(List<DownResInfo> downList, int nDownThreadNumb, int nLimitDownSize, string szLocalSavePath)
         {
             m_nDownSize = 0;
@@ -60,6 +73,8 @@ namespace ASGame
             m_nLimitDownSize = nLimitDownSize;
             m_nLastTime = 0;
             m_szLocalSavePath = szLocalSavePath;
+            m_nSuccessCount = 0;
+            m_nFailedCount = 0;
 
             // 统计总的下载量
             for (int i = downList.Count - 1; i >= 0; --i)
@@ -71,10 +86,11 @@ namespace ASGame
                 nDownThreadNumb = downList.Count;
 
             m_DownList = downList;
-            m_nDownCount = downList.Count;
+            m_nTotalDownCount = downList.Count;
             m_nNextDownIndex = 0;
             m_nDownThreadNumb = nDownThreadNumb;
             m_runThreads = new Thread[nDownThreadNumb];
+
             for (int i = 0; i < nDownThreadNumb; ++i)
             {
                 Thread t = new Thread(ThreadFunc);
@@ -117,12 +133,12 @@ namespace ASGame
         }
         static void ThreadFunc(object obj)
         {
-            CHttpDownMng pMng = obj as CHttpDownMng;
+            CDownloader pMng = obj as CDownloader;
             pMng.DownThread();
         }
         static void WriteThreadFunc(object obj)
         {
-            CHttpDownMng pMng = obj as CHttpDownMng;
+            CDownloader pMng = obj as CDownloader;
             pMng.WriteThread();
         }
         bool PopDownFileInfo(out DownResInfo resInfo)
@@ -132,7 +148,7 @@ namespace ASGame
                 return false;
             lock (this)
             {
-                if (m_nNextDownIndex < m_nDownCount)
+                if (m_nNextDownIndex < m_nTotalDownCount)
                 {
                     resInfo = m_DownList[m_nNextDownIndex++];
                 }
@@ -224,9 +240,17 @@ namespace ASGame
             PushWrite(pBlock); // 通知写线程关闭对应的文件
 
             if (bSuc)
+            {
                 Debug.Log("文件下载成功,url:" + url);
+                m_nSuccessCount++;
+            }  
             else
+            {
                 Debug.LogError("文件下载失败,url:" + url);
+                m_nFailedCount++;
+            }
+
+            m_downloadFinish?.Invoke(url, bSuc, resInfo);
         }
         public class MemBlock
         {
@@ -358,6 +382,8 @@ namespace ASGame
                 else
                     m_nDownSize += nDownSize;
                 m_nTotalDownSize += nDownSize;
+
+                m_downloadProgress?.Invoke(m_nTotalDownSize, m_nTotalNeedDownSize, 1, 1);   //TODO:
             }
         }
         void PushWrite(MemBlock pBlock)

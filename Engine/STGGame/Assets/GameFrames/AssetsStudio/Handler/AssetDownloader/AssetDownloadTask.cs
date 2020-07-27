@@ -11,19 +11,21 @@ namespace ASGame
 
         public int downThreadNumb = 2;                                      //下载线程数量
         public int limitDownSize = 100 * 1024;                              //下载速度
-        public string[] urlPaths;                                           //源路径
-        public string storePath;                                            //储存路径
+        public string[] urlPaths;                                           //下载路径
+        public string savePath;                                             //储存路径
 
         public AssetDownloadCompletedCallback onCompleted;                  //完成回调
         public AssetDownloadProgressCallback onProgress;                    //进度回调
 
-        private CHttpDownMng m_downloadMgr;
+        private CDownloader m_downloadMgr;
         private List<DownResInfo> m_downList;
 
         public long CreateTime { get; protected set; }                      //创建时间
         public long FinishTime { get; protected set; }                      //完成时间
-        public long CurSize { get; protected set; }                         //当前下载大小
-        public long TotalSize { get; protected set; }                       //总的大小
+        public long CurSize { get {return m_downloadMgr != null ? m_downloadMgr.TotalDownSize : 0; } }                                      //当前下载大小
+        public long TotalSize { get { return m_downloadMgr != null ? m_downloadMgr.TotalNeedDownSize : 0; } }                               //总的大小
+        public int CurCount { get; protected set; }
+        public int TotalCount { get; protected set; }
 
         public AssetDownloadTask()
         {
@@ -32,13 +34,9 @@ namespace ASGame
 
         public void Start()
         {
-            if(m_downloadMgr == null)
-            {
-                GetDownloadMgr();
-
-            }
-            InitDownFile(urlPaths);
-            m_downloadMgr.StartDown(m_downList, downThreadNumb, limitDownSize, storePath);
+            var mgr = GetDownloadMgr();
+            var downList = InitDownFile(urlPaths);
+            mgr.StartDown(downList, downThreadNumb, limitDownSize, savePath);
         }
 
         public void Pause()
@@ -68,7 +66,8 @@ namespace ASGame
         ////
         private List<DownResInfo> InitDownFile(string[] downUrl)
         {
-            List<DownResInfo> downList = new List<DownResInfo>();
+            List<DownResInfo> downList = GetDownloadList();
+            downList.Clear();
             if (downUrl != null && downUrl.Length > 0)
             {
                 foreach (var url in downUrl)
@@ -88,9 +87,10 @@ namespace ASGame
             CHttpDown.GetDownFileSize(url, out node.nFileSize);
             downList.Add(node);
         }
-        private CHttpDownMng GetDownloadMgr()
+
+        private CDownloader GetDownloadMgr()
         {
-            m_downloadMgr = m_downloadMgr ?? new CHttpDownMng();
+            m_downloadMgr = m_downloadMgr ?? new CDownloader();
             return m_downloadMgr;
         }
 
@@ -100,15 +100,16 @@ namespace ASGame
             return m_downList;
         }
 
-        private void OnCompleted()
+        private void OnFinish()
         {
             FinishTime = XTimeTools.NowTimeStampMs();
 
             onCompleted?.Invoke(this);
         }
-        private void OnProgress()
+
+        private void OnProgress(long cur, long total)
         {
-            onProgress?.Invoke(this);
+            onProgress?.Invoke(cur, total);
         }
 
     }

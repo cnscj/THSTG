@@ -6,7 +6,7 @@ using ASGame;
 
 public class TestDown : MonoBehaviour
 {
-    CHttpDownMng m_downMng;
+    CDownloader m_downMng;
     void Start()
     {
         CTcp.StartTestIPV6("ipv6-test.com"); // 启动时测试一下我本地的IPV6环境, 请将这个域名修改你项目的CDN地址
@@ -25,7 +25,7 @@ public class TestDown : MonoBehaviour
         //PushDownFile(downList, "http://static.it1352.com/Content/upload/4ed6d2990e07438395000000087858a3.jpg");
         //PushDownFile(downList, "http://static.it1352.com/Content/upload/1eda9f0e70134189839a7dd4b5e271ca.jpg");
         //PushDownFile(downList, "http://static.it1352.com/Content/upload/567680127c434a9099dc7f2a705695a5.jpg");
-        CHttpDownMng mng = new CHttpDownMng();
+        CDownloader mng = new CDownloader();
         mng.StartDown(downList, 2, 100 * 1024, CTargetPlat.PersistentRootPath);
         m_downMng = mng;
     }
