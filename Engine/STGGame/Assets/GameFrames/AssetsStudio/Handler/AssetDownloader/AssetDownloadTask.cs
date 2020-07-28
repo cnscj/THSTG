@@ -21,7 +21,7 @@ namespace ASGame
         private List<DownResInfo> m_downList;
 
         public long CreateTime { get; protected set; }                      //创建时间
-        public long FinishTime { get; protected set; }                      //完成时间
+        public long CompleteTime { get; protected set; }                    //完成时间
         public long CurSize { get {return m_downloadMgr != null ? m_downloadMgr.TotalDownSize : 0; } }                                      //当前下载大小
         public long TotalSize { get { return m_downloadMgr != null ? m_downloadMgr.TotalNeedDownSize : 0; } }                               //总的大小
         public int CurCount { get; protected set; }
@@ -58,9 +58,10 @@ namespace ASGame
         public void Clear()
         {
             Stop();
+            m_downloadMgr?.ClearDown();
             m_downList?.Clear();
             CreateTime = XTimeTools.NowTimeStampMs();
-            FinishTime = -1;
+            CompleteTime = -1;
         }
 
         ////
@@ -100,11 +101,16 @@ namespace ASGame
             return m_downList;
         }
 
+        private void OnCompleted()
+        {
+            CompleteTime = XTimeTools.NowTimeStampMs();
+            onCompleted?.Invoke(this);
+        }
+
         private void OnFinish()
         {
-            FinishTime = XTimeTools.NowTimeStampMs();
+            //当所有文件下载完成时,才是真正完成
 
-            onCompleted?.Invoke(this);
         }
 
         private void OnProgress(long cur, long total)

@@ -30,12 +30,15 @@ namespace ASGame
         public FileStream file;
     }
 
-    public delegate void DownloadProgress(long curSize, long totalSize, int curCount, int totalCount);  //TODO
-    public delegate void DownloadFinish(string url,bool isSuc, DownResFile resFile);
+    public delegate void DownloadProgress(long curSize, long totalSize, int curCount, int totalCount);
+    public delegate void DownloadFinish(string url, bool isSuc, DownResFile resFile);
 
     public class CDownloader
     {
         List<DownResInfo> m_DownList;
+        List<DownResFile> m_successDownList;
+        List<DownResFile> m_failedDownList;
+
         int m_nNextDownIndex = 0;           //当前下载下标
         int m_nTotalDownCount = 0;          //下载总数量
 
@@ -45,8 +48,6 @@ namespace ASGame
         Thread[] m_runThreads;
         Thread m_runWriteThread;
 
-        int m_nSuccessCount = 0;    //成功个数
-        int m_nFailedCount = 0;     //失败个数
         long m_nDownSize; // 当前下载的大小
         long m_nTotalDownSize; // 当前总的下载大小
         long m_nTotalNeedDownSize; // 当前下载总的下载量
@@ -59,8 +60,17 @@ namespace ASGame
 
         string m_szLocalSavePath;
 
+        public string LocalSavePath { get { return m_szLocalSavePath; } }
         public long TotalDownSize { get { return m_nTotalDownSize; } }
         public long TotalNeedDownSize { get { return m_nTotalNeedDownSize; } }
+        public int TotalDownCount { get { return m_nNextDownIndex + 1; } }
+        public int TotalNeedDownCount { get { return m_nTotalDownCount; } }
+
+        public CDownloader()
+        {
+            m_successDownList = new List<DownResFile>();
+            m_failedDownList = new List<DownResFile>();
+        }
 
         // 功能：开启多线程下载
         // 参数：downList - 下载列表
@@ -73,8 +83,6 @@ namespace ASGame
             m_nLimitDownSize = nLimitDownSize;
             m_nLastTime = 0;
             m_szLocalSavePath = szLocalSavePath;
-            m_nSuccessCount = 0;
-            m_nFailedCount = 0;
 
             // 统计总的下载量
             for (int i = downList.Count - 1; i >= 0; --i)
@@ -86,6 +94,9 @@ namespace ASGame
                 nDownThreadNumb = downList.Count;
 
             m_DownList = downList;
+            m_successDownList.Clear();
+            m_failedDownList.Clear();
+
             m_nTotalDownCount = downList.Count;
             m_nNextDownIndex = 0;
             m_nDownThreadNumb = nDownThreadNumb;
@@ -130,6 +141,15 @@ namespace ASGame
                     Thread.Sleep(1); // 强制等待线程退出
                 }
             }
+        }
+
+        public void ClearDown()
+        {
+            m_downloadFinish = null;
+            m_downloadProgress = null;
+
+            m_successDownList.Clear();
+            m_failedDownList.Clear();
         }
         static void ThreadFunc(object obj)
         {
@@ -242,12 +262,12 @@ namespace ASGame
             if (bSuc)
             {
                 Debug.Log("文件下载成功,url:" + url);
-                m_nSuccessCount++;
+                m_successDownList.Add(resInfo);
             }  
             else
             {
                 Debug.LogError("文件下载失败,url:" + url);
-                m_nFailedCount++;
+                m_failedDownList.Add(resInfo);
             }
 
             m_downloadFinish?.Invoke(url, bSuc, resInfo);
