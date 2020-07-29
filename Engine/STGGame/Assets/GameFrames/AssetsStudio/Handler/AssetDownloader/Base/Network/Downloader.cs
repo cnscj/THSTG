@@ -30,8 +30,8 @@ namespace ASGame
         public FileStream file;
     }
 
-    public delegate void DownloadProgress(long curSize, long totalSize, int curCount, int totalCount);
-    public delegate void DownloadFinish(string url, bool isSuc, DownResFile resFile);
+    public delegate void DownloadProgress(long curSize, long totalSize);
+    public delegate void DownloadFinish(string url, bool isSuc);
 
     public class CDownloader
     {
@@ -63,8 +63,12 @@ namespace ASGame
         public string LocalSavePath { get { return m_szLocalSavePath; } }
         public long TotalDownSize { get { return m_nTotalDownSize; } }
         public long TotalNeedDownSize { get { return m_nTotalNeedDownSize; } }
-        public int TotalDownCount { get { return m_nNextDownIndex + 1; } }
+        public int TotalDownCount { get { return m_nNextDownIndex; } }
         public int TotalNeedDownCount { get { return m_nTotalDownCount; } }
+        public DownloadFinish OnDownloadFinish { get { return m_downloadFinish; } set { m_downloadFinish = value; } }
+        public DownloadProgress OnDownloadProgress { get { return m_downloadProgress; } set { m_downloadProgress = value; } } 
+        public List<DownResFile> SuccessDownList { get => m_successDownList; }
+        public List<DownResFile> FailedDownList { get => m_failedDownList; }
 
         public CDownloader()
         {
@@ -115,6 +119,12 @@ namespace ASGame
             tw.Start(this);
             m_runWriteThread = tw;
         }
+        public void StartDown(string[] urlList, int nDownThreadNumb, int nLimitDownSize, string szLocalSavePath)
+        {
+            List<DownResInfo> downList = CreateDownList(urlList);
+            StartDown(downList, nDownThreadNumb, nLimitDownSize, szLocalSavePath);
+        }
+
         public void StopDown(bool bAbort, bool bWait)
         {
             if (m_nDownThreadNumb > 0)
@@ -151,16 +161,42 @@ namespace ASGame
             m_successDownList.Clear();
             m_failedDownList.Clear();
         }
+
         static void ThreadFunc(object obj)
         {
             CDownloader pMng = obj as CDownloader;
             pMng.DownThread();
         }
+
         static void WriteThreadFunc(object obj)
         {
             CDownloader pMng = obj as CDownloader;
             pMng.WriteThread();
         }
+
+        List<DownResInfo> CreateDownList(string[] downUrl)
+        {
+            List<DownResInfo> downList = new List<DownResInfo>();
+            downList.Clear();
+            if (downUrl != null && downUrl.Length > 0)
+            {
+                foreach (var url in downUrl)
+                {
+                    PushDownFile(downList,url);
+                }
+            }
+
+            return downList;
+        }
+
+        void PushDownFile(List<DownResInfo> downList, string url)
+        {
+            DownResInfo node = new DownResInfo();
+            node.url = url;
+            CHttpDown.GetDownFileSize(url, out node.nFileSize);
+            downList.Add(node);
+        }
+
         bool PopDownFileInfo(out DownResInfo resInfo)
         {
             resInfo = null;
@@ -175,6 +211,7 @@ namespace ASGame
             }
             return resInfo != null;
         }
+
         void DownThread()
         {
             DownResInfo resInfo = null;
@@ -192,6 +229,7 @@ namespace ASGame
             // 线程退出，线程数减一
             System.Threading.Interlocked.Decrement(ref m_nDownThreadNumb);
         }
+
         bool IsNeedLimitDown()
         {
             lock (this)
@@ -209,6 +247,7 @@ namespace ASGame
             }
             return false;
         }
+
         void LimitSpeed()
         {
             while (IsNeedLimitDown())
@@ -251,6 +290,7 @@ namespace ASGame
             }
             NotifyDownEvent(url, true, resInfo);
         }
+
         // 功能：通知文件下载事件
         void NotifyDownEvent(string url, bool bSuc, DownResFile resInfo)
         {
@@ -261,17 +301,16 @@ namespace ASGame
 
             if (bSuc)
             {
-                Debug.Log("文件下载成功,url:" + url);
                 m_successDownList.Add(resInfo);
             }  
             else
             {
-                Debug.LogError("文件下载失败,url:" + url);
                 m_failedDownList.Add(resInfo);
             }
 
-            m_downloadFinish?.Invoke(url, bSuc, resInfo);
+            m_downloadFinish?.Invoke(url, bSuc);
         }
+
         public class MemBlock
         {
             public MemBlock m_pNext;
@@ -282,6 +321,7 @@ namespace ASGame
             public int nFileSize; // 文件总的大小
             public DownResFile resFile;
         }
+
         MemBlock m_InvalidBlock;
         int m_nCurBlockMemSize;
         int m_nUseBlockMemSize; // 当前使用的内存
@@ -403,7 +443,7 @@ namespace ASGame
                     m_nDownSize += nDownSize;
                 m_nTotalDownSize += nDownSize;
 
-                m_downloadProgress?.Invoke(m_nTotalDownSize, m_nTotalNeedDownSize, 1, 1);   //TODO:
+                m_downloadProgress?.Invoke(m_nTotalDownSize, m_nTotalNeedDownSize);
             }
         }
         void PushWrite(MemBlock pBlock)

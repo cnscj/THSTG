@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.Generic;
+using UnityEngine;
 using XLibrary;
 
 namespace ASGame
@@ -18,25 +19,33 @@ namespace ASGame
         public AssetDownloadProgressCallback onProgress;                    //进度回调
 
         private CDownloader m_downloadMgr;
-        private List<DownResInfo> m_downList;
 
         public long CreateTime { get; protected set; }                      //创建时间
-        public long CompleteTime { get; protected set; }                    //完成时间
+        public long StartTime { get; protected set; }                       //开始时间
+        public long CompletedTime { get; protected set; }                   //完成时间
         public long CurSize { get {return m_downloadMgr != null ? m_downloadMgr.TotalDownSize : 0; } }                                      //当前下载大小
         public long TotalSize { get { return m_downloadMgr != null ? m_downloadMgr.TotalNeedDownSize : 0; } }                               //总的大小
-        public int CurCount { get; protected set; }
-        public int TotalCount { get; protected set; }
+        public int CurCount { get { return m_downloadMgr != null ? m_downloadMgr.TotalDownCount : 0; } }
+        public int TotalCount { get { return m_downloadMgr != null ? m_downloadMgr.TotalNeedDownCount : 0; } }
+        public List<DownResFile> SuccessDownList { get { return m_downloadMgr != null ? m_downloadMgr.SuccessDownList : null; } }
+        public List<DownResFile> FailedDownList { get { return m_downloadMgr != null ? m_downloadMgr.FailedDownList : null; } }
 
         public AssetDownloadTask()
         {
             CreateTime = XTimeTools.NowTimeStampMs();
+            status = AssetDownloadStatus.DOWNLOAD_NONE;
         }
 
         public void Start()
         {
             var mgr = GetDownloadMgr();
-            var downList = InitDownFile(urlPaths);
-            mgr.StartDown(downList, downThreadNumb, limitDownSize, savePath);
+            mgr.OnDownloadFinish = OnFinish;
+            mgr.OnDownloadProgress = OnProgress;
+
+            mgr.StartDown(urlPaths, downThreadNumb, limitDownSize, savePath);
+
+            StartTime = XTimeTools.NowTimeStampMs();
+            status = AssetDownloadStatus.DOWNLOAD_DOWNLOADING;
         }
 
         public void Pause()
@@ -45,6 +54,8 @@ namespace ASGame
                 return;
 
             m_downloadMgr.StopDown(false, true);
+            StartTime = -1;
+            status = AssetDownloadStatus.DOWNLOAD_PAUSE;
         }
 
         public void Stop()
@@ -53,70 +64,41 @@ namespace ASGame
                 return;
 
             m_downloadMgr.StopDown(true, false);
-        }
-
-        public void Clear()
-        {
-            Stop();
-            m_downloadMgr?.ClearDown();
-            m_downList?.Clear();
-            CreateTime = XTimeTools.NowTimeStampMs();
-            CompleteTime = -1;
+            StartTime = -1;
+            status = AssetDownloadStatus.DOWNLOAD_CANCELED;
         }
 
         ////
-        private List<DownResInfo> InitDownFile(string[] downUrl)
-        {
-            List<DownResInfo> downList = GetDownloadList();
-            downList.Clear();
-            if (downUrl != null && downUrl.Length > 0)
-            {
-                foreach (var url in downUrl)
-                {
-                    PushDownFile(url);
-                }
-            }
-
-            return downList;
-        }
-
-        private void PushDownFile(string url)
-        {
-            var downList = GetDownloadList();
-            DownResInfo node = new DownResInfo();
-            node.url = url;
-            CHttpDown.GetDownFileSize(url, out node.nFileSize);
-            downList.Add(node);
-        }
-
         private CDownloader GetDownloadMgr()
         {
             m_downloadMgr = m_downloadMgr ?? new CDownloader();
             return m_downloadMgr;
         }
 
-        private List<DownResInfo> GetDownloadList()
-        {
-            m_downList = m_downList ?? new List<DownResInfo>();
-            return m_downList;
-        }
-
         private void OnCompleted()
         {
-            CompleteTime = XTimeTools.NowTimeStampMs();
+            CompletedTime = XTimeTools.NowTimeStampMs();
             onCompleted?.Invoke(this);
+            status = AssetDownloadStatus.DOWNLOAD_COMPLETED;
         }
 
-        private void OnFinish()
+        private void OnFinish(string url, bool isSuc)
         {
-            //当所有文件下载完成时,才是真正完成
+            if (m_downloadMgr == null)
+                return;
 
+            if (m_downloadMgr.TotalDownCount == m_downloadMgr.TotalNeedDownCount)
+            {
+                OnCompleted();
+            }
         }
 
         private void OnProgress(long cur, long total)
         {
+            if (m_downloadMgr == null)
+                return;
+
             onProgress?.Invoke(cur, total);
         }
-
     }
 }

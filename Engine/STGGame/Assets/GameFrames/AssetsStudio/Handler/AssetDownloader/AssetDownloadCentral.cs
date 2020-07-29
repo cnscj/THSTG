@@ -226,7 +226,7 @@ namespace ASGame
             {
                 foreach (var task in m_progressMap)
                 {
-                    if (task.status == AssetDownloadStatus.DOWNLOAD_FINISH)
+                    if (task.status == AssetDownloadStatus.DOWNLOAD_COMPLETED)
                     {
                         GetSuccessList().AddLast(task);
                     }
@@ -307,7 +307,6 @@ namespace ASGame
         }
 
         //Android目录下,下载中的存放路径必须在Application.dataPath,下载完成在拷贝到Application.persistentDataPath
-        ///
         protected void OnDownloadSuccess(AssetDownloadTask task)
         {
             //将临时文件移动到持久目录

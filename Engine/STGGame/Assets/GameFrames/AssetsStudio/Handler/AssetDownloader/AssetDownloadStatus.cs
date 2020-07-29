@@ -8,7 +8,7 @@ namespace ASGame
         public static readonly int DOWNLOAD_WRITE_FAILED = -104;
         public static readonly int DOWNLOAD_CANCELED = -103;
         public static readonly int DOWNLOAD_TIMEOUT = -102;
-        public static readonly int DOWNLOAD_INVALID_URL = -101;
+        public static readonly int DOWNLOAD_INVALID_URLS = -101;
 
         public static readonly int DOWNLOAD_NONE = 0;
 
@@ -16,7 +16,7 @@ namespace ASGame
         public static readonly int DOWNLOAD_QUEUE = 102;
         public static readonly int DOWNLOAD_DOWNLOADING = 103;
 
-        public static readonly int DOWNLOAD_FINISH = 200;
+        public static readonly int DOWNLOAD_COMPLETED = 200;
     }
 
 }
