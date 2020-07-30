@@ -31,7 +31,7 @@ namespace ASGame
     }
 
     public delegate void DownloadProgress(long curSize, long totalSize);
-    public delegate void DownloadFinish(string url, bool isSuc);
+    public delegate void DownloadFinish(string url, string path);
 
     public class CDownloader
     {
@@ -292,15 +292,19 @@ namespace ASGame
         }
 
         // 功能：通知文件下载事件
+        // FIXME:多线程下需要加锁
+        // FIXME:子线程不应该直接调用回调,不然会卡住子线程,回调可用BeginInvoke
         void NotifyDownEvent(string url, bool bSuc, DownResFile resInfo)
         {
             // 这里只是输出一个日志，用户自行扩展事件吧
             MemBlock pBlock = new MemBlock();
             pBlock.resFile = resInfo;
             PushWrite(pBlock); // 通知写线程关闭对应的文件
+            string fileSavePath = null;
 
             if (bSuc)
             {
+                fileSavePath = resInfo.file.Name;
                 m_successDownList.Add(resInfo);
             }  
             else
@@ -308,7 +312,7 @@ namespace ASGame
                 m_failedDownList.Add(resInfo);
             }
 
-            m_downloadFinish?.Invoke(url, bSuc);
+            m_downloadFinish?.Invoke(url, fileSavePath);
         }
 
         public class MemBlock

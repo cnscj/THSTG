@@ -16,6 +16,7 @@ namespace ASGame
         public string savePath;                                             //储存路径
 
         public AssetDownloadCompletedCallback onCompleted;                  //完成回调
+        public AssetDownloadFinishCallback onFinish;                        //下载回调
         public AssetDownloadProgressCallback onProgress;                    //进度回调
 
         private CDownloader m_downloadMgr;
@@ -82,11 +83,12 @@ namespace ASGame
             status = AssetDownloadStatus.DOWNLOAD_COMPLETED;
         }
 
-        private void OnFinish(string url, bool isSuc)
+        private void OnFinish(string url, string path)
         {
             if (m_downloadMgr == null)
                 return;
-
+            
+            onFinish?.Invoke(url, path);
             if (m_downloadMgr.TotalDownCount == m_downloadMgr.TotalNeedDownCount)
             {
                 OnCompleted();
