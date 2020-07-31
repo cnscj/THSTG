@@ -1,11 +1,12 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using XLibrary;
 
 namespace ASGame
 {
-    public class AssetDownloadTask
+    public class AssetDownloadTask : IComparable<AssetDownloadTask>
     {
         public int id;              
         public int status;                                                  //状态
@@ -87,7 +88,7 @@ namespace ASGame
         {
             if (m_downloadMgr == null)
                 return;
-            
+
             onFinish?.Invoke(url, path);
             if (m_downloadMgr.TotalDownCount == m_downloadMgr.TotalNeedDownCount)
             {
@@ -101,6 +102,11 @@ namespace ASGame
                 return;
 
             onProgress?.Invoke(cur, total);
+        }
+
+        public int CompareTo(AssetDownloadTask other)
+        {
+            return this.id - other.id;
         }
     }
 }

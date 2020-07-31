@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using XLibrary;
@@ -12,9 +13,9 @@ namespace ASGame
         //全局限速
         //全局最大任务下载数
         //定时任务
-        public int maxCount = 6;                                                //最大同时下载任务个数
+        public int maxCount = 3;                                                //最大同时下载任务个数
         public float limidSpeed = -1f;                                          //全局限速
-        public string savePath = CTargetPlat.PersistentRootPath;                //保存路径
+        public string savePath;                //保存路径
 
         private Dictionary<string, AssetDownloadTask> m_tasksMap;               //所有任务列表
         private SortedSet<AssetDownloadTask> m_queueMap;                        //排队队列(含优先级
@@ -70,7 +71,8 @@ namespace ASGame
         }
 
         /////////////////////////////////////
-
+        
+        //TODO:
         public AssetDownloadTask NewTask(string[] urlPaths)
         {
             if (urlPaths != null && urlPaths.Length > 0 && !string.IsNullOrEmpty(savePath))
@@ -89,6 +91,7 @@ namespace ASGame
                 //默认全部送到暂停队列,方便以后开启空闲下载
                 GetPauseMap().Add(task);
                 task.status = AssetDownloadStatus.DOWNLOAD_PAUSE;
+                return task;
             }
             return null;
         }
@@ -215,7 +218,6 @@ namespace ASGame
         }
 
         /////////////////////////////////////
-
         private void UpdateWait()
         {
             if (m_queueMap == null)
@@ -301,6 +303,10 @@ namespace ASGame
         private string GetTaskKey(string[] urlPaths)
         {
             return string.Format("{0}", urlPaths.GetHashCode());
+        }
+        private void Awake()
+        {
+            savePath = CTargetPlat.PersistentRootPath;  //TODO:只有在启动才可获取
         }
 
         private void Update()

@@ -19,8 +19,8 @@ namespace ASGame
     public class DownResInfo
     {
         public string url; // 资源文件的URL
-        public int nDownSize; // 已经下载的大小
-        public int nFileSize; // 文件大小
+        public int nDownSize; // 已经下载的大小(字节B)
+        public int nFileSize; // 文件大小(字节B)
     };
 
     public class DownResFile
@@ -40,7 +40,9 @@ namespace ASGame
         List<DownResFile> m_failedDownList;
 
         int m_nNextDownIndex = 0;           //当前下载下标
+
         int m_nTotalDownCount = 0;          //下载总数量
+        int m_nTotalNeedDownCount = 0;          //下载总数量
 
         int m_nDownThreadNumb = 0; // 下载线程数量
         int m_nWriteThreadNumb = 0;
@@ -63,8 +65,8 @@ namespace ASGame
         public string LocalSavePath { get { return m_szLocalSavePath; } }
         public long TotalDownSize { get { return m_nTotalDownSize; } }
         public long TotalNeedDownSize { get { return m_nTotalNeedDownSize; } }
-        public int TotalDownCount { get { return m_nNextDownIndex; } }
-        public int TotalNeedDownCount { get { return m_nTotalDownCount; } }
+        public int TotalDownCount { get { return m_nTotalDownCount; } }
+        public int TotalNeedDownCount { get { return m_nTotalNeedDownCount; } }
         public DownloadFinish OnDownloadFinish { get { return m_downloadFinish; } set { m_downloadFinish = value; } }
         public DownloadProgress OnDownloadProgress { get { return m_downloadProgress; } set { m_downloadProgress = value; } } 
         public List<DownResFile> SuccessDownList { get => m_successDownList; }
@@ -101,8 +103,11 @@ namespace ASGame
             m_successDownList.Clear();
             m_failedDownList.Clear();
 
-            m_nTotalDownCount = downList.Count;
             m_nNextDownIndex = 0;
+
+            m_nTotalNeedDownCount = downList.Count;
+            m_nTotalDownCount = 0;
+
             m_nDownThreadNumb = nDownThreadNumb;
             m_runThreads = new Thread[nDownThreadNumb];
 
@@ -204,7 +209,7 @@ namespace ASGame
                 return false;
             lock (this)
             {
-                if (m_nNextDownIndex < m_nTotalDownCount)
+                if (m_nNextDownIndex < m_nTotalNeedDownCount)
                 {
                     resInfo = m_DownList[m_nNextDownIndex++];
                 }
@@ -292,8 +297,8 @@ namespace ASGame
         }
 
         // 功能：通知文件下载事件
-        // FIXME:多线程下需要加锁
-        // FIXME:子线程不应该直接调用回调,不然会卡住子线程,回调可用BeginInvoke
+        // XXX:多线程下需要加锁
+        // XXX:子线程不应该直接调用回调,不然会卡住子线程,回调可用BeginInvoke
         void NotifyDownEvent(string url, bool bSuc, DownResFile resInfo)
         {
             // 这里只是输出一个日志，用户自行扩展事件吧
@@ -301,6 +306,7 @@ namespace ASGame
             pBlock.resFile = resInfo;
             PushWrite(pBlock); // 通知写线程关闭对应的文件
             string fileSavePath = null;
+            m_nTotalDownCount++;
 
             if (bSuc)
             {
