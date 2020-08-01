@@ -26,14 +26,26 @@ namespace ASGame
         private LinkedList<AssetDownloadTask> m_failedQueue;                    //失败队列
         private LinkedList<AssetDownloadTask> m_releaseQueue;                   //释放队列
 
+        private int m_taskId = 0;
+
         public int TaskCount
         {
-            get { return m_queueMap.Count + m_progressMap.Count + m_pauseMap.Count; }
+            get { return WaitingCount + DownloadingCount + PauseCount; }
+        }
+
+        public int WaitingCount
+        {
+            get { return m_queueMap != null ? m_queueMap.Count : 0; }
+        }
+
+        public int PauseCount
+        {
+            get { return m_pauseMap != null ? m_pauseMap.Count : 0; }
         }
 
         public int DownloadingCount
         {
-            get { return m_progressMap.Count; }
+            get { return m_progressMap != null ? m_progressMap.Count : 0; }
         }
 
         public long DownloadedSize
@@ -71,8 +83,6 @@ namespace ASGame
         }
 
         /////////////////////////////////////
-        
-        //TODO:
         public AssetDownloadTask NewTask(string[] urlPaths)
         {
             if (urlPaths != null && urlPaths.Length > 0 && !string.IsNullOrEmpty(savePath))
@@ -101,23 +111,24 @@ namespace ASGame
             if (m_queueMap != null && m_queueMap.Contains(task))
             {
                 //如果本来就在排队,提高优先级
-                task.status = AssetDownloadStatus.DOWNLOAD_QUEUE;
+
             }
             else if (m_pauseMap != null && m_pauseMap.Contains(task))
             {
                 //从暂停队列移到排队队列
-                m_pauseMap.Remove(task);
+                GetPauseMap().Remove(task);
                 GetQueueMap().Add(task);
+                task.status = AssetDownloadStatus.DOWNLOAD_QUEUE;
             }
         }
 
         public void PauseTask(AssetDownloadTask task)
         {
-            if (m_progressMap.Contains(task) || m_queueMap.Contains(task))
+            if ((m_progressMap != null && m_progressMap.Contains(task)) || (m_queueMap != null && m_queueMap.Contains(task)))
             {
                 DisactiveTask(task);
-                m_progressMap.Remove(task);
-                m_queueMap.Remove(task);
+                GetProcressMap().Remove(task);
+                GetQueueMap().Remove(task);
                 GetPauseMap().Add(task);
             }
         }
@@ -131,18 +142,22 @@ namespace ASGame
             if (m_tasksMap != null)
             {
                 var taskKey = GetTaskKey(task.urlPaths);
-                if (m_tasksMap.ContainsKey(taskKey))
+                if (GetTaskMap().ContainsKey(taskKey))
                 {
                     GetReleaseList().AddLast(task);
                 }
-                
             }
         }
 
         public void StartAll()
         {
-            //所有
-            foreach(var task in m_pauseMap)
+            if (m_pauseMap == null || m_pauseMap.Count <= 0)
+                return;
+
+            List<AssetDownloadTask> taskList = new List<AssetDownloadTask>();
+            taskList.AddRange(m_pauseMap);
+
+            foreach (var task in taskList)
             {
                 StartTask(task);
             }
@@ -150,19 +165,26 @@ namespace ASGame
 
         public void PauseAll()
         {
-            foreach (var taskInQueue in m_queueMap)             //先停止在排队队列中的,不然会被插到下载队列
+            List<AssetDownloadTask> taskList = new List<AssetDownloadTask>();
+            if (m_queueMap != null) taskList.AddRange(m_queueMap);
+            if (m_progressMap != null) taskList.AddRange(m_progressMap);
+
+            foreach (var task in taskList)
             {
-                PauseTask(taskInQueue);
+                PauseTask(task);
             }
-            foreach (var taskInProgress in m_progressMap)       //然后停止下载队列的
-            {
-                PauseTask(taskInProgress);
-            }
+
         }
 
         public void RemoveAll()
         {
-            foreach(var task in m_tasksMap.Values)
+            if (m_tasksMap == null || m_tasksMap.Count <= 0)
+                return;
+
+            List<AssetDownloadTask> taskList = new List<AssetDownloadTask>();
+            taskList.AddRange(m_tasksMap.Values);
+
+            foreach (var task in taskList)
             {
                 RemoveTask(task);
             }
@@ -172,6 +194,7 @@ namespace ASGame
         private AssetDownloadTask GetOrCreateTask()
         {
             var task = new AssetDownloadTask();
+            task.id = m_taskId++;
             return task;
         }
 
@@ -220,10 +243,7 @@ namespace ASGame
         /////////////////////////////////////
         private void UpdateWait()
         {
-            if (m_queueMap == null)
-                return;
-
-            while (m_queueMap.Count > 0 && (maxCount > 0 && m_progressMap.Count < maxCount))
+            while (WaitingCount > 0 && (maxCount > 0 && DownloadingCount < maxCount))
             {
                 AssetDownloadTask task = null;
                 foreach(var item in m_queueMap)
@@ -293,7 +313,7 @@ namespace ASGame
                 var task = m_releaseQueue.Last.Value;
                 m_releaseQueue.RemoveLast();
 
-                DisactiveTask(task);
+                DestroyTask(task);
 
                 var taskKey = GetTaskKey(task.urlPaths);
                 m_tasksMap.Remove(taskKey);
@@ -330,15 +350,22 @@ namespace ASGame
             task.Start();
         }
 
-        //失活任务,终止下载
+        //失活任务,停止下载
         private void DisactiveTask(AssetDownloadTask task)
+        {
+            if (task == null)
+                return;
+
+            task.Pause();
+        }
+
+        private void DestroyTask(AssetDownloadTask task)
         {
             if (task == null)
                 return;
 
             task.Stop();
         }
-
         //Android目录下,下载中的存放路径必须在Application.dataPath,下载完成在拷贝到Application.persistentDataPath
         protected void OnDownloadSuccess(AssetDownloadTask task)
         {

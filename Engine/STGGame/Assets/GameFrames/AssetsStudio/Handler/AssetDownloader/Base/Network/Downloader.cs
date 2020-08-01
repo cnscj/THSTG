@@ -47,6 +47,7 @@ namespace ASGame
         int m_nDownThreadNumb = 0; // 下载线程数量
         int m_nWriteThreadNumb = 0;
         bool m_bNeedStop = false;
+        bool m_bIsPause = false;
         Thread[] m_runThreads;
         Thread m_runWriteThread;
 
@@ -83,6 +84,15 @@ namespace ASGame
         //      nDownThreadNumb - 下载线程数量
         public void StartDown(List<DownResInfo> downList, int nDownThreadNumb, int nLimitDownSize, string szLocalSavePath)
         {
+            if (m_bIsPause)
+            {
+                if (m_DownList != null && m_DownList.Count > 0)
+                {
+                    m_bIsPause = false;
+                    return;
+                }
+            }
+
             m_nDownSize = 0;
             m_nTotalDownSize = 0;
             m_nTotalNeedDownSize = 0;
@@ -130,8 +140,14 @@ namespace ASGame
             StartDown(downList, nDownThreadNumb, nLimitDownSize, szLocalSavePath);
         }
 
+        public void PauseDown()
+        {
+            m_bIsPause = true;
+        }
         public void StopDown(bool bAbort, bool bWait)
         {
+            m_bIsPause = false;
+
             if (m_nDownThreadNumb > 0)
             {
                 m_bNeedStop = true;
@@ -160,6 +176,8 @@ namespace ASGame
 
         public void ClearDown()
         {
+            m_bIsPause = false;
+
             m_downloadFinish = null;
             m_downloadProgress = null;
 
@@ -223,6 +241,8 @@ namespace ASGame
             CHttp http = new CHttp();
             while (!m_bNeedStop)
             {
+                while (m_bIsPause) Thread.Sleep(1);
+
                 if (PopDownFileInfo(out resInfo))
                 {
                     DownFile(http, resInfo.url, resInfo.nFileSize, resInfo.nDownSize);
@@ -310,7 +330,9 @@ namespace ASGame
 
             if (bSuc)
             {
-                fileSavePath = resInfo.file.Name;
+                if (resInfo != null && resInfo.file != null)
+                    fileSavePath = resInfo.file.Name;
+
                 m_successDownList.Add(resInfo);
             }  
             else

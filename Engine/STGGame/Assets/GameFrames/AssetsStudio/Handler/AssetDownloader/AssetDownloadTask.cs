@@ -80,8 +80,9 @@ namespace ASGame
         private void OnCompleted()
         {
             CompletedTime = XTimeTools.NowTimeStampMs();
-            onCompleted?.Invoke(this);
             status = AssetDownloadStatus.DOWNLOAD_COMPLETED;
+
+            onCompleted?.Invoke(this);
         }
 
         private void OnFinish(string url, string path)
