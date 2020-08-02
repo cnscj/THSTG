@@ -4,9 +4,9 @@ using FairyGUI;
 using UnityEngine;
 namespace THGame.UI
 {
-    public interface IGoUpdate
+    public abstract class GoBaseUpdater
     {
-        void Update(GoUpdateContext context);
+       public abstract void Update(GoUpdateContext context);
     }
 
 }

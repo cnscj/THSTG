@@ -5,15 +5,16 @@ using UnityEngine;
 
 namespace THGame.UI
 {
-    public class GoAlphaUpdater : IGoUpdate
+    public class GoAlphaUpdater : GoBaseUpdater
     {
         private MaterialPropertyBlock _materialPropertyBlock;
-        private Color _alphaColor = Color.white;
+        private Color _fguiColor = Color.white;
         public GoAlphaUpdater()
         {
             _materialPropertyBlock = new MaterialPropertyBlock();
         }
-        public void Update(GoUpdateContext context)
+
+        public override void Update(GoUpdateContext context)
         {
             if (context.wrapperTarget != null && context.wrapperContext != null)
             {
@@ -23,8 +24,8 @@ namespace THGame.UI
                 {
                     renderer.GetPropertyBlock(_materialPropertyBlock);
 
-                    _alphaColor.a = alpha;
-                    _materialPropertyBlock.SetColor("_FGUIColor", _alphaColor);
+                    _fguiColor.a = alpha;
+                    _materialPropertyBlock.SetColor("_FGUIColor", _fguiColor);
 
                     renderer.SetPropertyBlock(_materialPropertyBlock);
 
@@ -32,6 +33,7 @@ namespace THGame.UI
             }
 
         }
+
     }
 }
 

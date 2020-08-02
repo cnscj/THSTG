@@ -7,25 +7,51 @@ namespace THGame.UI
 {
     public class GoUpdater
     {
-        private List<IGoUpdate> _updaters;
+        private Dictionary<string,GoBaseUpdater> _updaters;
         private GoWrapper _goWrapper;
         private GoUpdateContext _updateContext;
 
-        public void AddUpdater(IGoUpdate iUpdater)
+        public T AddUpdater<T>() where T : GoBaseUpdater , new()
         {
-            if (iUpdater == null)
-                return;
+            var updaterKey = GetUpdaterKey<T>();
+            if (_updaters != null)
+            {
+                if (_updaters.ContainsKey(updaterKey))
+                {
+                    return _updaters[updaterKey] as T;
+                }
+            }
 
-            GetUpdaters().Add(iUpdater);
+            T iUpdater = new T();
+            if (iUpdater == null)
+                return default;
+
+            GetUpdaters().Add(updaterKey,iUpdater);
+            return iUpdater;
         }
 
-        public void RemoveUpdater(IGoUpdate iUpdater)
+        public T GetUpdater<T>() where T : GoBaseUpdater
+        {
+            if (_updaters == null)
+                return default;
+
+            var updaterKey = GetUpdaterKey<T>();
+            if (_updaters.TryGetValue(updaterKey,out var iUpdater))
+            {
+                return iUpdater as T;
+            }
+            return default;
+        }
+
+        public void RemoveUpdater<T>() where T : GoBaseUpdater
         {
             if (_updaters == null)
                 return;
 
-            GetUpdaters().Remove(iUpdater);
+            var updaterKey = GetUpdaterKey<T>();
+            GetUpdaters().Remove(updaterKey);
         }
+
         public void SetGoWrapper(GoWrapper wrapper)
         {
             if (_goWrapper != null)
@@ -52,7 +78,7 @@ namespace THGame.UI
             updateContext.wrapperTarget = _goWrapper.wrapTarget;
             updateContext.wrapperContext = context;
 
-            foreach (var updater in _updaters)
+            foreach (var updater in _updaters.Values)
             {
                 updater.Update(_updateContext);
             }
@@ -63,9 +89,15 @@ namespace THGame.UI
             return _updateContext;
         }
 
-        private List<IGoUpdate> GetUpdaters()
+        private string GetUpdaterKey<T>()
         {
-            _updaters = _updaters ?? new List<IGoUpdate>();
+            var type = typeof(T);
+            return type.FullName;
+        }
+
+        private Dictionary<string, GoBaseUpdater> GetUpdaters()
+        {
+            _updaters = _updaters ?? new Dictionary<string,GoBaseUpdater>();
             return _updaters;
         }
     }

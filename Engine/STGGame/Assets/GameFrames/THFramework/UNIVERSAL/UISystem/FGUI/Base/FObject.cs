@@ -332,7 +332,6 @@ namespace THGame.UI
         {
             _obj.onRemovedFromStage.Add(func);
         }
-
         //---------- 改变事件 -----------
         public void OnSizeChanged(EventCallback1 func)
         {
@@ -513,5 +512,6 @@ namespace THGame.UI
             SetVisible(false);
             SetHeight(0);
         }
+
     }
 }
