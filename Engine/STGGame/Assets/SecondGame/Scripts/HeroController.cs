@@ -32,7 +32,7 @@ namespace UCGame
 
             UpdateRigidbody();
             UpdateRenderer();
-            UpdateAniation();
+            UpdateAnimation();
 
             ClearState();
         }
@@ -110,7 +110,7 @@ namespace UCGame
 
         }
 
-        void UpdateAniation()
+        void UpdateAnimation()
         {
             if (animator == null)
                 return;

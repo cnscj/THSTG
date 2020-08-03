@@ -199,38 +199,17 @@ namespace ASEditor
 
                     foreach (var actionPair in groupPair.Value)
                     {
-                        //动画曲线
-                        EditorCurveBinding curveBinding = new EditorCurveBinding();
-                        curveBinding.type = typeof(SpriteRenderer);
-                        curveBinding.path = "";
-                        curveBinding.propertyName = "m_Sprite";
-                        float frameTime = 1 / SpriteToolsConfig.GetInstance().defaultFrameRate;
-                        int index = 0;
-                        List<ObjectReferenceKeyframe> keyFrames = new List<ObjectReferenceKeyframe>();
-                        foreach (var listPair in actionPair.Value)
-                        {
-                            ObjectReferenceKeyframe keyFrame = new ObjectReferenceKeyframe();
-                            keyFrame.time = (float)(frameTime * index);
-                            keyFrame.value = listPair.Value.sprite;
-                            keyFrames.Add(keyFrame);
-                            index++;
-                        }
-
-                        AnimationClip clip = new AnimationClip();
-                        clip.frameRate = SpriteToolsConfig.GetInstance().defaultFrameRate;//动画帧率，30比较合适
-#if !UNITY_5
-                        AnimationUtility.SetAnimationType(clip, ModelImporterAnimationType.Generic);
-#endif
-                        AnimationUtility.SetObjectReferenceCurve(clip, curveBinding, keyFrames.ToArray());
-
-
                         //保存动画Clip
                         string outName = actionPair.Key;
                         string saveName = string.Format("{0}.anim", outName);
                         string savePath = Path.Combine(saveOutRootPath, saveName);
 
-                        AssetDatabase.CreateAsset(clip, savePath);
-                        AssetDatabase.SaveAssets();
+                        List<Sprite> spriteList = new List<Sprite>();
+                        foreach (var listPair in actionPair.Value)
+                        {
+                            spriteList.Add(listPair.Value.sprite);
+                        }
+                        AnimationClip clip = MakeAnimationClip(spriteList.ToArray(), SpriteToolsConfig.GetInstance().defaultFrameRate, savePath);
 
                         outActionMap.Add(actionPair.Key, clip);
                         if (callback != null)
@@ -741,6 +720,43 @@ namespace ASEditor
             }
 
 
+        }
+
+        public static AnimationClip MakeAnimationClip(Object []keyframes, float frameRate = 12.0f , string savePath = null)
+        {
+            //动画曲线
+            EditorCurveBinding curveBinding = new EditorCurveBinding();
+            curveBinding.type = typeof(SpriteRenderer);
+            curveBinding.path = "";
+            curveBinding.propertyName = "m_Sprite";
+            float frameTime = 1 / frameRate;
+            int index = 0;
+            List<ObjectReferenceKeyframe> keyFrames = new List<ObjectReferenceKeyframe>();
+            foreach (var keyframe in keyframes)
+            {
+                ObjectReferenceKeyframe keyFrame = new ObjectReferenceKeyframe();
+                keyFrame.time = (float)(frameTime * index);
+                keyFrame.value = keyframe;
+                keyFrames.Add(keyFrame);
+                index++;
+            }
+
+            AnimationClip clip = new AnimationClip();
+            clip.frameRate = SpriteToolsConfig.GetInstance().defaultFrameRate;//动画帧率，30比较合适
+#if !UNITY_5
+            AnimationUtility.SetAnimationType(clip, ModelImporterAnimationType.Generic);
+#endif
+            AnimationUtility.SetObjectReferenceCurve(clip, curveBinding, keyFrames.ToArray());
+
+
+            if (!string.IsNullOrEmpty(savePath))
+            {
+                //保存动画Clip
+                AssetDatabase.CreateAsset(clip, savePath);
+                AssetDatabase.SaveAssets();
+            }
+
+            return clip;
         }
 
         ///

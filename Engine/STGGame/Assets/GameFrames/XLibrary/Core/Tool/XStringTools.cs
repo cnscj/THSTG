@@ -91,6 +91,20 @@ namespace XLibrary
         }
 
         /// <summary>
+        /// 提取字符串除最后一个_之前的内容
+        /// </summary>
+        /// <param name="path">文件路径/文件名</param>
+        /// <returns></returns>
+        public static string SplitPathName(string path)
+        {
+            string fileName = Path.GetFileNameWithoutExtension(path);
+            int indexOf_ = fileName.LastIndexOf('_');
+            string pathKey = (indexOf_ == -1) ? fileName : fileName.Remove(indexOf_);
+
+            return pathKey;
+        }
+
+        /// <summary>
         /// 提取字符串包含的ID
         /// </summary>
         /// <param name="path">文件路径/文件名</param>

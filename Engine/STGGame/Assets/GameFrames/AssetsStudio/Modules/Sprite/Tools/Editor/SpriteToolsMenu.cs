@@ -208,6 +208,27 @@ namespace ASEditor
 
         }
 
+        [MenuItem("Assets/ASEditor/资源工具/精灵菜单/动画/用选中项生成动画")]
+        public static void MenuGenSelectionAnimaAndController()
+        {
+            var selection = Selection.objects;
+            if (selection != null && selection.Length > 0)
+            {
+                var target = selection[0];
+                string filePath = AssetDatabase.GetAssetPath(target);
+                string fileRoot = Path.GetDirectoryName(filePath);
+                string fileKey = XStringTools.SplitPathName(target.name);
+                string savePath = Path.Combine(fileRoot, string.Format("{0}.anim", fileKey));
+
+                SpriteEditorTools.MakeAnimationClip(selection, 12f, savePath);
+            }
+            else
+            {
+                Debug.LogError("没有选中的文件");
+            }
+
+        }
+
         public static void GenSpriteOneKey(string assetPath)
         {
             List<string> rootList = new List<string>();
