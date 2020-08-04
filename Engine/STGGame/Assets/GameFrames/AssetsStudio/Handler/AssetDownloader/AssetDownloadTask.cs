@@ -8,8 +8,9 @@ namespace ASGame
 {
     public class AssetDownloadTask : IComparable<AssetDownloadTask>
     {
-        public int id;              
-        public int status;                                                  //状态
+        public int id;
+        public int priority;                                                //优先级
+        public int status;                                                  //状态p
 
         public int downThreadNumb = 2;                                      //下载线程数量
         public int limitDownSize = 100 * 1024;                              //下载速度
@@ -107,7 +108,10 @@ namespace ASGame
 
         public int CompareTo(AssetDownloadTask other)
         {
-            return this.id - other.id;
+            if (this.priority == other.priority)
+                return this.id - other.id;
+
+            return other.priority - this.priority;
         }
     }
 }

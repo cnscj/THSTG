@@ -111,6 +111,9 @@ namespace ASGame
             if (m_queueMap != null && m_queueMap.Contains(task))
             {
                 //如果本来就在排队,提高优先级
+                m_queueMap.Remove(task);
+                task.priority++;
+                m_queueMap.Add(task);
 
             }
             else if (m_pauseMap != null && m_pauseMap.Contains(task))
@@ -324,9 +327,10 @@ namespace ASGame
         {
             return string.Format("{0}", urlPaths.GetHashCode());
         }
+
         private void Awake()
         {
-            savePath = CTargetPlat.PersistentRootPath;  //TODO:只有在启动才可获取
+            savePath = savePath ?? CTargetPlat.PersistentRootPath;
         }
 
         private void Update()
@@ -366,6 +370,7 @@ namespace ASGame
 
             task.Stop();
         }
+
         //Android目录下,下载中的存放路径必须在Application.dataPath,下载完成在拷贝到Application.persistentDataPath
         protected void OnDownloadSuccess(AssetDownloadTask task)
         {
