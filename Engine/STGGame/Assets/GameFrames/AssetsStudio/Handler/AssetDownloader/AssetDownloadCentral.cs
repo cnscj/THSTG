@@ -15,7 +15,7 @@ namespace ASGame
         //定时任务
         public int maxCount = 3;                                                //最大同时下载任务个数
         public float limidSpeed = -1f;                                          //全局限速
-        public string savePath;                //保存路径
+        public string savePath;                                                 //保存路径
 
         private Dictionary<string, AssetDownloadTask> m_tasksMap;               //所有任务列表
         private SortedSet<AssetDownloadTask> m_queueMap;                        //排队队列(含优先级
@@ -150,6 +150,21 @@ namespace ASGame
                     GetReleaseList().AddLast(task);
                 }
             }
+        }
+
+        public bool HadTask(string []urlPaths)
+        {
+            if (m_tasksMap != null)
+            {
+                var taskKey = GetTaskKey(urlPaths);
+                return m_tasksMap.ContainsKey(taskKey);
+            }
+            return false;
+        }
+
+        public bool HadTask(AssetDownloadTask task)
+        {
+            return HadTask(task.urlPaths);
         }
 
         public void StartAll()
@@ -325,7 +340,15 @@ namespace ASGame
 
         private string GetTaskKey(string[] urlPaths)
         {
-            return string.Format("{0}", urlPaths.GetHashCode());
+            if (urlPaths == null || urlPaths.Length <= 0)
+                return string.Empty;
+
+            int hashCode = 0;
+            foreach(var url in urlPaths)
+            {
+                hashCode += url.GetHashCode();
+            }
+            return string.Format("{0}", hashCode);
         }
 
         private void Awake()

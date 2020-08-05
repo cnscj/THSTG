@@ -24,7 +24,7 @@ namespace ASGame
             return fileSize;
         }
 
-        //前台下载,主动下载
+        //前台下载,主动下载(缺啥下啥
         public AssetDownloadCentral GetForegroundCentral()
         {
             m_foregroundCentral = m_foregroundCentral ?? new AssetDownloadCentral();
