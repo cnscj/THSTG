@@ -8,10 +8,10 @@ namespace ASEditor
 {
     public class AssetProcesserConfigerGUI : WindowGUI<AssetProcesserConfigerGUI>
     {
-        [MenuItem("AssetsStudio/资源后处理配置", false, 4)]
+        [MenuItem("AssetsStudio/资源预处理配置", false, 4)]
         static void ShowWnd()
         {
-            ShowWindow("资源后处理配置");
+            ShowWindow("资源预处理配置");
         }
 
         protected override void OnInit()

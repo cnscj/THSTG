@@ -35,7 +35,7 @@ namespace ASGame
 
     public class CDownloader
     {
-        List<DownResInfo> m_DownList;
+        List<DownResInfo> m_downList;
         List<DownResFile> m_successDownList;
         List<DownResFile> m_failedDownList;
 
@@ -50,6 +50,8 @@ namespace ASGame
         bool m_bIsPause = false;
         Thread[] m_runThreads;
         Thread m_runWriteThread;
+
+        ManualResetEvent m_pauseEvent;
 
         long m_nDownSize; // 当前下载的大小
         long m_nTotalDownSize; // 当前总的下载大小
@@ -69,12 +71,13 @@ namespace ASGame
         public int TotalDownCount { get { return m_nTotalDownCount; } }
         public int TotalNeedDownCount { get { return m_nTotalNeedDownCount; } }
         public DownloadFinish OnDownloadFinish { get { return m_downloadFinish; } set { m_downloadFinish = value; } }
-        public DownloadProgress OnDownloadProgress { get { return m_downloadProgress; } set { m_downloadProgress = value; } } 
+        public DownloadProgress OnDownloadProgress { get { return m_downloadProgress; } set { m_downloadProgress = value; } }
         public List<DownResFile> SuccessDownList { get => m_successDownList; }
         public List<DownResFile> FailedDownList { get => m_failedDownList; }
 
         public CDownloader()
         {
+            m_pauseEvent = new ManualResetEvent(false);
             m_successDownList = new List<DownResFile>();
             m_failedDownList = new List<DownResFile>();
         }
@@ -86,11 +89,9 @@ namespace ASGame
         {
             if (m_bIsPause)
             {
-                if (m_DownList != null && m_DownList.Count > 0)
-                {
-                    m_bIsPause = false;
-                    return;
-                }
+                m_bIsPause = false;
+                m_pauseEvent.Set();
+                return;
             }
 
             m_nDownSize = 0;
@@ -109,7 +110,7 @@ namespace ASGame
             if (nDownThreadNumb > downList.Count)
                 nDownThreadNumb = downList.Count;
 
-            m_DownList = downList;
+            m_downList = downList;
             m_successDownList.Clear();
             m_failedDownList.Clear();
 
@@ -119,6 +120,7 @@ namespace ASGame
             m_nTotalDownCount = 0;
 
             m_nDownThreadNumb = nDownThreadNumb;
+            m_pauseEvent.Set();
             m_runThreads = new Thread[nDownThreadNumb];
 
             for (int i = 0; i < nDownThreadNumb; ++i)
@@ -143,10 +145,13 @@ namespace ASGame
         public void PauseDown()
         {
             m_bIsPause = true;
+
+            m_pauseEvent.Reset();
         }
         public void StopDown(bool bAbort, bool bWait)
         {
             m_bIsPause = false;
+            m_pauseEvent.Set();
 
             if (m_nDownThreadNumb > 0)
             {
@@ -177,6 +182,7 @@ namespace ASGame
         public void ClearDown()
         {
             m_bIsPause = false;
+            m_pauseEvent.Set();
 
             m_downloadFinish = null;
             m_downloadProgress = null;
@@ -229,7 +235,7 @@ namespace ASGame
             {
                 if (m_nNextDownIndex < m_nTotalNeedDownCount)
                 {
-                    resInfo = m_DownList[m_nNextDownIndex++];
+                    resInfo = m_downList[m_nNextDownIndex++];
                 }
             }
             return resInfo != null;
@@ -241,7 +247,7 @@ namespace ASGame
             CHttp http = new CHttp();
             while (!m_bNeedStop)
             {
-                while (m_bIsPause) Thread.Sleep(1);
+                m_pauseEvent.WaitOne();
 
                 if (PopDownFileInfo(out resInfo))
                 {
@@ -317,8 +323,7 @@ namespace ASGame
         }
 
         // 功能：通知文件下载事件
-        // XXX:多线程下需要加锁
-        // XXX:子线程不应该直接调用回调,不然会卡住子线程,回调可用BeginInvoke
+        // FIXME:子线程不应该直接调用回调,不然会卡住子线程
         void NotifyDownEvent(string url, bool bSuc, DownResFile resInfo)
         {
             // 这里只是输出一个日志，用户自行扩展事件吧

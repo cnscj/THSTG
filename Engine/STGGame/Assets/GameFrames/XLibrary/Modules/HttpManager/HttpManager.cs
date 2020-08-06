@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -33,6 +34,14 @@ namespace XLibGame
                 m_coroutines.Remove(id);
             }
         }
+        public int Ping(string ipAddr, Action<float> callfunc)
+        {
+            var newId = m_coroutineId++;
+            var coroutine = StartCoroutine(OnPingCoroutine(newId, ipAddr, callfunc));
+            m_coroutines.Add(newId, coroutine);
+
+            return newId;
+        }
 
         public void Clear()
         {
@@ -41,6 +50,41 @@ namespace XLibGame
                 StopCoroutine(coroutine);
             }
             m_coroutines.Clear();
+        }
+
+        IEnumerator OnPingCoroutine(int id, string ipAddr, Action<float> callfunc)
+        {
+            Ping ping = new Ping(ipAddr);
+            int addTime = 0;
+            int requestCount = 20 * 10; // 0.1秒 请求 1 次，所以请求次数是 n秒 x 10
+                                               // 等待请求返回
+            while (!ping.isDone)
+            {
+                yield return new WaitForSeconds(0.1f);
+                // 链接失败
+                if (addTime > requestCount)
+                {
+                    addTime = 0;
+                    if (callfunc != null)
+                    {
+                        callfunc(ping.time);
+                    }
+                    yield break;
+                }
+                addTime++;
+            }
+
+            m_coroutines.Remove(id);
+
+            // 链接成功
+            if (ping.isDone)
+            {
+                if (callfunc != null)
+                {
+                    callfunc(ping.time);
+                }
+                yield return null;
+            }
         }
 
         private int StartRequest(bool isPost, HttpParams args)
