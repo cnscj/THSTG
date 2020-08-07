@@ -11,7 +11,7 @@ namespace ASGame
         {
             public static readonly int Force = 1 << 0;          //强制更新
         }
-
+        public int id;                                          //包的编号
         public int version;                                     //版本号
         public int flag;                                        //额外的flag
 

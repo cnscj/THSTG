@@ -40,7 +40,12 @@ namespace THGame.UI
 
         public class GraphArgs : BaseArgs
         {
-
+            public class Wrapper
+            {
+                public GameObject target;
+                public bool cloneMaterial;
+            }
+            public Wrapper wrapper;
         }
 
         public class ButtonArgs : BaseArgs
@@ -57,8 +62,6 @@ namespace THGame.UI
         {
             public string promptText;
         }
-        
-
 
         public class ListArgs : BaseArgs
         {
@@ -95,7 +98,12 @@ namespace THGame.UI
             var fGraph = NewT<FGraph, GGraph>(graphArgs);
             if (graphArgs != null)
             {
-
+                if (graphArgs.wrapper != null)
+                {
+                    var goWrapper = new GoWrapper();
+                    goWrapper.SetWrapTarget(graphArgs.wrapper.target, graphArgs.wrapper.cloneMaterial);
+                    fGraph.SetNativeObject(goWrapper);
+                }
             }
             return fGraph;
         }
@@ -138,7 +146,7 @@ namespace THGame.UI
             InitBaseArgs(fLoader, loaderArgs);
             if (loaderArgs != null)
             {
-                if (!string.IsNullOrEmpty(loaderArgs.url)) fLoader.SetUrl(loaderArgs.url);
+                fLoader.SetUrl(loaderArgs.url);
             }
             
             return fLoader;
@@ -153,8 +161,6 @@ namespace THGame.UI
                 if (listArgs.onState != null) fList.SetState(listArgs.onState);
                 if (listArgs.onClickItem != null) fList.OnClickItem(listArgs.onClickItem);
             }
-
-
 
             return fList;
         }

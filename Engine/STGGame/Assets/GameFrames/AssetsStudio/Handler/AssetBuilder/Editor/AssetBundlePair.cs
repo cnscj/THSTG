@@ -15,7 +15,7 @@ namespace ASEditor
             bundleName = name;
         }
 
-        public bool isEmpty()
+        public bool IsEmpty()
         {
             return string.IsNullOrEmpty(assetPath) || string.IsNullOrEmpty(bundleName);
         }

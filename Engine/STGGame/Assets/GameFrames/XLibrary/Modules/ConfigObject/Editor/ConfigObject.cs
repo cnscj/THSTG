@@ -6,8 +6,8 @@ namespace XLibEditor
 {
     public class ConfigObject<T> : ScriptableObject where T : ScriptableObject, new()
     {
-        public static string resourcePath = "Assets/Resources";
-        public static string configAssetsPath = XPathTools.Combine(resourcePath, string.Format("{0}{1}.asset", typeof(T).Namespace, typeof(T).Name));
+        protected static string _saveFolder = "Assets/Resources";
+        protected static string _configAssetsPath = XPathTools.Combine(_saveFolder, string.Format("{0}{1}.asset", typeof(T).Namespace, typeof(T).Name));
 
         private static T s_asset;
 
@@ -23,18 +23,18 @@ namespace XLibEditor
         static T GetOrCreateAsset()
         {
             T asset = null;
-            if (XFileTools.Exists(configAssetsPath))
+            if (XFileTools.Exists(_configAssetsPath))
             {
-                asset = AssetDatabase.LoadAssetAtPath<T>(configAssetsPath);
+                asset = AssetDatabase.LoadAssetAtPath<T>(_configAssetsPath);
             }
             else
             {
                 asset = ScriptableObject.CreateInstance<T>();
-                if (!XFolderTools.Exists(resourcePath))
+                if (!XFolderTools.Exists(_saveFolder))
                 {
-                    XFolderTools.CreateDirectory(resourcePath);
+                    XFolderTools.CreateDirectory(_saveFolder);
                 }
-                AssetDatabase.CreateAsset(asset, configAssetsPath);
+                AssetDatabase.CreateAsset(asset, _configAssetsPath);
                 AssetDatabase.Refresh();
             }
             return asset;
@@ -45,10 +45,10 @@ namespace XLibEditor
         {
             if (path != null && path != "")
             {
-                configAssetsPath = path;
+                _configAssetsPath = path;
                 return path;
             }
-            return configAssetsPath;
+            return _configAssetsPath;
         }
 
     }

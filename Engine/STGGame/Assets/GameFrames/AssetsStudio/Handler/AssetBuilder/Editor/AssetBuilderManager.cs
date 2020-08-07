@@ -22,12 +22,12 @@ namespace ASEditor
                 return iResult;
             }
         }
-
+        public static readonly string SHARE_BUILDER_NAME = "_GlobalShare_";
         //需要进行一次全局依赖Share打包
         private List<AssetBaseBuilder> m_builderCommonList = new List<AssetBaseBuilder>();
         private List<AssetBaseBuilder> m_builderCustomList = new List<AssetBaseBuilder>();
 
-        private Dictionary<string, List<string>> m_shareMap = new Dictionary<string, List<string>>();
+        private Dictionary<string, List<string>> m_buildAssetMap = new Dictionary<string, List<string>>();
         private Dictionary<string, List<AssetBundlePair>> m_bundleBuilds = new Dictionary<string, List<AssetBundlePair>>();
 
         public void Build(AssetBaseBuilder []builders = null)
@@ -49,7 +49,7 @@ namespace ASEditor
             m_builderCommonList.Clear();
             m_builderCustomList.Clear();
 
-            m_shareMap.Clear();
+            m_buildAssetMap.Clear();
             m_bundleBuilds.Clear();
         }
 
@@ -122,7 +122,7 @@ namespace ASEditor
             {
                 builder.Clear();
                 var fileList = builder.GetFileList();
-                m_shareMap.Add(builder.GetName(), fileList);
+                m_buildAssetMap.Add(builder.GetName(), fileList);
 
                 var bundleList = builder.GetBundleList();
                 m_bundleBuilds.Add(builder.GetName(), bundleList);
@@ -135,22 +135,22 @@ namespace ASEditor
             {
                 builder.Clear();
                 var fileList = builder.GetFileList();
-                m_shareMap.Add(builder.GetName(), fileList);
+                m_buildAssetMap.Add(builder.GetName(), fileList);
 
                 var bundleList = builder.GetBundleList();
                 m_bundleBuilds.Add(builder.GetName(), bundleList);
             }
         }
 
-        private void Build4Share()
+        private List<string> CollectShare()
         {
             Dictionary<string, int> refCounts = new Dictionary<string, int>();
-            foreach(var kv in m_shareMap)
+            foreach(var kv in m_buildAssetMap)
             {
                 foreach(var fullPath in kv.Value)
                 {
                     string assetPath = XPathTools.GetRelativePath(fullPath);
-                    string[] dps = AssetDatabase.GetDependencies(assetPath);
+                    string[] dps = AssetBuildDependent.GetDependencies(assetPath);
                     foreach (var dp in dps)
                     {
                         if (refCounts.TryGetValue(dp, out var refCount))
@@ -165,17 +165,72 @@ namespace ASEditor
                 }
             }
 
-            List<AssetBundlePair> shareBundleList = new List<AssetBundlePair>();
+            List<string> shareAssetList = new List<string>();
             foreach(var refKV in refCounts)
             {
                 if (refKV.Value > 1)
                 {
-                    //全部打到Share里去
-                    string shareBundleName = AssetBuildConfiger.GetInstance().GetBuildBundleShareName(refKV.Key);
-                    shareBundleList.Add(new AssetBundlePair(refKV.Key, shareBundleName));
+                    shareAssetList.Add(refKV.Key); 
                 }
             }
-            m_bundleBuilds.Add("_GlobalShare_", shareBundleList);
+
+            return shareAssetList;
+        }
+
+        //这里需要做下合并,减少ab数量:一个依赖的与依赖合并，一个引用的与引用合并
+        private void Build4Share()
+        {
+            List<string> shareAssetList = CollectShare();
+            List<AssetBundlePair> shareBundleList = GetOrCreateShareList();
+
+            Dictionary<string, string> depMap = new Dictionary<string, string>();
+            Dictionary<string, string> refMap = new Dictionary<string, string>();
+            if (AssetBuildConfiger.GetInstance().isOptimzeShareBundle)
+            {
+                foreach (var assetPath in shareAssetList)
+                {
+                    string[] dps = AssetBuildDependent.GetDependencies(assetPath);
+                    foreach (var dp in dps)
+                    {
+                        if (dp.CompareTo(assetPath) == 0)
+                            continue;
+
+                        // 单一依赖
+                        if (dps.Length == 2)
+                        {
+                            depMap[assetPath] = dp;
+                        }
+
+                        //单一引用
+                        if (refMap.ContainsKey(dp))
+                        {
+                            refMap[dp] = "";    //已经不是单一引用了
+                        }
+                        else
+                        {
+                            refMap[dp] = assetPath;
+                        }
+                    }
+                }
+            }
+
+            foreach (var assetPath in shareAssetList)
+            {
+                string shareBundleName = AssetBuildConfiger.GetInstance().GetBuildBundleShareName(assetPath);//全部打到Share里去
+                if (depMap.TryGetValue(assetPath,out var depFilePath))
+                {
+                    shareBundleName = AssetBuildConfiger.GetInstance().GetBuildBundleShareName(depFilePath);
+                }
+                else if(refMap.TryGetValue(assetPath,out var refFilePath))
+                {
+                    if(!string.IsNullOrEmpty(refFilePath))
+                    {
+                        shareBundleName = AssetBuildConfiger.GetInstance().GetBuildBundleShareName(refFilePath);
+                    }
+                }
+
+                shareBundleList.Add(new AssetBundlePair(assetPath, shareBundleName));
+            }
         }
 
         private void BuildAll()
@@ -217,7 +272,7 @@ namespace ASEditor
                 Dictionary<string, HashSet<string>> buildMap = new Dictionary<string, HashSet<string>>();
                 foreach (var pair in bundleList)
                 {
-                    if (pair.isEmpty())
+                    if (pair.IsEmpty())
                         continue;
 
                     var assetPath = pair.assetPath.ToLower();
@@ -229,6 +284,7 @@ namespace ASEditor
 
                     if (fileSet.Contains(assetPath))
                         continue;
+
                     fileSet.Add(assetPath);
 
                     HashSet<string> bundleSet;
@@ -254,6 +310,18 @@ namespace ASEditor
             }
             return buildList.ToArray();
         }
+
+        private List<AssetBundlePair> GetOrCreateShareList()
+        {
+            List<AssetBundlePair> shareBundleList = null;
+            if (!m_bundleBuilds.TryGetValue(SHARE_BUILDER_NAME, out shareBundleList))
+            {
+                shareBundleList = new List<AssetBundlePair>();
+                m_bundleBuilds.Add(SHARE_BUILDER_NAME, shareBundleList);
+            }
+            return shareBundleList;
+        }
     }
+
 
 }

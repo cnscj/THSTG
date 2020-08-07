@@ -82,7 +82,7 @@ namespace THGame.UI
         private void OnRemovedFromStage(EventContext context)
         {
             var gObj = context.sender as GObject;
-            if (gObj.isDisposed)
+            if (gObj.isDisposed)    //FIXME:Remove是在Dispose之前的,所以可能判断不了
             {
                 Remove(gObj);
             }

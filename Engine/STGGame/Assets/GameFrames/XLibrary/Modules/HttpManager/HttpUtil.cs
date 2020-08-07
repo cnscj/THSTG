@@ -1,5 +1,11 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 namespace XLibGame
@@ -23,6 +29,12 @@ namespace XLibGame
             texture.LoadImage(data);
 
             return texture;
+        }
+
+        public static JObject Json2JObject(string content)
+        {
+            JObject jo = (JObject)JsonConvert.DeserializeObject(content.ToString());
+            return jo;
         }
     }
 

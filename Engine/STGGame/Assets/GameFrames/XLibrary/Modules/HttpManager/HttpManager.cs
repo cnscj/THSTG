@@ -56,7 +56,7 @@ namespace XLibGame
         {
             Ping ping = new Ping(ipAddr);
             int addTime = 0;
-            int requestCount = 20 * 10; // 0.1秒 请求 1 次，所以请求次数是 n秒 x 10
+            int requestCount = 20 * 10;         // 0.1秒 请求 1 次，所以请求次数是 n秒 x 10
                                                // 等待请求返回
             while (!ping.isDone)
             {

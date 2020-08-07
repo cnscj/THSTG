@@ -7,61 +7,65 @@ namespace XLibGame
 {
     public class HttpForm
     {
-        private List<Tuple<string, object>> m_params;
+        private Dictionary<string, object> m_params;
 
         public HttpForm()
         {
+
+        }
+
+        public HttpForm(Dictionary<string, object> form)
+        {
+            m_params = new Dictionary<string, object>();
+            if (form != null)
+            {
+                foreach (var pair in form)
+                {
+                    Add(pair.Key, pair.Value);
+                }
+            }
+
+        }
+
+        public HttpForm(HttpForm form) : this(form.m_params)
+        {
+
         }
 
         public object this[string key]
         {
+            get
+            {
+                if (m_params != null && m_params.ContainsKey(key))
+                    return m_params[key];
+                return null;
+            }
             set
             {
-                m_params = m_params ?? new List<Tuple<string, object>>();
-                m_params.Add(new Tuple<string, object>(key, value));
+                m_params = m_params ?? new Dictionary<string, object>();
+                m_params[key] = value;
             }
         }
 
 
-        public void Add(string field, object data)
+        public void Add(string key, object data)
         {
-            if (m_params == null)
+            m_params = m_params ?? new Dictionary<string, object>();
+            if (m_params.ContainsKey(key))
                 return;
 
-            m_params.Add(new Tuple<string, object>(field, data));
+            m_params.Add(key, data);
         }
 
-        public void Remove(string field)
+        public void Remove(string key)
         {
             if (m_params == null)
                 return;
 
-            for(int i = 0;i < m_params.Count; i++)
-            {
-                var pair = m_params[i];
-                if (string.IsNullOrEmpty(field))
-                {
-                    if (pair.Item1 == field)
-                    {
-                        m_params.Remove(pair);
-                    }
-                }
-                else
-                {
-                    if (pair.Item2.ToString() == field)
-                    {
-                        m_params.Remove(pair);
-                    }
-                }
-                
-            }
-        }
-        public void RemoveLast()
-        {
-            if (m_params == null)
+            if (string.IsNullOrEmpty(key))
                 return;
 
-            m_params.RemoveAt(m_params.Count - 1);
+            m_params.Remove(key);
         }
 
         public void Clear()
@@ -108,14 +112,10 @@ namespace XLibGame
             {
                 foreach (var pair in m_params)
                 {
-                    if (!string.IsNullOrEmpty(pair.Item1))
-                    {
-                        if (pair.Item2 is byte[])
-                            ret.AddBinaryData(pair.Item1, pair.Item2 as byte[]);
-                        else
-                            ret.AddField(pair.Item1, pair.Item2.ToString());
-                    }
-                   
+                    if (pair.Value is byte[])
+                        ret.AddBinaryData(pair.Key, pair.Value as byte[]);
+                    else
+                        ret.AddField(pair.Key, pair.Value.ToString());
                 }
             }
             return ret;
@@ -129,16 +129,8 @@ namespace XLibGame
             {
                 foreach (var pair in m_params)
                 {
-                    if (string.IsNullOrEmpty(pair.Item1))
-                    {
-                        data.Remove(data.Length - 1, 1);
-                        data.Append(pair.Item2.ToString() + "&");
-                    }
-                    else
-                    {
-                        data.Append(pair.Item1 + "=");
-                        data.Append(pair.Item2.ToString() + "&");
-                    }
+                    data.Append(pair.Key + "=");
+                    data.Append(pair.Value.ToString() + "&");
                 }
                 data.Remove(data.Length - 1, 1);
             }

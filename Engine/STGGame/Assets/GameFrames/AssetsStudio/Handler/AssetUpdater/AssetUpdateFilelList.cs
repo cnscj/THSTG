@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using XLibrary;
 
 namespace ASGame
 {
@@ -9,7 +7,7 @@ namespace ASGame
         public AssetUpdateItem[] fileList;
 
         //生成某个目录的文件列表
-        public static AssetUpdateFilelList CreateFolderFileList(string assetPath)
+        public static AssetUpdateFilelList CreateFolderFileList(string assetFolder)
         {
             return default;
         }

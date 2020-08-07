@@ -1,5 +1,4 @@
 ﻿
-using UnityEngine;
 using UnityEngine.Networking;
 using XLibrary;
 
@@ -8,6 +7,12 @@ namespace XLibGame
     public class HttpResult
     {
         UnityWebRequest _webRequest;
+
+        public bool IsHttpError => _webRequest.isHttpError;
+        public bool IsNetworkError => _webRequest.isNetworkError;
+        public bool IsDone => _webRequest.isDone;
+        public string Error => _webRequest.error;
+
         public HttpResult(UnityWebRequest webRequest)
         {
             _webRequest = webRequest;
@@ -27,5 +32,7 @@ namespace XLibGame
             var unzipData = ZipUtility.DecompressDeflate(oriData);
             return unzipData;
         }
+
+        
     }
 }

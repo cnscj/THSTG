@@ -9,7 +9,7 @@ namespace ASEditor
 {
     public class AssetUpdateConfigerGUI1 : WindowGUI<AssetUpdateConfigerGUI1>
     {
-        [MenuItem("AssetsStudio/资源更新配置", false, 5)]
+        [MenuItem("AssetsStudio/资源更新配置", false, 6)]
         static void ShowWnd()
         {
             ShowWindow("资源更新配置");

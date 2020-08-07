@@ -77,7 +77,7 @@ namespace ASEditor
             Dictionary<string, HashSet<string>> buildMap = new Dictionary<string, HashSet<string>>();
             foreach (var pair in bundleList)
             {
-                if (pair.isEmpty())
+                if (pair.IsEmpty())
                     continue;
 
                 var assetPath = pair.assetPath.ToLower();
@@ -147,7 +147,13 @@ namespace ASEditor
             m_files = null;
         }
 
-        protected string[] GetReferenceds(string assetPath)
+        protected virtual string[] GetDependencies(string assetPath)
+        {
+            assetPath = XPathTools.GetRelativePath(assetPath);
+            return AssetBuildDependent.GetDependencies(assetPath);
+        }
+
+        protected virtual string[] GetReferenceds(string assetPath)
         {
             var refMap = GetRefrenceMap();
             string relaPathLow = assetPath.ToLower();
@@ -156,12 +162,6 @@ namespace ASEditor
                 return refMap[relaPathLow];
             }
             return null;
-        }
-
-        protected string[] GetDependencies(string assetPath)
-        {
-            assetPath = XPathTools.GetRelativePath(assetPath);
-            return AssetDatabase.GetDependencies(assetPath);
         }
 
         private Dictionary<string, string[]> GetRefrenceMap()

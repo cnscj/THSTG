@@ -57,6 +57,7 @@ namespace ASEditor
             AssetBuildConfiger.GetInstance().exportFolder = GUILayoutEx.ShowPathBar("输出目录", AssetBuildConfiger.GetInstance().exportFolder);
             AssetBuildConfiger.GetInstance().shareBundleName = EditorGUILayout.TextField("公共包名", AssetBuildConfiger.GetInstance().shareBundleName);
             AssetBuildConfiger.GetInstance().isCombinePlatformName = EditorGUILayout.Toggle("输出目录拼接平台名称", AssetBuildConfiger.GetInstance().isCombinePlatformName);
+            AssetBuildConfiger.GetInstance().isOptimzeShareBundle = EditorGUILayout.Toggle("优化Share打包", AssetBuildConfiger.GetInstance().isOptimzeShareBundle);
             AssetBuildConfiger.GetInstance().isRidofSpecialChar = EditorGUILayout.Toggle("包名移除特殊字符", AssetBuildConfiger.GetInstance().isRidofSpecialChar);
 
             m_itemSortedList.DoLayoutList();
