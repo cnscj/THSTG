@@ -15,7 +15,7 @@ namespace ASGame
         protected enum LoadMethod
         {
             //同步
-            Immediately,    //立刻(可能无法设置回调,待讨论
+            Immediately,    //立刻
 
             //异步
             Coroutine,      //协程
@@ -163,10 +163,7 @@ namespace ASGame
                         nextframe?.action();
                         nextframe.isExecuted = true;
                     }
-                    else
-                    {
-                        m_removeQueue.Enqueue(nextframe);
-                    }
+                    m_removeQueue.Enqueue(nextframe);
                 }
             }
         }

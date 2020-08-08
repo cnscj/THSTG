@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using XLibrary;
 
@@ -17,11 +18,22 @@ namespace ASEditor
 
         protected override string[] OnFiles()
         {
-            string buildSuffix = buildItem.buildSuffix ?? "*.*";
-            string[] files = Directory.GetFiles(buildItem.buildSrcPath, buildSuffix, SearchOption.AllDirectories)
-                   .ToArray();
+            string buildSuffix = "*.*";
+            string regularFileName = buildItem.regexFileName ?? ".*";
+            string[] files = Directory.GetFiles(buildItem.buildSrcPath, buildSuffix, SearchOption.AllDirectories);
 
-            return files;
+            Regex regex = new Regex(regularFileName);
+            List<string> fixFileList = new List<string>();
+            foreach(var filePath in files)
+            {
+                string fileName = Path.GetFileName(filePath);
+                if(regex.IsMatch(fileName))
+                {
+                    fixFileList.Add(filePath);
+                }
+            }
+
+            return fixFileList.ToArray();
         }
 
         protected override AssetBundlePair[] OnBundles(string assetPath)

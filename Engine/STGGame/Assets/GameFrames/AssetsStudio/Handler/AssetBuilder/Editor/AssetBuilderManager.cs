@@ -192,7 +192,8 @@ namespace ASEditor
                     string[] dps = AssetBuildDependent.GetDependencies(assetPath);
                     foreach (var dp in dps)
                     {
-                        if (dp.CompareTo(assetPath) == 0)
+                        //忽略自己
+                        if (string.Compare(assetPath,dp,true) == 0)
                             continue;
 
                         // 单一依赖

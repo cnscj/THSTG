@@ -21,7 +21,7 @@ namespace ASEditor
                 {
                     y = position.y + 0 * EditorGUIUtility.singleLineHeight,
                     width = Math.Max(0, position.width),
-                }, "资源名", nameProperty.stringValue);
+                }, "备注", nameProperty.stringValue);
 
 
                 EditorGUIUtility.labelWidth = 100;

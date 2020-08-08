@@ -40,7 +40,7 @@ namespace ASEditor
                 }, "资源路径", srcPathProperty.stringValue);
                 GUILayout.BeginArea(new Rect(position) {
                     x = EditorGUIUtility.currentViewWidth - 105,
-                    y = position.y + 1 * EditorGUIUtility.singleLineHeight + 174,
+                    y = position.y + 1 * EditorGUIUtility.singleLineHeight + 174+17,
                     width = 100,
                 });
                 if (GUILayout.Button("浏览"))
@@ -53,11 +53,11 @@ namespace ASEditor
                 }
                 GUILayout.EndArea();
 
-                SerializedProperty suffixProperty = property.FindPropertyRelative("buildSuffix");
-                suffixProperty.stringValue = EditorGUI.TextField(new Rect(position)
+                SerializedProperty regexFileNameProperty = property.FindPropertyRelative("regexFileName");
+                regexFileNameProperty.stringValue = EditorGUI.TextField(new Rect(position)
                 {
                     y = position.y + 2 * EditorGUIUtility.singleLineHeight
-                },"搜索后缀", suffixProperty.stringValue);
+                },"被打包资源名(限正则)", regexFileNameProperty.stringValue);
 
                 SerializedProperty assetBundleFormatNameProperty = property.FindPropertyRelative("assetBundleNameFormat");
                 assetBundleFormatNameProperty.stringValue = EditorGUI.TextField(new Rect(position)
