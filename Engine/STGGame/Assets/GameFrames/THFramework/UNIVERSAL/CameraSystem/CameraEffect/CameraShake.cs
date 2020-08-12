@@ -4,10 +4,8 @@ namespace THGame
 {
     // 震屏控制器,挂载在摄像机上,
     //摄像机必须挂载一个空的父节点上,否则位置会被锁死
-    public class CameraShake : BaseCameraEffecter
+    public class CameraShake : BaseCameraEffecter<CameraShake>
     {
-        private static CameraShake s_instance;
-
         // K帧属性
         [Header("震屏(上下、远近、摇头）")]
         public Vector3 shakeArgs;
@@ -19,26 +17,7 @@ namespace THGame
         private Vector3 m_startEulerAngles;
 
         private float m_startTick;
-
-        private void Awake()
-        {
-            s_instance = this;
-        }
-
-        public static CameraShake Instance
-        {
-            get
-            {
-                if (s_instance && s_instance.m_startTick >= 0f)
-                {
-                    s_instance.m_startTick = Time.realtimeSinceStartup;
-                    s_instance.enabled = true;
-                }
-   
-                return s_instance;
-            }
-        }
-
+    
         // 属性受animation控制，需要在animation之后执行，即使用LateUpdate()
         void LateUpdate()
         {

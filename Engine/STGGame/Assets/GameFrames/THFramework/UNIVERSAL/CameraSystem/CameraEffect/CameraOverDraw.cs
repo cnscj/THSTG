@@ -3,18 +3,13 @@
 namespace THGame
 {
     [ExecuteInEditMode]
-    public class CameraOverDraw : BaseCameraEffecter
+    public class CameraOverDraw : BaseCameraEffecter<CameraOverDraw>
     {
-        public static CameraOverDraw Instance { get; protected set; }
+
 
         public new Camera camera;
         public bool sceneColorApply = false;
         public Color sceneColor = Color.white;
-
-        private void Awake()
-        {
-            Instance = this;
-        }
 
         void LateUpdate()
         {

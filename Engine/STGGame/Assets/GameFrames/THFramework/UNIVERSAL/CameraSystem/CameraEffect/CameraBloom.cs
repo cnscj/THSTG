@@ -4,15 +4,8 @@ using System.Collections;
 namespace THGame
 {
     [ExecuteInEditMode]
-    public class CameraBloom : BaseCameraEffecter
+    public class CameraBloom : BaseCameraEffecter<CameraBloom>
     {
-        public static CameraBloom Instance { get; protected set; }
 
-        private void Awake()
-        {
-            Instance = this;
-        }
-
-      
     }
 }

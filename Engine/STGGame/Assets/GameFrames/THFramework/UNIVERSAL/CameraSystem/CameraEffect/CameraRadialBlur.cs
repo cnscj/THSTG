@@ -4,7 +4,7 @@ namespace THGame
 {
     //非运行时也触发效果
     [ExecuteInEditMode]
-    public class CameraRadialBlur : BaseCameraEffecter
+    public class CameraRadialBlur : BaseCameraEffecter<CameraRadialBlur>
     {
         public static CameraRadialBlur Instance { get; protected set; }
 
