@@ -7,6 +7,8 @@ namespace THGame
     [ExecuteInEditMode]
     public class CameraGlobalColor : BaseCameraEffecter<CameraGlobalColor>
     {
+        public Color sceneColor = Color.white;
+
         private void Start()
         {
            

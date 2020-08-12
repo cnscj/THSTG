@@ -31,22 +31,13 @@ namespace STGGame
         {
             if (shakerEnabled)
             {
-                if (CameraShake.Instance)
-                {
-                    CameraShake.Instance.shakeArgs.x = shakeHeight;
-                    CameraShake.Instance.shakeArgs.y = shakeForward;
-                    CameraShake.Instance.shakeArgs.z = shakeRotation;
-                }
+                
 
             }
 
             if (sceneColorEnabled)
             {
-                if (CameraOverDraw.Instance)
-                {
-                    CameraOverDraw.Instance.sceneColorApply = sceneColorEnabled;
-                    CameraOverDraw.Instance.sceneColor = sceneColor;
-                }
+               
             }
 
             if (radialBlurEnabled)
