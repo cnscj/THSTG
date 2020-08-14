@@ -7,13 +7,19 @@ namespace THGame
     [ExecuteInEditMode]
     public class CameraGlobalColor : BaseCameraEffecter<CameraGlobalColor>
     {
-        public Color sceneColor = Color.white;
+        private static Color s_golbalColor = Color.white;
 
-        private void Start()
+        public static void SetGlobalColor()
         {
-           
+            Shader.SetGlobalColor("_SceneColor", s_golbalColor);
+        }
+        public static Color GetGlobalColor()
+        {
+            return Shader.GetGlobalColor("_SceneColor");
         }
 
+
+        public Color sceneColor = Color.white;
         private void Update()
         {
  

@@ -7,6 +7,7 @@ namespace THGame
     [ExecuteInEditMode]
     public class CameraTimeScale : BaseCameraEffecter<CameraTimeScale>
     {
+        [Header("时间缩放系数(0~1）")]
         public float timeScale = 1f;
         private float m_lastTimeScale = 1f;
 
