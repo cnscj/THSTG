@@ -5,7 +5,7 @@ using UnityEngine;
 namespace THGame
 {
     [ExecuteInEditMode]
-    public class CameraGlobalColor : BaseCameraEffecter<CameraGlobalColor>
+    public class CameraGlobalColor : BaseCameraEffecter
     {
         private static Color s_golbalColor = Color.white;
 

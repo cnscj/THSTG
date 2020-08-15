@@ -5,7 +5,7 @@ using XLibrary.Package;
 
 namespace THGame
 {
-    public class BaseCameraEffecter<T> : MonoSingleton<T> where T : MonoBehaviour
+    public class BaseCameraEffecter : MonoBehaviour
     {
         protected EffectedCamera GetEffectedCamera()
         {

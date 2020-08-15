@@ -4,10 +4,8 @@ namespace THGame
 {
     //非运行时也触发效果
     [ExecuteInEditMode]
-    public class CameraRadialBlur : BaseCameraEffecter<CameraRadialBlur>
+    public class CameraRadialBlur : BaseCameraEffecter
     {
-        public static CameraRadialBlur Instance { get; protected set; }
-
         //模糊程度，不能过高
         [Range(0, 0.5f)]public float blurFactor = 0.045f;
         [Range(0.0f, 2.0f)]public float lerpFactor = 2.0f;//清晰图像与原图插值
@@ -15,14 +13,8 @@ namespace THGame
         private Vector2 blurCenter = new Vector2(0.5f, 0.5f);//模糊中心（0-1）屏幕空间，默认为中心点
         private Material _material = null;
         private int downSampleFactor = 2;//降低分辨率
-        
-
-        private void Awake()
-        {
-            Instance = this;
-        }
-
-        public Material _Material
+       
+        protected Material _Material
         {
             get
             {
