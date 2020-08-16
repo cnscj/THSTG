@@ -16,13 +16,13 @@ namespace THGame
         {
             if (!isScaleable) return;
 
-            Time.timeScale = timeScale;
+            Time.timeScale *= timeScale;
         }
 
         public void Recover()
         {
             timeScale = 1f;
-            Time.timeScale = timeScale;
+            Time.timeScale *= timeScale;
         }
 
     }

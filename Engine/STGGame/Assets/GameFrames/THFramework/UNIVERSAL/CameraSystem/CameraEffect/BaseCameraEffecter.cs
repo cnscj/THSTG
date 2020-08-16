@@ -19,7 +19,7 @@ namespace THGame
 
         protected Transform[] GetTransforms()
         {
-            return GetEffectedCamera().cameraTransforms;
+            return GetEffectedCamera().transforms;
         }
     }
 }

@@ -9,8 +9,8 @@ namespace THGame
         //模糊程度，不能过高
         [Range(0, 0.5f)]public float blurFactor = 0.045f;
         [Range(0.0f, 2.0f)]public float lerpFactor = 2.0f;//清晰图像与原图插值
+        [Header("模糊中心（0-1）")]public Vector2 blurCenter = new Vector2(0.5f, 0.5f);//屏幕空间，默认为中心点
 
-        private Vector2 blurCenter = new Vector2(0.5f, 0.5f);//模糊中心（0-1）屏幕空间，默认为中心点
         private Material _material = null;
         private int downSampleFactor = 2;//降低分辨率
        

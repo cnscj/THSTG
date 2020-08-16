@@ -11,7 +11,7 @@ namespace ASGame
         protected override IEnumerator OnLoadAssetAsync(AssetLoadHandler handler)
         {
             string assetPath = handler.path;
-            var request = Resources.LoadAsync(assetPath);
+            var request = Resources.LoadAsync(assetPath);   //Resources加载路径不能有后缀
             yield return request;
 
             handler.status = AssetLoadStatus.LOAD_FINISHED;

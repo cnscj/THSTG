@@ -7,7 +7,7 @@ namespace THGame
 {
     public class EffectedCamera : MonoSingleton<EffectedCamera>
     {
-        public Transform[] cameraTransforms;
+        public Transform[] transforms;
         public Camera[] cameras;
 
         private Dictionary<Transform, VectorMatrix> m_materixBackup;
@@ -16,7 +16,7 @@ namespace THGame
         public Dictionary<Transform, VectorMatrix> SaveMatrixs(Dictionary<Transform, VectorMatrix>  backupMaterix)
         {
             backupMaterix = backupMaterix ?? new Dictionary<Transform, VectorMatrix>();
-            foreach (var transform in cameraTransforms)
+            foreach (var transform in transforms)
             {
                 VectorMatrix matrix = null;
                 if (!backupMaterix.TryGetValue(transform,out matrix))
@@ -37,7 +37,7 @@ namespace THGame
         {
             if (m_materixBackup != null)
             {
-                foreach (var transform in cameraTransforms)
+                foreach (var transform in transforms)
                 {
                     if (m_materixBackup.TryGetValue(transform, out var matrix))
                     {
@@ -54,7 +54,7 @@ namespace THGame
             m_materixBackup = materixs;
             if (m_materixBackup != null)
             {
-                foreach (var transform in cameraTransforms)
+                foreach (var transform in transforms)
                 {
                     if (m_materixBackup.TryGetValue(transform, out var matrix))
                     {
