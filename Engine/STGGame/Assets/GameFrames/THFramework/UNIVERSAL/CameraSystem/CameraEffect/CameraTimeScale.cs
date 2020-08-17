@@ -5,7 +5,7 @@ using UnityEngine;
 namespace THGame
 {
     [ExecuteInEditMode]
-    public class CameraTimeScale : BaseCameraEffecter
+    public class CameraTimeScale : MonoBehaviour
     {
         [Header("时间缩放系数(0~1）")]
         [Range(0,1)]public float timeScale = 1f;
