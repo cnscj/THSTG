@@ -87,7 +87,7 @@ namespace THGame
         //简谐运动
         float CalculateHarmonicValue(float amplitude, float frequency)
         {
-            var x1 = Mathf.Cos(Time.realtimeSinceStartup * frequency * FREQ_COEF);
+            var x1 = Mathf.Cos(Time.fixedTime * frequency * FREQ_COEF);
             var x2 = AMPL_COEF * amplitude;
             var val = x1 * x2;
             var dir = Mathf.Sign(x1);

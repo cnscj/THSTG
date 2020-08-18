@@ -6,7 +6,6 @@ using XLibrary;
 
 namespace ASGame
 {
-    //TODO:模型特效如果在UI上显示,需要设置层级
     public class ModelEffectLoader : MonoBehaviour
     {
         private List<GameObject> m_effectNodes;
