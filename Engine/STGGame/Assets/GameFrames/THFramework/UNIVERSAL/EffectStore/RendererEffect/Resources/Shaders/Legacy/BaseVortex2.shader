@@ -1,6 +1,6 @@
 ﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
-Shader "AS/Ex/BaseVortex2" {
+Shader "TH/Ex/BaseVortex2" {
 Properties
 {
 [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}

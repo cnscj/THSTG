@@ -8,7 +8,7 @@ namespace THGame
     //后效管理区
     public class ShaderManager : MonoSingleton<ShaderManager>
     {
-
+       
     }
 
 }

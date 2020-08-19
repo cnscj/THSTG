@@ -1,6 +1,6 @@
 ﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
-Shader "AS/Ex/BaseVortex" {  
+Shader "TH/Ex/BaseVortex" {  
     Properties {  
         //start-------------------------------------------------------------  
         _MainTex ("Base (RGB)", 2D) = "white" {}  

@@ -1,4 +1,4 @@
-﻿Shader "AS/Ex/WalkLight"
+﻿Shader "TH/Ex/WalkLight"
 {
     Properties
     {

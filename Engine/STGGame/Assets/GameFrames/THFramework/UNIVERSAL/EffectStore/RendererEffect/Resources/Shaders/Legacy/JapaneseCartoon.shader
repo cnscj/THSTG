@@ -1,6 +1,6 @@
 ﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
-Shader "AS/Ex/JapaneseCartoon"
+Shader "TH/Ex/JapaneseCartoon"
 {
     Properties
     {

@@ -1,6 +1,6 @@
 ﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
-Shader "AS/Ex/UVRiver" {
+Shader "TH/Ex/UVRiver" {
     Properties{
  
         _MainTex("Texture", 2D) = "white"{} //纹理

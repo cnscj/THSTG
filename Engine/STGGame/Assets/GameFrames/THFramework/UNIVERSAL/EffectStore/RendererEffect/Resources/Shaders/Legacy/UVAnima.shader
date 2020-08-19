@@ -1,4 +1,4 @@
-﻿Shader "AS/Ex/UVAmina"
+﻿Shader "TH/Ex/UVAmina"
 {
 Properties
 {
