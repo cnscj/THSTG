@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using FairyGUI;
 using FairyGUI.Utils;
-using UnityEngine;
 using XLibGame;
 using EventCallback1 = XLibGame.EventCallback1;
 namespace THGame.UI

@@ -43,8 +43,7 @@ namespace THGame.UI
                 {
                     if (!view.IsDisposed())
                     {
-                        view.SetArgs(args);
-                        GRoot.inst.AddChild(view.GetObject());
+                        view.__OpenByManager(args);
                         isNeedCreate = false;
                     }
                 }
@@ -60,13 +59,21 @@ namespace THGame.UI
                     viewInfo = new ViewInfo();
                     viewInfo.view = fView;
 
-                    GRoot.inst.AddChild(fView.GetObject());
-
                     m_viewsMap[type] = viewInfo;
-
                     m_onCreated?.Invoke(viewInfo);
+
+                    fView.__OpenByManager(args);
                 } ,args);
             }
+        }
+
+        public void Open(FView view, object args = null)
+        {
+            if (view == null)
+                return;
+
+            Type type = __GetViewKey(view);
+            Open(type, args);
         }
 
         public void Open<T>(object args = null) where T : FView, new()
@@ -102,15 +109,7 @@ namespace THGame.UI
                         m_viewsMap.Remove(type);
                     } 
                 }
-
-                if (isDisposed)
-                {
-                    view.Dispose();
-                }
-                else
-                {
-                    view.RemoveFromParent();
-                }
+                view.__CloseByManager(isDisposed);
             }
         }
 
@@ -127,7 +126,7 @@ namespace THGame.UI
                         isDisposed = false;
                     }
 
-                    view.Close(isDisposed);
+                    view.__CloseByManager(isDisposed);
                 }
             }
         }

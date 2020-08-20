@@ -15,27 +15,29 @@ namespace THGame.UI
         {
 
         }
+        public virtual void Open(object args = null)
+        {
+            ViewManager.GetInstance().Open(this, args);
+        }
 
         public virtual void Close(bool isDisposed = true)
         {
-            //XXX:如果有退出动画,必须等动画结束在执行
-            ViewInfo viewInfo = ViewManager.GetInstance().GetViewInfo(GetType());
-            if (viewInfo != null && viewInfo.view == this)
-            {
-                ViewManager.GetInstance().Close(this, isDisposed);
-            }
-            else
-            {
-                if (isDisposed)
-                {
-                    Dispose();
-                }
-                else
-                {
-                    RemoveFromParent();
-                }
-            }
+            ViewManager.GetInstance().Close(this, isDisposed);
+        }
 
+        //给VIewManager调用
+        public void __OpenByManager(object args = null)
+        {
+            SetArgs(args);
+            GRoot.inst.AddChild(GetObject());
+        }
+
+        public void __CloseByManager(bool isDisposed = true)
+        {
+            if (isDisposed)
+                Dispose();
+            else
+                RemoveFromParent();
         }
 
         public override Wrapper<GObject> InitWithObj(GObject obj)
