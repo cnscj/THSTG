@@ -6,7 +6,8 @@ namespace THGame.UI
 {
     public abstract class GoBaseUpdater
     {
-       public abstract void Update(GoUpdateContext context);
+        public abstract void Update(GoUpdateContext context);
+        public virtual void Reset() { }
     }
 
 }
