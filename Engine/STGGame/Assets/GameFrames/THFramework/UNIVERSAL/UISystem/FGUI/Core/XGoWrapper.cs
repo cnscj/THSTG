@@ -24,7 +24,13 @@ namespace THGame.UI
             if (iUpdater == null)
                 return default;
 
+            var updateContext = GetOrCreateContext();
+            updateContext.goWrapper = this;
+
+            iUpdater.context = updateContext;
             GetUpdaters().Add(updaterKey, iUpdater);
+            iUpdater.OnAdded();
+
             return iUpdater;
         }
 
@@ -47,7 +53,13 @@ namespace THGame.UI
                 return;
 
             var updaterKey = GetUpdaterKey<T>();
+            if (_updaters.TryGetValue(updaterKey, out var iUpdater))
+            {
+                iUpdater.OnRemove();
+                iUpdater.context = null;
+            }
             GetUpdaters().Remove(updaterKey);
+
         }
 
         public void RemoveAllUpdater()
@@ -55,6 +67,11 @@ namespace THGame.UI
             if (_updaters == null)
                 return;
 
+            foreach (var iUpdater in _updaters.Values)
+            {
+                iUpdater.OnRemove();
+                iUpdater.context = null;
+            }
             _updaters.Clear();
         }
 
@@ -71,7 +88,7 @@ namespace THGame.UI
 
             foreach (var updater in _updaters.Values)
             {
-                updater.Reset();
+                updater.OnReset();
             }
         }
 
@@ -81,12 +98,19 @@ namespace THGame.UI
                 return;
 
             var updateContext = GetOrCreateContext();
+            var oldGameObejct = updateContext.wrapperTarget;
+            var newGameObject = wrapTarget;
+
             updateContext.wrapperTarget = wrapTarget;
             updateContext.wrapperContext = context;
 
             foreach (var updater in _updaters.Values)
             {
-                updater.Update(_updateContext);
+                if (oldGameObejct != newGameObject)
+                {
+                    updater.OnReplace(oldGameObejct, newGameObject);
+                }
+                updater.OnUpdate();
             }
         }
 

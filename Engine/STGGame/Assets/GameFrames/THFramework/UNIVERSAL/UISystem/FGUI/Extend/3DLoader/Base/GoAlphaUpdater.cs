@@ -14,7 +14,7 @@ namespace THGame.UI
             _materialPropertyBlock = new MaterialPropertyBlock();
         }
 
-        public override void Update(GoUpdateContext context)
+        public override void OnUpdate()
         {
             if (context.wrapperTarget != null && context.wrapperContext != null)
             {
