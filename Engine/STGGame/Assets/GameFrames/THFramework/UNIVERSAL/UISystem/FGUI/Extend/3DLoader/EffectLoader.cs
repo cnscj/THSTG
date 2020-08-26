@@ -12,7 +12,9 @@ namespace THGame.UI
 
         protected override XGoWrapper GetOrCreateGOWrapper()
         {
-            return base.GetOrCreateGOWrapper();
+            var goWrapper = base.GetOrCreateGOWrapper();
+            goWrapper.AddUpdater<GoSortingOrderUpdater>();
+            return goWrapper;
         }
     }
 

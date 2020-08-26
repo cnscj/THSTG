@@ -18,9 +18,14 @@ namespace THGame
 
         private int downSampleFactor = 2;//降低分辨率
 
+        protected override Shader OnShader()
+        {
+            return Shader.Find("Hidden/TH/PostProcessRadialBlur");
+        }
+
         void OnRenderImage(RenderTexture source, RenderTexture destination)
         {
-            if (_Material)
+            if (Material)
             {
                 //申请两块降低了分辨率的RT
                 RenderTexture rt1 = RenderTexture.GetTemporary(source.width >> downSampleFactor, source.height >> downSampleFactor, 0, source.format);
@@ -28,14 +33,14 @@ namespace THGame
                 Graphics.Blit(source, rt1);
 
                 //使用降低分辨率的rt进行模糊:pass0
-                _Material.SetFloat("_BlurFactor", blurFactor);
-                _Material.SetVector("_BlurCenter", blurCenter);
-                Graphics.Blit(rt1, rt2, _Material, 0);
+                Material.SetFloat("_BlurFactor", blurFactor);
+                Material.SetVector("_BlurCenter", blurCenter);
+                Graphics.Blit(rt1, rt2, Material, 0);
 
                 //使用rt2和原始图像lerp:pass1
-                _Material.SetTexture("_BlurTex", rt2);
-                _Material.SetFloat("_LerpFactor", lerpFactor);
-                Graphics.Blit(source, destination, _Material, 1);
+                Material.SetTexture("_BlurTex", rt2);
+                Material.SetFloat("_LerpFactor", lerpFactor);
+                Graphics.Blit(source, destination, Material, 1);
 
                 //释放RT
                 RenderTexture.ReleaseTemporary(rt1);

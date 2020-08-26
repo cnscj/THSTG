@@ -20,6 +20,11 @@ namespace THGame
 
         private float waveStartTime;
 
+        protected override Shader OnShader()
+        {
+            return Shader.Find("Hidden/TH/PostProcessWaterWave");
+        }
+
         public void Wave(float x,float y)
         {
             waveStartTime = Time.time;
@@ -32,18 +37,18 @@ namespace THGame
         }
         void OnRenderImage(RenderTexture source, RenderTexture destination)
         {
-            if (_Material)
+            if (Material)
             {
                 //计算波纹移动的距离，根据enable到目前的时间*速度求解
                 float curWaveDistance = (Time.time - waveStartTime) * waveSpeed;
                 //设置一系列参数
-                _Material.SetFloat("_distanceFactor", distanceFactor);
-                _Material.SetFloat("_timeFactor", timeFactor);
-                _Material.SetFloat("_totalFactor", totalFactor);
-                _Material.SetFloat("_waveWidth", waveWidth);
-                _Material.SetFloat("_curWaveDis", curWaveDistance);
-                _Material.SetVector("_startPos", startPos);
-                Graphics.Blit(source, destination, _Material);
+                Material.SetFloat("_distanceFactor", distanceFactor);
+                Material.SetFloat("_timeFactor", timeFactor);
+                Material.SetFloat("_totalFactor", totalFactor);
+                Material.SetFloat("_waveWidth", waveWidth);
+                Material.SetFloat("_curWaveDis", curWaveDistance);
+                Material.SetVector("_startPos", startPos);
+                Graphics.Blit(source, destination, Material);
             }
             else
             {

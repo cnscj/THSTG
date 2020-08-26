@@ -18,6 +18,7 @@ namespace THGame.UI
         {
             if (context.wrapperTarget != null && context.wrapperContext != null)
             {
+                //要区别,模型,特效,模型特效这些情况
                 var alpha = context.wrapperContext.alpha;
                 var renderers = context.wrapperTarget.GetComponentsInChildren<Renderer>();
                 foreach(var renderer in renderers)

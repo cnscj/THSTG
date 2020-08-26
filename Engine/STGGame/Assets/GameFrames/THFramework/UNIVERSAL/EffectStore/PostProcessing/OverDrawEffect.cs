@@ -8,12 +8,17 @@ namespace THGame
     {
         public Color sceneColor = Color.white;
 
+        protected override Shader OnShader()
+        {
+            return Shader.Find("Hidden/TH/PostProcessOverDraw");
+        }
+
         void OnRenderImage(RenderTexture source, RenderTexture destination)
         {
-            if (_Material)
+            if (Material)
             {
-                _Material.SetColor("_OverDrawColor", sceneColor);
-                Graphics.Blit(source, destination, _Material);
+                Material.SetColor("_OverDrawColor", sceneColor);
+                Graphics.Blit(source, destination, Material);
             }
             else
             {

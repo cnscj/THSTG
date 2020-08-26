@@ -99,6 +99,7 @@ namespace THGame
         }
 
         //布朗运动
+        //TODO:缺少一个缓动
         Vector2 CacculateBrownVector(float amplitude)
         {
             Vector2 ret = Vector2.zero;
@@ -111,6 +112,7 @@ namespace THGame
         }
 
         //随机两点运动
+        //TODO:缺少一个缓动
         float CalculatePointValue(float amplitude)
         {
             return AMPL_COEF * amplitude * (Random.value < 0.5f ? -1f : 1f);
