@@ -175,7 +175,7 @@ namespace THGame.UI
         }
 
         //
-        private void _OnAddedToStage()
+        protected virtual void _OnAddedToStage()
         {
             OnInitEvent();
             _InitScheduler();
@@ -183,10 +183,11 @@ namespace THGame.UI
             OnEnter();
         }
 
-        private void _OnRemovedFromStage()
+        protected virtual void _OnRemovedFromStage()
         {
             _RemoveEvent();
             _RemoveSchedule();
+
             OnExit();
         }
 

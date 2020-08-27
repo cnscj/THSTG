@@ -75,10 +75,29 @@ namespace THGame.UI
             _updaters.Clear();
         }
 
+        public new void CacheRenderers()
+        {
+            base.CacheRenderers();
+
+            if (_updaters == null)
+                return;
+
+            foreach (var iUpdater in _updaters.Values)
+            {
+                iUpdater.OnRefresh();
+            }
+        }
+
         override public void Update(UpdateContext context)
         {
             UpdateContext(context);
             base.Update(context);
+        }
+
+        public override void Dispose()
+        {
+            RemoveAllUpdater();
+            base.Dispose();
         }
 
         virtual public void Reset()
@@ -131,5 +150,6 @@ namespace THGame.UI
             _updaters = _updaters ?? new Dictionary<string, GoBaseUpdater>();
             return _updaters;
         }
+
     }
 }

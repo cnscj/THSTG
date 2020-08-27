@@ -30,10 +30,14 @@ namespace THGame.UI
         {
             SetArgs(args);
             GRoot.inst.AddChild(GetObject());
+
+            OnShowAnimation();
         }
 
         public void __CloseByManager(bool isDisposed = true)
         {
+            OnHideAnimation();
+
             if (isDisposed)
                 Dispose();
             else
@@ -58,7 +62,7 @@ namespace THGame.UI
         //TODO:
         protected virtual void OnShowAnimation()
         {
-
+            
         }
 
         protected virtual void OnHideAnimation()

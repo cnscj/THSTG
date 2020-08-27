@@ -152,7 +152,6 @@ namespace THGame.UI
             return fLoader;
         }
 
-        //TODO:
         public static FList NewList(ListArgs listArgs)
         {
             var fList = NewT<FList, GList>(listArgs);
