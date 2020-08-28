@@ -59,6 +59,7 @@ namespace ASEditor
             AssetBuildConfiger.GetInstance().isCombinePlatformName = EditorGUILayout.Toggle("输出目录拼接平台名称", AssetBuildConfiger.GetInstance().isCombinePlatformName);
             AssetBuildConfiger.GetInstance().isOptimzeShareBundle = EditorGUILayout.Toggle("优化Share打包", AssetBuildConfiger.GetInstance().isOptimzeShareBundle);
             AssetBuildConfiger.GetInstance().isRidofSpecialChar = EditorGUILayout.Toggle("包名移除特殊字符", AssetBuildConfiger.GetInstance().isRidofSpecialChar);
+            AssetBuildConfiger.GetInstance().isUseDependenciesCache = EditorGUILayout.Toggle("使用依赖缓存加速", AssetBuildConfiger.GetInstance().isUseDependenciesCache);
 
             m_itemSortedList.DoLayoutList();
             EditorGUILayout.HelpBox("包路径说明\n" +

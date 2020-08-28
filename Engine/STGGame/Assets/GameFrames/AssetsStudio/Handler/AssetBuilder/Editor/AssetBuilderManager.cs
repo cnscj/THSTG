@@ -150,7 +150,7 @@ namespace ASEditor
                 foreach(var fullPath in kv.Value)
                 {
                     string assetPath = XPathTools.GetRelativePath(fullPath);
-                    string[] dps = AssetBuildDependent.GetDependencies(assetPath);
+                    string[] dps = AssetBuildRelationship.GetDependencies(assetPath);
                     foreach (var dp in dps)
                     {
                         if (refCounts.TryGetValue(dp, out var refCount))
@@ -189,7 +189,7 @@ namespace ASEditor
             {
                 foreach (var assetPath in shareAssetList)
                 {
-                    string[] dps = AssetBuildDependent.GetDependencies(assetPath);
+                    string[] dps = AssetBuildRelationship.GetDependencies(assetPath);
                     foreach (var dp in dps)
                     {
                         //忽略自己

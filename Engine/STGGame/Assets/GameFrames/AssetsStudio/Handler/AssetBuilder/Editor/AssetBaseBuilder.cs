@@ -150,7 +150,7 @@ namespace ASEditor
         protected virtual string[] GetDependencies(string assetPath)
         {
             assetPath = XPathTools.GetRelativePath(assetPath);
-            return AssetBuildDependent.GetDependencies(assetPath);
+            return AssetBuildRelationship.GetDependencies(assetPath);
         }
 
         protected virtual string[] GetReferenceds(string assetPath)

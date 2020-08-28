@@ -1,18 +1,36 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FSMTransition : MonoBehaviour
+namespace THGame
 {
-    // Start is called before the first frame update
-    void Start()
+    public class FSMTransition
     {
-        
-    }
+		private readonly Func<bool> testConditionFunc;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+		public event Action OnComplete;
+
+		public FSMTransition(Func<bool> testConditionFunction = null)
+		{
+			testConditionFunc = testConditionFunction;
+		}
+
+		protected void Complete()
+		{
+			if (OnComplete != null) OnComplete();
+		}
+
+		public virtual void Begin()
+        {
+			Complete();
+        }
+
+		public bool TestCondition()
+		{
+			return testConditionFunc == null || testConditionFunc();
+		}
+	
+	}
+
 }

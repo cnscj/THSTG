@@ -31,6 +31,7 @@ namespace ASEditor
         public bool isCombinePlatformName = true;
         public bool isOptimzeShareBundle = true;
         public bool isRidofSpecialChar = true;
+        public bool isUseDependenciesCache = false;
 
         public List<AssetCommonBuildItem> buildItemList = new List<AssetCommonBuildItem>();
 

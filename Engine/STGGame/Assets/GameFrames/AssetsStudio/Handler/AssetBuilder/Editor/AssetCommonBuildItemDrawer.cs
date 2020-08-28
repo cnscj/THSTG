@@ -40,7 +40,7 @@ namespace ASEditor
                 }, "资源路径", srcPathProperty.stringValue);
                 GUILayout.BeginArea(new Rect(position) {
                     x = EditorGUIUtility.currentViewWidth - 105,
-                    y = position.y + 1 * EditorGUIUtility.singleLineHeight + 174+17,
+                    y = position.y + 1 * EditorGUIUtility.singleLineHeight + 174+ 2*17,
                     width = 100,
                 });
                 if (GUILayout.Button("浏览"))

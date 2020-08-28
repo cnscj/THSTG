@@ -19,6 +19,7 @@ MonoBehaviour:
   isCombinePlatformName: 1
   isOptimzeShareBundle: 1
   isRidofSpecialChar: 1
+  isUseDependenciesCache: 0
   buildItemList:
   - isEnabled: 1
     builderName: Effect
