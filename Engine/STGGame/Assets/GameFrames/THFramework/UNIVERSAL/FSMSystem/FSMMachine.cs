@@ -10,94 +10,101 @@ namespace THGame
 	public class FSMMachine
 	{
 		public string Name { get; set; }
+
+		public FSMState PreviousState { get; private set; }
 		public FSMState CurrentState { get; private set; }
 		public FSMTransition CurrentTransition { get; private set; }
 
-		private Dictionary<string, FSMState> _states = new Dictionary<string, FSMState>();
-		private Dictionary<string, FSMTransition> _transitionsFrom = new Dictionary<string, FSMTransition>();
-		private Dictionary<FSMTransition, string> _transitionsTo = new Dictionary<FSMTransition, string>();
+		public bool IsTransitioning { get { return CurrentTransition != null; } }
 
+		private HashSet<FSMState> _states = new HashSet<FSMState>();
+		private Dictionary<FSMState, Dictionary<string, FSMTransition>> _transitions = new Dictionary<FSMState, Dictionary<string, FSMTransition>>();
+
+		private bool isInitialisingState;
 		private event Action<FSMState> OnStateEnter;
 		private event Action<FSMState> OnStateExit;
 		private event Action<FSMState, FSMState> OnStateChange;
 
-		public void SetDefalutState(string name)
+		public FSMMachine AddState(FSMState fSMState)
         {
-			if (string.IsNullOrEmpty(name)) return;
-			if (_states.ContainsKey(name)) return;
+			if (fSMState == null) return this;
+			if (_states.Contains(fSMState)) return this;
 
-			CurrentState = _states[name];
+			_states.Add(fSMState);
+
+			return this;
 		}
 
-		public FSMState AddState(string name)
-        {
-			if (string.IsNullOrEmpty(name)) return null;
-			if (_states.ContainsKey(name)) return null;
-
-			var state = new FSMState(name);
-			return state;
-        }
-
-		public FSMTransition AddTransition(string from, string to, Func<bool> condition = null)
+		public FSMMachine AddTransition(FSMTransition fSMTransition, string command = null)
 		{
-			if (string.IsNullOrEmpty(from)) return null;
-			if (string.IsNullOrEmpty(to)) return null;
-			if (!_states.ContainsKey(from)) return null;
-			if (!_states.ContainsKey(to)) return null;
+			if (fSMTransition == null) return this;
+			if (!_states.Contains(fSMTransition.FromState)) return this;
+			if (!_states.Contains(fSMTransition.ToState)) return this;
 
-			var transition = new FSMTransition(condition);
-			_transitionsFrom.Add(from, transition);
-			_transitionsTo.Add(transition, to);
+			command = string.IsNullOrEmpty(command) ? fSMTransition.ToState.Name : command;
 
-			return transition;
+			_transitions[fSMTransition.FromState] = _transitions.ContainsKey(fSMTransition.FromState) ? _transitions[fSMTransition.FromState] : new Dictionary<string, FSMTransition>();
+			_transitions[fSMTransition.FromState][command] = fSMTransition;
+
+			return this;
 		}
 
-		//TODO:
-		public bool Transfer(string stateName)
+		public void SetDefalutState(FSMState state)
+		{
+			if (!_states.Contains(state)) return;
+
+			CurrentState = state;
+		}
+
+		public bool Transfer(string command)
         {
-			var transition = _transitionsFrom[stateName];
+			if (IsTransitioning) return false;
+			if (CurrentState == null) return false;
+			if (!_transitions[CurrentState].ContainsKey(command)) return false;
+
+			if (isInitialisingState)
+			{
+				Debug.LogWarning("Do not call IssueCommand from OnStateChange and OnStateEnter handlers");
+				return false;
+			}
+
+			var transition = _transitions[CurrentState][command];
 			if (transition.TestCondition())
 			{
-				transition.OnComplete += HandleTransitionComplete;
 				CurrentTransition = transition;
-				if (OnStateExit != null)
-				{
-					OnStateExit(CurrentState);
-				}
-				transition.Begin();
+				transition.OnComplete += HandleTransitionComplete;
+
+                OnStateExit?.Invoke(CurrentState);
+                transition.Begin();
+
 				return true;
 			}
 			return false;
 		}
 
-		private void HandleTransitionComplete()
+		private void HandleTransitionComplete(FSMTransition transition)
 		{
 			CurrentTransition.OnComplete -= HandleTransitionComplete;
 
-			var previousState = CurrentState;
-			string toStateName = _transitionsTo[CurrentTransition];
-			CurrentState = _states[toStateName];
+			PreviousState = CurrentState;
+			CurrentState = transition.ToState;
 
 			CurrentTransition = null;
+			isInitialisingState = true;
 
-			previousState.Exit();
-			if (OnStateChange != null)
-			{
-				OnStateChange(previousState, CurrentState);
-			}
+			PreviousState.Exit();
+            OnStateChange?.Invoke(PreviousState, CurrentState);
 
-			CurrentState.Enter();
-			if (OnStateEnter != null)
-			{
-				OnStateEnter(CurrentState);
-			}
+            CurrentState.Enter();
+            OnStateEnter?.Invoke(CurrentState);
+
+			isInitialisingState = false;
 		}
 
-		public FSMMachine OnEnter(string state, Action handler)
+		public FSMMachine OnEnter(FSMState state, Action handler)
 		{
-			if (string.IsNullOrEmpty(state)) { throw new ArgumentNullException("state"); }
 			if (handler == null) { throw new ArgumentNullException("handler"); }
-			if (!_states.ContainsKey(state)) { throw new ArgumentException("unknown state", "state"); }
+			if (!_states.Contains(state)) { throw new ArgumentException("unknown state", "state"); }
 
 			OnStateEnter += enteredState =>
 			{
@@ -110,11 +117,10 @@ namespace THGame
 			return this;
 		}
 
-		public FSMMachine OnExit(string state, Action handler)
+		public FSMMachine OnExit(FSMState state, Action handler)
 		{
-			if (string.IsNullOrEmpty(state)) { throw new ArgumentNullException("state"); }
 			if (handler == null) { throw new ArgumentNullException("handler"); }
-			if (!_states.ContainsKey(state)) { throw new ArgumentException("unknown state", "state"); }
+			if (!_states.Contains(state)) { throw new ArgumentException("unknown state", "state"); }
 
 			OnStateExit += exitedState =>
 			{
@@ -136,18 +142,16 @@ namespace THGame
 		}
 
 	
-		public FSMMachine OnChange(string from, string to, Action handler)
+		public FSMMachine OnChange(FSMState fromState, FSMState toState, Action handler)
 		{
-			if (string.IsNullOrEmpty(from)) { throw new ArgumentNullException("from"); }
-			if (string.IsNullOrEmpty(to)) { throw new ArgumentNullException("to"); }
-			if (!_states.ContainsKey(from)) { throw new ArgumentException("unknown state", "from"); }
-			if (!_states.ContainsKey(to)) { throw new ArgumentException("unknown state", "to"); }
+			if (!_states.Contains(fromState)) { throw new ArgumentException("unknown state", "from"); }
+			if (!_states.Contains(toState)) { throw new ArgumentException("unknown state", "to"); }
 			if (handler == null) { throw new ArgumentNullException("handler"); }
 
-			OnStateChange += (fromState, toState) =>
+			OnStateChange += (from, to) =>
 			{
-				if (fromState.Equals(from) &&
-					toState.Equals(to))
+				if (from.Equals(fromState) &&
+					to.Equals(toState))
 				{
 					handler();
 				}

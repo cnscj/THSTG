@@ -14,10 +14,11 @@ namespace THGame
         public event Action OnEntered;
         public event Action OnExited;
 
-        public FSMState(string name)
+        public FSMState(string name) 
         {
             Name = name;
         }
+
         public void Enter()
         {
             if (OnEntered != null) OnEntered();
