@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace THGame
 {
@@ -24,8 +21,8 @@ namespace THGame
 
 		protected void Complete()
 		{
-			if (OnComplete != null) OnComplete(this);
-		}
+            OnComplete?.Invoke(this);
+        }
 
 		public virtual void Begin()
         {

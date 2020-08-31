@@ -49,7 +49,7 @@ namespace THGame
 			return this;
 		}
 
-		public void SetDefalutState(FSMState state)
+		public void DefalutState(FSMState state)
 		{
 			if (!_states.Contains(state)) return;
 
@@ -58,28 +58,33 @@ namespace THGame
 
 		public bool Transfer(string command)
         {
-			if (IsTransitioning) return false;
-			if (CurrentState == null) return false;
-			if (!_transitions[CurrentState].ContainsKey(command)) return false;
 
-			if (isInitialisingState)
+			if (IsTransitioning) return false;
+			if (CurrentState == null)
 			{
-				Debug.LogWarning("Do not call IssueCommand from OnStateChange and OnStateEnter handlers");
 				return false;
 			}
-
-			var transition = _transitions[CurrentState][command];
-			if (transition.TestCondition())
+			else
 			{
-				CurrentTransition = transition;
-				transition.OnComplete += HandleTransitionComplete;
+				if (!_transitions[CurrentState].ContainsKey(command)) return false;
 
-                OnStateExit?.Invoke(CurrentState);
-                transition.Begin();
+				if (isInitialisingState)
+				{
+					Debug.LogWarning("Do not call IssueCommand from OnStateChange and OnStateEnter handlers");
+					return false;
+				}
 
+				var transition = _transitions[CurrentState][command];
+				if (transition.TestCondition())
+				{
+					CurrentTransition = transition;
+					transition.OnComplete += HandleTransitionComplete;
+
+					OnStateExit?.Invoke(CurrentState);
+					transition.Begin();
+				}
 				return true;
 			}
-			return false;
 		}
 
 		private void HandleTransitionComplete(FSMTransition transition)
