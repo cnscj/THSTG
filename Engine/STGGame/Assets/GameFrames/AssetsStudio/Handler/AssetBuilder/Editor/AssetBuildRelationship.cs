@@ -1,8 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
+using XLibrary;
 
 namespace ASEditor
 {
@@ -30,14 +33,20 @@ namespace ASEditor
             }
             else
             {
-                return EMPTY_RET;
+                return new string[] { pathName };
             }
         }
 
-        [MenuItem("Assets/Refresh RelationCache")]
-        public static void RefreshCache()
+        [MenuItem("Assets/Save RelationCache")]
+        public static void RefreshAndSaveCache()
         {
             GetCollector().RefreshCache();
+            GetCollector().SaveDependsDataFile();
+        }
+        [MenuItem("Assets/Load RelationCache")]
+        public static void LoadCache()
+        {
+            GetCollector().LoadDependsDataFile();
         }
 
         private static AssetDependentCollector GetCollector()
@@ -47,17 +56,39 @@ namespace ASEditor
         }
     }
 
-    //TODO:加速接口优化
+    //加速接口优化
     //https://www.jianshu.com/p/a0ae15412a2d
     public class AssetDependentCollector
     {
+        public static readonly int VERSION = 100;
         public static readonly string[] EMPTY_RET = new string[] { };
+        public static readonly string EMPTY_CODE = "00000000000000000000000000000000";
         public static readonly string CACHE_PATH = "Library/AssetRelationshipCache";
 
-        class DependData
+        [SerializeField]
+        class RelationData
+        {
+            public int index;
+            public string hash;
+            public int[] dependsPathIndex;
+        }
+
+        [SerializeField]
+        class FileData
+        {
+            public int version;
+            public long date;
+
+            public int assetCount;
+            public int assetDependCount;
+            public string[] assetPaths;
+            public RelationData[] assetDepends;
+        }
+
+        class CollectionData
         {
             public int assetPathIndex;
-            public Hash128 assetDependencyHash;
+            public string assetDependencyHash;
 
             public List<int> dependsPathIndex = new List<int>();
             public List<int> referencesPathIndex = new List<int>();
@@ -67,14 +98,13 @@ namespace ASEditor
             public List<string> referencePath = new List<string>();
         }
 
-        // save data
-        Dictionary<string, DependData> _data;
         List<string> _strList;
+        Dictionary<string, CollectionData> _data;
         Dictionary<string, int> _strIndex;
 
         public AssetDependentCollector()
         {
-            _data = new Dictionary<string, DependData>();
+            _data = new Dictionary<string, CollectionData>();
             _strList = new List<string>();
             _strIndex = new Dictionary<string, int>();
         }
@@ -82,76 +112,191 @@ namespace ASEditor
         public void LoadDependsDataFile(string filePath = null)
         {
             filePath = string.IsNullOrEmpty(filePath) ? CACHE_PATH : filePath;
-            //文件流的写入
-            using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-            {
-                StreamReader streamReader = new StreamReader(fileStream);
-                string line = "";
-                while ((line = streamReader.ReadLine()) != null)
-                {
 
-                }
-                streamReader.Close();
-                fileStream.Close();
+            FileInfo fileInfo = new FileInfo(filePath);
+            if (!fileInfo.Exists)
+                return;
+
+            FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            StreamReader streamReader = new StreamReader(fileStream);
+
+            var fileData = new FileData();
+            string line = string.Empty;
+
+            //第一行
+            line = streamReader.ReadLine().Trim();
+            string[] headSections = line.Split(',');
+            fileData.version = int.Parse(headSections[0]);
+            fileData.date = long.Parse(headSections[1]);
+
+            //第二行
+            line = streamReader.ReadLine().Trim();
+            string[] lengthSections = line.Split(',');
+            fileData.assetCount = int.Parse(lengthSections[0]);
+            fileData.assetDependCount = int.Parse(lengthSections[1]);
+
+            fileData.assetPaths = new string[fileData.assetCount];
+            for (int i = 0; i < fileData.assetCount; i++)
+            {
+                line = streamReader.ReadLine().Trim();
+                string[] assetSections = line.Split('=');
+
+                var assetIndex = int.Parse(assetSections[0]);
+                fileData.assetPaths[assetIndex] = assetSections[1];
             }
+
+            fileData.assetDepends = new RelationData[fileData.assetDependCount];
+            for (int i = 0; i < fileData.assetDependCount; i++)
+            {
+                line = streamReader.ReadLine().Trim();
+                int leftBracketIndex = line.IndexOf('(',0);
+                int rightBracketIndex = line.IndexOf(')', leftBracketIndex);
+                int colonIndex = line.IndexOf(':', rightBracketIndex);
+
+                var indexStr = line.Substring(0, leftBracketIndex);
+                var hashCode = line.Substring(leftBracketIndex + 1, rightBracketIndex - leftBracketIndex - 1);
+                var refStr = line.Substring(colonIndex + 1);
+
+                var index = int.Parse(indexStr);
+                fileData.assetDepends[index] = fileData.assetDepends[index] ?? new RelationData();
+                var relationData = fileData.assetDepends[index];
+
+                var refSections = refStr.Split(',');
+
+                relationData.index = index;
+                relationData.hash = hashCode;
+
+                relationData.dependsPathIndex = new int[refSections.Length];
+                for (int j = 0; j < refSections.Length; j++)
+                    relationData.dependsPathIndex[j] = int.Parse(refSections[j]);
+
+            }
+
+            streamReader.Close();
+            fileStream.Close();
+
+            streamReader.Dispose();
+            fileStream.Dispose();
+
+            //转换
+            _data.Clear();
+            _strList.Clear();
+            _strIndex.Clear();
+
+            for(int i = 0; i < fileData.assetPaths.Length; i++)
+            {
+                _strList.Add(fileData.assetPaths[i]);
+                _strIndex[_strList[i].ToLower()] = i;
+            }
+
+            
+            for (int i = 0; i < fileData.assetDepends.Length; i++)
+            {
+                var depData = fileData.assetDepends[i];
+                var srcPath = _strList[depData.index];
+                var srcCollectionData = GetOrCreateDependData(srcPath.ToLower());
+
+                for (int j = 0; j < depData.dependsPathIndex.Length ;j++)
+                {
+                    var depPath = _strList[depData.dependsPathIndex[j]];
+                    var depCollectionData = GetOrCreateDependData(depPath.ToLower());
+
+                    srcCollectionData.dependsPath.Add(depPath);
+                    srcCollectionData.dependsPathIndex.Add(depData.dependsPathIndex[j]);
+
+                    depCollectionData.referencePath.Add(srcPath);
+                    depCollectionData.referencesPathIndex.Add(depData.index);
+                }
+            }
+
         }
+        //TODO:保存的时候,可以把那些只有1个依赖的砍掉
 
         //将数据存储为二进制
         public void SaveDependsDataFile(string savePath = null)
         {
             savePath = string.IsNullOrEmpty(savePath) ? CACHE_PATH : savePath;
-            using (FileStream fscreat = new FileStream(savePath, FileMode.CreateNew, FileAccess.Write))
-            {
+            FileStream fileStream = new FileStream(savePath, FileMode.Create, FileAccess.Write);
+            StreamWriter streamWriter = new StreamWriter(fileStream);
 
-                fscreat.Close();
+            //转换
+            FileData fileData = new FileData();
+            fileData.version = VERSION;
+            fileData.date = XTimeTools.NowTimeStampMs();
+            fileData.assetPaths = _strList.ToArray();
+
+            var assetDependList = new List<RelationData>();
+            foreach(var depData in _data.Values)
+            {
+                var relationData = new RelationData();
+                relationData.index = depData.assetPathIndex;
+                relationData.hash = depData.assetDependencyHash;
+
+                relationData.dependsPathIndex = depData.dependsPathIndex.ToArray();
+
+                assetDependList.Add(relationData);
             }
+            fileData.assetDepends = assetDependList.ToArray();
+            fileData.assetCount = _strList.Count;
+            fileData.assetDependCount = assetDependList.Count;
+
+            /////
+            
+            StringBuilder indeBuilder = new StringBuilder();
+            streamWriter.WriteLine(string.Format("{0},{1}", fileData.version, fileData.date));
+            streamWriter.WriteLine(string.Format("{0},{1}", fileData.assetCount, fileData.assetDependCount));
+
+            for (int i = 0; i < fileData.assetCount; i++)
+            {
+                streamWriter.WriteLine(string.Format("{0}={1}", i, fileData.assetPaths[i]));
+            }
+
+            for (int i = 0; i < fileData.assetDependCount; i++)
+            {
+                var assetDepend = fileData.assetDepends[i];
+                indeBuilder.Clear();
+                for (int j = 0; j < assetDepend.dependsPathIndex.Length; j++)
+                {
+                    indeBuilder.Append(assetDepend.dependsPathIndex[j]);
+                    if (j < assetDepend.dependsPathIndex.Length - 1) indeBuilder.Append(",");
+                }
+                var depStr = indeBuilder.ToString();
+
+                streamWriter.WriteLine(string.Format("{0}({1}):{2}", assetDepend.index, assetDepend.hash, depStr));
+            }
+
+            streamWriter.Close();
+            fileStream.Close();
+
+            streamWriter.Dispose();
+            fileStream.Dispose();
         }
 
-        //刷新缓存
         private int GetAndTryAddAssetPath(string assetPath)
         {
             var assetPathLow = assetPath.ToLower();
             if (!_strIndex.ContainsKey(assetPathLow))
             {
                 var index = _strList.Count;
-                _strList.Add(assetPathLow);
+                _strList.Add(assetPath);
                 _strIndex[assetPathLow] = index;
             }
             return _strIndex[assetPathLow];
         }
 
-        private DependData GetOrCreateDependData(string assetPath)
+        private CollectionData GetOrCreateDependData(string assetPath)
         {
             var assetPathLow = assetPath.ToLower();
             if (!_data.ContainsKey(assetPathLow))
             {
                 var index = GetAndTryAddAssetPath(assetPath);
-                var depData = new DependData();
+                var depData = new CollectionData();
                 depData.assetPathIndex = index;
-                depData.assetDependencyHash = AssetDatabase.GetAssetDependencyHash(assetPath);
+                depData.assetDependencyHash = AssetDatabase.GetAssetDependencyHash(assetPath).ToString();
 
                 _data.Add(assetPathLow, depData);
             }
             return _data[assetPathLow];
-        }
-
-        public void UpdateCache(string assetPath)
-        {
-            var darData = GetOrCreateDependData(assetPath);
-            var dDependencyHash = AssetDatabase.GetAssetDependencyHash(assetPath);
-            if (dDependencyHash != darData.assetDependencyHash)
-            {
-                //清除相关引用
-                //清除相关依赖
-                if (Hash128.Equals(dDependencyHash,0))  //文件被删
-                {
-
-                }
-                else
-                {
-
-                }
-            }
         }
 
         public void RefreshCache()
@@ -163,20 +308,92 @@ namespace ASEditor
             var allAssetPaths = AssetDatabase.GetAllAssetPaths();
             foreach (var srcPath in allAssetPaths)
             {
-                var srcPathIndex = GetAndTryAddAssetPath(srcPath);
-                var srcDepData = GetOrCreateDependData(srcPath);
-                var dependencies = AssetDatabase.GetDependencies(srcPath);
+                AddRelation(srcPath);
+            }
+        }
 
-                foreach (var depPath in dependencies)
+        private void RemoveRelation(string srcPath)
+        {
+            var srcPathLow = srcPath.ToLower();
+            if (_data.TryGetValue(srcPathLow, out var srcDepData))
+            {
+                //从引用中移除自己
+                var srcPathIndex = _strIndex[srcPathLow];
+                srcDepData.referencePath.Remove(srcPath);
+                srcDepData.referencesPathIndex.Remove(srcPathIndex);
+
+                _data.Remove(srcPathLow);
+            }
+
+        }
+
+        public void UpdateRelation(string srcPath)
+        {
+            var srcPathLow = srcPath.ToLower();
+            if (_data.TryGetValue(srcPathLow,out var srcDepData))
+            {
+                //var oldHashCode = srcDepData.assetDependencyHash;
+                var newHashCode = AssetDatabase.GetAssetDependencyHash(srcPath).ToString();
+
+                if (string.Compare(newHashCode, EMPTY_CODE) == 0)
                 {
-                    var depPathIndex = GetAndTryAddAssetPath(depPath);
-                    var refDepData = GetOrCreateDependData(depPath);
-                    refDepData.referencePath.Add(srcPath);
-                    refDepData.referencesPathIndex.Add(srcPathIndex);
-
-                    srcDepData.dependsPath.Add(depPath);
-                    srcDepData.dependsPathIndex.Add(depPathIndex);
+                    RemoveRelation(srcPath);
+                    return;
                 }
+                else
+                {
+                    //更新
+                    var srcPathIndex = _strIndex[srcPathLow];
+                    srcDepData.referencePath.Remove(srcPath);
+                    srcDepData.referencesPathIndex.Remove(srcPathIndex);
+                    srcDepData.dependsPath.Clear();
+                    srcDepData.dependsPathIndex.Clear();
+
+                    var dependencies = AssetDatabase.GetDependencies(srcPath);
+                    foreach (var depPath in dependencies)
+                    {
+                        var depHashCode = AssetDatabase.GetAssetDependencyHash(depPath).ToString();
+                        if (string.Compare(depHashCode, EMPTY_CODE) == 0)
+                            continue;
+
+                        var depPathIndex = GetAndTryAddAssetPath(depPath);
+                        var refDepData = GetOrCreateDependData(depPath);
+                        srcDepData.dependsPath.Add(depPath);
+                        srcDepData.dependsPathIndex.Add(depPathIndex);
+
+                        refDepData.referencePath.Add(srcPath);
+                        refDepData.referencesPathIndex.Add(srcPathIndex);
+                    }
+                }
+            }
+            else
+            {
+                AddRelation(srcPath);
+            }
+        }
+
+        private void AddRelation(string srcPath)
+        {
+            var srcHashCode = AssetDatabase.GetAssetDependencyHash(srcPath).ToString();
+            if (string.Compare(srcHashCode,EMPTY_CODE) == 0)
+                return;
+
+            var dependencies = AssetDatabase.GetDependencies(srcPath);
+            var srcPathIndex = GetAndTryAddAssetPath(srcPath);
+            var srcDepData = GetOrCreateDependData(srcPath);
+            foreach (var depPath in dependencies)
+            {
+                var depHashCode = AssetDatabase.GetAssetDependencyHash(depPath).ToString();
+                if (string.Compare(depHashCode, EMPTY_CODE) == 0)
+                    continue;
+
+                var depPathIndex = GetAndTryAddAssetPath(depPath);
+                var refDepData = GetOrCreateDependData(depPath);
+                srcDepData.dependsPath.Add(depPath);
+                srcDepData.dependsPathIndex.Add(depPathIndex);
+
+                refDepData.referencePath.Add(srcPath);
+                refDepData.referencesPathIndex.Add(srcPathIndex);
             }
         }
 
@@ -187,7 +404,7 @@ namespace ASEditor
             {
                 return dependData.dependsPath.ToArray();
             }
-            return EMPTY_RET;
+            return new string[] { pathName };
         }
 
         public string[] GetReferenceds(string pathName)
@@ -197,7 +414,7 @@ namespace ASEditor
             {
                 return dependData.referencePath.ToArray();
             }
-            return EMPTY_RET;
+            return new string[] { pathName };
         }
     }
 
