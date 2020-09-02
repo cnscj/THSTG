@@ -55,9 +55,11 @@ namespace ASEditor
 
         private void Build()
         {
+            if (AssetBuildConfiger.GetInstance().isUseDependenciesCache) AssetBuildRelationship.TryLoadCache();
             BuildBefore();
             BuildAll();
             BuildAfter();
+            if (AssetBuildConfiger.GetInstance().isUseDependenciesCache) AssetBuildRelationship.SaveCache();
         }
 
         private void BuildBefore()

@@ -14,39 +14,55 @@ namespace ASEditor
         public static readonly string[] EMPTY_RET = new string[] { };
 
         static AssetDependentCollector _collector;
-        public static string[] GetDependencies(string pathName)
+        public static string[] GetDependencies(string path)
         {
             if (AssetBuildConfiger.GetInstance().isUseDependenciesCache)
             {
-                return GetCollector().GetDependencies(pathName);
+                TryUpdate(path);
+                return GetCollector().GetDependencies(path);
             }
             else
             {
-                return AssetDatabase.GetDependencies(pathName);
-            }
-        }
-        public static string[] GetReferenceds(string pathName)
-        {
-            if (AssetBuildConfiger.GetInstance().isUseDependenciesCache)
-            {
-                return GetCollector().GetReferenceds(pathName);
-            }
-            else
-            {
-                return new string[] { pathName };
+                return AssetDatabase.GetDependencies(path);
             }
         }
 
-        [MenuItem("Assets/Save RelationCache")]
-        public static void RefreshAndSaveCache()
+        public static string[] GetReferences(string path)
+        {
+            if (AssetBuildConfiger.GetInstance().isUseDependenciesCache)
+            {
+                TryUpdate(path);
+                return GetCollector().GetReferences(path);
+            }
+            else
+            {
+                return EMPTY_RET;
+            }
+        }
+
+        public static void RefreshCache()
         {
             GetCollector().RefreshCache();
+        }
+
+        public static void SaveCache()
+        {
             GetCollector().SaveDependsDataFile();
         }
-        [MenuItem("Assets/Load RelationCache")]
+
+        public static void TryLoadCache()
+        {
+            GetCollector().TryLoadDependsDataFile();
+        }
         public static void LoadCache()
         {
             GetCollector().LoadDependsDataFile();
+        }
+
+        private static void TryUpdate(string path)
+        {
+            GetCollector().LoadOrSaveDependsDataFile();
+            GetCollector().UpdateRelation(path);
         }
 
         private static AssetDependentCollector GetCollector()
@@ -101,12 +117,39 @@ namespace ASEditor
         List<string> _strList;
         Dictionary<string, CollectionData> _data;
         Dictionary<string, int> _strIndex;
+        bool isLoaded = false;
+        bool isSaved = false;
 
         public AssetDependentCollector()
         {
             _data = new Dictionary<string, CollectionData>();
             _strList = new List<string>();
             _strIndex = new Dictionary<string, int>();
+        }
+
+        public void LoadOrSaveDependsDataFile(string filePath = null)
+        {
+            filePath = string.IsNullOrEmpty(filePath) ? CACHE_PATH : filePath;
+            if (!isLoaded)
+            {
+                RefreshCache();
+                SaveDependsDataFile(filePath);
+                isLoaded = true;
+            }
+        }
+
+        public void TryLoadDependsDataFile(string filePath = null)
+        {
+            filePath = string.IsNullOrEmpty(filePath) ? CACHE_PATH : filePath;
+            FileInfo fileInfo = new FileInfo(filePath);
+            if (!fileInfo.Exists)
+            {
+                LoadOrSaveDependsDataFile();
+            }
+            else
+            {
+                LoadDependsDataFile();
+            }
         }
 
         public void LoadDependsDataFile(string filePath = null)
@@ -208,9 +251,8 @@ namespace ASEditor
                     depCollectionData.referencesPathIndex.Add(depData.index);
                 }
             }
-
+            isLoaded = true;
         }
-        //TODO:保存的时候,可以把那些只有1个依赖的砍掉
 
         //将数据存储为二进制
         public void SaveDependsDataFile(string savePath = null)
@@ -270,6 +312,8 @@ namespace ASEditor
 
             streamWriter.Dispose();
             fileStream.Dispose();
+
+            isSaved = true;
         }
 
         private int GetAndTryAddAssetPath(string assetPath)
@@ -308,7 +352,7 @@ namespace ASEditor
             var allAssetPaths = AssetDatabase.GetAllAssetPaths();
             foreach (var srcPath in allAssetPaths)
             {
-                AddRelation(srcPath);
+                UpdateRelation(srcPath);
             }
         }
 
@@ -332,8 +376,12 @@ namespace ASEditor
             var srcPathLow = srcPath.ToLower();
             if (_data.TryGetValue(srcPathLow,out var srcDepData))
             {
-                //var oldHashCode = srcDepData.assetDependencyHash;
+                var oldHashCode = srcDepData.assetDependencyHash;
                 var newHashCode = AssetDatabase.GetAssetDependencyHash(srcPath).ToString();
+                if (string.Compare(oldHashCode, newHashCode) == 0)
+                {
+                    return;
+                }
 
                 if (string.Compare(newHashCode, EMPTY_CODE) == 0)
                 {
@@ -352,10 +400,6 @@ namespace ASEditor
                     var dependencies = AssetDatabase.GetDependencies(srcPath);
                     foreach (var depPath in dependencies)
                     {
-                        var depHashCode = AssetDatabase.GetAssetDependencyHash(depPath).ToString();
-                        if (string.Compare(depHashCode, EMPTY_CODE) == 0)
-                            continue;
-
                         var depPathIndex = GetAndTryAddAssetPath(depPath);
                         var refDepData = GetOrCreateDependData(depPath);
                         srcDepData.dependsPath.Add(depPath);
@@ -374,18 +418,18 @@ namespace ASEditor
 
         private void AddRelation(string srcPath)
         {
-            var srcHashCode = AssetDatabase.GetAssetDependencyHash(srcPath).ToString();
-            if (string.Compare(srcHashCode,EMPTY_CODE) == 0)
-                return;
+            //var srcHashCode = AssetDatabase.GetAssetDependencyHash(srcPath).ToString();
+            //if (string.Compare(srcHashCode,EMPTY_CODE) == 0)
+            //    return;
 
             var dependencies = AssetDatabase.GetDependencies(srcPath);
             var srcPathIndex = GetAndTryAddAssetPath(srcPath);
             var srcDepData = GetOrCreateDependData(srcPath);
             foreach (var depPath in dependencies)
             {
-                var depHashCode = AssetDatabase.GetAssetDependencyHash(depPath).ToString();
-                if (string.Compare(depHashCode, EMPTY_CODE) == 0)
-                    continue;
+                //var depHashCode = AssetDatabase.GetAssetDependencyHash(depPath).ToString();
+                //if (string.Compare(depHashCode, EMPTY_CODE) == 0)
+                //    continue;
 
                 var depPathIndex = GetAndTryAddAssetPath(depPath);
                 var refDepData = GetOrCreateDependData(depPath);
@@ -407,7 +451,7 @@ namespace ASEditor
             return new string[] { pathName };
         }
 
-        public string[] GetReferenceds(string pathName)
+        public string[] GetReferences(string pathName)
         {
             var pathNameLow = pathName.ToLower();
             if (_data.TryGetValue(pathNameLow, out var dependData))
