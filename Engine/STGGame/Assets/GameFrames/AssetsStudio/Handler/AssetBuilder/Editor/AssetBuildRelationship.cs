@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Serialization;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
 using XLibrary;
+using XLibrary.Package;
 
 namespace ASEditor
 {
@@ -13,7 +13,6 @@ namespace ASEditor
     {
         public static readonly string[] EMPTY_RET = new string[] { };
 
-        static AssetDependentCollector _collector;
         public static string[] GetDependencies(string path)
         {
             if (AssetBuildConfiger.GetInstance().isUseDependenciesCache)
@@ -67,19 +66,19 @@ namespace ASEditor
 
         private static AssetDependentCollector GetCollector()
         {
-            _collector = _collector ?? new AssetDependentCollector();
-            return _collector;
+            return AssetDependentCollector.GetInstance();
         }
     }
 
     //加速接口优化
     //https://www.jianshu.com/p/a0ae15412a2d
-    public class AssetDependentCollector
+    public class AssetDependentCollector : Singleton<AssetDependentCollector>
     {
         public static readonly int VERSION = 100;
         public static readonly string[] EMPTY_RET = new string[] { };
         public static readonly string EMPTY_CODE = "00000000000000000000000000000000";
         public static readonly string CACHE_PATH = "Library/AssetRelationshipCache";
+        public static readonly HashSet<string> ROOT_PATHS = new HashSet<string> { "Assets" };
 
         [SerializeField]
         class RelationData
@@ -110,15 +109,16 @@ namespace ASEditor
             public List<int> referencesPathIndex = new List<int>();
 
             // 用于返回查询结果，不保存
-            public List<string> dependsPath = new List<string>();    
+            public List<string> dependsPath = new List<string>();
             public List<string> referencePath = new List<string>();
         }
 
         List<string> _strList;
         Dictionary<string, CollectionData> _data;
         Dictionary<string, int> _strIndex;
-        bool isLoaded = false;
-        bool isSaved = false;
+
+        public bool IsLoaded { get; private set; }
+        public bool IsSaved { get; private set; }
 
         public AssetDependentCollector()
         {
@@ -127,14 +127,34 @@ namespace ASEditor
             _strIndex = new Dictionary<string, int>();
         }
 
+        public string[] GetDependencies(string pathName)
+        {
+            var pathNameLow = pathName.ToLower();
+            if (_data.TryGetValue(pathNameLow, out var dependData))
+            {
+                return dependData.dependsPath.ToArray();
+            }
+            return new string[] { pathName };
+        }
+
+        public string[] GetReferences(string pathName)
+        {
+            var pathNameLow = pathName.ToLower();
+            if (_data.TryGetValue(pathNameLow, out var dependData))
+            {
+                return dependData.referencePath.ToArray();
+            }
+            return new string[] { pathName };
+        }
+
         public void LoadOrSaveDependsDataFile(string filePath = null)
         {
             filePath = string.IsNullOrEmpty(filePath) ? CACHE_PATH : filePath;
-            if (!isLoaded)
+            if (!IsLoaded)
             {
                 RefreshCache();
                 SaveDependsDataFile(filePath);
-                isLoaded = true;
+                IsLoaded = true;
             }
         }
 
@@ -251,7 +271,7 @@ namespace ASEditor
                     depCollectionData.referencesPathIndex.Add(depData.index);
                 }
             }
-            isLoaded = true;
+            IsSaved = true;
         }
 
         //将数据存储为二进制
@@ -313,7 +333,7 @@ namespace ASEditor
             streamWriter.Dispose();
             fileStream.Dispose();
 
-            isSaved = true;
+            IsSaved = true;
         }
 
         private int GetAndTryAddAssetPath(string assetPath)
@@ -418,18 +438,24 @@ namespace ASEditor
 
         private void AddRelation(string srcPath)
         {
-            //var srcHashCode = AssetDatabase.GetAssetDependencyHash(srcPath).ToString();
-            //if (string.Compare(srcHashCode,EMPTY_CODE) == 0)
-            //    return;
+            if (!IsPathEligible(srcPath))
+                return;
+
+            var srcHashCode = AssetDatabase.GetAssetDependencyHash(srcPath).ToString();
+            if (string.Compare(srcHashCode, EMPTY_CODE) == 0)
+                return;
 
             var dependencies = AssetDatabase.GetDependencies(srcPath);
             var srcPathIndex = GetAndTryAddAssetPath(srcPath);
             var srcDepData = GetOrCreateDependData(srcPath);
             foreach (var depPath in dependencies)
             {
-                //var depHashCode = AssetDatabase.GetAssetDependencyHash(depPath).ToString();
-                //if (string.Compare(depHashCode, EMPTY_CODE) == 0)
-                //    continue;
+                if (!IsPathEligible(depPath))
+                    continue;
+
+                var depHashCode = AssetDatabase.GetAssetDependencyHash(depPath).ToString();
+                if (string.Compare(depHashCode, EMPTY_CODE) == 0)
+                    continue;
 
                 var depPathIndex = GetAndTryAddAssetPath(depPath);
                 var refDepData = GetOrCreateDependData(depPath);
@@ -441,24 +467,42 @@ namespace ASEditor
             }
         }
 
-        public string[] GetDependencies(string pathName)
+        private bool IsPathEligible(string path)
         {
-            var pathNameLow = pathName.ToLower();
-            if (_data.TryGetValue(pathNameLow,  out var dependData))
-            {
-                return dependData.dependsPath.ToArray();
-            }
-            return new string[] { pathName };
-        }
+            if (string.IsNullOrEmpty(path))
+                return false;
 
-        public string[] GetReferences(string pathName)
+            if (ROOT_PATHS.Count <= 0)
+                return true;
+
+            int left = path.IndexOf('/');
+            if (left < 0)
+                return false;
+
+            var rootPath = path.Substring(0,left);
+ 
+            return ROOT_PATHS.Contains(rootPath);
+        }
+    }
+
+    public class AssetDependentCollectorPostprocessor : AssetPostprocessor
+    {
+        public static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
         {
-            var pathNameLow = pathName.ToLower();
-            if (_data.TryGetValue(pathNameLow, out var dependData))
-            {
-                return dependData.referencePath.ToArray();
-            }
-            return new string[] { pathName };
+            if (!AssetBuildConfiger.GetInstance().isUseDependenciesCache)
+                return;
+
+            if (!AssetDependentCollector.GetInstance().IsLoaded)
+                return;
+
+            foreach (var assetPath in importedAssets)
+                AssetDependentCollector.GetInstance().UpdateRelation(assetPath);
+            foreach (var assetPath in deletedAssets)
+                AssetDependentCollector.GetInstance().UpdateRelation(assetPath);
+            foreach (var assetPath in movedAssets)
+                AssetDependentCollector.GetInstance().UpdateRelation(assetPath);
+            foreach (var assetPath in movedFromAssetPaths)
+                AssetDependentCollector.GetInstance().UpdateRelation(assetPath);
         }
     }
 

@@ -9,7 +9,7 @@ namespace THGame
         public static float FREQ_COEF = 100f;
         public static float AMPL_COEF = 0.1f;
 
-        public Vector3 shakeArgs = Vector3.zero;
+        [HideInInspector]public Vector3 shakeArgs = Vector3.zero;
         public float frequency = 1;
         public float shakeTime = -1;
 
@@ -99,7 +99,6 @@ namespace THGame
         }
 
         //布朗运动
-        //TODO:缺少一个缓动
         Vector2 CacculateBrownVector(float amplitude)
         {
             Vector2 ret = Vector2.zero;
@@ -112,7 +111,6 @@ namespace THGame
         }
 
         //随机两点运动
-        //TODO:缺少一个缓动
         float CalculatePointValue(float amplitude)
         {
             return AMPL_COEF * amplitude * (Random.value < 0.5f ? -1f : 1f);
