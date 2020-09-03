@@ -11,6 +11,13 @@ namespace XLibGame
     {
         protected int m_coroutineId;
         private Dictionary<int, Coroutine> m_coroutines;
+        enum RequestMode
+        {
+            Get,
+            Post,
+            Put,
+            Delete
+        }
         public HttpManager()
         {
             m_coroutines = new Dictionary<int, Coroutine>();
@@ -18,12 +25,22 @@ namespace XLibGame
 
         public int Post(HttpParams args)
         {
-            return StartRequest(true, args);
+            return StartRequest(RequestMode.Post, args);
         }
 
         public int Get(HttpParams args)
         {
-            return StartRequest(false, args);
+            return StartRequest(RequestMode.Get, args);
+        }
+
+        public int Put(HttpParams args)
+        {
+            return StartRequest(RequestMode.Put, args);
+        }
+
+        public int Delete(HttpParams args)
+        {
+            return StartRequest(RequestMode.Delete, args);
         }
 
         public void Stop(int id)
@@ -87,7 +104,7 @@ namespace XLibGame
             }
         }
 
-        private int StartRequest(bool isPost, HttpParams args)
+        private int StartRequest(RequestMode requestMode, HttpParams args)
         {
             if (args == null)
                 return -1;
@@ -97,22 +114,28 @@ namespace XLibGame
 
             var newId = m_coroutineId++;
             Coroutine coroutine = null;
-            if (isPost)
+            switch(requestMode)
             {
-                coroutine = StartCoroutine(OnPostCoroutine(newId, args));
+                case RequestMode.Post:
+                    coroutine = StartCoroutine(OnPostCoroutine(newId, args));
+                    break;
+                case RequestMode.Get:
+                    coroutine = StartCoroutine(OnGetCoroutine(newId, args));
+                    break;
+                case RequestMode.Put:
+                    coroutine = StartCoroutine(OnPutCoroutine(newId, args));
+                    break;
+                case RequestMode.Delete:
+                    coroutine = StartCoroutine(OnDeleteCoroutine(newId, args));
+                    break;
             }
-            else
-            {
-                coroutine = StartCoroutine(OnGetCoroutine(newId, args));
-            }
-
             m_coroutines[newId] = coroutine;
             return newId;
         }
 
         IEnumerator OnPostCoroutine(int id, HttpParams args)
         {
-            var wwwForm = (args.data != null) ? args.data.ToPostData(args.url) : null;
+            var wwwForm = (args.formData != null) ? args.formData.ToPostData(args.url) : null;
             var request = UnityWebRequest.Post(args.url, wwwForm);
             InitRequest(request, args);
 
@@ -122,8 +145,28 @@ namespace XLibGame
 
         IEnumerator OnGetCoroutine(int id, HttpParams args)
         {
-            var newUrl = (args.data != null) ? args.data.ToGetData(args.url): args.url;
+            var newUrl = (args.formData != null) ? args.formData.ToGetData(args.url): args.url;
             var request = UnityWebRequest.Get(newUrl);
+            InitRequest(request, args);
+
+            yield return request.SendWebRequest();
+            OnRequestCallback(id, request, args);
+        }
+
+        IEnumerator OnPutCoroutine(int id, HttpParams args)
+        {
+            var newUrl = args.url;
+            var request = UnityWebRequest.Put(newUrl, args.bodyData);
+            InitRequest(request, args);
+
+            yield return request.SendWebRequest();
+            OnRequestCallback(id, request, args);
+        }
+
+        IEnumerator OnDeleteCoroutine(int id, HttpParams args)
+        {
+            var newUrl = args.url;
+            var request = UnityWebRequest.Delete(newUrl);
             InitRequest(request, args);
 
             yield return request.SendWebRequest();
@@ -132,7 +175,11 @@ namespace XLibGame
 
         private void InitRequest(UnityWebRequest webRequest, HttpParams args)
         {
-            webRequest.timeout = args.timeout;
+            if (args.timeout > 0)
+            {
+                webRequest.timeout = args.timeout;
+            }
+
         }
 
         void OnRequestCallback(int id, UnityWebRequest webRequest, HttpParams args)

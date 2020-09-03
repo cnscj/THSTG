@@ -10,6 +10,9 @@ namespace ASGame
     //资源分包
     public class AssetUpdateManager : Singleton<AssetUpdateManager>
     {
+        public static string updateCheckUrl = "";
+        public static string updateDownLoadUrl = "";
+
         public AssetUpdateCompletedCallback onCompleted;
         //初始化当前资源,版本号一些重要信息做资源更新的基础
 

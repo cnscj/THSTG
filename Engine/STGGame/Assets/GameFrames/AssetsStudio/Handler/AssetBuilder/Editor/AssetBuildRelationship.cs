@@ -372,23 +372,55 @@ namespace ASEditor
             var allAssetPaths = AssetDatabase.GetAllAssetPaths();
             foreach (var srcPath in allAssetPaths)
             {
-                UpdateRelation(srcPath);
+                AddRelation(srcPath);
             }
         }
 
-        private void RemoveRelation(string srcPath)
+        public void RemoveRelation(string srcPath)
         {
             var srcPathLow = srcPath.ToLower();
             if (_data.TryGetValue(srcPathLow, out var srcDepData))
             {
-                //从引用中移除自己
+                //但是_strIndex不能做删除,只能做新增,否则index全数作废
+                //从其他人的依赖中引用中移除自己
                 var srcPathIndex = _strIndex[srcPathLow];
-                srcDepData.referencePath.Remove(srcPath);
-                srcDepData.referencesPathIndex.Remove(srcPathIndex);
+                foreach(var refPathIndex in srcDepData.referencesPathIndex)
+                {
+                    var refPath = _strList[refPathIndex];
+                    var refPathLow = refPath.ToLower();
+                    if (_data.TryGetValue(refPathLow, out var refDepData))
+                    {
+                        refDepData.dependsPath.Remove(srcPath);
+                        refDepData.dependsPathIndex.Remove(srcPathIndex);
+                    }
+                }
+
+                _strIndex.Remove(srcPathLow);
+                _strList[srcPathIndex] = "";    //这里用空值占位
 
                 _data.Remove(srcPathLow);
             }
 
+        }
+
+        public void MoveRelation(string formPath,string destPath)
+        {
+            var formPathLow = formPath.ToLower();
+            var destPathLow = destPath.ToLower();
+            if (_data.TryGetValue(formPathLow, out var depData))
+            {
+                var pathIndex = depData.assetPathIndex;
+                _strList[pathIndex] = destPath;
+                depData.dependsPath.Remove(formPath);
+                depData.referencePath.Remove(formPath);
+
+                depData.dependsPath.Add(destPath);
+                depData.referencePath.Add(destPath);
+
+                _data.Remove(formPathLow);
+                _data.Add(destPathLow, depData);
+                
+            }
         }
 
         public void UpdateRelation(string srcPath)
@@ -436,7 +468,7 @@ namespace ASEditor
             }
         }
 
-        private void AddRelation(string srcPath)
+        public void AddRelation(string srcPath)
         {
             if (!IsPathEligible(srcPath))
                 return;
@@ -496,13 +528,16 @@ namespace ASEditor
                 return;
 
             foreach (var assetPath in importedAssets)
-                AssetDependentCollector.GetInstance().UpdateRelation(assetPath);
+                AssetDependentCollector.GetInstance().AddRelation(assetPath);
             foreach (var assetPath in deletedAssets)
-                AssetDependentCollector.GetInstance().UpdateRelation(assetPath);
-            foreach (var assetPath in movedAssets)
-                AssetDependentCollector.GetInstance().UpdateRelation(assetPath);
-            foreach (var assetPath in movedFromAssetPaths)
-                AssetDependentCollector.GetInstance().UpdateRelation(assetPath);
+                AssetDependentCollector.GetInstance().RemoveRelation(assetPath);
+            for(int i = 0; i < movedAssets.Length ; i++)
+            {
+                var srcPath = movedFromAssetPaths[i];
+                var destPath = movedAssets[i];
+                AssetDependentCollector.GetInstance().MoveRelation(srcPath, destPath);
+            }
+
         }
     }
 

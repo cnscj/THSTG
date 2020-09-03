@@ -108,6 +108,12 @@ namespace XLibrary
 			}
 		}
 
+		public static long GetLength(string filePath)
+        {
+			FileInfo fileInfo = new FileInfo(filePath);
+			return fileInfo.Length;
+		}
+
 		public static string GetMD5(string filePath)
 		{
 			try

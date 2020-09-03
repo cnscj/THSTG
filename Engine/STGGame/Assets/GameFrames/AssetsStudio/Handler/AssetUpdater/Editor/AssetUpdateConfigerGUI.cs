@@ -24,7 +24,9 @@ namespace ASEditor
         protected override void OnShow()
         {
             GUILayout.BeginVertical();
-          
+            AssetUpdateConfiger.GetInstance().assetPath = GUILayoutEx.ShowPathBar("资源目录", AssetUpdateConfiger.GetInstance().assetPath);
+
+
             GUILayout.EndVertical();
         }
 
