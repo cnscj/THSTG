@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using XLibrary.Package;
@@ -11,7 +12,8 @@ namespace ASGame
     public class AssetUpdateManager : Singleton<AssetUpdateManager>
     {
         public static string updateCheckUrl = "";
-        public static string updateDownLoadUrl = "";
+        public static string updateDownloadUrl = "";
+        public static string downloadTempFolder = "";
 
         public AssetUpdateCompletedCallback onCompleted;
         //初始化当前资源,版本号一些重要信息做资源更新的基础
@@ -32,6 +34,44 @@ namespace ASGame
         //校验文件完整性
 
         //更新完成
+
+        public void Update()
+        {
+            CheckUpdate(OnCheckCallback);
+
+        }
+
+        public bool IsHaveUpdate()
+        {
+            return false;
+        }
+
+        //检查更新
+        private void CheckUpdate(Action action)
+        {
+
+        }
+
+        private void OnDownLoadcallback()
+        {
+
+        }
+
+        private void DownloadAssets(AssetUpdateUpdateList updateList)
+        {
+
+        }
+
+        //替换游戏资源
+        private void ReplaceAssets(AssetUpdateUpdateList.Package updatePackage, string tempFolder, string gameFolder)
+        {
+
+        }
+
+        private void OnCheckCallback()
+        {
+
+        }
 
     }
 

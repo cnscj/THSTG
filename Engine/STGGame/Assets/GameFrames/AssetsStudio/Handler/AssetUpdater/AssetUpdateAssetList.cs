@@ -15,22 +15,26 @@ namespace ASGame
 
             public string Serialize()
             {
-                return string.Format("{0},{1},{2}", filePath, fileMd5, fileSize);
+                return string.Format("{0}={1},{2}", filePath, fileMd5, fileSize);
             }
 
             public void Deserialization(string content)
             {
-                string[] strArray = content.Split(',');
-                filePath = strArray[0];
-                fileMd5 = strArray[1];
-                fileSize = long.Parse(strArray[4]);
+                int equalIndex = content.IndexOf('=');
+                filePath = content.Substring(0, equalIndex);
+
+                var argsStr = content.Substring(equalIndex + 1);
+                var args = argsStr.Split(',');
+
+                fileMd5 = args[0];
+                fileSize = long.Parse(args[1]);
             }
         }
 
+        public string type = "assets";
         public int version;
         public long date;
 
-        public int fileCount;
         public Item[] fileItems;
 
         public void Create(string assetFolder)
@@ -38,20 +42,22 @@ namespace ASGame
             if (string.IsNullOrEmpty(assetFolder))
                 return;
 
+            var assetFolderLow = assetFolder.ToLower();
             var fileList = new List<Item>();
-            XFolderTools.TraverseFiles(assetFolder, (assetPath) =>
+            XFolderTools.TraverseFiles(assetFolder, (fullPath) =>
             {
-                var relaPath = XPathTools.GetRelativePath(assetPath);
+                var assetPath = XPathTools.GetRelativePath(fullPath);
+                var relaPath = XPathTools.SubRelativePath(assetFolder, assetPath);
+
                 var updateItem = new Item();
                 updateItem.filePath = relaPath.ToLower();
-                updateItem.fileMd5 = XFileTools.GetMD5(relaPath);
-                updateItem.fileSize = XFileTools.GetLength(relaPath);
+                updateItem.fileMd5 = XFileTools.GetMD5(assetPath);
+                updateItem.fileSize = XFileTools.GetLength(assetPath);
 
                 fileList.Add(updateItem);
 
             },true);
 
-            fileCount = fileList.Count;
             fileItems = fileList.ToArray();
 
         }
@@ -63,10 +69,9 @@ namespace ASGame
             StreamWriter streamWriter = new StreamWriter(fileStream);
 
             date = XTimeTools.NowTimeStampMs();
-            streamWriter.WriteLine(string.Format("{0},{1}", version, date));    //第一行
-            streamWriter.WriteLine(string.Format("{0}", fileCount));
+            streamWriter.WriteLine(string.Format("{0},{1},{2}",type, version, date));    //第一行
 
-            for(int i = 0; i < fileItems.Length;i++)
+            for(int i = 0; i < fileItems.Length; i++)
             {
                 var updateItem = fileItems[i];
                 streamWriter.WriteLine(updateItem.Serialize());
@@ -87,17 +92,14 @@ namespace ASGame
 
             line = streamReader.ReadLine().Trim();  //第一行
             string[] headSections = line.Split(',');
-            version = int.Parse(headSections[0]);
-            date = long.Parse(headSections[1]);
-
-            line = streamReader.ReadLine().Trim();
-            string[] exSections = line.Split(',');
-            fileCount = int.Parse(exSections[0]);
+            type = headSections[0];
+            version = int.Parse(headSections[1]);
+            date = long.Parse(headSections[2]);
 
             var fileList = new List<Item>();
-            for (int i = 0; i < fileCount; i++)
+            while((line = streamReader.ReadLine()) != null)
             {
-                line = streamReader.ReadLine().Trim();
+                line = line.Trim();
                 var updateItem = new Item();
                 updateItem.Deserialization(line);
 
@@ -109,6 +111,18 @@ namespace ASGame
             fileStream.Close();
             streamReader.Dispose();
             fileStream.Dispose();
+        }
+
+        public Dictionary<string ,Item> GetDict()
+        {
+            var dict = new Dictionary<string, Item>();
+
+            foreach(var item in fileItems)
+            {
+                dict.Add(item.filePath, item);
+            }
+
+            return dict;
         }
     }
 

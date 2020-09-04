@@ -33,22 +33,13 @@ namespace ASGame
             }
         }
 
+        public string type = "packages";
         public int version;
         public long date;
 
-        public int fileCount;
         public Item[] fileItems;
 
         private Dictionary<string, Item> _packageDict;
-
-
-        public Item[] GetItemList()
-        {
-            var fileList = new List<Item>();
-            fileList.AddRange(_packageDict.Values);
-
-            return fileList.ToArray();
-        }
 
         //TODO:
         public void Remove(string assetPath)
@@ -75,13 +66,7 @@ namespace ASGame
             var fileList = new List<Item>();
             fileList.AddRange(_packageDict.Values);
 
-            fileCount = fileList.Count;
             fileItems = fileList.ToArray();
-
-
-            fileCount = fileList.Count;
-            fileItems = fileList.ToArray();
-
         }
 
         //生成某个目录的文件列表
@@ -91,8 +76,7 @@ namespace ASGame
             StreamWriter streamWriter = new StreamWriter(fileStream);
 
             date = XTimeTools.NowTimeStampMs();
-            streamWriter.WriteLine(string.Format("{0},{1}", version, date));    //第一行
-            streamWriter.WriteLine(string.Format("{0}", fileCount));
+            streamWriter.WriteLine(string.Format("{0},{1},{2}",type, version, date));    //第一行
 
             for(int i = 0; i < fileItems.Length;i++)
             {
@@ -115,17 +99,14 @@ namespace ASGame
 
             line = streamReader.ReadLine().Trim();  //第一行
             string[] headSections = line.Split(',');
-            version = int.Parse(headSections[0]);
-            date = long.Parse(headSections[1]);
-
-            line = streamReader.ReadLine().Trim();
-            string[] exSections = line.Split(',');
-            fileCount = int.Parse(exSections[0]);
+            type = headSections[0];
+            version = int.Parse(headSections[1]);
+            date = long.Parse(headSections[2]);
 
             var fileList = new List<Item>();
-            for (int i = 0; i < fileCount; i++)
+            while ((line = streamReader.ReadLine()) != null)
             {
-                line = streamReader.ReadLine().Trim();
+                line = line.Trim();
                 var updateItem = new Item();
                 updateItem.Deserialization(line);
 
@@ -137,6 +118,22 @@ namespace ASGame
             fileStream.Close();
             streamReader.Dispose();
             fileStream.Dispose();
+        }
+
+        public Item[] GetItemList()
+        {
+            var fileList = new List<Item>();
+            fileList.AddRange(_packageDict.Values);
+
+            return fileList.ToArray();
+        }
+
+        //TODO:
+        public Dictionary<string, Item> GetDict()
+        {
+            _packageDict = _packageDict ?? new Dictionary<string, Item>();
+
+            return _packageDict;
         }
     }
 
