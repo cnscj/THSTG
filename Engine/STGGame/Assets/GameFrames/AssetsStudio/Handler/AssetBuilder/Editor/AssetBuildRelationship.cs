@@ -105,6 +105,7 @@ namespace ASEditor
             public int assetPathIndex;
             public string assetDependencyHash;
 
+            //下面的可以考虑换成Dictionary
             public List<int> dependsPathIndex = new List<int>();
             public List<int> referencesPathIndex = new List<int>();
 

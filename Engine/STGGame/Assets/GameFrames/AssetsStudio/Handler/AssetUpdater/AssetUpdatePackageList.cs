@@ -37,48 +37,19 @@ namespace ASGame
         public int version;
         public long date;
 
-        public Item[] fileItems;
-
-        private Dictionary<string, Item> _packageDict;
-
-        //TODO:
-        public void Remove(string assetPath)
-        {
-
-        }
-
-        public Item Get(string assetPath)
-        {
-            return null;
-        }
-
-
-        public void Add(Item item)
-        {
-            return;
-        }
-
-        public void Create(string assetFolder)
-        {
-            if (string.IsNullOrEmpty(assetFolder))
-                return;
-
-            var fileList = new List<Item>();
-            fileList.AddRange(_packageDict.Values);
-
-            fileItems = fileList.ToArray();
-        }
+        private Dictionary<string, Item> _data = new Dictionary<string, Item>();
 
         //生成某个目录的文件列表
         public void Export(string savePath)
         {
+            var fileItems = GetItemList();
             FileStream fileStream = new FileStream(savePath, FileMode.Create, FileAccess.Write);
             StreamWriter streamWriter = new StreamWriter(fileStream);
 
             date = XTimeTools.NowTimeStampMs();
             streamWriter.WriteLine(string.Format("{0},{1},{2}",type, version, date));    //第一行
 
-            for(int i = 0; i < fileItems.Length;i++)
+            for(int i = 0; i < fileItems.Length; i++)
             {
                 var updateItem = fileItems[i];
                 streamWriter.WriteLine(updateItem.Serialize());
@@ -112,28 +83,35 @@ namespace ASGame
 
                 fileList.Add(updateItem);
             }
-            fileItems = fileList.ToArray();
 
             streamReader.Close();
             fileStream.Close();
             streamReader.Dispose();
             fileStream.Dispose();
+
+            List2Dict(fileList, _data);
+        }
+
+        private void List2Dict(List<Item> itemList, Dictionary<string,Item> itemDict)
+        {
+            itemDict.Clear();
+            foreach(var item in itemList)
+            {
+                itemDict.Add(item.filePath, item);
+            }
         }
 
         public Item[] GetItemList()
         {
             var fileList = new List<Item>();
-            fileList.AddRange(_packageDict.Values);
+            fileList.AddRange(_data.Values);
 
             return fileList.ToArray();
         }
 
-        //TODO:
         public Dictionary<string, Item> GetDict()
         {
-            _packageDict = _packageDict ?? new Dictionary<string, Item>();
-
-            return _packageDict;
+            return _data;
         }
     }
 
