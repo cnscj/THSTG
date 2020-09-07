@@ -63,10 +63,10 @@ namespace ASGame
         }
 
         //替换游戏资源
-        private void ReplaceAssets(AssetUpdateUpdateList.Package updatePackage, string tempFolder, string gameFolder)
-        {
+        //private void ReplaceAssets(AssetUpdateUpdateList.Package updatePackage, string tempFolder, string gameFolder)
+        //{
 
-        }
+        //}
 
         private void OnCheckCallback()
         {

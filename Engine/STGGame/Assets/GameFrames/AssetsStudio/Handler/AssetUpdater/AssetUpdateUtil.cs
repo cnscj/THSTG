@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ASGame
 {
-    public static class AssetUpdateTool
+    public static class AssetUpdateUtil
     {
 
     }
