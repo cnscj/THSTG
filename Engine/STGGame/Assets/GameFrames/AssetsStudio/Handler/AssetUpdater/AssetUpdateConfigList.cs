@@ -4,7 +4,7 @@ using XLibrary;
 
 namespace ASGame
 {
-    //分包表
+    //分包配置表
     public class AssetUpdateConfigList
     {
         public class Item

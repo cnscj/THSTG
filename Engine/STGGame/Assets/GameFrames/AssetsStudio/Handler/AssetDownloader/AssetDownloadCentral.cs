@@ -83,6 +83,19 @@ namespace ASGame
         }
 
         /////////////////////////////////////
+
+        //TODO:从磁盘加载任务
+        public AssetDownloadTask LoadTask()
+        {
+            return null;
+        }
+
+        public void SaveTask()
+        {
+            //生成临时文件
+        }
+
+
         public AssetDownloadTask NewTask(string[] urlPaths)
         {
             if (urlPaths != null && urlPaths.Length > 0 && !string.IsNullOrEmpty(savePath))
@@ -95,7 +108,7 @@ namespace ASGame
 
                 var task = GetOrCreateTask();
                 task.urlPaths = urlPaths;
-                task.savePath = savePath;
+                task.savePaths = new string[] { savePath };
                 GetTaskMap().Add(taskKey, task);
 
                 //默认全部送到暂停队列,方便以后开启空闲下载
@@ -150,6 +163,12 @@ namespace ASGame
                     GetReleaseList().AddLast(task);
                 }
             }
+        }
+
+        //临时文件也一并移除
+        public void DeleteTask(AssetDownloadTask task)
+        {
+
         }
 
         public bool HadTask(string []urlPaths)

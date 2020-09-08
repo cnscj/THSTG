@@ -26,13 +26,14 @@ public class TestDown : MonoBehaviour
         //PushDownFile(downList, "http://static.it1352.com/Content/upload/1eda9f0e70134189839a7dd4b5e271ca.jpg");
         //PushDownFile(downList, "http://static.it1352.com/Content/upload/567680127c434a9099dc7f2a705695a5.jpg");
         CDownloader mng = new CDownloader();
-        mng.StartDown(downList, 2, 100 * 1024, CTargetPlat.PersistentRootPath);
+        mng.StartDown(downList, 2, 100 * 1024);
         m_downMng = mng;
     }
     void  PushDownFile(List<DownResInfo> downList, string url)
     {
         DownResInfo node = new DownResInfo();
         node.url = url;
+        node.savePath = CTargetPlat.PersistentRootPath;
         CHttpDown.GetDownFileSize(url, out node.nFileSize);
         downList.Add(node);
     }

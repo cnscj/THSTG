@@ -8,14 +8,16 @@ namespace ASGame
 {
     public class AssetDownloadTask : IComparable<AssetDownloadTask>
     {
+        public static readonly string DOWNLOADING_SUFFIX = ".downloading";
+
         public int id;
         public int priority;                                                //优先级
         public int status;                                                  //状态
 
         public int downThreadNumb = 2;                                      //下载线程数量
-        public int limitDownSize = 100 * 1024;                              //下载速度
+        public int limitDownSize = 100 * 1024;                              //下载速度(Kb)
         public string[] urlPaths;                                           //下载路径
-        public string savePath;                                             //储存路径
+        public string[] savePaths;                                          //储存路径
 
         public AssetDownloadCompletedCallback onCompleted;                  //完成回调
         public AssetDownloadFinishCallback onFinish;                        //下载回调
@@ -45,7 +47,7 @@ namespace ASGame
             mgr.OnDownloadFinish = OnFinish;
             mgr.OnDownloadProgress = OnProgress;
 
-            mgr.StartDown(urlPaths, downThreadNumb, limitDownSize, savePath);
+            mgr.StartDown(urlPaths, savePaths, downThreadNumb, limitDownSize);
 
             StartTime = XTimeTools.NowTimeStampMs();
             status = AssetDownloadStatus.DOWNLOAD_DOWNLOADING;
