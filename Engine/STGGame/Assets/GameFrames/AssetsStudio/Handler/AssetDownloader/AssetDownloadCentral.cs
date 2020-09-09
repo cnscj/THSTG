@@ -14,8 +14,8 @@ namespace ASGame
         //全局最大任务下载数
         //定时任务
         public int maxCount = 3;                                                //最大同时下载任务个数
-        public float limidSpeed = -1f;                                          //全局限速
-        public string savePath;                                                 //保存路径
+        public int limidSpeed = -1;                                             //全局限速
+        public string saveFolder;                                               //保存路径
 
         private Dictionary<string, AssetDownloadTask> m_tasksMap;               //所有任务列表
         private SortedSet<AssetDownloadTask> m_queueMap;                        //排队队列(含优先级
@@ -95,10 +95,15 @@ namespace ASGame
             //生成临时文件
         }
 
+        //临时文件也一并移除
+        public void DeleteTask(AssetDownloadTask task)
+        {
+
+        }
 
         public AssetDownloadTask NewTask(string[] urlPaths)
         {
-            if (urlPaths != null && urlPaths.Length > 0 && !string.IsNullOrEmpty(savePath))
+            if (urlPaths != null && urlPaths.Length > 0)
             {
                 var taskKey = GetTaskKey(urlPaths);
                 if (m_tasksMap != null && m_tasksMap.TryGetValue(taskKey, out var taskInMap))
@@ -108,7 +113,7 @@ namespace ASGame
 
                 var task = GetOrCreateTask();
                 task.urlPaths = urlPaths;
-                task.savePaths = new string[] { savePath };
+                task.savePaths = GetFileSavePathsByUrls(urlPaths);
                 GetTaskMap().Add(taskKey, task);
 
                 //默认全部送到暂停队列,方便以后开启空闲下载
@@ -163,12 +168,6 @@ namespace ASGame
                     GetReleaseList().AddLast(task);
                 }
             }
-        }
-
-        //临时文件也一并移除
-        public void DeleteTask(AssetDownloadTask task)
-        {
-
         }
 
         public bool HadTask(string []urlPaths)
@@ -372,7 +371,7 @@ namespace ASGame
 
         private void Awake()
         {
-            savePath = savePath ?? CTargetPlat.PersistentRootPath;
+            saveFolder = saveFolder ?? CTargetPlat.PersistentRootPath;
         }
 
         private void Update()
@@ -423,6 +422,29 @@ namespace ASGame
             //移除无效的临时文件
         }
 
+
+        private string GetLocalPathNameByUrl(string url, string saveFolder)
+        {
+            int nIndex = url.LastIndexOf('/');
+            if (nIndex != -1)
+            {
+                string szFileName = url.Substring(nIndex + 1);
+                return string.Format("{0}/{1}", saveFolder, szFileName);
+            }
+            return string.Empty;
+        }
+
+        private string[] GetFileSavePathsByUrls(string[] urlPaths)
+        {
+            List<string> savePathList = new List<string>();
+
+            foreach(var url in urlPaths)
+            {
+                savePathList.Add(GetLocalPathNameByUrl(url, saveFolder));
+            }
+
+            return savePathList.ToArray();
+        }
 
     }
 

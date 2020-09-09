@@ -43,10 +43,10 @@ namespace ASGame
 
         int m_nNextDownIndex = 0;           //当前下载下标
 
-        int m_nTotalDownCount = 0;          //下载总数量
+        int m_nHadDownedCount = 0;          //下载总数量
         int m_nTotalNeedDownCount = 0;      //下载总数量
 
-        int m_nDownThreadNumb = 0; // 下载线程数量
+        int m_nDownThreadNumb = 0;          // 下载线程数量
         int m_nWriteThreadNumb = 0;
         bool m_bNeedStop = false;
         bool m_bIsPause = false;
@@ -55,19 +55,19 @@ namespace ASGame
 
         ManualResetEvent m_pauseEvent;
 
-        long m_nDownSize; // 当前下载的大小
-        long m_nTotalDownSize; // 当前总的下载大小
-        long m_nTotalNeedDownSize; // 当前下载总的下载量
-        long m_nLimitDownSize; // 每秒限制下载的大小
-        long m_nLastTime; // 上一次统计的时间点
+        long m_nDownSize;                   // 当前下载的大小
+        long m_nHadDownedSize;              // 当前总的下载大小
+        long m_nTotalNeedDownSize;          // 当前下载总的下载量
+        long m_nLimitDownSize;              // 每秒限制下载的大小
+        long m_nLastTime;                   // 上一次统计的时间点
 
 
         DownloadFinish m_downloadFinish;
         DownloadProgress m_downloadProgress;
 
-        public long TotalDownSize { get { return m_nTotalDownSize; } }
+        public long HadDownedSize { get { return m_nHadDownedSize; } }
         public long TotalNeedDownSize { get { return m_nTotalNeedDownSize; } }
-        public int TotalDownCount { get { return m_nTotalDownCount; } }
+        public int HadDownedCount { get { return m_nHadDownedCount; } }
         public int TotalNeedDownCount { get { return m_nTotalNeedDownCount; } }
         public DownloadFinish OnDownloadFinish { get { return m_downloadFinish; } set { m_downloadFinish = value; } }
         public DownloadProgress OnDownloadProgress { get { return m_downloadProgress; } set { m_downloadProgress = value; } }
@@ -84,6 +84,7 @@ namespace ASGame
         // 功能：开启多线程下载
         // 参数：downList - 下载列表
         //      nDownThreadNumb - 下载线程数量
+        //      nLimitDownSize - 下载速度限制
         public void StartDown(List<DownResInfo> downList, int nDownThreadNumb, int nLimitDownSize)
         {
             if (m_bIsPause)
@@ -94,7 +95,7 @@ namespace ASGame
             }
 
             m_nDownSize = 0;
-            m_nTotalDownSize = 0;
+            m_nHadDownedSize = 0;
             m_nTotalNeedDownSize = 0;
             m_nLimitDownSize = nLimitDownSize;
             m_nLastTime = 0;
@@ -115,7 +116,7 @@ namespace ASGame
             m_nNextDownIndex = 0;
 
             m_nTotalNeedDownCount = downList.Count;
-            m_nTotalDownCount = 0;
+            m_nHadDownedCount = 0;
 
             m_nDownThreadNumb = nDownThreadNumb;
             m_pauseEvent.Set();
@@ -199,7 +200,7 @@ namespace ASGame
                 for (int i = 0; i < downUrl.Length; i++)
                 {
                     var url = downUrl[i];
-                    var savePath = (i < savePaths.Length) ? savePaths[i] : savePaths[savePaths.Length - 1];
+                    var savePath = savePaths[i];
                     PushDownFile(downList,url, savePath);
                 }
             }
@@ -255,7 +256,7 @@ namespace ASGame
         {
             lock (this)
             {
-                if (m_nDownSize > m_nLimitDownSize)
+                if (m_nLimitDownSize > 0 && m_nDownSize > m_nLimitDownSize)
                 {
                     long nNow = System.DateTime.Now.Ticks / 10000;
                     if (0 == m_nLastTime)
@@ -295,7 +296,7 @@ namespace ASGame
             {
                 // 无法获取文件大小信息,整个下载吧
                 bool bSuc = DownPart(http, url, 0, 0, nFileSize, resInfo, resFile);
-                NotifyDownEvent(url, bSuc, resFile);
+                NotifyDownEvent(url, bSuc, resInfo, resFile);
                 return;
             }
             int nPageSize = 1024 * 300;         // 分片的大小，应小于你的最大限制下载速度, 这里默认选用300K，读者自己根据项目修改
@@ -309,24 +310,24 @@ namespace ASGame
                 nDownSize = nFileOffset + nPageSize < nFileSize ? nPageSize : (nFileSize - nFileOffset);
                 if (!DownPart(http, url, nFileOffset, nDownSize, nFileSize, resInfo, resFile))
                 {
-                    NotifyDownEvent(url, false, resFile);
+                    NotifyDownEvent(url, false, resInfo , resFile);
                     return;
                 }
             }
 
-            NotifyDownEvent(url, true, resFile);
+            NotifyDownEvent(url, true, resInfo, resFile);
         }
 
         // 功能：通知文件下载事件
-        void NotifyDownEvent(string url, bool bSuc, DownResFile resInfo)
+        void NotifyDownEvent(string url, bool bSuc, DownResInfo resInfo , DownResFile resFile)
         {
             // 这里只是输出一个日志，用户自行扩展事件吧
             MemBlock pBlock = new MemBlock();
-            pBlock.resFile = resInfo;
+            pBlock.resFile = resFile;
             PushWrite(pBlock); // 通知写线程关闭对应的文件
-            m_nTotalDownCount++;
+            m_nHadDownedCount++;
 
-            OnFileDownloadComplete(url, bSuc, resInfo);
+            OnFileDownloadComplete(url, bSuc, resInfo, resFile);
            
         }
 
@@ -373,6 +374,7 @@ namespace ASGame
             pBlock.nDownSize = nDownSize;
             pBlock.nFileSize = nFileSize;
             pBlock.resFile = null;
+            pBlock.resInfo = null;
             return pBlock;
         }
         void FreeBlock(MemBlock pBlock)
@@ -380,6 +382,7 @@ namespace ASGame
             if (pBlock.data == null)
                 return;
             pBlock.resFile = null;
+            pBlock.resInfo = null;
             lock (this)
             {
                 m_nUseBlockMemSize -= 4096;
@@ -463,9 +466,9 @@ namespace ASGame
                 }
                 else
                     m_nDownSize += nDownSize;
-                m_nTotalDownSize += nDownSize;
+                m_nHadDownedSize += nDownSize;
 
-                OnFileDownloadProgress(m_nTotalDownSize, m_nTotalNeedDownSize);
+                OnFileDownloadProgress(m_nHadDownedSize, m_nTotalNeedDownSize);
             }
         }
         void PushWrite(MemBlock pBlock)
@@ -582,24 +585,24 @@ namespace ASGame
 
         ///
         // FIXME:子线程不应该直接调用回调,不然会卡住子线程
-        private void OnFileDownloadProgress(long nTotalDownSize, long nTotalNeedDownSize)
+        private void OnFileDownloadProgress(long nHadDownedSize, long nTotalNeedDownSize)
         {
-            m_downloadProgress?.Invoke(nTotalDownSize, nTotalNeedDownSize);
+            m_downloadProgress?.Invoke(nHadDownedSize, nTotalNeedDownSize);
         }
 
-        private void OnFileDownloadComplete(string url, bool bSuc, DownResFile resInfo)
+        private void OnFileDownloadComplete(string url, bool bSuc, DownResInfo resInfo, DownResFile resFile)
         {
             string fileSavePath = null;
             if (bSuc)
             {
-                if (resInfo != null && resInfo.file != null)
-                    fileSavePath = resInfo.file.Name;
+                if (resFile != null && resFile.file != null)
+                    fileSavePath = resFile.file.Name;
 
-                m_successDownList.Add(resInfo);
+                m_successDownList.Add(resFile);
             }
             else
             {
-                m_failedDownList.Add(resInfo);
+                m_failedDownList.Add(resFile);
             }
 
             m_downloadFinish?.Invoke(url, fileSavePath);
@@ -607,13 +610,14 @@ namespace ASGame
 
         private string GetLocalPathNameByUrl(string url, string savePath)
         {
-            int nIndex = url.LastIndexOf('/');
-            if (nIndex != -1)
-            {
-                string szFileName = url.Substring(nIndex + 1);
-                return string.Format("{0}/{1}", savePath, szFileName);
-            }
-            return string.Empty;
+            //int nIndex = url.LastIndexOf('/');
+            //if (nIndex != -1)
+            //{
+            //    string szFileName = url.Substring(nIndex + 1);
+            //    return string.Format("{0}/{1}", savePath, szFileName);
+            //}
+            //return string.Empty;
+            return savePath;
         }
     }
 

@@ -15,7 +15,7 @@ namespace ASGame
         public int status;                                                  //状态
 
         public int downThreadNumb = 2;                                      //下载线程数量
-        public int limitDownSize = 100 * 1024;                              //下载速度(Kb)
+        public int limitDownSize = -1;                                      //下载速度(Kb)
         public string[] urlPaths;                                           //下载路径
         public string[] savePaths;                                          //储存路径
 
@@ -28,9 +28,9 @@ namespace ASGame
         public long CreateTime { get; protected set; }                      //创建时间
         public long StartTime { get; protected set; }                       //开始时间
         public long CompletedTime { get; protected set; }                   //完成时间
-        public long CurSize { get {return m_downloadMgr != null ? m_downloadMgr.TotalDownSize : 0; } }                                      //当前下载大小
+        public long CurSize { get {return m_downloadMgr != null ? m_downloadMgr.HadDownedSize : 0; } }                                      //当前下载大小
         public long TotalSize { get { return m_downloadMgr != null ? m_downloadMgr.TotalNeedDownSize : 0; } }                               //总的大小
-        public int CurCount { get { return m_downloadMgr != null ? m_downloadMgr.TotalDownCount : 0; } }
+        public int CurCount { get { return m_downloadMgr != null ? m_downloadMgr.HadDownedCount : 0; } }
         public int TotalCount { get { return m_downloadMgr != null ? m_downloadMgr.TotalNeedDownCount : 0; } }
         public List<DownResFile> SuccessDownList { get { return m_downloadMgr != null ? m_downloadMgr.SuccessDownList : null; } }
         public List<DownResFile> FailedDownList { get { return m_downloadMgr != null ? m_downloadMgr.FailedDownList : null; } }
@@ -94,7 +94,7 @@ namespace ASGame
                 return;
 
             onFinish?.Invoke(url, path);
-            if (m_downloadMgr.TotalDownCount == m_downloadMgr.TotalNeedDownCount)
+            if (m_downloadMgr.HadDownedCount == m_downloadMgr.TotalNeedDownCount)
             {
                 OnCompleted();
             }
