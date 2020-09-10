@@ -34,7 +34,6 @@ namespace ASGame
     public delegate void DownloadProgress(long curSize, long totalSize);
     public delegate void DownloadFinish(string url, string path);
 
-
     public class CDownloader
     {
         List<DownResInfo> m_downList;
@@ -79,6 +78,35 @@ namespace ASGame
             m_pauseEvent = new ManualResetEvent(false);
             m_successDownList = new List<DownResFile>();
             m_failedDownList = new List<DownResFile>();
+        }
+
+        public DownResInfo CreateDownInfo(string url,string path)
+        {
+            DownResInfo node = new DownResInfo();
+            node.url = url;
+            node.savePath = path;
+            CHttpDown.GetDownFileSize(url, out node.nFileSize);
+
+            return node;
+        }
+
+        public List<DownResInfo> CreateDownList(string[] downUrls, string[] savePaths)
+        {
+            List<DownResInfo> downList = new List<DownResInfo>();
+            downList.Clear();
+            if (downUrls != null && downUrls.Length > 0)
+            {
+                for (int i = 0; i < downUrls.Length; i++)
+                {
+                    var url = downUrls[i];
+                    var path = savePaths[i];
+                    var resInfo = CreateDownInfo(url, path);
+
+                    downList.Add(resInfo);
+                }
+            }
+
+            return downList;
         }
 
         // 功能：开启多线程下载
@@ -135,6 +163,7 @@ namespace ASGame
             tw.Start(this);
             m_runWriteThread = tw;
         }
+
         public void StartDown(string[] urlList, string[] savePaths, int nDownThreadNumb, int nLimitDownSize)
         {
             List<DownResInfo> downList = CreateDownList(urlList, savePaths);
@@ -189,32 +218,6 @@ namespace ASGame
         {
             CDownloader pMng = obj as CDownloader;
             pMng.WriteThread();
-        }
-
-        List<DownResInfo> CreateDownList(string[] downUrl, string[] savePaths)
-        {
-            List<DownResInfo> downList = new List<DownResInfo>();
-            downList.Clear();
-            if (downUrl != null && downUrl.Length > 0)
-            {
-                for (int i = 0; i < downUrl.Length; i++)
-                {
-                    var url = downUrl[i];
-                    var savePath = savePaths[i];
-                    PushDownFile(downList,url, savePath);
-                }
-            }
-
-            return downList;
-        }
-
-        void PushDownFile(List<DownResInfo> downList, string url, string savePath)
-        {
-            DownResInfo node = new DownResInfo();
-            node.url = url;
-            node.savePath = savePath;
-            CHttpDown.GetDownFileSize(url, out node.nFileSize);
-            downList.Add(node);
         }
 
         bool PopDownFileInfo(out DownResInfo resInfo)
@@ -562,7 +565,7 @@ namespace ASGame
             DownResInfo resInfo = pBlock.resInfo;
             if (resFile.file == null)
             {
-                string szLocalPathName = GetLocalPathNameByUrl(pBlock.url, resInfo.savePath);
+                string szLocalPathName = resInfo.savePath;
                 if (pBlock.nFileOfset == 0)
                 {
                     if (File.Exists(szLocalPathName))
@@ -606,18 +609,6 @@ namespace ASGame
             }
 
             m_downloadFinish?.Invoke(url, fileSavePath);
-        }
-
-        private string GetLocalPathNameByUrl(string url, string savePath)
-        {
-            //int nIndex = url.LastIndexOf('/');
-            //if (nIndex != -1)
-            //{
-            //    string szFileName = url.Substring(nIndex + 1);
-            //    return string.Format("{0}/{1}", savePath, szFileName);
-            //}
-            //return string.Empty;
-            return savePath;
         }
     }
 

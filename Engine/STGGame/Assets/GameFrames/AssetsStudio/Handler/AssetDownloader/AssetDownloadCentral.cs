@@ -440,7 +440,8 @@ namespace ASGame
 
             foreach(var url in urlPaths)
             {
-                savePathList.Add(GetLocalPathNameByUrl(url, saveFolder));
+                var savePath = GetLocalPathNameByUrl(url, saveFolder);
+                savePathList.Add(savePath);
             }
 
             return savePathList.ToArray();

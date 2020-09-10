@@ -40,6 +40,14 @@ namespace ASGame
             CreateTime = XTimeTools.NowTimeStampMs();
             status = AssetDownloadStatus.DOWNLOAD_NONE;
         }
+      
+        public int CompareTo(AssetDownloadTask other)
+        {
+            if (this.priority == other.priority)
+                return this.id - other.id;
+
+            return other.priority - this.priority;
+        }
 
         public void Start()
         {
@@ -80,7 +88,7 @@ namespace ASGame
             return m_downloadMgr;
         }
 
-        private void OnCompleted()
+        protected void OnCompleted()
         {
             CompletedTime = XTimeTools.NowTimeStampMs();
             status = AssetDownloadStatus.DOWNLOAD_COMPLETED;
@@ -88,7 +96,7 @@ namespace ASGame
             onCompleted?.Invoke(this);
         }
 
-        private void OnFinish(string url, string path)
+        protected void OnFinish(string url, string path)
         {
             if (m_downloadMgr == null)
                 return;
@@ -100,20 +108,13 @@ namespace ASGame
             }
         }
 
-        private void OnProgress(long cur, long total)
+        protected void OnProgress(long cur, long total)
         {
             if (m_downloadMgr == null)
                 return;
 
             onProgress?.Invoke(cur, total);
         }
-      
-        public int CompareTo(AssetDownloadTask other)
-        {
-            if (this.priority == other.priority)
-                return this.id - other.id;
 
-            return other.priority - this.priority;
-        }
     }
 }
