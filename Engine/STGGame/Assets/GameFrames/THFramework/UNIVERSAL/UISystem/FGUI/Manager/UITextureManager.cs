@@ -6,6 +6,7 @@ using System.IO;
 using FairyGUI;
 using UnityEngine;
 using UnityEngine.Networking;
+using XLibrary.Lang;
 using XLibrary.Package;
 
 namespace THGame.UI
@@ -282,11 +283,14 @@ namespace THGame.UI
         }
 
         public long maxLocalCacheSize = 0;           //本地缓存大小
-        public long maxMemoryCacheSize = 50 * 1024;  //内存缓存池
+        public float maxMemoryCacheSaveTime = 60;     //内存缓存池
+
 
         private int m_id;
         private Dictionary<int, TaskHandler> m_taskHandlerDict;
         private Dictionary<string, TaskInfo> m_taskInfoDict;
+
+        private LRUCache<string, object> m_textureCache;
 
         private Dictionary<int, TaskInfo> m_taskDict;
 
