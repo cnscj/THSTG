@@ -6,25 +6,20 @@ using System.Threading;
 
 namespace XLibrary.Lang
 {
-    //TODO:
-    public class LFUCache<TKey, TValue> //: IDictionary<TKey, TValue>
+    public class LFUCache<TKey, TValue>
     {
-        internal sealed class CacheEntity
+        internal sealed class LFUNode
         {
-            public TKey Key { get; }
+            public TKey Key { get; set; }
             public TValue Value { get; set; }
             public int Frequency { get; set; } = 0;
-            public CacheEntity(TKey key, TValue value)
-            {
-                this.Key = key;
-                this.Value = value;
-            }
         }
 
-        Dictionary<TKey, CacheEntity> entityDictionary = new Dictionary<TKey, CacheEntity>();
-        Dictionary<int, LinkedList<CacheEntity>> frequencyDictionary = new Dictionary<int, LinkedList<CacheEntity>>();
-        private readonly int capacity;
         public event EventHandler<string> Log;
+
+        Dictionary<TKey, LFUNode> _dictionary = new Dictionary<TKey, LFUNode>();
+        Dictionary<int, LinkedList<LFUNode>> _linkedListDict = new Dictionary<int, LinkedList<LFUNode>>();
+        private readonly int capacity;
         private SpinLock spinLock = new SpinLock();
         private SortedSet<int> frequencySortedSet = new SortedSet<int>();
 
@@ -51,7 +46,7 @@ namespace XLibrary.Lang
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public TValue Add(TKey key, TValue value)
+        public void Add(TKey key, TValue value)
         {
             var lockSeed = false;
             if (!this.spinLock.IsHeldByCurrentThread)
@@ -59,12 +54,11 @@ namespace XLibrary.Lang
                 this.spinLock.Enter(ref lockSeed);
             }
 
-            CacheEntity currentEntity = null;
-            TValue removeValue = default;
-            if (entityDictionary.ContainsKey(key))
+            LFUNode currentEntity = null;
+            if (_dictionary.ContainsKey(key))
             {
                 Log?.Invoke(this, $"覆盖已有的键：{key}={value}");
-                currentEntity = entityDictionary[key];
+                currentEntity = _dictionary[key];
                 currentEntity.Value = value;
 
                 RemoveFromSet(currentEntity);
@@ -74,21 +68,22 @@ namespace XLibrary.Lang
             else
             {
                 Log?.Invoke(this, $"新增缓存：{key}={value}");
-                if (entityDictionary.Count == capacity)
+                if (_dictionary.Count == capacity)
                 {
                     Log?.Invoke(this, $"缓存过多，需要删除最不常用缓存...");
                     var removeEntity = GetLeastFrequentEntity();
                     if (removeEntity != null)
                     {
-                        removeValue = removeEntity.Value;
                         Remove(removeEntity.Key);
                     }
                 }
 
-                if (entityDictionary.Count < capacity)
+                if (_dictionary.Count < capacity)
                 {
-                    currentEntity = new CacheEntity(key, value);
-                    this.entityDictionary.Add(key, currentEntity);
+                    currentEntity = new LFUNode();
+                    currentEntity.Key = key;
+                    currentEntity.Value = value;
+                    this._dictionary.Add(key, currentEntity);
                     AddToSet(currentEntity);
                 }
             }
@@ -98,7 +93,6 @@ namespace XLibrary.Lang
                 this.spinLock.Exit();
             }
 
-            return removeValue;
         }
 
         /// <summary>
@@ -106,12 +100,12 @@ namespace XLibrary.Lang
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public TValue Remove(TKey key)
+        public void Remove(TKey key)
         {
-            if (!this.entityDictionary.ContainsKey(key))
+            if (!this._dictionary.ContainsKey(key))
             {
                 Log?.Invoke(this, $"无法删除不存在的Key：{key}");
-                return default;
+                return;
             }
 
             var lockSeed = false;
@@ -120,8 +114,8 @@ namespace XLibrary.Lang
                 this.spinLock.Enter(ref lockSeed);
             }
 
-            var currentEntity = this.entityDictionary[key];
-            this.entityDictionary.Remove(key);
+            var currentEntity = this._dictionary[key];
+            this._dictionary.Remove(key);
             Log?.Invoke(this, $"删除缓存：{currentEntity.Key}={currentEntity.Value}");
 
             RemoveFromSet(currentEntity);
@@ -129,8 +123,6 @@ namespace XLibrary.Lang
             {
                 this.spinLock.Exit();
             }
-
-            return currentEntity.Value;
         }
 
         /// <summary>
@@ -140,7 +132,7 @@ namespace XLibrary.Lang
         /// <returns></returns>
         public TValue Get(TKey key)
         {
-            if (!this.entityDictionary.ContainsKey(key))
+            if (!this._dictionary.ContainsKey(key))
             {
                 Log?.Invoke(this, $"使用Key不存在的缓存：{key}");
                 return default;
@@ -152,7 +144,7 @@ namespace XLibrary.Lang
                 this.spinLock.Enter(ref lockSeed);
             }
 
-            var currentEntity = this.entityDictionary[key];
+            var currentEntity = this._dictionary[key];
             Log?.Invoke(this, $"使用缓存：{currentEntity.Key}={currentEntity.Value}");
 
             RemoveFromSet(currentEntity);
@@ -166,6 +158,17 @@ namespace XLibrary.Lang
 
             return currentEntity.Value;
         }
+
+        public bool ContainsKey(TKey key)
+        {
+            return _dictionary.ContainsKey(key);
+        }
+
+        public void Clear()
+        {
+            _linkedListDict.Clear();
+            _dictionary.Clear();
+        }
         #endregion
 
         #region 频率操作
@@ -174,13 +177,13 @@ namespace XLibrary.Lang
         /// 获取最不常用缓存
         /// </summary>
         /// <returns></returns>
-        private CacheEntity GetLeastFrequentEntity()
+        private LFUNode GetLeastFrequentEntity()
         {
             if (frequencySortedSet.Count == 0)
                 return default;
             var leastFrequency = frequencySortedSet.Min;
-            var result = frequencyDictionary.ContainsKey(leastFrequency) ?
-                frequencyDictionary[leastFrequency].First() :
+            var result = _linkedListDict.ContainsKey(leastFrequency) ?
+                _linkedListDict[leastFrequency].First() :
                 null;
             Log?.Invoke(this, $"最不常用缓存：{(result == null ? "[null]" : $"{result.Key.ToString()} (频率={leastFrequency})")}");
             return result;
@@ -190,17 +193,17 @@ namespace XLibrary.Lang
         /// 从频率Set移除缓存
         /// </summary>
         /// <param name="currentEntity"></param>
-        private void RemoveFromSet(CacheEntity currentEntity)
+        private void RemoveFromSet(LFUNode currentEntity)
         {
-            if (!frequencyDictionary.ContainsKey(currentEntity.Frequency))
+            if (!_linkedListDict.ContainsKey(currentEntity.Frequency))
                 return;
-            var frequencySet = frequencyDictionary[currentEntity.Frequency];
+            var frequencySet = _linkedListDict[currentEntity.Frequency];
             frequencySet.Remove(currentEntity);
             Log?.Invoke(this, $"从频率Set移除缓存：{$"{currentEntity.Key.ToString()} (频率={currentEntity.Frequency})"}");
             if (frequencySortedSet.Min == currentEntity.Frequency && frequencySet.Count == 0)
             {
                 Log?.Invoke(this, $"同时移除当前的空频率Set：{currentEntity.Frequency}");
-                frequencyDictionary.Remove(currentEntity.Frequency);
+                _linkedListDict.Remove(currentEntity.Frequency);
                 frequencySortedSet.Remove(frequencySortedSet.Min);
             }
         }
@@ -209,19 +212,19 @@ namespace XLibrary.Lang
         /// 添加缓存到Set
         /// </summary>
         /// <param name="currentEntity"></param>
-        private void AddToSet(CacheEntity currentEntity)
+        private void AddToSet(LFUNode currentEntity)
         {
-            if (!frequencyDictionary.ContainsKey(currentEntity.Frequency))
+            if (!_linkedListDict.ContainsKey(currentEntity.Frequency))
             {
                 Log?.Invoke(this, $"新建频率Set：{currentEntity.Frequency}");
-                frequencyDictionary.Add(currentEntity.Frequency, new LinkedList<CacheEntity>());
+                _linkedListDict.Add(currentEntity.Frequency, new LinkedList<LFUNode>());
                 frequencySortedSet.Add(currentEntity.Frequency);
             }
 
-            if (!frequencyDictionary[currentEntity.Frequency].Contains(currentEntity))
+            if (!_linkedListDict[currentEntity.Frequency].Contains(currentEntity))
             {
                 Log?.Invoke(this, $"向频率Set里增加缓存：{$"{currentEntity.Key.ToString()} (频率={currentEntity.Frequency})"}");
-                frequencyDictionary[currentEntity.Frequency].AddLast(currentEntity);
+                _linkedListDict[currentEntity.Frequency].AddLast(currentEntity);
             }
         }
 
@@ -240,7 +243,7 @@ namespace XLibrary.Lang
             var result = new Dictionary<int, List<TKey>>();
             foreach (var frequency in frequencySortedSet)
             {
-                var cacheKeys = frequencyDictionary[frequency].Select(entity => entity.Key).ToList();
+                var cacheKeys = _linkedListDict[frequency].Select(entity => entity.Key).ToList();
                 result.Add(frequency, cacheKeys);
             }
 
@@ -249,7 +252,7 @@ namespace XLibrary.Lang
                 this.spinLock.Exit();
             }
 
-            Log?.Invoke(this, $"获取EntityDictionary列表：\n\t{string.Join("\n\t", this.entityDictionary.Keys)}");
+            Log?.Invoke(this, $"获取EntityDictionary列表：\n\t{string.Join("\n\t", this._dictionary.Keys)}");
             Log?.Invoke(this, $"获取频率字典列表：\n\t{string.Join("\n\t", result.Select(pair => $"频率={pair.Key} : {string.Join("、", pair.Value)}"))}");
 
             return result;

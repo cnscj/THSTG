@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using FairyGUI;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -258,43 +259,147 @@ namespace THGame.UI
         }
     }
 
+    //TODO:久化-用于将图片保存到本地 
+    //有可能写文件失败,或者写坏了
+    public class DataPersistencer : MonoBehaviour
+    {
+        //启动一个写线程,专门写文件
+        public class WriteRequest
+        {
+            public string path;
+            public byte[] data;
+        }
+
+        public string saveFolder;
+        public float maxIdleTime = -1f;
+        public long maxCacheLength = -1;
+
+        private Queue<WriteRequest> _writeQueue;
+        private bool isStopThread;
+        private Thread m_runWriteThread;
+
+        static void WriteThreadFunc(object obj)
+        {
+            DataPersistencer pDataPersistencer = obj as DataPersistencer;
+            pDataPersistencer.OnWriteFile();
+        }
+
+        public void Read(string name, Action<byte[]> callback)
+        {
+            if (string.IsNullOrEmpty(name))
+                return ;
+
+            string loadPath = GetFilePath(name);
+            //TODO:
+        }
+        public void Write(string name, byte[] data)
+        {
+            if (string.IsNullOrEmpty(name))
+                return;
+
+            if (data == null)
+                return;
+
+            string savePath = GetFilePath(name);
+            WriteRequest request = new WriteRequest();
+            request.path = savePath;
+            request.data = data;
+
+            GetWriteQueue().Enqueue(request);
+        }
+
+        private string GetFilePath(string name)
+        {
+            return name;
+        }
+
+        private Queue<WriteRequest> GetWriteQueue()
+        {
+            _writeQueue = _writeQueue ?? new Queue<WriteRequest>();
+            return _writeQueue;
+        }
+
+        private void StartWriteThread()
+        {
+            if (m_runWriteThread == null)
+            {
+                Thread tw = new Thread(WriteThreadFunc);
+                tw.Start(this);
+                m_runWriteThread = tw;
+            }
+
+            isStopThread = false;
+        }
+
+        private void StopWriteThread()
+        {
+            isStopThread = true;
+            m_runWriteThread = null;
+        }
+
+        private void OnWriteFile()
+        {
+            while(!isStopThread)
+            {
+                if (_writeQueue != null && _writeQueue.Count > 0)
+                {
+                    //TODO:
+                }
+                else
+                {
+                    Thread.Sleep(100);
+                }
+            }
+            m_runWriteThread = null;
+        }
+    }
 
     //用于加载网络资源
-    //TODO:缺少缓存机制
     public class NetworkCentral : MonoBehaviour
     {
-        public delegate void LoadSuccess(object data);
-        public delegate void LoadFailed(int reason);
-
         public class TaskInfo
         {
-            public int id;
             public string path;
             public Coroutine coroutine;
-            public Action<object> onSuccess;
-            public Action<int> onFailed;
+            public Dictionary<int,TaskHandler> callbacks;
+
+            public void Success(Texture texture)
+            {
+                if (callbacks != null)
+                {
+                    foreach (var handler in callbacks.Values)
+                    {
+                        handler.onSuccess?.Invoke(texture);
+                    }
+                }
+            }
+
+            public void Failed(int reason)
+            {
+                if (callbacks != null)
+                {
+                    foreach (var handler in callbacks.Values)
+                    {
+                        handler.onFailed?.Invoke(reason);
+                    }
+                }
+            }
         }
 
         public class TaskHandler
         {
+            public int id;
             public TaskInfo taskInfo;
-            public Action<object> onSuccess;
+            public Action<Texture> onSuccess;
             public Action<int> onFailed;
         }
 
-        public long maxLocalCacheSize = 0;           //本地缓存大小
-        public float maxMemoryCacheSaveTime = 60;     //内存缓存池
-
-
-        private int m_id;
+        private int m_taskHandlerId;
         private Dictionary<int, TaskHandler> m_taskHandlerDict;
         private Dictionary<string, TaskInfo> m_taskInfoDict;
+        private Queue<TaskInfo> m_taskCache;
 
-        private LRUCache<string, object> m_textureCache;
-
-        private Dictionary<int, TaskInfo> m_taskDict;
-
-        public int Load(string url, Action<object> onSuccess, Action<int> onFailed)
+        public int Load(string url, Action<Texture> onSuccess, Action<int> onFailed)
         {
             //Url地址严格大小写
             if (string.IsNullOrEmpty(url))
@@ -303,65 +408,98 @@ namespace THGame.UI
                 return -1;
             }
 
+            TaskInfo taskInfo = null;
+            if (!m_taskInfoDict.TryGetValue(url, out taskInfo))
+            {
+                taskInfo = NewTask(url);
+                StartTask(taskInfo);
 
-            var taskInfo = NewTask(url, onSuccess, onFailed);
-            StartTask(taskInfo);
-
-            GetTaskDict().Add(taskInfo.id, taskInfo);
-            return taskInfo.id;
+                GetTaskDict().Add(url, taskInfo);
+            }
+            TaskHandler taskHandler = NewTaskHandler(taskInfo, onSuccess, onFailed);
+            return taskHandler.id;
         }
 
         public void Stop(int id)
         {
-            if (m_taskDict == null)
+            if (m_taskHandlerDict == null)
                 return;
 
-            if (m_taskDict.TryGetValue(id, out var taskInfo))
+            if (m_taskHandlerDict.TryGetValue(id, out var taskHandler))
             {
-                StopTask(taskInfo);
-                RemoveTask(taskInfo);
+                var taskInfo = taskHandler.taskInfo;
+                if (taskInfo.callbacks != null)
+                {
+                    taskInfo.callbacks.Remove(id);
+
+                    if (taskInfo.callbacks.Count <= 0)
+                    {
+                        StopTask(taskInfo);
+                        RemoveTask(taskInfo);
+                    }
+                }
+            }
+        }
+        
+        private TaskHandler NewTaskHandler(TaskInfo taskInfo, Action<Texture> onSuccess, Action<int> onFailed)
+        {
+            if (taskInfo == null)
+                return default;
+
+            var handler = new TaskHandler();
+            var id = ++m_taskHandlerId;
+
+            handler.id = id;
+            handler.taskInfo = taskInfo;
+            handler.onSuccess = onSuccess;
+            handler.onFailed = onFailed;
+
+            GetTaskHandler().Add(id, handler);
+            taskInfo.callbacks[id] = handler;
+
+            return handler;
+        }
+
+        private void RemoveTaskHandler(int id)
+        {
+            if (m_taskHandlerDict == null)
+                return;
+
+            if (m_taskHandlerDict.Count <= 0)
+                return;
+
+            if (m_taskHandlerDict.TryGetValue(id, out var handler))
+            {
+                var taskInfo = handler.taskInfo;
+                if (taskInfo != null && taskInfo.callbacks != null)
+                {
+                    taskInfo.callbacks.Remove(id);
+                }
+
+                m_taskHandlerDict.Remove(id);
             }
         }
 
-        public int LoadTextureFormLocal(string url, Action<Texture> onSuccess, Action<int> onFailed)
+        private void RemoveAllTaskCallback(TaskInfo taskInfo)
         {
-            return 0;
-        }
-
-        public int LoadTextureFormNetwork(string url, Action<Texture> onSuccess, Action<int> onFailed)
-        {
-            return Load(url, (obj) =>
+            var callbacks = taskInfo.callbacks;
+            if (callbacks != null)
             {
-                var data = (byte[])obj;
-                var texture = new Texture2D(100, 100);
-                var ret = texture.LoadImage(data);
-                if (!ret)
+                foreach(var pair in callbacks)
                 {
-                    Debug.LogWarningFormat("[TextureNew]url {0} load error", url);
-                    onFailed?.Invoke(UITextureLoadStatus.DATA_ERROR);
-                    return;
+                    m_taskHandlerDict.Remove(pair.Key);
                 }
-                onSuccess?.Invoke(texture);
-            }, onFailed);
+                callbacks.Clear();
+            }
         }
 
-        private void Remove(int id)
+        private TaskInfo NewTask(string path)
         {
-            if (m_taskDict == null)
-                return;
+            var taskInfo = GetTaskQueue().Dequeue() ?? new TaskInfo();
 
-            m_taskDict.Remove(id);
-        }
-
-        private TaskInfo NewTask(string path, Action<object> onSuccess, Action<int> onFailed)
-        {
-            var id = ++m_id;
-            var taskInfo = new TaskInfo();
-
-            taskInfo.id = id;
             taskInfo.path = path;
-            taskInfo.onSuccess = onSuccess;
-            taskInfo.onFailed = onFailed;
+            taskInfo.callbacks = taskInfo.callbacks ?? new Dictionary<int, TaskHandler>();
+
             return taskInfo;
         }
 
@@ -377,10 +515,11 @@ namespace THGame.UI
 
         private void RemoveTask(TaskInfo taskInfo)
         {
-            if (m_taskDict == null)
+            if (m_taskInfoDict == null)
                 return;
 
-            m_taskDict.Remove(taskInfo.id);
+            m_taskInfoDict.Remove(taskInfo.path);
+            GetTaskQueue().Enqueue(taskInfo);
         }
 
         private IEnumerator OnGetCoroutine(TaskInfo taskInfo)
@@ -395,36 +534,60 @@ namespace THGame.UI
 
         private void OnRequestCallback(TaskInfo taskInfo, UnityWebRequest webRequest)
         {
-            Remove(taskInfo.id);
-
+            bool isSuccess = true;
             if (webRequest.isNetworkError || webRequest.isHttpError)
             {
-                taskInfo.onFailed?.Invoke(UITextureLoadStatus.NETWORK_ERROR);
-                return;
+                taskInfo.Failed(UITextureLoadStatus.NETWORK_ERROR);
+                isSuccess = false;
             }
-
 
             if (!webRequest.isDone)
             {
-                taskInfo.onFailed?.Invoke(UITextureLoadStatus.LOAD_ERROR);
-                return;
+                taskInfo.Failed(UITextureLoadStatus.LOAD_ERROR);
+                isSuccess = false;
             }
-
 
             if (webRequest.responseCode != 200)
             {
-                taskInfo.onFailed?.Invoke(UITextureLoadStatus.LOAD_ERROR);
-                return;
+                taskInfo.Failed(UITextureLoadStatus.LOAD_ERROR);
+                isSuccess = false;
             }
 
-            var data = webRequest.downloadHandler.data;
-            taskInfo.onSuccess?.Invoke(data);
+            if (isSuccess)
+            {
+                var srcData = webRequest.downloadHandler.data;
+                var data = (byte[])srcData;
+                var texture = new Texture2D(100, 100);
+                var ret = texture.LoadImage(data);
+                if (!ret)
+                {
+                    Debug.LogWarningFormat("[TextureNew]url {0} load error", taskInfo.path);
+                    taskInfo.Failed(UITextureLoadStatus.DATA_ERROR);
+                }else
+                {
+                    taskInfo.Success(texture);
+                }
+            }
+
+            RemoveAllTaskCallback(taskInfo);
+            RemoveTask(taskInfo);
         }
 
-        private Dictionary<int, TaskInfo> GetTaskDict()
+        private Dictionary<int, TaskHandler> GetTaskHandler()
         {
-            m_taskDict = m_taskDict ?? new Dictionary<int, TaskInfo>();
-            return m_taskDict;
+            m_taskHandlerDict = m_taskHandlerDict ?? new Dictionary<int, TaskHandler>();
+            return m_taskHandlerDict;
+        }
+        private Dictionary<string, TaskInfo> GetTaskDict()
+        {
+            m_taskInfoDict = m_taskInfoDict ?? new Dictionary<string, TaskInfo>();
+            return m_taskInfoDict;
+        }
+
+        private Queue<TaskInfo> GetTaskQueue()
+        {
+            m_taskCache = m_taskCache ?? new Queue<TaskInfo>();
+            return m_taskCache;
         }
     }
 
@@ -1021,7 +1184,7 @@ namespace THGame.UI
         private Dictionary<string, string> m_pathDict;
         private Texture m_defaultTexture;
 
-        public Texture DefaultTexture
+        public Texture DefaultTexture   //默认纹理   
         {
             get
             {
@@ -1033,7 +1196,7 @@ namespace THGame.UI
                 m_defaultTexture = value;
                 AddTexture(DEFAULT_TEXTURE_KEY, m_defaultTexture, true);
             }
-        }                    //默认纹理                
+        }                                 
 
         public void SetCustomLoader(Func<string, Texture> syncFunc, Action<string, Action<Texture>> asyncFunc)
         {
@@ -1182,9 +1345,9 @@ namespace THGame.UI
 
             if (IsUrl(path))
             {
-                GetNetworkCentral().LoadTextureFormNetwork(path, (texture2d) =>
+                GetNetworkCentral().Load(path, (texture2d) =>
                 {
-                    OnLoadCallbackSuccess(false, path, texture2d, onSuccess);
+                    OnLoadCallbackSuccess(true, path, texture2d, onSuccess);
                 },(reason) =>
                 {
                     OnLoadCallbackFailed(reason, onFailed, onSuccess);
