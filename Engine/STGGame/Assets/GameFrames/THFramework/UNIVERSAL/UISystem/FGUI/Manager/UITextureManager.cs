@@ -270,13 +270,15 @@ namespace THGame.UI
             public byte[] data;
         }
 
-        public string saveFolder;
+        public string saveFolder = "";
         public float maxIdleTime = -1f;
         public long maxCacheLength = -1;
 
         private Queue<WriteRequest> _writeQueue;
+        private string m_curWritePath;
         private bool isStopThread;
         private Thread m_runWriteThread;
+        private float m_lastWriteTime;
 
         static void WriteThreadFunc(object obj)
         {
@@ -290,8 +292,28 @@ namespace THGame.UI
                 return ;
 
             string loadPath = GetFilePath(name);
-            //TODO:
+            if (string.Compare(loadPath, m_curWritePath) == 0)
+                return;
+
+            FileStream fileStream = new FileStream(loadPath, FileMode.Open, FileAccess.Read);
+            if (fileStream != null)
+            {
+                BinaryReader binaryReader = new BinaryReader(fileStream);
+
+                int fsLen = (int)fileStream.Length;
+                byte[] heByte = new byte[fsLen];
+                int r = binaryReader.Read(heByte, 0, heByte.Length);
+
+                callback?.Invoke(heByte);
+
+                binaryReader.Close();
+                binaryReader.Dispose();
+            }
+
+            fileStream.Close();
+            fileStream.Dispose();
         }
+
         public void Write(string name, byte[] data)
         {
             if (string.IsNullOrEmpty(name))
@@ -306,11 +328,13 @@ namespace THGame.UI
             request.data = data;
 
             GetWriteQueue().Enqueue(request);
+            StartWriteThread();
         }
 
         private string GetFilePath(string name)
         {
-            return name;
+            string savePath = Path.Combine(saveFolder, name);
+            return savePath;
         }
 
         private Queue<WriteRequest> GetWriteQueue()
@@ -343,11 +367,44 @@ namespace THGame.UI
             {
                 if (_writeQueue != null && _writeQueue.Count > 0)
                 {
-                    //TODO:
+                    var writeInfo = _writeQueue.Dequeue();
+                    string srcPath = writeInfo.path;
+                    string tempPath = string.Format("{0}.temp", srcPath);
+                    FileStream fileStream = new FileStream(tempPath, FileMode.OpenOrCreate, FileAccess.Write);
+
+                    if (fileStream != null)
+                    {
+                        m_curWritePath = writeInfo.path;
+                        BinaryWriter binaryWriter = new BinaryWriter(fileStream);
+
+                        binaryWriter.Seek(0, SeekOrigin.Begin);
+                        binaryWriter.Write(writeInfo.data, 0, writeInfo.data.Length);
+
+                        binaryWriter.Close();
+                        binaryWriter.Dispose();
+                    }
+
+                    fileStream.Close();
+                    fileStream.Dispose();
+
+                    if (File.Exists(srcPath))
+                        File.Delete(srcPath);
+                    File.Move(tempPath, srcPath);
+
+                    m_curWritePath = null;
+                    m_lastWriteTime = Time.realtimeSinceStartup;
                 }
                 else
                 {
-                    Thread.Sleep(100);
+                    if (maxIdleTime >= 0)
+                    {
+                        if (Time.realtimeSinceStartup - m_lastWriteTime >= maxIdleTime)
+                        {
+                            break;
+                        }
+                    }
+                    
+                    Thread.Sleep(1);
                 }
             }
             m_runWriteThread = null;
@@ -1178,6 +1235,8 @@ namespace THGame.UI
         private NetworkCentral m_networkCentral;
         private BundleManager m_bundleManager;
         private NTexturePool m_ntexturePool;
+        private DataPersistencer m_dataPersistencer;
+
         //TODO:小图图集打包
         private Func<string, Texture> m_customLoaderSync;              //自定义同步加载器
         private Action<string, Action<Texture>> m_customLoaderAsync;   //自定义异步加载器
@@ -1347,7 +1406,8 @@ namespace THGame.UI
             {
                 GetNetworkCentral().Load(path, (texture2d) =>
                 {
-                    OnLoadCallbackSuccess(true, path, texture2d, onSuccess);
+                    var textureInfo = OnLoadCallbackSuccess(true, path, texture2d, onSuccess);
+                    OnDataCacheCallback(path, textureInfo);
                 },(reason) =>
                 {
                     OnLoadCallbackFailed(reason, onFailed, onSuccess);
@@ -1433,6 +1493,21 @@ namespace THGame.UI
             }
         }
 
+        private void OnDataCacheCallback(string path, TextureCache.TextureInfo textureInfo)
+        {
+            if (textureInfo == null)
+                return;
+
+            if (string.IsNullOrEmpty(path))
+                return;
+
+            var dataCache = GetDataPersistencer();
+            var texture2D = TextureToTexture2D(textureInfo.texture);
+            var data = texture2D.EncodeToPNG();
+
+            dataCache.Write(path, data);
+        }
+
         private void OnManagerCallback(string path, TextureCache.TextureInfo textureInfo)
         {
             if (textureInfo == null)
@@ -1497,7 +1572,24 @@ namespace THGame.UI
             }
         }
 
-        private TextureCache GetTextureCache()
+        private Texture2D TextureToTexture2D(Texture texture)
+        {
+            Texture2D texture2D = new Texture2D(texture.width, texture.height, TextureFormat.RGBA32, false);
+            RenderTexture currentRT = RenderTexture.active;
+            RenderTexture renderTexture = RenderTexture.GetTemporary(texture.width, texture.height, 32);
+            Graphics.Blit(texture, renderTexture);
+
+            RenderTexture.active = renderTexture;
+            texture2D.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
+            texture2D.Apply();
+
+            RenderTexture.active = currentRT;
+            RenderTexture.ReleaseTemporary(renderTexture);
+
+            return texture2D;
+        }
+
+        public TextureCache GetTextureCache()
         {
             if (m_u3dTexCache == null)
             {
@@ -1508,7 +1600,7 @@ namespace THGame.UI
             return m_u3dTexCache;
         }
 
-        private NetworkCentral GetNetworkCentral()
+        public NetworkCentral GetNetworkCentral()
         {
             if (m_networkCentral == null)
             {
@@ -1519,7 +1611,7 @@ namespace THGame.UI
             return m_networkCentral;
         }
 
-        private BundleManager GetBundleManager()
+        public BundleManager GetBundleManager()
         {
             if (m_bundleManager == null)
             {
@@ -1530,7 +1622,7 @@ namespace THGame.UI
             return m_bundleManager;
         }
 
-        private NTexturePool GetNTexturePool()
+        public NTexturePool GetNTexturePool()
         {
             if (m_ntexturePool == null)
             {
@@ -1539,6 +1631,17 @@ namespace THGame.UI
                 m_ntexturePool = managerGobj.AddComponent<NTexturePool>();
             }
             return m_ntexturePool;
+        }
+
+        public DataPersistencer GetDataPersistencer()
+        {
+            if (m_dataPersistencer == null)
+            {
+                GameObject managerGobj = new GameObject("DataPersistencer");
+                managerGobj.transform.SetParent(transform, false);
+                m_dataPersistencer = managerGobj.AddComponent<DataPersistencer>();
+            }
+            return m_dataPersistencer;
         }
     }
 }
