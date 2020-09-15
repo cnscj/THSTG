@@ -259,7 +259,7 @@ namespace THGame.UI
         }
     }
 
-    //TODO:久化-用于将图片保存到本地 
+    //TODO:持久化-用于将图片保存到本地 
     //有可能写文件失败,或者写坏了
     public class DataPersistencer : MonoBehaviour
     {
@@ -270,7 +270,7 @@ namespace THGame.UI
             public byte[] data;
         }
 
-        public string saveFolder = "";
+        public string saveFolder = "texture_cache";
         public float maxIdleTime = -1f;
         public long maxCacheLength = -1;
 
@@ -286,10 +286,31 @@ namespace THGame.UI
             pDataPersistencer.OnWriteFile();
         }
 
+        public void ReadTexture(string name, Action<Texture> callback)
+        {
+            Read(name, (srcData) =>
+            {
+                var data = (byte[])srcData;
+                var texture = new Texture2D(100, 100);
+                var ret = texture.LoadImage(data);
+                if (ret)
+                {
+                    callback?.Invoke(texture);
+                }
+            });
+        }
+
+        public void WriteTexture(string name, Texture texture)
+        {
+            var texture2d = TextureToTexture2D(texture);
+            var data = texture2d.EncodeToPNG();
+            Write(name, data);
+        }
+
         public void Read(string name, Action<byte[]> callback)
         {
             if (string.IsNullOrEmpty(name))
-                return ;
+                return;
 
             string loadPath = GetFilePath(name);
             if (string.Compare(loadPath, m_curWritePath) == 0)
@@ -331,6 +352,17 @@ namespace THGame.UI
             StartWriteThread();
         }
 
+        private void PargueCache()
+        {
+
+        }
+       
+        private void Start()
+        {
+            saveFolder = Path.Combine(Application.dataPath, saveFolder);
+
+        }
+
         private string GetFilePath(string name)
         {
             string savePath = Path.Combine(saveFolder, name);
@@ -358,7 +390,6 @@ namespace THGame.UI
         private void StopWriteThread()
         {
             isStopThread = true;
-            m_runWriteThread = null;
         }
 
         private void OnWriteFile()
@@ -408,6 +439,23 @@ namespace THGame.UI
                 }
             }
             m_runWriteThread = null;
+        }
+
+        private Texture2D TextureToTexture2D(Texture texture)
+        {
+            Texture2D texture2D = new Texture2D(texture.width, texture.height, TextureFormat.RGBA32, false);
+            RenderTexture currentRT = RenderTexture.active;
+            RenderTexture renderTexture = RenderTexture.GetTemporary(texture.width, texture.height, 32);
+            Graphics.Blit(texture, renderTexture);
+
+            RenderTexture.active = renderTexture;
+            texture2D.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
+            texture2D.Apply();
+
+            RenderTexture.active = currentRT;
+            RenderTexture.ReleaseTemporary(renderTexture);
+
+            return texture2D;
         }
     }
 
@@ -1502,10 +1550,9 @@ namespace THGame.UI
                 return;
 
             var dataCache = GetDataPersistencer();
-            var texture2D = TextureToTexture2D(textureInfo.texture);
-            var data = texture2D.EncodeToPNG();
+            var texture = textureInfo.texture;
 
-            dataCache.Write(path, data);
+            dataCache.WriteTexture(path, texture);
         }
 
         private void OnManagerCallback(string path, TextureCache.TextureInfo textureInfo)
@@ -1570,23 +1617,6 @@ namespace THGame.UI
             {
                 return false;
             }
-        }
-
-        private Texture2D TextureToTexture2D(Texture texture)
-        {
-            Texture2D texture2D = new Texture2D(texture.width, texture.height, TextureFormat.RGBA32, false);
-            RenderTexture currentRT = RenderTexture.active;
-            RenderTexture renderTexture = RenderTexture.GetTemporary(texture.width, texture.height, 32);
-            Graphics.Blit(texture, renderTexture);
-
-            RenderTexture.active = renderTexture;
-            texture2D.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
-            texture2D.Apply();
-
-            RenderTexture.active = currentRT;
-            RenderTexture.ReleaseTemporary(renderTexture);
-
-            return texture2D;
         }
 
         public TextureCache GetTextureCache()

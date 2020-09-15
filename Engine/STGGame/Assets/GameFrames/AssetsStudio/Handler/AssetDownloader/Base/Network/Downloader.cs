@@ -586,8 +586,7 @@ namespace ASGame
             }
         }
 
-        ///
-        // FIXME:子线程不应该直接调用回调,不然会卡住子线程
+        // 子线程不应该直接调用回调,不然会卡住子线程
         private void OnFileDownloadProgress(long nHadDownedSize, long nTotalNeedDownSize)
         {
             m_downloadProgress?.Invoke(nHadDownedSize, nTotalNeedDownSize);
