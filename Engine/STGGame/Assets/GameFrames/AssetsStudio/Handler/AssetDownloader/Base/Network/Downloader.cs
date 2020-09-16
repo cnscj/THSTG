@@ -294,6 +294,7 @@ namespace ASGame
             DownResFile resFile = new DownResFile();
             resFile.url = url;
             resFile.nFileSize = 0;
+            OnFileDownliadBegin(resInfo, resFile);
 
             if (0 == nFileSize)
             {
@@ -327,10 +328,11 @@ namespace ASGame
             // 这里只是输出一个日志，用户自行扩展事件吧
             MemBlock pBlock = new MemBlock();
             pBlock.resFile = resFile;
+            pBlock.resInfo = resInfo;
             PushWrite(pBlock); // 通知写线程关闭对应的文件
             m_nHadDownedCount++;
 
-            OnFileDownloadComplete(url, bSuc, resInfo, resFile);
+            OnFileDownloadFinish(url, bSuc, resInfo, resFile);
            
         }
 
@@ -556,6 +558,8 @@ namespace ASGame
                         pBlock.resFile.file.Close();
                         pBlock.resFile.file = null;
                     }
+                    OnFileDownloadEnd(pBlock.resInfo, pBlock.resFile);
+                    pBlock.resInfo = null;
                     pBlock.resFile = null;
                 }
                 return;
@@ -565,16 +569,16 @@ namespace ASGame
             DownResInfo resInfo = pBlock.resInfo;
             if (resFile.file == null)
             {
-                string szLocalPathName = resInfo.savePath;
+                string szLocalPath = resInfo.savePath;
                 if (pBlock.nFileOfset == 0)
                 {
-                    if (File.Exists(szLocalPathName))
-                        File.Delete(szLocalPathName);
+                    if (File.Exists(szLocalPath))
+                        File.Delete(szLocalPath);
                 }
-                resFile.file = new FileStream(szLocalPathName, FileMode.OpenOrCreate, FileAccess.Write);
+                resFile.file = new FileStream(szLocalPath, FileMode.OpenOrCreate, FileAccess.Write);
                 if (resFile.file == null)
                 {
-                    Debug.LogError(szLocalPathName + "文件打开失败!");
+                    Debug.LogError(szLocalPath + "文件打开失败!");
                 }
             }
             FileStream file = resFile.file;
@@ -587,19 +591,20 @@ namespace ASGame
         }
 
         // 子线程不应该直接调用回调,不然会卡住子线程
+        private void OnFileDownliadBegin(DownResInfo resInfo, DownResFile resFile)
+        {
+          
+        }
+
         private void OnFileDownloadProgress(long nHadDownedSize, long nTotalNeedDownSize)
         {
             m_downloadProgress?.Invoke(nHadDownedSize, nTotalNeedDownSize);
         }
 
-        private void OnFileDownloadComplete(string url, bool bSuc, DownResInfo resInfo, DownResFile resFile)
+        private void OnFileDownloadFinish(string url, bool bSuc, DownResInfo resInfo, DownResFile resFile)
         {
-            string fileSavePath = null;
             if (bSuc)
             {
-                if (resFile != null && resFile.file != null)
-                    fileSavePath = resFile.file.Name;
-
                 m_successDownList.Add(resFile);
             }
             else
@@ -607,7 +612,12 @@ namespace ASGame
                 m_failedDownList.Add(resFile);
             }
 
-            m_downloadFinish?.Invoke(url, fileSavePath);
+            m_downloadFinish?.Invoke(resInfo.url, resInfo.savePath);
+        }
+
+        private void OnFileDownloadEnd(DownResInfo resInfo, DownResFile resFile)
+        {
+            
         }
     }
 

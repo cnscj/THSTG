@@ -53,14 +53,6 @@ namespace XLibrary
 				trimExt = fileName.Replace("." + ext, "");
 		}
 
-		public static string StringToMD5(string str)
-		{
-			if (string.IsNullOrEmpty(str))
-				return "";
-
-            return ToMD5(Encoding.UTF8.GetBytes(str));
-		}
-
 		public static string ToMD5(byte[] data)
 		{
             MD5 md5 = MD5.Create();
@@ -74,6 +66,14 @@ namespace XLibrary
 
 			return sBuilder.ToString();
 		}
+
+        public static string ToMD5(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+                return "";
+
+            return ToMD5(Encoding.UTF8.GetBytes(str));
+        }
 
 
         /// <summary>

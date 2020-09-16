@@ -285,7 +285,7 @@ namespace ASEditor
             //转换
             FileData fileData = new FileData();
             fileData.version = VERSION;
-            fileData.date = XTimeTools.NowTimeStampMs();
+            fileData.date = XTimeTools.NowTimeStampMs;
             fileData.assetPaths = _strList.ToArray();
 
             var assetDependList = new List<RelationData>();

@@ -7,7 +7,7 @@ using System.Threading;
 using FairyGUI;
 using UnityEngine;
 using UnityEngine.Networking;
-using XLibrary.Lang;
+using XLibrary;
 using XLibrary.Package;
 
 namespace THGame.UI
@@ -270,15 +270,16 @@ namespace THGame.UI
             public byte[] data;
         }
 
-        public string saveFolder = "texture_cache";
-        public float maxIdleTime = -1f;
+        public string saveFolderName = "texture_cache";
+        public int maxIdleTime = 60;
         public long maxCacheLength = -1;
 
         private Queue<WriteRequest> _writeQueue;
         private string m_curWritePath;
         private bool isStopThread;
         private Thread m_runWriteThread;
-        private float m_lastWriteTime;
+        private long m_lastWriteTime;
+        private string m_saveFolderPath;
 
         static void WriteThreadFunc(object obj)
         {
@@ -354,18 +355,25 @@ namespace THGame.UI
 
         private void PargueCache()
         {
-
+            //TODO:
         }
-       
-        private void Start()
-        {
-            saveFolder = Path.Combine(Application.dataPath, saveFolder);
 
+        private string GetFolderPath()
+        {
+            if (string.IsNullOrEmpty(m_saveFolderPath))
+            {
+                m_saveFolderPath = Path.Combine(XPlatformTools.PersistentRootPath, saveFolderName);
+                if (!Directory.Exists(m_saveFolderPath))
+                    Directory.CreateDirectory(m_saveFolderPath);
+            }
+
+            return m_saveFolderPath;
         }
 
         private string GetFilePath(string name)
         {
-            string savePath = Path.Combine(saveFolder, name);
+            string newName = XStringTools.ToMD5(name);
+            string savePath = Path.Combine(GetFolderPath(), newName);
             return savePath;
         }
 
@@ -401,7 +409,7 @@ namespace THGame.UI
                     var writeInfo = _writeQueue.Dequeue();
                     string srcPath = writeInfo.path;
                     string tempPath = string.Format("{0}.temp", srcPath);
-                    FileStream fileStream = new FileStream(tempPath, FileMode.OpenOrCreate, FileAccess.Write);
+                    FileStream fileStream = new FileStream(tempPath, FileMode.CreateNew, FileAccess.Write);
 
                     if (fileStream != null)
                     {
@@ -423,19 +431,19 @@ namespace THGame.UI
                     File.Move(tempPath, srcPath);
 
                     m_curWritePath = null;
-                    m_lastWriteTime = Time.realtimeSinceStartup;
+                    m_lastWriteTime = XTimeTools.NowTimeStamp;
                 }
                 else
                 {
                     if (maxIdleTime >= 0)
                     {
-                        if (Time.realtimeSinceStartup - m_lastWriteTime >= maxIdleTime)
+                        if (XTimeTools.NowTimeStamp - m_lastWriteTime >= maxIdleTime)
                         {
                             break;
                         }
                     }
                     
-                    Thread.Sleep(1);
+                    Thread.Sleep(500);
                 }
             }
             m_runWriteThread = null;
@@ -514,7 +522,7 @@ namespace THGame.UI
             }
 
             TaskInfo taskInfo = null;
-            if (!m_taskInfoDict.TryGetValue(url, out taskInfo))
+            if (!GetTaskDict().TryGetValue(url, out taskInfo))
             {
                 taskInfo = NewTask(url);
                 StartTask(taskInfo);
@@ -600,7 +608,7 @@ namespace THGame.UI
 
         private TaskInfo NewTask(string path)
         {
-            var taskInfo = GetTaskQueue().Dequeue() ?? new TaskInfo();
+            var taskInfo = GetTaskQueue().Count > 0 ? GetTaskQueue().Dequeue() : new TaskInfo();
 
             taskInfo.path = path;
             taskInfo.callbacks = taskInfo.callbacks ?? new Dictionary<int, TaskHandler>();

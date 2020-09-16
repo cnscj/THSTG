@@ -95,7 +95,7 @@ namespace XLibrary
                     string szDataPath = Application.persistentDataPath;
 #if UNITY_STANDALONE || UNITY_EDITOR
                     szDataPath = Application.dataPath;
-                    szDataPath = szDataPath.Substring(0, szDataPath.Length - 6) + "";
+                    szDataPath = szDataPath.Substring(0, szDataPath.Length - 6) + "";   //6:"Assets"
 #endif
 
 #if UNITY_IPHONE
@@ -103,10 +103,8 @@ namespace XLibrary
 #elif UNITY_ANDROID
                     m_persistent_root_path = string.Format( "{0}/Android", szDataPath );
 #else
-                    m_persistent_root_path = szDataPath + "/Windows";
+                    m_persistent_root_path = szDataPath + "Windows";
 #endif
-                    if (!System.IO.Directory.Exists(m_persistent_root_path))
-                        System.IO.Directory.CreateDirectory(m_persistent_root_path);
                 }
                 return m_persistent_root_path;
             }

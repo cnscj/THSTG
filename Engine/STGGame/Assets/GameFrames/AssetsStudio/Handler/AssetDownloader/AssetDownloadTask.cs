@@ -37,7 +37,7 @@ namespace ASGame
 
         public AssetDownloadTask()
         {
-            CreateTime = XTimeTools.NowTimeStampMs();
+            CreateTime = XTimeTools.NowTimeStampMs;
             status = AssetDownloadStatus.DOWNLOAD_NONE;
         }
       
@@ -57,7 +57,7 @@ namespace ASGame
 
             mgr.StartDown(urlPaths, savePaths, downThreadNumb, limitDownSize);
 
-            StartTime = XTimeTools.NowTimeStampMs();
+            StartTime = XTimeTools.NowTimeStampMs;
             status = AssetDownloadStatus.DOWNLOAD_DOWNLOADING;
         }
 
@@ -90,7 +90,7 @@ namespace ASGame
 
         protected void OnCompleted()
         {
-            CompletedTime = XTimeTools.NowTimeStampMs();
+            CompletedTime = XTimeTools.NowTimeStampMs;
             status = AssetDownloadStatus.DOWNLOAD_COMPLETED;
 
             onCompleted?.Invoke(this);

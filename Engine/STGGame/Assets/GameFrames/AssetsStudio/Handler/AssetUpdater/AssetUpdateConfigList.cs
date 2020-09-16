@@ -46,7 +46,7 @@ namespace ASGame
             FileStream fileStream = new FileStream(savePath, FileMode.Create, FileAccess.Write);
             StreamWriter streamWriter = new StreamWriter(fileStream);
 
-            date = XTimeTools.NowTimeStampMs();
+            date = XTimeTools.NowTimeStampMs;
             streamWriter.WriteLine(string.Format("{0},{1},{2}",type, version, date));    //第一行
 
             for(int i = 0; i < fileItems.Length; i++)

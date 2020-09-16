@@ -35,59 +35,82 @@ namespace XLibrary
         /// 获取时间戳Ms
         /// </summary>
         /// <returns></returns>
-        public static long NowTimeStampMs()
+        public static long NowTimeStampMs
         {
-            return (DateTime.Now.ToUniversalTime().Ticks - 621355968000000000) / 10000;
+            get
+            {
+                return (DateTime.Now.ToUniversalTime().Ticks - 621355968000000000) / 10000;
+            }
 
         }
         /// <summary>
         /// 获取时间戳
         /// </summary>
         /// <returns></returns>
-        public static long NowTimeStamp()
+        public static long NowTimeStamp
         {
-            TimeSpan ts = DateTime.UtcNow - TIME_ORIGIN;
-            return Convert.ToInt64(ts.TotalMilliseconds / 1000);
+            get
+            {
+                TimeSpan ts = DateTime.UtcNow - TIME_ORIGIN;
+                return Convert.ToInt64(ts.TotalMilliseconds / 1000);
+            }
+
         }
 
         /// <summary>
         /// 当前DateTime
         /// </summary>
         /// <returns></returns>
-        public static DateTime NowDateTime()
+        public static DateTime NowDateTime
         {
-            return DateTime.Now;
+            get
+            {
+                return DateTime.Now;
+            }
         }
 
         /// <summary>
         /// 当前时间字符串格式
         /// </summary>
         /// <returns></returns>
-        public static string NowTimeStr()
+        public static string NowTimeStr
         {
-            return DateTime.Now.ToString();
+            get
+            {
+                return DateTime.Now.ToString();
+            }
         }
 
         /// <summary>
         /// 取得今天度过了多少秒
         /// </summary>
         /// <returns></returns>
-        public static long NowSeconds()
+        public static long NowSeconds
         {
-            DateTime dataTime = NowDateTime();
-            return dataTime.Hour * 3600 + dataTime.Minute * 60 + dataTime.Second;
+            get
+            {
+                DateTime dataTime = NowDateTime;
+                return dataTime.Hour * 3600 + dataTime.Minute * 60 + dataTime.Second;
+            }
         }
 
         //无格式时间202001192212
-        public static string NowUnformatTimeStr()
+        public static string NowUnformatTimeStr
         {
-            DateTime dt = NowDateTime();
-            return string.Format("{0:yyyyMMddHHmmss}", dt);
+            get
+            {
+                DateTime dt = NowDateTime;
+                return string.Format("{0:yyyyMMddHHmmss}", dt);
+            }
+            
         }
-        public static string NowUnformatTimeStrMs()
+        public static string NowUnformatTimeStrMs
         {
-            DateTime dt = NowDateTime();
-            return string.Format("{0:yyyyMMddHHmmssfff}", dt);
+            get
+            {
+                DateTime dt = NowDateTime;
+                return string.Format("{0:yyyyMMddHHmmssfff}", dt);
+            }
         }
 
 

@@ -21,13 +21,13 @@ namespace ASGame
         public static PALT_TYPE GetPlatType()
         {
 #if UNITY_IPHONE
-    return PALT_TYPE.PLAT_IPHONE;
+            return PALT_TYPE.PLAT_IPHONE;
 #elif UNITY_ANDROID
-    return PALT_TYPE.PLAT_ANDORID;
+            return PALT_TYPE.PLAT_ANDORID;
 #elif UNITY_WP8
-    return PALT_TYPE.PLAT_WP8;
+            return PALT_TYPE.PLAT_WP8;
 #elif UNITY_STANDALONE_WIN
-        return PALT_TYPE.PLAT_WINDOWS;
+            return PALT_TYPE.PLAT_WINDOWS;
 #else
             return PALT_TYPE.PLAT_UNKNOW;
 #endif
@@ -55,14 +55,14 @@ namespace ASGame
             string url = "file:///" + Application.streamingAssetsPath + "/" + GetTargetPlatName() + '/' + szFileName;
             return url;
 #elif UNITY_ANDROID
-        string url = Application.streamingAssetsPath + "/" + GetTargetPlatName() + '/' + szFileName;
-        return url;
+            string url = Application.streamingAssetsPath + "/" + GetTargetPlatName() + '/' + szFileName;
+            return url;
 #elif UNITY_IPHONE
-        string url = "file://" + Application.streamingAssetsPath + "/" + GetTargetPlatName() + '/' + szFileName;
-        return url;
+            string url = "file://" + Application.streamingAssetsPath + "/" + GetTargetPlatName() + '/' + szFileName;
+            return url;
 #else
-        string url = "file:///" + Application.streamingAssetsPath + "/" + GetTargetPlatName() + '/' + szFileName;
-        return url;
+            string url = "file:///" + Application.streamingAssetsPath + "/" + GetTargetPlatName() + '/' + szFileName;
+            return url;
 #endif
         }
         public static string GetAssetPathName(string szFileName)
@@ -71,14 +71,14 @@ namespace ASGame
             string url = Application.streamingAssetsPath + "/" + GetTargetPlatName() + '/' + szFileName;
             return url;
 #elif UNITY_ANDROID
-        string url = Application.streamingAssetsPath + "/" + GetTargetPlatName() + '/' + szFileName;
-        return url;
+            string url = Application.streamingAssetsPath + "/" + GetTargetPlatName() + '/' + szFileName;
+            return url;
 #elif UNITY_IPHONE
-        string url = Application.streamingAssetsPath + "/" + GetTargetPlatName() + '/' + szFileName;
-        return url;
+            string url = Application.streamingAssetsPath + "/" + GetTargetPlatName() + '/' + szFileName;
+            return url;
 #else
-        string url = Application.streamingAssetsPath + "/" + GetTargetPlatName() + '/' + szFileName;
-        return url;
+            string url = Application.streamingAssetsPath + "/" + GetTargetPlatName() + '/' + szFileName;
+            return url;
 #endif
         }
 

@@ -23,7 +23,7 @@ namespace ASGame
         //       nFileSize - 输出文件的大小
         // 返回值：返回true表示得到了文件的大小，URL地址有效; 返回false表示无法得到文件的信息
         // 说明：这个接口是阻塞模式的，请不要在主线程调用
-        static public bool  GetDownFileSize(string url, out int nOutFileSize, long nRandSeed = 0)
+        static public bool GetDownFileSize(string url, out int nOutFileSize, long nRandSeed = 0)
         {
             nOutFileSize = 0;
 
