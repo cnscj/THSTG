@@ -80,6 +80,11 @@ namespace ASGame
             m_failedDownList = new List<DownResFile>();
         }
 
+        ~CDownloader()
+        {
+            m_bNeedStop = true;
+        }
+
         public DownResInfo CreateDownInfo(string url,string path)
         {
             DownResInfo node = new DownResInfo();
@@ -556,8 +561,8 @@ namespace ASGame
                     if (pBlock.resFile.file != null)
                     {
                         pBlock.resFile.file.Close();
-                        pBlock.resFile.file = null;
                     }
+
                     OnFileDownloadEnd(pBlock.resInfo, pBlock.resFile);
                     pBlock.resInfo = null;
                     pBlock.resFile = null;
@@ -569,7 +574,7 @@ namespace ASGame
             DownResInfo resInfo = pBlock.resInfo;
             if (resFile.file == null)
             {
-                string szLocalPath = resInfo.savePath;
+                string szLocalPath = GetLocalPathNameByUrl(resInfo.url,resInfo.savePath);
                 if (pBlock.nFileOfset == 0)
                 {
                     if (File.Exists(szLocalPath))
@@ -591,17 +596,22 @@ namespace ASGame
         }
 
         // 子线程不应该直接调用回调,不然会卡住子线程
-        private void OnFileDownliadBegin(DownResInfo resInfo, DownResFile resFile)
+        protected string GetLocalPathNameByUrl(string url, string savePath)
+        {
+            return string.Format("{0}.temp", savePath);
+        }
+
+        protected void OnFileDownliadBegin(DownResInfo resInfo, DownResFile resFile)
         {
           
         }
 
-        private void OnFileDownloadProgress(long nHadDownedSize, long nTotalNeedDownSize)
+        protected void OnFileDownloadProgress(long nHadDownedSize, long nTotalNeedDownSize)
         {
             m_downloadProgress?.Invoke(nHadDownedSize, nTotalNeedDownSize);
         }
 
-        private void OnFileDownloadFinish(string url, bool bSuc, DownResInfo resInfo, DownResFile resFile)
+        protected void OnFileDownloadFinish(string url, bool bSuc, DownResInfo resInfo, DownResFile resFile)
         {
             if (bSuc)
             {
@@ -615,9 +625,16 @@ namespace ASGame
             m_downloadFinish?.Invoke(resInfo.url, resInfo.savePath);
         }
 
-        private void OnFileDownloadEnd(DownResInfo resInfo, DownResFile resFile)
+        protected void OnFileDownloadEnd(DownResInfo resInfo, DownResFile resFile)
         {
-            
+            string tempPath = resFile.file.Name;
+            string savePath = resInfo.savePath;
+            if (File.Exists(tempPath))
+            {
+                if (File.Exists(savePath))
+                    File.Delete(savePath);
+                File.Move(tempPath, savePath);
+            }
         }
     }
 

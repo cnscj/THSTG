@@ -83,6 +83,12 @@ namespace ASGame
         }
 
         /////////////////////////////////////
+        private void OnDestroy()
+        {
+            //需要停止所有任务,否则线程无法退出
+            StopAll();
+        }
+        /////////////////////////////////////
 
         //TODO:从磁盘加载任务
         public AssetDownloadTask LoadTask()
@@ -217,14 +223,23 @@ namespace ASGame
             if (m_tasksMap == null || m_tasksMap.Count <= 0)
                 return;
 
-            List<AssetDownloadTask> taskList = new List<AssetDownloadTask>();
-            taskList.AddRange(m_tasksMap.Values);
-
-            foreach (var task in taskList)
+            foreach (var task in m_tasksMap.Values)
             {
                 RemoveTask(task);
             }
         }
+
+        private void StopAll()
+        {
+            if (m_tasksMap == null || m_tasksMap.Count <= 0)
+                return;
+
+            foreach (var task in m_tasksMap.Values)
+            {
+                task.Stop();
+            }
+        }
+
 
         /////////////////////////////////////
         private AssetDownloadTask GetOrCreateTask()

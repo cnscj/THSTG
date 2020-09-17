@@ -259,7 +259,7 @@ namespace THGame.UI
         }
     }
 
-    //TODO:持久化-用于将图片保存到本地 
+    //持久化-用于将图片保存到本地 
     //有可能写文件失败,或者写坏了
     public class DataPersistencer : MonoBehaviour
     {
@@ -270,21 +270,48 @@ namespace THGame.UI
             public byte[] data;
         }
 
-        public string saveFolderName = "texture_cache";
-        public int maxIdleTime = 60;
-        public long maxCacheLength = -1;
+        public class FileNode
+        {
+            public string name;
+            public string path;
+            public long accessTime;
+        }
 
-        private Queue<WriteRequest> _writeQueue;
+        public string saveFolderName = "texture_cache";
+        public int maxIdleTime = 60;                //空闲时间x关闭写线程
+        public long maxCacheCount = 100;            //保留最近访问的n个文件
+
+        private Queue<WriteRequest> m_writeQueue;
         private string m_curWritePath;
         private bool isStopThread;
         private Thread m_runWriteThread;
         private long m_lastWriteTime;
         private string m_saveFolderPath;
 
+        private Dictionary<string, LinkedListNode<FileNode>> m_cacheFileDict;
+        private LinkedList<FileNode> m_cacheFileList;
+
+
         static void WriteThreadFunc(object obj)
         {
             DataPersistencer pDataPersistencer = obj as DataPersistencer;
             pDataPersistencer.OnWriteFile();
+        }
+
+        private void Awake()
+        {
+            LoadCache();
+        }
+
+        public bool IsContain(string name)
+        {
+            if (m_cacheFileDict == null || m_cacheFileDict.Count <= 0)
+            {
+                return false;
+            }
+
+            var key = GetFileName(name);
+            return m_cacheFileDict.ContainsKey(key);
         }
 
         public void ReadTexture(string name, Action<Texture> callback)
@@ -317,9 +344,13 @@ namespace THGame.UI
             if (string.Compare(loadPath, m_curWritePath) == 0)
                 return;
 
+
             FileStream fileStream = new FileStream(loadPath, FileMode.Open, FileAccess.Read);
             if (fileStream != null)
             {
+                var fileName = GetFileName(name);
+                UpdateCache(fileName);
+
                 BinaryReader binaryReader = new BinaryReader(fileStream);
 
                 int fsLen = (int)fileStream.Length;
@@ -353,9 +384,105 @@ namespace THGame.UI
             StartWriteThread();
         }
 
-        private void PargueCache()
+        public void Close()
         {
-            //TODO:
+            StopWriteThread();
+        }
+
+        private void LoadCache()
+        {
+            if (maxCacheCount <= 0)
+                return;
+
+            var folderPath = GetFolderPath(); 
+            if (Directory.Exists(folderPath))
+            {
+                DirectoryInfo direction = new DirectoryInfo(folderPath);
+                FileInfo[] files = direction.GetFiles("*", SearchOption.AllDirectories);
+                List<FileInfo> fileList = new List<FileInfo>();
+                fileList.AddRange(files);
+                fileList.Sort((a, b) =>
+                {
+                    if (a.CreationTime < b.CreationTime) return 1;
+                    else if(a.LastAccessTime == b.LastAccessTime) return 0;
+                    else return -1;
+                });
+                foreach (var fileInfo in fileList)
+                {
+                    PushCache(fileInfo);
+                }
+
+            }
+        }
+        private void UpdateCache(string name)
+        {
+            if (maxCacheCount <= 0)
+                return;
+
+            if (String.IsNullOrEmpty(name))
+                return;
+
+            if (GetCacheDict().TryGetValue(name,out var listNode))
+            {
+                GetCacheList().Remove(listNode);
+                GetCacheList().AddFirst(listNode);
+            }
+        }
+        private void PushCache(FileInfo fileInfo)
+        {
+            if (maxCacheCount <= 0)
+                return;
+
+            if (fileInfo == null)
+                return;
+
+            var name = fileInfo.Name;
+            if (!GetCacheDict().ContainsKey(name))
+            {
+                var fileNode = new FileNode();
+                fileNode.name = name;
+                fileNode.path = fileInfo.FullName;
+                fileNode.accessTime = XTimeTools.GetTimeStamp(fileInfo.LastAccessTime);
+
+                var listNode = GetCacheList().AddFirst(fileNode);
+                GetCacheDict().Add(name, listNode);
+
+                //如果超过限制,弹出末端文件,并移除之
+                if (CheckCacheMax())
+                {
+                    var lastNode = GetCacheList().Last;
+                    var lastFileNode = lastNode.Value;
+
+                    GetCacheDict().Remove(lastFileNode.name);
+                    GetCacheList().Remove(lastNode);
+
+                    DoWithFile(lastFileNode);
+                }
+            }
+        }
+
+        private void DoWithFile(FileNode node)
+        {
+            var filePath = node.path;
+            if (File.Exists(filePath))
+                File.Delete(filePath);
+        }
+
+        private bool CheckCacheMax()
+        {
+            return maxCacheCount > 0 && GetCacheDict().Count > maxCacheCount;
+        }
+
+        private Dictionary<string, LinkedListNode<FileNode>> GetCacheDict()
+        {
+            m_cacheFileDict = m_cacheFileDict ?? new Dictionary<string, LinkedListNode<FileNode>>();
+            return m_cacheFileDict;
+        }
+
+        private LinkedList<FileNode> GetCacheList()
+        {
+            m_cacheFileList = m_cacheFileList ?? new LinkedList<FileNode>();
+            return m_cacheFileList;
         }
 
         private string GetFolderPath()
@@ -372,15 +499,20 @@ namespace THGame.UI
 
         private string GetFilePath(string name)
         {
-            string newName = XStringTools.ToMD5(name);
+            string newName = GetFileName(name);
             string savePath = Path.Combine(GetFolderPath(), newName);
             return savePath;
         }
 
+        private string GetFileName(string name)
+        {
+            string newName = XStringTools.ToMD5(name);
+            return newName;
+        }
         private Queue<WriteRequest> GetWriteQueue()
         {
-            _writeQueue = _writeQueue ?? new Queue<WriteRequest>();
-            return _writeQueue;
+            m_writeQueue = m_writeQueue ?? new Queue<WriteRequest>();
+            return m_writeQueue;
         }
 
         private void StartWriteThread()
@@ -400,13 +532,25 @@ namespace THGame.UI
             isStopThread = true;
         }
 
+        private void OnWriteCompleted(string filePath)
+        {
+            if (maxCacheCount <= 0)
+                return;
+
+            if (File.Exists(filePath))
+            {
+                FileInfo fileInfo = new FileInfo(filePath);
+                PushCache(fileInfo);
+            }
+        }
+
         private void OnWriteFile()
         {
             while(!isStopThread)
             {
-                if (_writeQueue != null && _writeQueue.Count > 0)
+                if (m_writeQueue != null && m_writeQueue.Count > 0)
                 {
-                    var writeInfo = _writeQueue.Dequeue();
+                    var writeInfo = m_writeQueue.Dequeue();
                     string srcPath = writeInfo.path;
                     string tempPath = string.Format("{0}.temp", srcPath);
                     FileStream fileStream = new FileStream(tempPath, FileMode.CreateNew, FileAccess.Write);
@@ -429,6 +573,8 @@ namespace THGame.UI
                     if (File.Exists(srcPath))
                         File.Delete(srcPath);
                     File.Move(tempPath, srcPath);
+
+                    OnWriteCompleted(srcPath);
 
                     m_curWritePath = null;
                     m_lastWriteTime = XTimeTools.NowTimeStamp;
@@ -752,6 +898,9 @@ namespace THGame.UI
 
             public void Add(string assetName, LoadCallback callback)
             {
+                if (string.IsNullOrEmpty(assetName))
+                    return;
+
                 var dict = GetLoadDict();
                 if (dict.ContainsKey(assetName))
                 {
@@ -1311,7 +1460,12 @@ namespace THGame.UI
                 m_defaultTexture = value;
                 AddTexture(DEFAULT_TEXTURE_KEY, m_defaultTexture, true);
             }
-        }                                 
+        }
+
+        private void OnDestroy()
+        {
+            m_dataPersistencer?.Close();
+        }
 
         public void SetCustomLoader(Func<string, Texture> syncFunc, Action<string, Action<Texture>> asyncFunc)
         {
@@ -1460,14 +1614,24 @@ namespace THGame.UI
 
             if (IsUrl(path))
             {
-                GetNetworkCentral().Load(path, (texture2d) =>
+                if (GetDataPersistencer().IsContain(path))
                 {
-                    var textureInfo = OnLoadCallbackSuccess(true, path, texture2d, onSuccess);
-                    OnDataCacheCallback(path, textureInfo);
-                },(reason) =>
+                    GetDataPersistencer().ReadTexture(path, (texture2d) =>
+                    {
+                        OnLoadCallbackSuccess(true, path, texture2d, onSuccess);
+                    });
+                }
+                else
                 {
-                    OnLoadCallbackFailed(reason, onFailed, onSuccess);
-                });
+                    GetNetworkCentral().Load(path, (texture2d) =>
+                    {
+                        var textureInfo = OnLoadCallbackSuccess(true, path, texture2d, onSuccess);
+                        OnDataCacheCallback(path, textureInfo);
+                    }, (reason) =>
+                    {
+                        OnLoadCallbackFailed(reason, onFailed, onSuccess);
+                    });
+                }
             }
             else
             {
@@ -1618,7 +1782,7 @@ namespace THGame.UI
         {
             try
             {
-                string Url = @"^http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?$";
+                string Url = @"^(ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&%\$#_]*)?$";
                 return System.Text.RegularExpressions.Regex.IsMatch(str, Url);
             }
             catch (Exception)
