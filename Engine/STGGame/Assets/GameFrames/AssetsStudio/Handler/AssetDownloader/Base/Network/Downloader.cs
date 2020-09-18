@@ -36,6 +36,8 @@ namespace ASGame
 
     public class CDownloader
     {
+        public static readonly string DOWNLOADING_SUFFIX = ".downloading";
+
         List<DownResInfo> m_downList;
         List<DownResFile> m_successDownList;
         List<DownResFile> m_failedDownList;
@@ -48,10 +50,11 @@ namespace ASGame
         int m_nDownThreadNumb = 0;          // 下载线程数量
         int m_nWriteThreadNumb = 0;
         bool m_bNeedStop = false;
-        bool m_bIsPause = false;
+
         Thread[] m_runThreads;
         Thread m_runWriteThread;
 
+        bool m_bIsPause = false;
         ManualResetEvent m_pauseEvent;
 
         long m_nDownSize;                   // 当前下载的大小
@@ -75,7 +78,7 @@ namespace ASGame
 
         public CDownloader()
         {
-            m_pauseEvent = new ManualResetEvent(false);
+            m_pauseEvent = new ManualResetEvent(true);
             m_successDownList = new List<DownResFile>();
             m_failedDownList = new List<DownResFile>();
         }
@@ -120,13 +123,6 @@ namespace ASGame
         //      nLimitDownSize - 下载速度限制
         public void StartDown(List<DownResInfo> downList, int nDownThreadNumb, int nLimitDownSize)
         {
-            if (m_bIsPause)
-            {
-                m_bIsPause = false;
-                m_pauseEvent.Set();
-                return;
-            }
-
             m_nDownSize = 0;
             m_nHadDownedSize = 0;
             m_nTotalNeedDownSize = 0;
@@ -152,7 +148,6 @@ namespace ASGame
             m_nHadDownedCount = 0;
 
             m_nDownThreadNumb = nDownThreadNumb;
-            m_pauseEvent.Set();
             m_runThreads = new Thread[nDownThreadNumb];
 
             for (int i = 0; i < nDownThreadNumb; ++i)
@@ -167,6 +162,8 @@ namespace ASGame
             Thread tw = new Thread(WriteThreadFunc);
             tw.Start(this);
             m_runWriteThread = tw;
+
+            ResumeDown();
         }
 
         public void StartDown(string[] urlList, string[] savePaths, int nDownThreadNumb, int nLimitDownSize)
@@ -175,17 +172,21 @@ namespace ASGame
             StartDown(downList, nDownThreadNumb, nLimitDownSize);
         }
 
+        public void ResumeDown()
+        {
+            m_bIsPause = false;
+            m_pauseEvent.Set();
+        }
+
         public void PauseDown()
         {
             m_bIsPause = true;
-
             m_pauseEvent.Reset();
         }
 
         public void StopDown(bool bAbort, bool bWait)
         {
-            m_bIsPause = false;
-            m_pauseEvent.Set();
+            ResumeDown();
 
             if (m_nDownThreadNumb > 0)
             {
@@ -196,7 +197,7 @@ namespace ASGame
             {
                 while (m_nDownThreadNumb > 0 || m_nWriteThreadNumb > 0)
                 {
-                    Thread.Sleep(1); // 强制等待线程退出
+                    Thread.Sleep(1); // 强制等待线程退出(主线程的
                 }
             }
         }
@@ -246,7 +247,7 @@ namespace ASGame
             CHttp http = new CHttp();
             while (!m_bNeedStop)
             {
-                m_pauseEvent.WaitOne();
+                m_pauseEvent.WaitOne();         //阻塞线程,暂停下载
 
                 if (PopDownFileInfo(out resInfo))
                 {
@@ -313,6 +314,8 @@ namespace ASGame
             int nDownSize = 0;
             for (; nFileOffset < nFileSize; nFileOffset += nPageSize)
             {
+                m_pauseEvent.WaitOne();         //阻塞线程,暂停下载
+
                 // 先限速
                 LimitSpeed();
                 // 开始分片下载
@@ -595,10 +598,10 @@ namespace ASGame
             }
         }
 
-        // 子线程不应该直接调用回调,不然会卡住子线程
+        // 下面函数都是在子线程中执行的,不能直接回调Unity主线程
         protected string GetLocalPathNameByUrl(string url, string savePath)
         {
-            return string.Format("{0}.temp", savePath);
+            return string.Format("{0}{1}", savePath, DOWNLOADING_SUFFIX);
         }
 
         protected void OnFileDownliadBegin(DownResInfo resInfo, DownResFile resFile)

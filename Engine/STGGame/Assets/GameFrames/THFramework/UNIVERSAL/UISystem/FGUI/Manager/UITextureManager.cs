@@ -419,7 +419,7 @@ namespace THGame.UI
             if (maxCacheCount <= 0)
                 return;
 
-            if (String.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(name))
                 return;
 
             if (GetCacheDict().TryGetValue(name,out var listNode))

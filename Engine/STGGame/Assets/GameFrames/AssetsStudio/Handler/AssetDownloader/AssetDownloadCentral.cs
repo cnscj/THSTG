@@ -95,13 +95,13 @@ namespace ASGame
         {
             return null;
         }
-
+        //TODO:
         public void SaveTask()
         {
             //生成临时文件
         }
 
-        //临时文件也一并移除
+        //TODO:临时文件也一并移除
         public void DeleteTask(AssetDownloadTask task)
         {
 
@@ -153,11 +153,27 @@ namespace ASGame
         {
             if ((m_progressMap != null && m_progressMap.Contains(task)) || (m_queueMap != null && m_queueMap.Contains(task)))
             {
-                DisactiveTask(task);
+                EnabledTask(task, false);
                 GetProcressMap().Remove(task);
                 GetQueueMap().Remove(task);
                 GetPauseMap().Add(task);
             }
+        }
+
+        public void ResumeTask(AssetDownloadTask task)
+        {
+            if ((m_pauseMap != null && m_pauseMap.Contains(task)))
+            {
+                EnabledTask(task, true);
+                GetPauseMap().Remove(task);
+                GetQueueMap().Remove(task);
+                GetProcressMap().Add(task);
+            }
+        }
+
+        public void StopTask(AssetDownloadTask task)
+        {
+            RemoveTask(task);
         }
 
         public void RemoveTask(AssetDownloadTask task)
@@ -229,7 +245,7 @@ namespace ASGame
             }
         }
 
-        private void StopAll()
+        public void StopAll()
         {
             if (m_tasksMap == null || m_tasksMap.Count <= 0)
                 return;
@@ -411,12 +427,19 @@ namespace ASGame
         }
 
         //失活任务,停止下载
-        private void DisactiveTask(AssetDownloadTask task)
+        private void EnabledTask(AssetDownloadTask task, bool isEnabled)
         {
             if (task == null)
                 return;
 
-            task.Pause();
+            if (isEnabled)
+            {
+                task.Resume();
+            }
+            else
+            {
+                task.Pause();
+            }
         }
 
         private void DestroyTask(AssetDownloadTask task)

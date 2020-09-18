@@ -2,14 +2,13 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using XLibGame;
 using XLibrary;
 
 namespace ASGame
 {
     public class AssetDownloadTask : IComparable<AssetDownloadTask>
     {
-        public static readonly string DOWNLOADING_SUFFIX = ".downloading";
-
         public int id;
         public int priority;                                                //优先级
         public int status;                                                  //状态
@@ -66,9 +65,19 @@ namespace ASGame
             if (m_downloadMgr == null)
                 return;
 
-            m_downloadMgr.StopDown(false, true);
+            m_downloadMgr.PauseDown();
             StartTime = -1;
             status = AssetDownloadStatus.DOWNLOAD_PAUSE;
+        }
+
+        public void Resume()
+        {
+            if (m_downloadMgr == null)
+                return;
+
+            m_downloadMgr.ResumeDown();
+            StartTime = XTimeTools.NowTimeStampMs;
+            status = AssetDownloadStatus.DOWNLOAD_DOWNLOADING;
         }
 
         public void Stop()
@@ -88,12 +97,18 @@ namespace ASGame
             return m_downloadMgr;
         }
 
+        // 下面的回调是子线程回调主线程
         protected void OnCompleted()
         {
             CompletedTime = XTimeTools.NowTimeStampMs;
             status = AssetDownloadStatus.DOWNLOAD_COMPLETED;
 
-            onCompleted?.Invoke(this);
+            CallbackManager.GetInstance()?.QueueOnMainThread((param) =>
+            {
+                var task = (AssetDownloadTask)param;
+                onCompleted?.Invoke(task);
+            },this);
+            
         }
 
         protected void OnFinish(string url, string path)
@@ -101,7 +116,14 @@ namespace ASGame
             if (m_downloadMgr == null)
                 return;
 
-            onFinish?.Invoke(url, path);
+            Tuple<string, string> bundle = new Tuple<string, string>(url, path);
+            CallbackManager.GetInstance()?.QueueOnMainThread((param) =>
+            {
+                var tuple = (Tuple<string, string>)param;
+                onFinish?.Invoke(tuple.Item1, tuple.Item2);
+            }, bundle);
+
+                
             if (m_downloadMgr.HadDownedCount == m_downloadMgr.TotalNeedDownCount)
             {
                 OnCompleted();
@@ -113,7 +135,13 @@ namespace ASGame
             if (m_downloadMgr == null)
                 return;
 
-            onProgress?.Invoke(cur, total);
+            Tuple<long, long> bundle = new Tuple<long, long>(cur, total);
+            CallbackManager.GetInstance()?.QueueOnMainThread((param) =>
+            {
+                var tuple = (Tuple<long, long>)param;
+                onProgress?.Invoke(tuple.Item1, tuple.Item2);
+            }, bundle);
+          
         }
 
     }

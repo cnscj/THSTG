@@ -1,6 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using XLibGame;
 using XLibrary.Package;
 
 namespace ASGame
@@ -9,6 +8,7 @@ namespace ASGame
     //提供 静默下载 一个开关
     public class AssetDownloadManager : MonoSingleton<AssetDownloadManager>
     {
+        private GameObject m_centralsGameObject;
         private AssetDownloadCentral m_foregroundCentral;           //前台下载
         private AssetDownloadCentral m_backgroundCentral;           //后台下载
 
@@ -24,21 +24,44 @@ namespace ASGame
             return fileSize;
         }
 
-        //前台下载,主动下载(缺啥下啥
+        private void Awake()
+        {
+            CallbackManager.GetInstance();  //唤醒下
+        }
+
+        private GameObject GetCentralGameObject()
+        {
+            if (m_centralsGameObject == null)
+            {
+                m_centralsGameObject = new GameObject("DownloadCentrals");
+                m_centralsGameObject.transform.SetParent(transform);
+            }
+            return m_centralsGameObject;
+        }
+
+        //前台下载,主动下载
         public AssetDownloadCentral GetForegroundCentral()
         {
-            m_foregroundCentral = m_foregroundCentral ?? new AssetDownloadCentral();
+            if (m_foregroundCentral == null)
+            {
+                GameObject centralGobj = new GameObject("ForegroundCentral");
+                centralGobj.transform.SetParent(GetCentralGameObject().transform, false);
+                m_foregroundCentral = centralGobj.AddComponent<AssetDownloadCentral>();
+            }
             return m_foregroundCentral;
         }
 
         //后台下载,用于边玩边下(空闲自动下载,随时启动,优先级比前台低
         public AssetDownloadCentral GetBackgroundCentral()
         {
-            m_backgroundCentral = m_backgroundCentral ?? new AssetDownloadCentral();
+            if (m_backgroundCentral == null)
+            {
+                GameObject centralGobj = new GameObject("BackgroundCentral");
+                centralGobj.transform.SetParent(GetCentralGameObject().transform, false);
+                m_backgroundCentral = centralGobj.AddComponent<AssetDownloadCentral>();
+            }
             return m_backgroundCentral;
         }
-
-
 
     }
 

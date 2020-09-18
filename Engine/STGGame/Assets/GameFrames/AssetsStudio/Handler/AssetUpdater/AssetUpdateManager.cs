@@ -52,6 +52,12 @@ namespace ASGame
 
         }
 
+        //校验资源
+        public void VerifyAsset()
+        {
+
+        }
+
         private void OnDownLoadcallback()
         {
 
