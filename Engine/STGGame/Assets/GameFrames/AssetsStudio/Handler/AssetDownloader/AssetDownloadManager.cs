@@ -63,6 +63,14 @@ namespace ASGame
             return m_backgroundCentral;
         }
 
+        //下载文件
+        public AssetDownloadTask Download(string []urls)
+        {
+            var task = GetForegroundCentral().NewTask(urls);
+            GetForegroundCentral().StartTask(task);
+            return task;
+        }
+
     }
 
 }

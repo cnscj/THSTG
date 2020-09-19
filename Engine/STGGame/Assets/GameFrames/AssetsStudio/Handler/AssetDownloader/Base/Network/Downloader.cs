@@ -202,18 +202,6 @@ namespace ASGame
             }
         }
 
-        public void ClearDown()
-        {
-            m_bIsPause = false;
-            m_pauseEvent.Set();
-
-            m_downloadFinish = null;
-            m_downloadProgress = null;
-
-            m_successDownList.Clear();
-            m_failedDownList.Clear();
-        }
-
         static void ThreadFunc(object obj)
         {
             CDownloader pMng = obj as CDownloader;
@@ -256,6 +244,16 @@ namespace ASGame
                 else
                     break;
             }
+
+            //TODO:
+            if (m_bNeedStop)
+            {
+                if (m_nHadDownedCount < m_nTotalNeedDownCount)
+                {
+                    OnFileDownloadInterrupt(resInfo, null); 
+                }
+            }
+
             http.Close();
             // 线程退出，线程数减一
             System.Threading.Interlocked.Decrement(ref m_nDownThreadNumb);
@@ -340,8 +338,7 @@ namespace ASGame
             PushWrite(pBlock); // 通知写线程关闭对应的文件
             m_nHadDownedCount++;
 
-            OnFileDownloadFinish(url, bSuc, resInfo, resFile);
-           
+            OnFileDownloadFinish(bSuc, resInfo, resFile);
         }
 
         public class MemBlock
@@ -614,7 +611,12 @@ namespace ASGame
             m_downloadProgress?.Invoke(nHadDownedSize, nTotalNeedDownSize);
         }
 
-        protected void OnFileDownloadFinish(string url, bool bSuc, DownResInfo resInfo, DownResFile resFile)
+        protected void OnFileDownloadInterrupt(DownResInfo resInfo, DownResFile resFile)
+        {
+
+        }
+
+        protected void OnFileDownloadFinish(bool bSuc, DownResInfo resInfo, DownResFile resFile)
         {
             if (bSuc)
             {

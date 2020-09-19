@@ -173,11 +173,6 @@ namespace ASGame
 
         public void StopTask(AssetDownloadTask task)
         {
-            RemoveTask(task);
-        }
-
-        public void RemoveTask(AssetDownloadTask task)
-        {
             if (m_queueMap != null) m_queueMap.Remove(task);
             if (m_pauseMap != null) m_pauseMap.Remove(task);
             if (m_progressMap != null) m_progressMap.Remove(task);
@@ -234,17 +229,6 @@ namespace ASGame
 
         }
 
-        public void RemoveAll()
-        {
-            if (m_tasksMap == null || m_tasksMap.Count <= 0)
-                return;
-
-            foreach (var task in m_tasksMap.Values)
-            {
-                RemoveTask(task);
-            }
-        }
-
         public void StopAll()
         {
             if (m_tasksMap == null || m_tasksMap.Count <= 0)
@@ -252,7 +236,7 @@ namespace ASGame
 
             foreach (var task in m_tasksMap.Values)
             {
-                task.Stop();
+                StopTask(task);
             }
         }
 
@@ -260,7 +244,7 @@ namespace ASGame
         /////////////////////////////////////
         private AssetDownloadTask GetOrCreateTask()
         {
-            var task = new AssetDownloadTask();
+            var task = new AssetDownloadTask(this);
             task.id = m_taskId++;
             return task;
         }
@@ -423,7 +407,7 @@ namespace ASGame
             if (task == null)
                 return;
 
-            task.Start();
+            task.StartByManager(this);
         }
 
         //失活任务,停止下载
@@ -434,11 +418,11 @@ namespace ASGame
 
             if (isEnabled)
             {
-                task.Resume();
+                task.ResumeByManager(this);
             }
             else
             {
-                task.Pause();
+                task.PauseByManager(this);
             }
         }
 
@@ -447,7 +431,7 @@ namespace ASGame
             if (task == null)
                 return;
 
-            task.Stop();
+            task.StopByManager(this);
         }
 
         //Android目录下,下载中的存放路径必须在Application.dataPath,下载完成在拷贝到Application.persistentDataPath
@@ -455,11 +439,11 @@ namespace ASGame
         {
             //将临时文件移动到持久目录
         }
+
         protected void OnDownloadFailed(AssetDownloadTask task)
         {
             //移除无效的临时文件
         }
-
 
         private string GetLocalPathNameByUrl(string url, string saveFolder)
         {

@@ -22,6 +22,7 @@ namespace ASGame
         public AssetDownloadFinishCallback onFinish;                        //下载回调
         public AssetDownloadProgressCallback onProgress;                    //进度回调
 
+        private AssetDownloadCentral m_central;
         private CDownloader m_downloadMgr;
 
         public long CreateTime { get; protected set; }                      //创建时间
@@ -34,8 +35,9 @@ namespace ASGame
         public List<DownResFile> SuccessDownList { get { return m_downloadMgr != null ? m_downloadMgr.SuccessDownList : null; } }
         public List<DownResFile> FailedDownList { get { return m_downloadMgr != null ? m_downloadMgr.FailedDownList : null; } }
 
-        public AssetDownloadTask()
+        public AssetDownloadTask(AssetDownloadCentral central)
         {
+            m_central = central;
             CreateTime = XTimeTools.NowTimeStampMs;
             status = AssetDownloadStatus.DOWNLOAD_NONE;
         }
@@ -48,7 +50,13 @@ namespace ASGame
             return other.priority - this.priority;
         }
 
-        public void Start()
+        public void Start() { GetDownloadCentral().StartTask(this); }
+        public void Pause() { GetDownloadCentral().PauseTask(this); }
+        public void Resume() { GetDownloadCentral().ResumeTask(this); }
+        public void Stop() { GetDownloadCentral().StopTask(this); }
+
+        ////////
+        public void StartByManager(AssetDownloadCentral central)
         {
             var mgr = GetDownloadMgr();
             mgr.OnDownloadFinish = OnFinish;
@@ -60,7 +68,7 @@ namespace ASGame
             status = AssetDownloadStatus.DOWNLOAD_DOWNLOADING;
         }
 
-        public void Pause()
+        public void PauseByManager(AssetDownloadCentral central)
         {
             if (m_downloadMgr == null)
                 return;
@@ -70,7 +78,7 @@ namespace ASGame
             status = AssetDownloadStatus.DOWNLOAD_PAUSE;
         }
 
-        public void Resume()
+        public void ResumeByManager(AssetDownloadCentral central)
         {
             if (m_downloadMgr == null)
                 return;
@@ -80,7 +88,7 @@ namespace ASGame
             status = AssetDownloadStatus.DOWNLOAD_DOWNLOADING;
         }
 
-        public void Stop()
+        public void StopByManager(AssetDownloadCentral central)
         {
             if (m_downloadMgr == null)
                 return;
@@ -91,6 +99,11 @@ namespace ASGame
         }
 
         ////
+        private AssetDownloadCentral GetDownloadCentral()
+        {
+            return m_central;
+        }
+
         private CDownloader GetDownloadMgr()
         {
             m_downloadMgr = m_downloadMgr ?? new CDownloader();
@@ -108,7 +121,6 @@ namespace ASGame
                 var task = (AssetDownloadTask)param;
                 onCompleted?.Invoke(task);
             },this);
-            
         }
 
         protected void OnFinish(string url, string path)
@@ -123,7 +135,7 @@ namespace ASGame
                 onFinish?.Invoke(tuple.Item1, tuple.Item2);
             }, bundle);
 
-                
+            //任务结束回调
             if (m_downloadMgr.HadDownedCount == m_downloadMgr.TotalNeedDownCount)
             {
                 OnCompleted();
