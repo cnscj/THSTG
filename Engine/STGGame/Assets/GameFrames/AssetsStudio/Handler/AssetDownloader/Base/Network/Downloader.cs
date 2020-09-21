@@ -245,15 +245,6 @@ namespace ASGame
                     break;
             }
 
-            //TODO:
-            if (m_bNeedStop)
-            {
-                if (m_nHadDownedCount < m_nTotalNeedDownCount)
-                {
-                    OnFileDownloadInterrupt(resInfo, null); 
-                }
-            }
-
             http.Close();
             // 线程退出，线程数减一
             System.Threading.Interlocked.Decrement(ref m_nDownThreadNumb);
@@ -594,7 +585,7 @@ namespace ASGame
                 file.Flush();
             }
         }
-
+        ///////////////
         // 下面函数都是在子线程中执行的,不能直接回调Unity主线程
         protected string GetLocalPathNameByUrl(string url, string savePath)
         {
@@ -611,11 +602,6 @@ namespace ASGame
             m_downloadProgress?.Invoke(nHadDownedSize, nTotalNeedDownSize);
         }
 
-        protected void OnFileDownloadInterrupt(DownResInfo resInfo, DownResFile resFile)
-        {
-
-        }
-
         protected void OnFileDownloadFinish(bool bSuc, DownResInfo resInfo, DownResFile resFile)
         {
             if (bSuc)
@@ -626,8 +612,6 @@ namespace ASGame
             {
                 m_failedDownList.Add(resFile);
             }
-
-            m_downloadFinish?.Invoke(resInfo.url, resInfo.savePath);
         }
 
         protected void OnFileDownloadEnd(DownResInfo resInfo, DownResFile resFile)
@@ -640,6 +624,8 @@ namespace ASGame
                     File.Delete(savePath);
                 File.Move(tempPath, savePath);
             }
+
+            m_downloadFinish?.Invoke(resInfo.url, resInfo.savePath);    //
         }
     }
 

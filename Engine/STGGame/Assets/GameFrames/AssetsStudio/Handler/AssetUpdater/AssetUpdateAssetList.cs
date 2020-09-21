@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using XLibrary;
 
@@ -31,16 +32,16 @@ namespace ASGame
             }
         }
 
-        public string type = "assets";
-        public int version;
-        public long date;
+        public string type = "assets";  //资源
+        public int version;             //版本号
+        public long date;               //日期
 
         public Item[] fileItems;
 
-        public void Create(string assetFolder)
+        public AssetUpdateAssetList Scan(string assetFolder)
         {
             if (string.IsNullOrEmpty(assetFolder))
-                return;
+                return this;
 
             var assetFolderLow = assetFolder.ToLower();
             var fileList = new List<Item>();
@@ -59,7 +60,7 @@ namespace ASGame
             },true);
 
             fileItems = fileList.ToArray();
-
+            return this;
         }
 
         //生成某个目录的文件列表
@@ -111,9 +112,44 @@ namespace ASGame
             fileStream.Close();
             streamReader.Dispose();
             fileStream.Dispose();
+
         }
 
-        public Dictionary<string ,Item> GetDict()
+        //验证某个文件夹的文件是否符合,但是无法判断增删
+        public bool Verify(string folderPath)
+        {
+            if (string.IsNullOrEmpty(folderPath))
+                return false;
+
+            if (!Directory.Exists(folderPath))
+                return false;
+
+            bool isVerify = true;
+            var dict = GetDictByPath();
+            XFolderTools.TraverseFiles(folderPath, (fullPath) =>
+            {
+                if (isVerify == false)
+                    return;
+
+                var assetPath = XPathTools.GetRelativePath(fullPath);
+                var relaPath = XPathTools.SubRelativePath(folderPath, assetPath);
+
+                if (dict.TryGetValue(relaPath, out var item))
+                {
+                    var fileMd5 = XFileTools.GetMD5(relaPath);
+                    if (string.Compare(item.fileMd5, fileMd5) != 0)
+                    {
+                        isVerify = false;
+                    }
+                }
+
+            }, true);
+
+            return isVerify;
+        }
+
+
+        public Dictionary<string ,Item> GetDictByPath()
         {
             var dict = new Dictionary<string, Item>();
 
@@ -124,6 +160,20 @@ namespace ASGame
 
             return dict;
         }
+
+        public Dictionary<string, Item> GetDictByMd5()
+        {
+            var dict = new Dictionary<string, Item>();
+
+            foreach (var item in fileItems)
+            {
+                dict.Add(item.fileMd5, item);
+            }
+
+            return dict;
+        }
+
+       
     }
 
 }

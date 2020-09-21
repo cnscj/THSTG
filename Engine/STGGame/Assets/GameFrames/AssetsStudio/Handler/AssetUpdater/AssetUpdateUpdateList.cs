@@ -44,8 +44,8 @@ namespace ASGame
             if (oldAssetList == null || newAssetList == null)
                 return;
 
-            var oldDict = oldAssetList.GetDict();
-            var newDict = newAssetList.GetDict();
+            var oldDict = oldAssetList.GetDictByPath();
+            var newDict = newAssetList.GetDictByPath();
             var packageDict = newPackageList?.GetDict();
 
             int maxCount = Math.Max(oldAssetList.fileItems.Length, newAssetList.fileItems.Length);
@@ -84,8 +84,8 @@ namespace ASGame
                     {
                         var item = new Item(newItem, packageItem);
 
-                        var modifyList = GetOrAddDictPackageAddList(package);
-                        modifyList.Add(item.filePath, item);
+                        var addList = GetOrAddDictPackageAddList(package);
+                        addList.Add(item.filePath, item);
 
                         GetDictPackage(package).size += newItem.fileSize;
                     }
