@@ -107,7 +107,7 @@ namespace ASGame
 
         }
 
-        public AssetDownloadTask NewTask(string[] urlPaths)
+        public AssetDownloadTask NewTask(string[] urlPaths, string[] savePaths = null)
         {
             if (urlPaths != null && urlPaths.Length > 0)
             {
@@ -119,13 +119,23 @@ namespace ASGame
 
                 var task = GetOrCreateTask();
                 task.urlPaths = urlPaths;
-                task.savePaths = GetFileSavePathsByUrls(urlPaths);
+                task.savePaths = savePaths;
                 GetTaskMap().Add(taskKey, task);
 
                 //默认全部送到暂停队列,方便以后开启空闲下载
                 GetPauseMap().Add(task);
                 task.status = AssetDownloadStatus.DOWNLOAD_PAUSE;
                 return task;
+            }
+            return null;
+        }
+
+        public AssetDownloadTask NewTask(string[] urlPaths)
+        {
+            if (urlPaths != null && urlPaths.Length > 0)
+            {
+                var savePaths = GetFileSavePathsByUrls(urlPaths);
+                return NewTask(urlPaths, savePaths);
             }
             return null;
         }

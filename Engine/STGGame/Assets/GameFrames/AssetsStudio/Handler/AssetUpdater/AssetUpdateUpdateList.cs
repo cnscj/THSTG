@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace ASGame
 {
@@ -8,137 +9,142 @@ namespace ASGame
     {
         public class Item
         {
-            public string filePath;     //文件路径
-            public string fileMd5;      //文件MD5
-            public int flag;            //标志
+            public string filePath;
+            public string fileMd5;
+            public int flag;
 
-            public Item(AssetUpdateAssetList.Item assetItem, AssetUpdateConfigList.Item packageItem)
+            public Item(AssetUpdateDifferenceList.Item itemSrc, AssetUpdateConfigList.Item itemCfg)
             {
-                if (assetItem != null)
+                if (itemSrc != null)
                 {
-                    filePath = assetItem.filePath;
-                    fileMd5 = assetItem.fileMd5;
+                    filePath = itemSrc.filePath;
+                    fileMd5 = itemSrc.fileMd5;
                 }
 
-                if (packageItem != null)
+                if (itemCfg != null)
                 {
-                    flag = packageItem.flag;
+                    flag = itemCfg.flag;
                 }
             }
         }
 
         public class Package
         {
-            public int index;
             public long size;
-            public Dictionary<string, Item> adds;
-            public Dictionary<string, Item> modifys;
+            
+            public List<string> urlPaths;
+            public List<string> savePaths;
 
-            public Dictionary<string, Item> removes;
+            public List<string> GetUrlList()
+            {
+                urlPaths = urlPaths ?? new List<string>();
+                return urlPaths;
+            }
+            public List<string> GetSaveList()
+            {
+                savePaths = savePaths ?? new List<string>();
+                return savePaths;
+            }
         }
 
+        private string _baseDownloadUrl;
+        private string _baseSaveFolder;
+        public Dictionary<string, Item> _items;
         private Dictionary<int, Package> _dict;
 
-        public void Create(AssetUpdateAssetList oldAssetList, AssetUpdateAssetList newAssetList, AssetUpdateConfigList newPackageList = null)
+
+        public AssetUpdateUpdateList(string baseDownloadUrl,string baseSaveFolder)
         {
-            if (oldAssetList == null || newAssetList == null)
+            _baseDownloadUrl = baseDownloadUrl;
+            _baseSaveFolder = baseSaveFolder;
+        }
+
+        public void Convert(AssetUpdateDifferenceList differenceList, AssetUpdateConfigList configList)
+        {
+            if (string.IsNullOrEmpty(_baseDownloadUrl) || string.IsNullOrEmpty(_baseSaveFolder))
                 return;
 
-            var oldDict = oldAssetList.GetDictByPath();
-            var newDict = newAssetList.GetDictByPath();
-            var packageDict = newPackageList?.GetDict();
-
-            int maxCount = Math.Max(oldAssetList.fileItems.Length, newAssetList.fileItems.Length);
-            for (int i = 0; i < maxCount; i++)
+            if (differenceList == null)
+                return;
+            
+            var packageDict = configList?.GetDict();
+            if (differenceList.adds != null && differenceList.adds.dict != null)
             {
-                int package = 0;
-                var oldItem = i < oldAssetList.fileItems.Length ? oldAssetList.fileItems[i] : null;
-                var newItem = i < newAssetList.fileItems.Length ? newAssetList.fileItems[i] : null;
-
-                if (newItem != null)
+                foreach (var vPair in differenceList.adds.dict)
                 {
-                    AssetUpdateConfigList.Item packageItem = null;
-                    if (packageDict != null)
-                    {
-                        if (packageDict.TryGetValue(newItem.filePath, out packageItem))
-                        {
-                            package = packageItem.packageId;
-                        }
-                    }
-
-                    if (oldDict.TryGetValue(newItem.filePath, out var sideOldItem))
-                    {
-                        //变更的
-                        if (string.Compare(newItem.fileMd5, sideOldItem.fileMd5, true) != 0) 
-                        {
-                            var item = new Item(newItem, packageItem);
-
-                            var modifyList = GetOrAddDictPackageModifyList(package);
-                            modifyList.Add(item.filePath, item);
-
-
-                            GetDictPackage(package).size += newItem.fileSize;
-                        }
-                    }
-                    else //新增的
-                    {
-                        var item = new Item(newItem, packageItem);
-
-                        var addList = GetOrAddDictPackageAddList(package);
-                        addList.Add(item.filePath, item);
-
-                        GetDictPackage(package).size += newItem.fileSize;
-                    }
+                    ConvertItem(vPair, packageDict);
                 }
+            }
 
-                if (oldItem != null)
+            if (differenceList.modifys != null && differenceList.modifys.dict != null)
+            {
+                foreach (var vPair in differenceList.modifys.dict)
                 {
-                    package = 0;                                    //包0移除
-                    if (!newDict.ContainsKey(oldItem.filePath))     //移除的
-                    {
-                        var item = new Item(oldItem, null);
-
-                        var removeList = GetOrAddDictPackageRemoveList(package);
-                        removeList.Add(item.filePath, item);
-                    }
+                    ConvertItem(vPair, packageDict);
                 }
             }
         }
 
-        public Dictionary<int, Package> GetDict()
+        private void ConvertItem(KeyValuePair<string,AssetUpdateDifferenceList.Item> pair,Dictionary<string, AssetUpdateConfigList.Item> dict)
+        {
+            var filePath = pair.Key;
+
+            int packageindex = 0;
+            AssetUpdateConfigList.Item itemCfg = null;
+            AssetUpdateDifferenceList.Item itemSrc = pair.Value;
+            if (dict != null && dict.TryGetValue(filePath, out itemCfg))
+            {
+                packageindex = itemCfg.packageId;
+            }
+
+            var item = new Item(itemSrc, itemCfg);
+            string urlPath = Path.Combine(_baseDownloadUrl, filePath);
+            string savePaths = Path.Combine(_baseSaveFolder, filePath);
+            var package = GetOrCreatePackage(packageindex);
+
+            package.size += pair.Value.fileSize;
+
+            GetOrCreateItemDict().Add(filePath,item);
+            package.GetUrlList().Add(urlPath);
+            package.GetSaveList().Add(savePaths);
+        }
+
+        private Package GetOrCreatePackage(int index)
+        {
+            var dict = GetOrCreateDict();
+            if (!dict.TryGetValue(index, out var package))
+            {
+                package = new Package();
+                dict.Add(index, package);
+            }
+            return dict[index];
+        }
+
+        public Dictionary<string, Item> GetOrCreateItemDict()
+        {
+            _items = _items ?? new Dictionary<string, Item>();
+            return _items;
+        }
+
+        private Dictionary<int, Package> GetOrCreateDict()
         {
             _dict = _dict ?? new Dictionary<int, Package>();
             return _dict;
         }
 
-        private Package GetDictPackage(int pakage)
+
+        public string[] GetUrlList(int packageIndex = 0)
         {
-            var dict = GetDict();
-            var package = dict.ContainsKey(pakage) ? dict[pakage] : (dict[pakage] = new Package());
-            return package;
+            var package = GetOrCreatePackage(packageIndex);
+            return package.GetUrlList().ToArray();
         }
 
-        private Dictionary<string, Item> GetOrAddDictPackageAddList(int pakage)
-        {
-            var package = GetDictPackage(pakage);
-            package.adds = package.adds ?? new Dictionary<string, Item>();
-            return package.adds;
-        }
 
-        private Dictionary<string, Item> GetOrAddDictPackageModifyList(int pakage)
+        public string[] GetSaveList(int packageIndex = 0)
         {
-            var package = GetDictPackage(pakage);
-            package.modifys = package.modifys ?? new Dictionary<string, Item>();
-            return package.modifys;
+            var package = GetOrCreatePackage(packageIndex);
+            return package.GetSaveList().ToArray();
         }
-
-        private Dictionary<string, Item> GetOrAddDictPackageRemoveList(int pakage)
-        {
-            var package = GetDictPackage(pakage);
-            package.removes = package.removes ?? new Dictionary<string, Item>();
-            return package.removes;
-        }
-
     }
 
 }

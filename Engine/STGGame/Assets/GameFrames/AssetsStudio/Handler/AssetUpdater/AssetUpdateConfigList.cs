@@ -33,6 +33,7 @@ namespace ASGame
             }
         }
 
+        public string path;
         public string type = "config";
         public int version;
         public long date;
@@ -59,6 +60,8 @@ namespace ASGame
             fileStream.Close();
             streamWriter.Dispose();
             fileStream.Dispose();
+
+            path = savePath;
         }
 
         public void Import(string loadPath)
@@ -88,6 +91,8 @@ namespace ASGame
             fileStream.Close();
             streamReader.Dispose();
             fileStream.Dispose();
+
+            path = loadPath;
 
             List2Dict(fileList, _data);
         }

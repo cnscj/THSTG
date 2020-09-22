@@ -32,6 +32,7 @@ namespace ASGame
             }
         }
 
+        public string path;
         public string type = "assets";  //资源
         public int version;             //版本号
         public long date;               //日期
@@ -59,6 +60,7 @@ namespace ASGame
 
             },true);
 
+            path = assetFolder;
             fileItems = fileList.ToArray();
             return this;
         }
@@ -82,6 +84,8 @@ namespace ASGame
             fileStream.Close();
             streamWriter.Dispose();
             fileStream.Dispose();
+
+            path = savePath;
         }
 
         public void Import(string loadPath)
@@ -113,6 +117,7 @@ namespace ASGame
             streamReader.Dispose();
             fileStream.Dispose();
 
+            path = loadPath;
         }
 
         //验证某个文件夹的文件是否符合,但是无法判断增删
@@ -126,6 +131,7 @@ namespace ASGame
 
             bool isVerify = true;
             var dict = GetDictByPath();
+            var record = new HashSet<string>();
             XFolderTools.TraverseFiles(folderPath, (fullPath) =>
             {
                 if (isVerify == false)
@@ -141,10 +147,18 @@ namespace ASGame
                     {
                         isVerify = false;
                     }
+                    record.Add(relaPath);
                 }
 
             }, true);
 
+            if (isVerify)
+            {
+                if(dict.Count != record.Count)
+                {
+                    isVerify = false;
+                }
+            }
             return isVerify;
         }
 
@@ -171,9 +185,6 @@ namespace ASGame
             }
 
             return dict;
-        }
-
-       
+        }   
     }
-
 }

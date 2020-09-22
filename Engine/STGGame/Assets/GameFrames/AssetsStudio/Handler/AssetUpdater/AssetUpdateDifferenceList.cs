@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using UnityEngine;
 
 namespace ASGame
@@ -11,11 +13,13 @@ namespace ASGame
         {
             public string filePath;     //文件路径
             public string fileMd5;      //文件MD5
+            public long fileSize;
 
             public Item(AssetUpdateAssetList.Item item)
             {
                 this.filePath = item.filePath;
                 this.fileMd5 = item.fileMd5;
+                this.fileSize = item.fileSize;
             }
         }
 
@@ -35,7 +39,7 @@ namespace ASGame
         public Group modifys;
         public Group removes;
 
-        public AssetUpdateDifferenceList Compare(AssetUpdateAssetList oldAssetList, AssetUpdateAssetList newAssetList)
+        public AssetUpdateDifferenceList Compare(AssetUpdateAssetList newAssetList, AssetUpdateAssetList oldAssetList)
         {
             if (oldAssetList == null || newAssetList == null)
                 return this;
@@ -111,6 +115,96 @@ namespace ASGame
             var hadRemoves = removes != null && removes.dict != null && removes.dict.Count > 0;
 
             return !hadModifys && !hadRemoves;
+        }
+
+        //同步差异文件
+        public void Synchronize(string srcFolderPath, string destFolderPath, bool isMove = false)
+        {
+            if (string.IsNullOrEmpty(srcFolderPath) || string.IsNullOrEmpty(destFolderPath))
+                return;
+
+            if (!Directory.Exists(srcFolderPath))
+                return;
+
+            if (!Directory.Exists(destFolderPath))
+                Directory.CreateDirectory(destFolderPath);
+
+            if (adds != null && adds.dict != null)
+            {
+                foreach (var item in adds.dict.Values)
+                {
+                    string srcFullPath = Path.Combine(srcFolderPath, item.filePath);
+                    string destFullPath = Path.Combine(destFolderPath, item.filePath);
+
+                    if (File.Exists(srcFullPath))
+                    {
+                        if (isMove) File.Move(srcFullPath, destFullPath);
+                        else File.Copy(srcFullPath, destFullPath);
+                    }
+                }
+            }
+
+            if (modifys != null && modifys.dict != null)
+            {
+                foreach (var item in modifys.dict.Values)
+                {
+                    string srcFullPath = Path.Combine(srcFolderPath, item.filePath);
+                    string destFullPath = Path.Combine(destFolderPath, item.filePath);
+
+                    if (File.Exists(srcFullPath))
+                    {
+                        if (File.Exists(destFullPath))
+                            File.Delete(destFullPath);
+
+                        if (isMove) File.Move(srcFullPath, destFullPath);
+                        else File.Copy(srcFullPath, destFullPath);
+                    }
+                }
+            }
+
+            if (removes != null && removes.dict != null)
+            {
+                foreach (var item in removes.dict.Values)
+                {
+                    string destFullPath = Path.Combine(destFolderPath, item.filePath);
+                    File.Delete(destFullPath);
+                }
+            }
+        }
+
+        public override string ToString()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            if (adds != null && adds.dict != null)
+            {
+                stringBuilder.AppendLine("Adds:");
+                foreach (var item in adds.dict.Values)
+                {
+                    stringBuilder.AppendLine(item.filePath);
+                }
+            }
+
+            if (modifys != null && modifys.dict != null)
+            {
+                stringBuilder.AppendLine("");
+                stringBuilder.AppendLine("Modifys:");
+                foreach (var item in modifys.dict.Values)
+                {
+                    stringBuilder.AppendLine(item.filePath);
+                }
+            }
+
+            if (removes != null && removes.dict != null)
+            {
+                stringBuilder.AppendLine("");
+                stringBuilder.AppendLine("Removes:");
+                foreach (var item in removes.dict.Values)
+                {
+                    stringBuilder.AppendLine(item.filePath);
+                }
+            }
+
+            return stringBuilder.ToString();
         }
 
         private Group GetModifyGroup()
