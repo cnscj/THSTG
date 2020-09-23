@@ -8,6 +8,8 @@ namespace ASGame
     //资源列表
     public class AssetUpdateAssetList
     {
+        public static readonly string FILE_TYPE = "assets";
+        public static readonly int FILE_VERSION = 100;
         public class Item
         {
             public string filePath;     //文件路径
@@ -33,9 +35,9 @@ namespace ASGame
         }
 
         public string path;
-        public string type = "assets";  //资源
-        public int version;             //版本号
-        public long date;               //日期
+        public string type = FILE_TYPE;         //资源
+        public int version = FILE_VERSION;      //版本号
+        public long date;                       //日期
 
         public Item[] fileItems;
 

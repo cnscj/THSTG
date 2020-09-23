@@ -51,6 +51,7 @@ namespace ASGame
         int m_nWriteThreadNumb = 0;
         bool m_bNeedStop = false;
 
+        //FIXME:线程切换浪费资源,后面换成Task
         Thread[] m_runThreads;
         Thread m_runWriteThread;
 
@@ -75,6 +76,7 @@ namespace ASGame
         public DownloadProgress OnDownloadProgress { get { return m_downloadProgress; } set { m_downloadProgress = value; } }
         public List<DownResFile> SuccessDownList { get => m_successDownList; }
         public List<DownResFile> FailedDownList { get => m_failedDownList; }
+        public DownResInfo CurDownloadInfo { get { return (m_downList != null && m_downList.Count > m_nNextDownIndex) ? m_downList[m_nNextDownIndex] : null; } }
 
         public CDownloader()
         {

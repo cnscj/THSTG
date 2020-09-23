@@ -90,22 +90,22 @@ namespace ASGame
         }
         /////////////////////////////////////
 
-        //TODO:从磁盘加载任务
-        public AssetDownloadTask LoadTask()
-        {
-            return null;
-        }
-        //TODO:
-        public void SaveTask()
-        {
-            //生成临时文件
-        }
+        ////TODO:从磁盘加载任务
+        //public AssetDownloadTask LoadTask()
+        //{
+        //    return null;
+        //}
+        ////TODO:
+        //public void SaveTask()
+        //{
+        //    //生成临时文件
+        //}
 
-        //TODO:临时文件也一并移除
-        public void DeleteTask(AssetDownloadTask task)
-        {
+        ////TODO:临时文件也一并移除
+        //public void DeleteTask(AssetDownloadTask task)
+        //{
 
-        }
+        //}
 
         public AssetDownloadTask NewTask(string[] urlPaths, string[] savePaths = null)
         {

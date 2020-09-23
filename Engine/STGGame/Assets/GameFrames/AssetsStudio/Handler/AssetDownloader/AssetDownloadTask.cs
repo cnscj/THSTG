@@ -34,6 +34,7 @@ namespace ASGame
         public int TotalCount { get { return m_downloadMgr != null ? m_downloadMgr.TotalNeedDownCount : 0; } }
         public List<DownResFile> SuccessDownList { get { return m_downloadMgr != null ? m_downloadMgr.SuccessDownList : null; } }
         public List<DownResFile> FailedDownList { get { return m_downloadMgr != null ? m_downloadMgr.FailedDownList : null; } }
+        public DownResInfo CurDownloadInfo { get { return m_downloadMgr != null ? m_downloadMgr.CurDownloadInfo : null; } }
 
         public AssetDownloadTask(AssetDownloadCentral central)
         {

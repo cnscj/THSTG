@@ -7,6 +7,8 @@ namespace ASGame
     //分包配置表
     public class AssetUpdateConfigList
     {
+        public static readonly string FILE_TYPE = "config";
+        public static readonly int FILE_VERSION = 100;
         public class Item
         {
             public string filePath;
@@ -34,8 +36,8 @@ namespace ASGame
         }
 
         public string path;
-        public string type = "config";
-        public int version;
+        public string type = FILE_TYPE;
+        public int version = FILE_VERSION;
         public long date;
 
         private Dictionary<string, Item> _data = new Dictionary<string, Item>();
