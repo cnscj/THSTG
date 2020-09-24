@@ -7,7 +7,9 @@ namespace ASGame
 {
     //文件差异列表
     public class AssetUpdateUpdateList
-    {
+    { 
+
+
         public class Item
         {
             public AssetUpdateDifferenceList.Item itemSrc;
@@ -24,7 +26,7 @@ namespace ASGame
         {
             public int index;
             public long size;
-            
+
             public List<string> urlPaths;
             public List<string> savePaths;
 
@@ -42,8 +44,7 @@ namespace ASGame
 
         private string _baseDownloadUrl;
         private string _baseSaveFolder;
-        public Dictionary<string, Item> _itemsWhitMd5;
-        public Dictionary<string, Item> _itemsWithPath;
+        public Dictionary<string, Item> _items;
         private Dictionary<int, Package> _dict;
 
         public string BaseDownloadUrl => _baseDownloadUrl;
@@ -100,10 +101,11 @@ namespace ASGame
 
             package.size += pair.Value.fileSize;
 
-            GetOrCreateMd5ItemDict().Add(fileMd5, item);
-            GetOrCreatePathItemDict().Add(filePath, item);
             package.GetUrlList().Add(urlPath);
             package.GetSaveList().Add(savePaths);
+
+
+            GetOrCreateItemDict().Add(savePaths.ToLower(), item);
         }
 
         public string GetFileDownloadUrl(Item item)
@@ -124,49 +126,6 @@ namespace ASGame
             return Path.Combine(_baseSaveFolder, string.Format("S{0}", packageIndex));
         }
 
-        //验证是否符合列表
-        public bool Verify(int packageIndex = 0)
-        {
-            string folderPath = GetSaveFolderPath(packageIndex);
-            if (string.IsNullOrEmpty(folderPath))
-                return false;
-
-            if (!Directory.Exists(folderPath))
-                return false;
-
-            bool isVerify = true;
-            var dict = GetOrCreatePathItemDict();
-            var record = new HashSet<string>();
-            XFolderTools.TraverseFiles(folderPath, (fullPath) =>
-            {
-                if (isVerify == false)
-                    return;
-
-                var assetPath = XPathTools.GetRelativePath(fullPath);
-                var relaPath = XPathTools.SubRelativePath(folderPath, assetPath);
-
-                if (dict.TryGetValue(relaPath, out var item))
-                {
-                    var fileMd5 = XFileTools.GetMD5(relaPath);
-                    if (string.Compare(item.itemSrc.fileMd5, fileMd5) != 0)
-                    {
-                        isVerify = false;
-                    }
-                    record.Add(relaPath);
-                }
-
-            }, true);
-
-            if (isVerify)
-            {
-                if (dict.Count != record.Count)
-                {
-                    isVerify = false;
-                }
-            }
-            return isVerify;
-        }
-
         private Package GetOrCreatePackage(int index)
         {
             var dict = GetOrCreateDict();
@@ -179,16 +138,10 @@ namespace ASGame
             return dict[index];
         }
 
-        private Dictionary<string, Item> GetOrCreateMd5ItemDict()
+        private Dictionary<string, Item> GetOrCreateItemDict()
         {
-            _itemsWhitMd5 = _itemsWhitMd5 ?? new Dictionary<string, Item>();
-            return _itemsWhitMd5;
-        }
-
-        private Dictionary<string, Item> GetOrCreatePathItemDict()
-        {
-            _itemsWithPath = _itemsWithPath ?? new Dictionary<string, Item>();
-            return _itemsWithPath;
+            _items = _items ?? new Dictionary<string, Item>();
+            return _items;
         }
 
         private Dictionary<int, Package> GetOrCreateDict()
@@ -198,25 +151,15 @@ namespace ASGame
         }
 
         ////////////////
-        public Item GetItemByMd5(string md5)
+        public Item GetItem(string path)
         {
-            if (_itemsWhitMd5 == null)
+            if (string.IsNullOrEmpty(path))
                 return null;
 
-            if (_itemsWhitMd5.TryGetValue(md5, out var item))
-            {
-                return item;
-            }
-
-            return null;
-        }
-
-        public Item GetItemByPath(string path)
-        {
-            if (_itemsWithPath == null)
+            if (_items == null)
                 return null;
 
-            if (_itemsWithPath.TryGetValue(path, out var item))
+            if (_items.TryGetValue(path.ToLower(), out var item))
             {
                 return item;
             }
@@ -246,7 +189,7 @@ namespace ASGame
         public Item[] GetItemList()
         {
             List<Item> items = new List<Item>();
-            items.AddRange(GetOrCreatePathItemDict().Values);
+            items.AddRange(GetOrCreateItemDict().Values);
             return items.ToArray();
         }
 

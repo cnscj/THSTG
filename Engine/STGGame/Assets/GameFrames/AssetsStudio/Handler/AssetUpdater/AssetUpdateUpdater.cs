@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using XLibrary;
 
 namespace ASGame
 {
@@ -12,6 +14,7 @@ namespace ASGame
 
         private AssetUpdateUpdateList _updateList;
         private AssetDownloadTask _downloadTask;
+        private string _srcAssetPaths;
         public AssetUpdateUpdater(AssetUpdateUpdateList updateList)
         {
             if (updateList == null)
@@ -36,7 +39,7 @@ namespace ASGame
             return -1L;
         }
 
-        public bool IsDiskspaceEnough(int packageIndex = 0)
+        public bool IsDiskspaceEnough(int packageIndex)
         {
             //取得保存路径下所在磁盘剩余空间大小
             var baseSaveFolder = _updateList.BaseSaveFolder;
@@ -52,7 +55,7 @@ namespace ASGame
             return residueSpace;
         }
 
-        public long GetUpdateNeedSize(int packageIndex = 0)
+        public long GetUpdateNeedSize(int packageIndex)
         {
             var package = _updateList.GetPackage(packageIndex);
             if (package != null)
@@ -62,8 +65,9 @@ namespace ASGame
             return 0;
         }
 
-        public void Update(int packageIndex = 0)
+        public void Update(string srcAssetPaths, int packageIndex = 0)
         {
+            _srcAssetPaths = srcAssetPaths;
             var updateUrls = _updateList.GetUrlList(packageIndex);
             var updateSaves = _updateList.GetSaveList(packageIndex);
 
@@ -80,20 +84,97 @@ namespace ASGame
 
         protected void OnDownloadCompleted(AssetUpdateUpdateList.Package package)
         {
-            //TODO:校验文件完整性
-            string saveFolder = _updateList.GetSaveFolderPath(package.index);
+            //校验文件完整性
+            var packageIndex = package.index;
+            string saveFolder = _updateList.GetSaveFolderPath(packageIndex);
 
             //完整性通过,开始拷贝文件
+            List<string> urlPaths = new List<string>();
+            List<string> savePaths = new List<string>();
+            if(VerifyFiles(packageIndex, urlPaths, savePaths))
+            {
+                UpdateFiles(packageIndex, _srcAssetPaths);
+            }
+            else
+            {
+                //TODO: 重新下载这些文件
+            }
 
             //没通过的文件重新下载
 
             onFinish?.Invoke();
         }
 
-        private void VerifyFiles()
+        private bool VerifyFiles(int packageIndex, List<string> urlPaths, List<string> savePaths)
         {
+            string folderPath = _updateList.GetSaveFolderPath(packageIndex);
+            if (string.IsNullOrEmpty(folderPath))
+                return false;
 
+            if (!Directory.Exists(folderPath))
+                return false;
+
+            bool isVerify = true;
+            var package = _updateList.GetPackage(packageIndex);
+
+            var pathsList = package.GetSaveList();
+            var urlsList = package.GetUrlList();
+            int totalCount = Math.Max(pathsList.Count, urlsList.Count);
+            for (int i = 0; i < totalCount; ++i)
+            {
+                var savePath = pathsList[i];
+                var urlPath = urlsList[i];
+
+                bool isFailed = true;
+                var item = _updateList.GetItem(savePath);
+                if (item != null)
+                {
+                    if (File.Exists(savePath))
+                    {
+                        string fileMd5 = XFileTools.GetMD5(savePath);
+                        if (string.Compare(item.itemSrc.fileMd5, fileMd5) == 0)
+                        {
+                            isFailed = false;
+                        }
+                    }
+                }
+
+                if (isFailed)
+                {
+                    urlPaths?.Add(urlPath);
+                    savePaths?.Add(savePath);
+
+                    isVerify = false;
+                    if (urlPaths == null && savePaths == null)
+                        break;
+                }
+            }
+
+            return isVerify;
         }
 
+        private void UpdateFiles(int packageIndex, string srcAssetPaths, bool isMove = false)
+        {
+            var package = _updateList.GetPackage(packageIndex);
+
+            var pathsList = package.GetSaveList();
+            for (int i = 0; i < pathsList.Count; ++i)
+            {
+                var savePath = pathsList[i];
+                var item = _updateList.GetItem(savePath);
+                if (item != null)
+                {
+                    string destPath = Path.Combine(srcAssetPaths, item.itemSrc.filePath);
+                    if (File.Exists(savePath))
+                    {
+                        if (File.Exists(destPath))
+                            File.Delete(destPath);
+
+                        if (isMove) File.Move(savePath, destPath);
+                        else File.Copy(savePath, destPath);
+                    }
+                }
+            }
+        }
     }
 }

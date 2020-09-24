@@ -122,8 +122,8 @@ namespace ASGame
             path = loadPath;
         }
 
-        //验证某个文件夹的文件是否符合,但是无法判断增删
-        public bool Verify(string folderPath)
+        //验证某个文件夹的文件是否符合
+        public bool Verify(string folderPath, List<Item> retList = null)
         {
             if (string.IsNullOrEmpty(folderPath))
                 return false;
@@ -133,34 +133,30 @@ namespace ASGame
 
             bool isVerify = true;
             var dict = GetDictByPath();
-            var record = new HashSet<string>();
-            XFolderTools.TraverseFiles(folderPath, (fullPath) =>
+
+            foreach(var pair in dict)
             {
-                if (isVerify == false)
-                    return;
-
-                var assetPath = XPathTools.GetRelativePath(fullPath);
-                var relaPath = XPathTools.SubRelativePath(folderPath, assetPath);
-
-                if (dict.TryGetValue(relaPath, out var item))
+                bool isFailed = true;
+                string path = Path.Combine(folderPath, pair.Value.filePath);
+                if (File.Exists(path))
                 {
-                    var fileMd5 = XFileTools.GetMD5(relaPath);
-                    if (string.Compare(item.fileMd5, fileMd5) != 0)
+                    string fileMd5 = XFileTools.GetMD5(path);
+                    if(string.Compare(pair.Value.fileMd5, fileMd5) == 0)
                     {
-                        isVerify = false;
+                        isFailed = false;
                     }
-                    record.Add(relaPath);
                 }
 
-            }, true);
-
-            if (isVerify)
-            {
-                if(dict.Count != record.Count)
+                if (isFailed)
                 {
+                    retList?.Add(pair.Value);
                     isVerify = false;
+                    if (retList == null)
+                        break;
                 }
+
             }
+
             return isVerify;
         }
 
