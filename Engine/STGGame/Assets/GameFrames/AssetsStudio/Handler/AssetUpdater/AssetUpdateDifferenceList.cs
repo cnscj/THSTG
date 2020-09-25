@@ -35,6 +35,7 @@ namespace ASGame
             }
         }
 
+        //变更项
         public Group adds;
         public Group modifys;
         public Group removes;

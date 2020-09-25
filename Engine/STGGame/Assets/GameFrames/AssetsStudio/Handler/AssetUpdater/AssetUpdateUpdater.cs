@@ -7,14 +7,15 @@ namespace ASGame
 {
     public class AssetUpdateUpdater
     {
+        public int maxRetryTimes = 3;
         public Action<AssetDownloadTask> onDownloadCompleted;
         public Action<float> onDownloadProgress;
-
         public Action onFinish;
 
         private AssetUpdateUpdateList _updateList;
         private AssetDownloadTask _downloadTask;
         private string _srcAssetPaths;
+        private int _downloadRetryTimes;
         public AssetUpdateUpdater(AssetUpdateUpdateList updateList)
         {
             if (updateList == null)
@@ -62,24 +63,21 @@ namespace ASGame
             {
                 return package.size;
             }
-            return 0;
+            return 0L;
         }
 
         public void Update(string srcAssetPaths, int packageIndex = 0)
         {
+            if (!IsDiskspaceEnough(packageIndex))
+                return;
+
             _srcAssetPaths = srcAssetPaths;
+
             var updateUrls = _updateList.GetUrlList(packageIndex);
             var updateSaves = _updateList.GetSaveList(packageIndex);
 
-            var downloader = AssetDownloadManager.GetInstance().GetForegroundCentral();
-
-            _downloadTask = downloader.NewTask(updateUrls, updateSaves);
-            _downloadTask.onCompleted += (task)=>
-            {
-                onDownloadCompleted?.Invoke(task);
-                var package = _updateList.GetPackage(packageIndex);
-                OnDownloadCompleted(package);
-            };
+            _downloadRetryTimes = 0;
+            DownloadFiles(packageIndex, updateUrls, updateSaves);
         }
 
         protected void OnDownloadCompleted(AssetUpdateUpdateList.Package package)
@@ -91,18 +89,42 @@ namespace ASGame
             //完整性通过,开始拷贝文件
             List<string> urlPaths = new List<string>();
             List<string> savePaths = new List<string>();
-            if(VerifyFiles(packageIndex, urlPaths, savePaths))
+            if(VerifyFiles(packageIndex, urlPaths, savePaths))  //所有文件验证成功才去拷贝
             {
                 UpdateFiles(packageIndex, _srcAssetPaths);
             }
             else
             {
-                //TODO: 重新下载这些文件
+                _downloadRetryTimes++;
+                DownloadFiles(packageIndex,urlPaths.ToArray(), savePaths.ToArray());
+                return;
             }
 
             //没通过的文件重新下载
 
             onFinish?.Invoke();
+        }
+
+        private void DownloadFiles(int packageIndex, string[]urlPaths, string[] savePaths)
+        {
+            if (urlPaths == null)
+                return;
+
+            if (urlPaths.Length <= 0)
+                return;
+
+            if (_downloadRetryTimes >= maxRetryTimes)   //重试次数大于n次,判断为更新失败
+                return;
+
+            var downloader = AssetDownloadManager.GetInstance().GetForegroundCentral();
+
+            _downloadTask = downloader.NewTask(urlPaths, savePaths);
+            _downloadTask.onCompleted = (task) =>
+            {
+                onDownloadCompleted?.Invoke(task);
+                var package = _updateList.GetPackage(packageIndex);
+                OnDownloadCompleted(package);
+            };
         }
 
         private bool VerifyFiles(int packageIndex, List<string> urlPaths, List<string> savePaths)
@@ -153,6 +175,7 @@ namespace ASGame
             return isVerify;
         }
 
+        //TODO:需要移除废弃文件
         private void UpdateFiles(int packageIndex, string srcAssetPaths, bool isMove = false)
         {
             var package = _updateList.GetPackage(packageIndex);

@@ -40,6 +40,8 @@ namespace ASGame
         public long date;                       //日期
 
         public Item[] fileItems;
+        private Dictionary<string, Item> _dictByPath; //字典
+        private Dictionary<string, Item> _dictByMd5; //字典
 
         public AssetUpdateAssetList Scan(string assetFolder)
         {
@@ -160,29 +162,60 @@ namespace ASGame
             return isVerify;
         }
 
+        public Item GetItemByPath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return default;
+
+            var dict = GetDictByPath();
+            if (dict.TryGetValue(path, out var item))
+            {
+                return item;
+            }
+            return default;
+        }
+
+        public Item GetItemByMd5(string md5)
+        {
+            if (string.IsNullOrEmpty(md5))
+                return default;
+
+            var dict = GetDictByMd5();
+            if (dict.TryGetValue(path, out var item))
+            {
+                return item;
+            }
+            return default;
+        }
+
 
         public Dictionary<string ,Item> GetDictByPath()
         {
-            var dict = new Dictionary<string, Item>();
-
-            foreach(var item in fileItems)
+            if (_dictByPath == null)
             {
-                dict.Add(item.filePath, item);
+                _dictByPath = new Dictionary<string, Item>();
+                foreach (var item in fileItems)
+                {
+                    _dictByPath.Add(item.filePath, item);
+                }
             }
-
-            return dict;
+            return _dictByPath;
         }
 
         public Dictionary<string, Item> GetDictByMd5()
         {
-            var dict = new Dictionary<string, Item>();
-
-            foreach (var item in fileItems)
+            if (_dictByMd5 == null)
             {
-                dict.Add(item.fileMd5, item);
+                _dictByMd5 = new Dictionary<string, Item>();
+                foreach (var item in fileItems)
+                {
+                    _dictByMd5.Add(item.fileMd5, item);
+                }
             }
+           
+            return _dictByMd5;
+        }
 
-            return dict;
-        }   
+
     }
 }
