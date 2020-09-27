@@ -29,6 +29,7 @@ namespace ASGame
 
             public List<string> urlPaths;
             public List<string> savePaths;
+            public List<string> invalidPaths;
 
             public List<string> GetUrlList()
             {
@@ -40,19 +41,28 @@ namespace ASGame
                 savePaths = savePaths ?? new List<string>();
                 return savePaths;
             }
+            public List<string> GetInvalidList()
+            {
+                invalidPaths = invalidPaths ?? new List<string>();
+                return invalidPaths;
+            }
         }
 
         private string _baseDownloadUrl;
+        private string _baseAssetFolder;
         private string _baseSaveFolder;
-        public Dictionary<string, Item> _items;
+        private Dictionary<string, Item> _itemsByPath;
+        private Dictionary<string, Item> _itemsByMd5;
         private Dictionary<int, Package> _dict;
 
         public string BaseDownloadUrl => _baseDownloadUrl;
+        public string BaseAssetFolder => _baseAssetFolder;
         public string BaseSaveFolder => _baseSaveFolder;
 
-        public AssetUpdateUpdateList(string baseDownloadUrl,string baseSaveFolder)
+        public AssetUpdateUpdateList(string baseDownloadUrl, string baseSaveFolder, string baseAssetPath)
         {
             _baseDownloadUrl = baseDownloadUrl;
+            _baseAssetFolder = baseAssetPath;
             _baseSaveFolder = baseSaveFolder;
         }
 
@@ -69,7 +79,7 @@ namespace ASGame
             {
                 foreach (var vPair in differenceList.adds.dict)
                 {
-                    ConvertItem(vPair, packageDict);
+                    ConverUpdateItem(vPair, packageDict);
                 }
             }
 
@@ -77,14 +87,22 @@ namespace ASGame
             {
                 foreach (var vPair in differenceList.modifys.dict)
                 {
-                    ConvertItem(vPair, packageDict);
+                    ConverUpdateItem(vPair, packageDict);
+                }
+            }
+
+            if (differenceList.removes != null && differenceList.removes.dict != null)
+            {
+                foreach (var vPair in differenceList.removes.dict)
+                {
+                    ConverRemoveItem(vPair, packageDict);
                 }
             }
         }
 
-        private void ConvertItem(KeyValuePair<string,AssetUpdateDifferenceList.Item> pair,Dictionary<string, AssetUpdateConfigList.Item> dict)
+        private void ConverUpdateItem(KeyValuePair<string,AssetUpdateDifferenceList.Item> pair,Dictionary<string, AssetUpdateConfigList.Item> dict)
         {
-            var filePath = pair.Key;
+            var filePath = pair.Value.filePath;
             var fileMd5 = pair.Value.fileMd5;
             int packageindex = 0;
             AssetUpdateConfigList.Item itemCfg = null;
@@ -105,7 +123,23 @@ namespace ASGame
             package.GetSaveList().Add(savePaths);
 
 
-            GetOrCreateItemDict().Add(savePaths.ToLower(), item);
+            GetOrCreatePathItemDict().Add(savePaths.ToLower(), item);
+            GetOrCreateMd5ItemDict().Add(fileMd5.ToLower(), item);
+        }
+
+        private void ConverRemoveItem(KeyValuePair<string, AssetUpdateDifferenceList.Item> pair, Dictionary<string, AssetUpdateConfigList.Item> dict)
+        {
+            var filePath = pair.Value.filePath;
+            int packageindex = 0;
+            AssetUpdateConfigList.Item itemCfg = null;
+            if (dict != null && dict.TryGetValue(filePath, out itemCfg))
+            {
+                packageindex = itemCfg.packageId;
+            }
+
+            var invalidPath = GetInvalidPath(filePath);
+            var package = GetOrCreatePackage(packageindex);
+            package.GetInvalidList().Add(invalidPath);
         }
 
         public string GetFileDownloadUrl(Item item)
@@ -126,6 +160,11 @@ namespace ASGame
             return Path.Combine(_baseSaveFolder, string.Format("S{0}", packageIndex));
         }
 
+        public string GetInvalidPath(string filePath)
+        {
+            return Path.Combine(_baseAssetFolder, filePath);
+        }
+
         private Package GetOrCreatePackage(int index)
         {
             var dict = GetOrCreateDict();
@@ -138,10 +177,16 @@ namespace ASGame
             return dict[index];
         }
 
-        private Dictionary<string, Item> GetOrCreateItemDict()
+        private Dictionary<string, Item> GetOrCreatePathItemDict()
         {
-            _items = _items ?? new Dictionary<string, Item>();
-            return _items;
+            _itemsByPath = _itemsByPath ?? new Dictionary<string, Item>();
+            return _itemsByPath;
+        }
+
+        private Dictionary<string, Item> GetOrCreateMd5ItemDict()
+        {
+            _itemsByMd5 = _itemsByMd5 ?? new Dictionary<string, Item>();
+            return _itemsByMd5;
         }
 
         private Dictionary<int, Package> GetOrCreateDict()
@@ -151,15 +196,31 @@ namespace ASGame
         }
 
         ////////////////
-        public Item GetItem(string path)
+        public Item GetItemByPath(string savePath)
         {
-            if (string.IsNullOrEmpty(path))
+            if (string.IsNullOrEmpty(savePath))
                 return null;
 
-            if (_items == null)
+            if (_itemsByPath == null)
                 return null;
 
-            if (_items.TryGetValue(path.ToLower(), out var item))
+            if (_itemsByPath.TryGetValue(savePath.ToLower(), out var item))
+            {
+                return item;
+            }
+
+            return null;
+        }
+
+        public Item GetItemByMd5(string md5)
+        {
+            if (string.IsNullOrEmpty(md5))
+                return null;
+
+            if (_itemsByMd5 == null)
+                return null;
+
+            if (_itemsByMd5.TryGetValue(md5.ToLower(), out var item))
             {
                 return item;
             }
@@ -189,7 +250,7 @@ namespace ASGame
         public Item[] GetItemList()
         {
             List<Item> items = new List<Item>();
-            items.AddRange(GetOrCreateItemDict().Values);
+            items.AddRange(GetOrCreatePathItemDict().Values);
             return items.ToArray();
         }
 
@@ -203,6 +264,12 @@ namespace ASGame
         {
             var package = GetOrCreatePackage(packageIndex);
             return package.GetSaveList().ToArray();
+        }
+
+        public string[] GetInvalidList(int packageIndex = 0)
+        {
+            var package = GetOrCreatePackage(packageIndex);
+            return package.GetInvalidList().ToArray();
         }
     }
 

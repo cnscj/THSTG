@@ -110,12 +110,13 @@ namespace ASGame
             }
 
             //差异表转成更新列表去更新
-            AssetUpdateUpdateList assetUpdateUpdateList = new AssetUpdateUpdateList(updateDownloadUrl, downloadFolderPath);
+            AssetUpdateUpdateList assetUpdateUpdateList = new AssetUpdateUpdateList(updateDownloadUrl, downloadFolderPath, assetFolderPath);
             assetUpdateUpdateList.Convert(differenceList, configList);
 
             //启动更新
             bool isUpdateFinsin = false;
             AssetUpdateUpdater updater = new AssetUpdateUpdater(assetUpdateUpdateList);
+            updater.Update();
             updater.onFinish = () => { isUpdateFinsin = true; };
 
             while (!isUpdateFinsin)
@@ -131,42 +132,6 @@ namespace ASGame
         {
             return false;
         }
-
-        //检查更新
-        private void CheckUpdate(Action action)
-        {
-
-        }
-
-        //比对资源
-        private AssetUpdateDifferenceList CompareAsset(AssetUpdateAssetList serverList, AssetUpdateAssetList clientList)
-        {
-            if (serverList == null || clientList == null)
-                return null;
-
-            AssetUpdateDifferenceList assetUpdateContrastList = new AssetUpdateDifferenceList();
-            assetUpdateContrastList.Compare(clientList, serverList);
-
-            return assetUpdateContrastList;
-        }
-
-        private void UpdateAsset(AssetUpdateDifferenceList contrastList)
-        {
-            if (contrastList == null)
-                return;
-
-            if (string.IsNullOrEmpty(assetFolderPath) || string.IsNullOrEmpty(downloadFolderPath))
-                return;
-
-
-            if (!Directory.Exists(assetFolderPath) || !Directory.Exists(downloadFolderPath))
-                return;
-
-            //将更新目录的文件拷贝过来,不过这之前还要校验下更新目录资源完整性
-
-
-        }
-
 
         private string GetNetworkAssetUrl()
         {

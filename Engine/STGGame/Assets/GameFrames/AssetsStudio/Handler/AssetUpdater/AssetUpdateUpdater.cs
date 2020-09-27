@@ -14,7 +14,6 @@ namespace ASGame
 
         private AssetUpdateUpdateList _updateList;
         private AssetDownloadTask _downloadTask;
-        private string _srcAssetPaths;
         private int _downloadRetryTimes;
         public AssetUpdateUpdater(AssetUpdateUpdateList updateList)
         {
@@ -24,8 +23,8 @@ namespace ASGame
             _updateList = updateList;
         }
 
-        // mac: /Users/test
-        // win: D:\\test
+        //mac: /Users/test
+        //win: D:\\test
         //这里没有考虑Android和Ios,需要提供SDk
         public long GetFreeDiskSpace(string storagePath)
         {
@@ -66,12 +65,10 @@ namespace ASGame
             return 0L;
         }
 
-        public void Update(string srcAssetPaths, int packageIndex = 0)
+        public void Update(int packageIndex = 0)
         {
             if (!IsDiskspaceEnough(packageIndex))
                 return;
-
-            _srcAssetPaths = srcAssetPaths;
 
             var updateUrls = _updateList.GetUrlList(packageIndex);
             var updateSaves = _updateList.GetSaveList(packageIndex);
@@ -91,7 +88,8 @@ namespace ASGame
             List<string> savePaths = new List<string>();
             if(VerifyFiles(packageIndex, urlPaths, savePaths))  //所有文件验证成功才去拷贝
             {
-                UpdateFiles(packageIndex, _srcAssetPaths);
+                var assetFolderPath = _updateList.BaseAssetFolder;
+                UpdateFiles(packageIndex, assetFolderPath);
             }
             else
             {
@@ -148,7 +146,7 @@ namespace ASGame
                 var urlPath = urlsList[i];
 
                 bool isFailed = true;
-                var item = _updateList.GetItem(savePath);
+                var item = _updateList.GetItemByPath(savePath);
                 if (item != null)
                 {
                     if (File.Exists(savePath))
@@ -175,16 +173,16 @@ namespace ASGame
             return isVerify;
         }
 
-        //TODO:需要移除废弃文件
         private void UpdateFiles(int packageIndex, string srcAssetPaths, bool isMove = false)
         {
             var package = _updateList.GetPackage(packageIndex);
 
+            //变更和新增的
             var pathsList = package.GetSaveList();
             for (int i = 0; i < pathsList.Count; ++i)
             {
                 var savePath = pathsList[i];
-                var item = _updateList.GetItem(savePath);
+                var item = _updateList.GetItemByPath(savePath);
                 if (item != null)
                 {
                     string destPath = Path.Combine(srcAssetPaths, item.itemSrc.filePath);
@@ -197,6 +195,15 @@ namespace ASGame
                         else File.Copy(savePath, destPath);
                     }
                 }
+            }
+
+            //移除无效文件
+            var invalidList = package.GetInvalidList();
+            for (int i = 0; i < pathsList.Count; ++i)
+            {
+                var invalidPath = invalidList[i];
+                if (File.Exists(invalidPath))
+                    File.Delete(invalidPath);
             }
         }
     }
