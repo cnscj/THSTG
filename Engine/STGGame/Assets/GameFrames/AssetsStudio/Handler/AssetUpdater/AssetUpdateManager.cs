@@ -19,6 +19,7 @@ namespace ASGame
         public string downloadFolderPath = "";
         public Action<int> onFinish;
 
+        //TODO:
         public void UpdateAsset()
         {
             //初始化当前资源,版本号一些重要信息做资源更新的基础
