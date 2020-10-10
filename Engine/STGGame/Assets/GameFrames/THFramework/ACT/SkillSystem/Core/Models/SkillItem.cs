@@ -9,6 +9,8 @@ namespace THGame
         public string skillName;
         public SkillAction skillAction;
         public SkillEffect skillEffect;
+        public SkillAudio skillAudio;
+
         public SkillEvent skillEvent;
     }
 

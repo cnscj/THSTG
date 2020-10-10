@@ -92,14 +92,39 @@ namespace ASEditor
 
             //2个滚动的视图
             EditorGUILayout.BeginHorizontal();
-            //TODO:
 
-           
+            ShowAllAssetList();
+            ShowConfigList();
+
             EditorGUILayout.EndHorizontal();
             ///
             EditorGUILayout.EndVertical();
 
             EditorGUILayout.EndHorizontal();
+        }
+
+        private void ShowAllAssetList()
+        {
+            EditorGUILayout.BeginVertical();
+            _srcSearchTextField.OnGUI();
+            EditorGUILayout.BeginScrollView(new Vector2(0, 0), (GUIStyle)"Asset List");
+
+
+
+            EditorGUILayout.EndScrollView();
+            EditorGUILayout.EndVertical();
+        }
+
+        private void ShowConfigList()
+        {
+            EditorGUILayout.BeginVertical();
+            _destSearchTextField.OnGUI();
+            EditorGUILayout.BeginScrollView(new Vector2(0,0), (GUIStyle)"Config Lis");
+
+
+
+            EditorGUILayout.EndScrollView();
+            EditorGUILayout.EndVertical();
         }
 
         private void NewConfigFile()
