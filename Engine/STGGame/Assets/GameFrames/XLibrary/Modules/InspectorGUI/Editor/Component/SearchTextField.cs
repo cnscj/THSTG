@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -11,6 +12,9 @@ namespace XLibEditor
         private GUIStyle TextFieldRoundEdgeCancelButtonEmpty;
         private GUIStyle TransparentTextField;
         private string m_InputSearchText;
+
+        private Action m_onClickFun;
+        private Action m_onChangedFun;
         /// <summary>
         /// 绘制输入框，放在OnGUI函数里
         /// </summary>
@@ -43,7 +47,7 @@ namespace XLibEditor
             if ((Event.current.type == EventType.MouseDown && rect.Contains(Event.current.mousePosition)))
             {
                 //当放大镜被点击
-                Debug.LogError("放大镜被点击");
+                m_onClickFun?.Invoke();
             }
 
             //如果面板重绘
@@ -60,6 +64,7 @@ namespace XLibEditor
                 {
                     textFieldRoundEdge.Draw(position, new GUIContent(""), 0);
                 }
+                
                 //因为是“全局变量”，用完要重置回来
                 GUI.contentColor = Color.white;
             }
@@ -70,7 +75,12 @@ namespace XLibEditor
             rect.x += num;
             rect.y += 1f;//为了和后面的style对其
 
-            m_InputSearchText = EditorGUI.TextField(rect, m_InputSearchText, transparentTextField);
+            string curValue = EditorGUI.TextField(rect, m_InputSearchText, transparentTextField);
+            if (string.Compare(m_InputSearchText,curValue) != 0)
+                m_onChangedFun?.Invoke();
+            m_InputSearchText = curValue;
+
+
             //绘制取消按钮，位置要在输入框右边
             position.x += position.width;
             position.width = gUIStyle.fixedWidth;
@@ -89,6 +99,25 @@ namespace XLibEditor
         {
             base.OnGUI();
             DrawInputTextField();
+        }
+
+        public string GetText()
+        {
+            return m_InputSearchText;
+        }
+        public void SetText(string text)
+        {
+            m_InputSearchText = text;
+        }
+
+        public void OnClick(Action action)
+        {
+            m_onClickFun = action;
+        }
+
+        public void OnChanged(Action action)
+        {
+            m_onChangedFun = action;
         }
     }
 }

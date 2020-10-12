@@ -20,7 +20,6 @@ namespace SEGame
         public string trunkRoot = "";                                     //主干目录
         public string branchRoot = "";                                    //更新目录
 
-        
         private LuaEnv m_luaEnv;
         private IntPtr m_luaCache = IntPtr.Zero;
         private CustomLoader m_customLoader = null;

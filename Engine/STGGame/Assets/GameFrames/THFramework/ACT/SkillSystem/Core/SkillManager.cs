@@ -9,7 +9,20 @@ namespace THGame
 {
     public class SkillFactory
     {
+        public virtual void PlayEffect()
+        {
 
+        }
+
+        public virtual void PlayAudio()
+        {
+
+        }
+
+        public virtual void PlayAction()
+        {
+
+        }
     }
 
     public class SkillLoader
@@ -17,7 +30,6 @@ namespace THGame
         //音效加载器
         //特效加载器
         //动作加载器
-
         public virtual void LoadEffect(string assetKey,Action<Object> callback)
         {
 
@@ -29,6 +41,11 @@ namespace THGame
         }
 
         public virtual void LoadAction(string assetKey, Action<Object> callback)
+        {
+
+        }
+
+        public virtual void LoadConfig(string assetKey, Action<Object> callback)
         {
 
         }

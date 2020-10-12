@@ -27,9 +27,8 @@ namespace SEGame
         public TextAsset luaScript;
         public Injection[] injections;
 
-        internal static LuaEnv luaEnv = new LuaEnv(); //all lua behaviour shared one luaenv only!
         internal static float lastGCTime = 0;
-        internal const float GCInterval = 1;//1 second 
+        internal const float gcInterval = 1;    //1 second 
 
         private Action luaStart;
         private Action luaUpdate;
@@ -39,11 +38,11 @@ namespace SEGame
 
         void Awake()
         {
-            scriptEnv = luaEnv.NewTable();
+            scriptEnv = GetLuaEnv().NewTable();
 
             // 为每个脚本设置一个独立的环境，可一定程度上防止脚本间全局变量、函数冲突
-            LuaTable meta = luaEnv.NewTable();
-            meta.Set("__index", luaEnv.Global);
+            LuaTable meta = GetLuaEnv().NewTable();
+            meta.Set("__index", GetLuaEnv().Global);
             scriptEnv.SetMetaTable(meta);
             meta.Dispose();
 
@@ -53,7 +52,7 @@ namespace SEGame
                 scriptEnv.Set(injection.name, injection.value);
             }
 
-            luaEnv.DoString(luaScript.text, "LuaTestScript", scriptEnv);
+            GetLuaEnv().DoString(luaScript.text, "chunk", scriptEnv);
 
             Action luaAwake = scriptEnv.Get<Action>("awake");
             scriptEnv.Get("start", out luaStart);
@@ -82,9 +81,9 @@ namespace SEGame
             {
                 luaUpdate();
             }
-            if (Time.time - LuaBehaviour.lastGCTime > GCInterval)
+            if (Time.time - LuaBehaviour.lastGCTime > gcInterval)
             {
-                luaEnv.Tick();
+                GetLuaEnv().Tick();
                 LuaBehaviour.lastGCTime = Time.time;
             }
         }
@@ -100,6 +99,12 @@ namespace SEGame
             luaStart = null;
             scriptEnv.Dispose();
             injections = null;
+        }
+
+        //all lua behaviour shared one luaenv only!
+        LuaEnv GetLuaEnv()
+        {
+            return LuaEngine.GetInstance().LuaEnv;
         }
     }
 }

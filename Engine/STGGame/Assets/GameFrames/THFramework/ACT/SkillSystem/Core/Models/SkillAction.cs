@@ -6,7 +6,7 @@ namespace THGame
     [System.Serializable]
     public class SkillAction
     {
-        public string actionName;       //动作名称
+        public string actionKey;       //动作名称
     }
 
 }

@@ -1,27 +1,56 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using ASGame;
 using UnityEditor;
 using UnityEngine;
 using XLibEditor;
+using XLibrary;
 
 namespace ASEditor
 {
     public class AssetUpdatePackageEditor : WindowGUI<AssetUpdatePackageEditor>
     {
+        class ListItem
+        {
+            public string path;
+            public bool isSelected;
+        }
         private string _saveFilePath;
         private string _manifestPath = "";
         private string _assetFolderPath = "";
+
+        private List<string> _assetFolderList;
+        private Dictionary<string, HashSet<string>> _manifestDict;
+        private Dictionary<string, AssetUpdateConfigList.Item> _configDict;
 
         private SearchTextField _srcSearchTextField = new SearchTextField();
         private SearchTextField _destSearchTextField = new SearchTextField();
         private AssetUpdateConfigList _assetUpdateConfigList = new AssetUpdateConfigList();
 
+        private List<ListItem> _assetList = new List<ListItem>();
+        private List<ListItem> _configList = new List<ListItem>();
+
+        private Vector2 _scrollPos1 = Vector2.zero;
+        private Vector2 _scrollPos2 = Vector2.zero;
 
         [MenuItem("AssetsStudio/资源工具/资源分包器")]
         static void ShowWnd()
         {
             ShowWindow("资源分包配置");
+        }
+
+        public AssetUpdatePackageEditor()
+        {
+            _srcSearchTextField.OnChanged(() =>
+            {
+                RefreshAssetList();
+            });
+
+            _destSearchTextField.OnChanged(() =>
+            {
+                RefreshConfigList();
+            });
         }
 
         //参考PackagesWindow
@@ -84,8 +113,7 @@ namespace ASEditor
                 _assetFolderPath = EditorUtility.OpenFolderPanel("OpenFolder", _assetFolderPath,"");
                 if (!string.IsNullOrEmpty(_assetFolderPath))
                 {
-                    //扫描目录
-                    ImportExAsset(_assetFolderPath);
+                    ImportExAsset(_assetFolderPath);//扫描目录
                 }
             }
             EditorGUILayout.EndHorizontal();
@@ -95,6 +123,7 @@ namespace ASEditor
 
             ShowAllAssetList();
             ShowConfigList();
+            //ShowConfigPanel();
 
             EditorGUILayout.EndHorizontal();
             ///
@@ -107,7 +136,29 @@ namespace ASEditor
         {
             EditorGUILayout.BeginVertical();
             _srcSearchTextField.OnGUI();
-            EditorGUILayout.BeginScrollView(new Vector2(0, 0), (GUIStyle)"Asset List");
+            _scrollPos1 = EditorGUILayout.BeginScrollView(_scrollPos1, (GUIStyle)"Asset List");
+
+            foreach (var item in _assetList)
+            {
+                string fileName = Path.GetFileName(item.path);
+               
+                if (GUILayout.Button(fileName, GUILayout.Width(250)))
+                {
+                    //TODO:
+                }
+            }
+
+            EditorGUILayout.EndScrollView();
+            EditorGUILayout.EndVertical();
+
+
+        }
+
+        private void ShowConfigList()
+        {
+            EditorGUILayout.BeginVertical();
+            _destSearchTextField.OnGUI();
+            _scrollPos2 = EditorGUILayout.BeginScrollView(_scrollPos2, (GUIStyle)"Config Lis");
 
 
 
@@ -115,13 +166,10 @@ namespace ASEditor
             EditorGUILayout.EndVertical();
         }
 
-        private void ShowConfigList()
+        private void ShowConfigPanel()
         {
             EditorGUILayout.BeginVertical();
-            _destSearchTextField.OnGUI();
-            EditorGUILayout.BeginScrollView(new Vector2(0,0), (GUIStyle)"Config Lis");
-
-
+  
 
             EditorGUILayout.EndScrollView();
             EditorGUILayout.EndVertical();
@@ -136,6 +184,7 @@ namespace ASEditor
         {
             NewConfigFile();
             _assetUpdateConfigList.Import(filePath);
+            RefreshConfigList();
         }
 
         private void SaveConfigFile(string filePath)
@@ -146,12 +195,81 @@ namespace ASEditor
         private void LoadManifestFile(string filePath)
         {
             AssetBundleManifest mainfest = AssetDatabase.LoadAssetAtPath<AssetBundleManifest>(filePath);
+            _manifestDict = new Dictionary<string, HashSet<string>>();
 
+            foreach (var bundle in mainfest.GetAllAssetBundles())
+            {
+                var deps = mainfest.GetAllDependencies(bundle);
+                HashSet<string> depSet = null;
+                if (!_manifestDict.TryGetValue(bundle,out depSet))
+                {
+                    depSet = new HashSet<string>();
+                    _manifestDict.Add(bundle, depSet);
+                }
+                foreach(var dep in deps)
+                {
+                    if (!depSet.Contains(dep))
+                        depSet.Add(dep);
+                }
+            }
+            RefreshAssetList();
         }
 
         private void ImportExAsset(string folderPath)
         {
+            _assetFolderPath = folderPath;
+            _assetFolderList = new List<string>();
 
+            XFolderTools.TraverseFiles(_assetFolderPath, (fullPath) =>
+            {
+                string exName = Path.GetExtension(fullPath);
+                _assetFolderList.Add(fullPath);
+            }, true);
+
+            RefreshAssetList();
+        }
+
+        private void AddConfig(string key)
+        {
+
+        }
+
+        private void RemoveCofig(string key)
+        {
+
+        }
+
+        private void RefreshAssetList()
+        {
+            _assetList.Clear();
+            foreach(var path in _assetFolderList)
+            {
+                string key = path;
+                if (_configDict != null)
+                {
+                    if (_configDict.ContainsKey(key))
+                    {
+                        continue;
+                    }
+                }
+
+                string searchKey = _srcSearchTextField.GetText();
+                if (!string.IsNullOrEmpty(searchKey))
+                {
+                    if (key.IndexOf(searchKey) < 0)
+                    {
+                        continue;
+                    }
+                }
+                var item = new ListItem();
+                item.path = path;
+                _assetList.Add(item);
+            }
+        }
+
+        private void RefreshConfigList()
+        {
+            _configList.Clear();
         }
     }
 

@@ -7,6 +7,7 @@ namespace THGame
     [System.Serializable]
     public class SkillAudio
     {
+        public string audioKey;
         public float timeTick;
 
     }

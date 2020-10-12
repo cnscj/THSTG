@@ -17,7 +17,7 @@ namespace THGame
         //施展技能
         public void Cast(string skill)
         {
-            
+
         }
 
         //中断技能
@@ -37,19 +37,20 @@ namespace THGame
             animator = animator ?? GetComponentInChildren<Animator>();
         }
 
-        //////////////////////////////
-
-        private void PlayAction(string name)
-        {
-            if (animator = null)
-                return;
-
-        }
-
-        private void PlayEffect(string name)
+        //////////
+        public void PlayAction()
         {
 
         }
+        public void PlayEffect()
+        {
+
+        }
+        public void PlayAudio()
+        {
+
+        }
+
     }
 
 }

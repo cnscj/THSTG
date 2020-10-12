@@ -5,11 +5,21 @@ using UnityEngine;
 namespace THGame
 {
     
-    public class SkillData
+    public class SkillData : ScriptableObject , ISerializationCallbackReceiver
     {
         public int version;
-        public Dictionary<string, SkillItem> skillItems;
+        public SkillItem[] skillItems;
         public SkillCombo skillCombo;
+
+        public void OnAfterDeserialize()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void OnBeforeSerialize()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 
 }

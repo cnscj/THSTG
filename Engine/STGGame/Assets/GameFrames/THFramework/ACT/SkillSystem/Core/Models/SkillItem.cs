@@ -6,6 +6,7 @@ namespace THGame
     [System.Serializable]
     public class SkillItem
     {
+        public int skillId;
         public string skillName;
         public SkillAction skillAction;
         public SkillEffect skillEffect;
