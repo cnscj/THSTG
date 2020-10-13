@@ -11,10 +11,18 @@ namespace ASEditor
 {
     public class AssetUpdatePackageEditor : WindowGUI<AssetUpdatePackageEditor>
     {
-        class ListItem
+        class AssetItem
         {
             public string path;
             public bool isSelected;
+        }
+
+        class ConfigItem
+        {
+            public string path;
+            public bool isSelected;
+            public int package;
+            public int flag;
         }
         private string _saveFilePath;
         private string _manifestPath = "";
@@ -22,14 +30,13 @@ namespace ASEditor
 
         private List<string> _assetFolderList;
         private Dictionary<string, HashSet<string>> _manifestDict;
-        private Dictionary<string, AssetUpdateConfigList.Item> _configDict;
+        private Dictionary<string, ConfigItem> _configDict;
 
         private SearchTextField _srcSearchTextField = new SearchTextField();
         private SearchTextField _destSearchTextField = new SearchTextField();
-        private AssetUpdateConfigList _assetUpdateConfigList = new AssetUpdateConfigList();
 
-        private List<ListItem> _assetList = new List<ListItem>();
-        private List<ListItem> _configList = new List<ListItem>();
+        private List<AssetItem> _assetList = new List<AssetItem>();
+        private List<ConfigItem> _configList = new List<ConfigItem>();
 
         private Vector2 _scrollPos1 = Vector2.zero;
         private Vector2 _scrollPos2 = Vector2.zero;
@@ -141,17 +148,18 @@ namespace ASEditor
             foreach (var item in _assetList)
             {
                 string fileName = Path.GetFileName(item.path);
-               
+                EditorGUILayout.BeginHorizontal();
+                //item.isSelected = GUILayout.Toggle(item.isSelected,"", GUILayout.Width(15));
+ 
                 if (GUILayout.Button(fileName, GUILayout.Width(250)))
                 {
-                    //TODO:
+                    Debug.Log(item.path);
                 }
+                EditorGUILayout.EndHorizontal();
             }
 
             EditorGUILayout.EndScrollView();
             EditorGUILayout.EndVertical();
-
-
         }
 
         private void ShowConfigList()
@@ -159,8 +167,6 @@ namespace ASEditor
             EditorGUILayout.BeginVertical();
             _destSearchTextField.OnGUI();
             _scrollPos2 = EditorGUILayout.BeginScrollView(_scrollPos2, (GUIStyle)"Config Lis");
-
-
 
             EditorGUILayout.EndScrollView();
             EditorGUILayout.EndVertical();
@@ -177,19 +183,41 @@ namespace ASEditor
 
         private void NewConfigFile()
         {
-            _assetUpdateConfigList = new AssetUpdateConfigList();
+            _configDict = null;
+            _configList.Clear();
+
+            RefreshConfigList();
         }
 
         private void OpenConfigFile(string filePath)
         {
-            NewConfigFile();
-            _assetUpdateConfigList.Import(filePath);
+            var assetUpdateConfigList = new AssetUpdateConfigList();
+            assetUpdateConfigList.Import(filePath);
+            var configList = assetUpdateConfigList.GetItemList();
+            foreach(var item in configList)
+            {
+
+            }
+
             RefreshConfigList();
         }
 
         private void SaveConfigFile(string filePath)
         {
-            _assetUpdateConfigList.Export(filePath);
+            var assetUpdateConfigList = new AssetUpdateConfigList();
+            var dict = assetUpdateConfigList.GetDict();
+            foreach (var item in _configList)
+            {
+                if (!dict.ContainsKey(item.path))
+                {
+                    var cfgItem = new AssetUpdateConfigList.Item();
+                    cfgItem.filePath = item.path;
+                    cfgItem.flag = item.flag;
+                    cfgItem.packageId = item.package;
+                    dict.Add(cfgItem.filePath, cfgItem);
+                }
+            }
+            assetUpdateConfigList.Export(filePath);
         }
 
         private void LoadManifestFile(string filePath)
@@ -261,7 +289,7 @@ namespace ASEditor
                         continue;
                     }
                 }
-                var item = new ListItem();
+                var item = new AssetItem();
                 item.path = path;
                 _assetList.Add(item);
             }
