@@ -99,6 +99,32 @@ namespace ASGame
             List2Dict(fileList, _data);
         }
 
+        public void AddItem(string key,Item item)
+        {
+            if (string.IsNullOrEmpty(key))
+                return;
+
+            if (item == null)
+                return;
+
+            _data[key] = item;
+
+        }
+
+        public void RemoveItem(string key)
+        {
+            _data.Remove(key);
+        }
+
+        public Item GetItem(string key)
+        {
+            if (_data.ContainsKey(key))
+            {
+                return _data[key];
+            }
+            return default;
+        }
+
         private void List2Dict(List<Item> itemList, Dictionary<string,Item> itemDict)
         {
             itemDict.Clear();
