@@ -21,8 +21,9 @@ namespace ASEditor
         {
             public string path;
             public bool isSelected;
-            public string package;
-            public string flag;
+            public int package;
+            public int type;
+            public int flag;
         }
         private string _saveFilePath;
         private string _manifestPath = "";
@@ -38,9 +39,11 @@ namespace ASEditor
         private List<ConfigItem> _configList = new List<ConfigItem>();
 
         private Queue<string> _addQueue = new Queue<string>();
+        private Queue<string> _removeQueue = new Queue<string>();
 
         private Vector2 _scrollPos1 = Vector2.zero;
         private Vector2 _scrollPos2 = Vector2.zero;
+        private Vector2 _scrollPos3 = Vector2.zero;
 
         private Dictionary<string, ConfigItem> _configDict = new Dictionary<string, ConfigItem>();
 
@@ -111,13 +114,25 @@ namespace ASEditor
                 }
                 else
                 {
-
+                    PurgeFileDict(_assetFolderPath);
                 }
             }
 
             EditorGUILayout.EndHorizontal();
 
             //2个打开条
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.TextField("资源目录", _assetFolderPath);
+            if (GUILayout.Button("浏览", GUILayout.Width(100)))
+            {
+                _assetFolderPath = EditorUtility.OpenFolderPanel("OpenFolder", _assetFolderPath,"");
+                if (!string.IsNullOrEmpty(_assetFolderPath))
+                {
+                    ImportExAsset(_assetFolderPath);//扫描目录
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.TextField("依赖文件", _manifestPath);
             if (GUILayout.Button("打开", GUILayout.Width(100)))
@@ -127,18 +142,6 @@ namespace ASEditor
                 {
                     //扫描依赖关系
                     LoadManifestFile(_manifestPath);
-                }
-            }
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.TextField("资源目录", _assetFolderPath);
-            if (GUILayout.Button("浏览", GUILayout.Width(100)))
-            {
-                _assetFolderPath = EditorUtility.OpenFolderPanel("OpenFolder", _assetFolderPath,"");
-                if (!string.IsNullOrEmpty(_assetFolderPath))
-                {
-                    ImportExAsset(_assetFolderPath);//扫描目录
                 }
             }
             EditorGUILayout.EndHorizontal();
@@ -169,9 +172,9 @@ namespace ASEditor
             {
                 string fileName = Path.GetFileName(item.path);
                 EditorGUILayout.BeginHorizontal();
-                //item.isSelected = GUILayout.Toggle(item.isSelected, "", GUILayout.Width(15));
+                item.isSelected = GUILayout.Toggle(item.isSelected, fileName, GUILayout.Width(250));
 
-                if (GUILayout.Button(fileName, GUILayout.Width(250)))
+                if (GUILayout.Button(">>", GUILayout.Width(20)))
                 {
                     _addQueue.Enqueue(item.path);
                 }
@@ -192,10 +195,14 @@ namespace ASEditor
             {
                 string fileName = Path.GetFileName(item.path);
                 EditorGUILayout.BeginHorizontal();
-
                 if (GUILayout.Button(fileName, GUILayout.Width(250)))
                 {
-
+                    _selectedItem = item;
+                    //TODO:需要重绘界面
+                }
+                if (GUILayout.Button("<<", GUILayout.Width(20)))
+                {
+                    _removeQueue.Enqueue(item.path);
                 }
                 EditorGUILayout.EndHorizontal();
             }
@@ -207,14 +214,17 @@ namespace ASEditor
         private void ShowConfigPanel()
         {
             EditorGUILayout.BeginVertical();
-
+            _scrollPos3 = EditorGUILayout.BeginScrollView(_scrollPos3, (GUIStyle)"Config Panel");
             if (_selectedItem != null)
             {
-                GUILayout.Label(_selectedItem.path);
-                _selectedItem.package = GUILayout.TextField("所在包:", _selectedItem.package);
-                _selectedItem.flag = GUILayout.TextField("标志:", _selectedItem.flag);
+                GUILayout.Label(string.Format("资源路径:{0}", _selectedItem.path));
+                _selectedItem.package = EditorGUILayout.IntField("所在包:", _selectedItem.package);
+                _selectedItem.type = EditorGUILayout.IntField("资源类型:", _selectedItem.type);
+                _selectedItem.flag = EditorGUILayout.IntField("标志:", _selectedItem.flag);
+
             }
-            
+            EditorGUILayout.EndScrollView();
+
             EditorGUILayout.EndVertical();
         }
 
@@ -231,6 +241,17 @@ namespace ASEditor
                 isNeedRefresh = true;
             }
 
+            if (_removeQueue.Count > 0)
+            {
+                while (_removeQueue.Count > 0)
+                {
+                    var patn = _removeQueue.Dequeue();
+                    RemoveCofig(patn);
+                }
+                isNeedRefresh = true;
+            }
+
+           
             if (isNeedRefresh)
             {
                 RefreshAssetList();
@@ -242,6 +263,7 @@ namespace ASEditor
         {
             _configDict.Clear();
             _configList.Clear();
+            _saveFilePath = "";
 
             RefreshConfigList();
         }
@@ -261,8 +283,9 @@ namespace ASEditor
                     cfgItem = new ConfigItem();
                 }
                 cfgItem.path = item.filePath;
-                cfgItem.package = string.Format("{0}", item.packageId);
-                cfgItem.flag = string.Format("{0}", item.flag);
+                cfgItem.package = item.packageId;
+                cfgItem.type = item.resourceType;
+                cfgItem.flag = item.flag;
 
                 _configDict[key] = cfgItem;
             }
@@ -280,8 +303,10 @@ namespace ASEditor
                 {
                     var cfgItem = new AssetUpdateConfigList.Item();
                     cfgItem.filePath = item.path;
-                    cfgItem.flag = int.Parse(item.flag);
-                    cfgItem.packageId = int.Parse(item.package);
+                    cfgItem.resourceType = item.type;
+                    cfgItem.flag = item.flag;
+                    cfgItem.packageId = item.package;
+
                     dict.Add(cfgItem.filePath, cfgItem);
                 }
             }
@@ -326,28 +351,57 @@ namespace ASEditor
             RefreshAssetList();
         }
 
-        private void AddConfig(string key)
+        private void PurgeFileDict(string folderPath)
         {
-            if (string.IsNullOrEmpty(key))
+            if (string.IsNullOrEmpty(folderPath))
                 return;
+
+            if (!Directory.Exists(folderPath))
+                return;
+
+            foreach(var pair in _configDict)
+            {
+                string fullPath = Path.Combine(folderPath, pair.Value.path);
+                if (!File.Exists(fullPath))
+                {
+                    _configDict.Remove(pair.Key);
+                }
+            }
+        }
+
+        private void AddConfig(string fullPath)
+        {
+            if (string.IsNullOrEmpty(fullPath))
+                return;
+
+            string relaPath = XPathTools.SubRelativePath(_assetFolderPath,fullPath);
 
             _configDict = _configDict ?? new Dictionary<string, ConfigItem>();
             ConfigItem newItem = new ConfigItem();
-            newItem.path = key;
+            newItem.path = relaPath;
 
-            _configDict[key] = newItem;
+            _configDict[relaPath] = newItem;
 
         }
 
-        private void RemoveCofig(string key)
+        private void RemoveCofig(string relaPath)
         {
-            if (string.IsNullOrEmpty(key))
+            if (string.IsNullOrEmpty(relaPath))
                 return;
 
             if (_configDict == null)
                 return;
 
-            _configDict.Remove(key);
+            ConfigItem item = null;
+            if (_configDict.TryGetValue(relaPath, out item))
+            {
+                if (_selectedItem == item)
+                {
+                    _selectedItem = null;
+                }
+            }
+            _configDict.Remove(relaPath);
+
         }
 
         private void RefreshAssetList()
@@ -355,7 +409,8 @@ namespace ASEditor
             _assetList.Clear();
             foreach(var path in _assetFolderList)
             {
-                string key = path;
+                string key = XPathTools.SubRelativePath(_assetFolderPath,path);
+                string fileName = Path.GetFileName(path);
                 if (_configDict != null)
                 {
                     if (_configDict.ContainsKey(key))
@@ -367,7 +422,7 @@ namespace ASEditor
                 string searchKey = _srcSearchTextField.GetText();
                 if (!string.IsNullOrEmpty(searchKey))
                 {
-                    if (key.IndexOf(searchKey) < 0)
+                    if (fileName.IndexOf(searchKey) < 0)
                     {
                         continue;
                     }
