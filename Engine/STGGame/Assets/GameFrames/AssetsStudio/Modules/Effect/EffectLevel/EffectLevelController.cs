@@ -8,14 +8,8 @@ namespace ASGame
 
     public class EffectLevelController : MonoBehaviour
     {
-        [System.Serializable]
-        public class EffectLevelInfo
-        {
-            public GameObject node;
-            public string path;
-            public int level;
-        }
         public string code;
+        public int category;
         public int level;   //当前级别,受升级影响
         public List<EffectLevelInfo> nodeList;
 

@@ -100,12 +100,12 @@ namespace ASEditor
         {
             if (newGO)
             {
-                if (ridLv > 0 && ridLv <= EffectLevelUtil.maxLevel)
+                if (ridLv > 0 && ridLv <= EffectLevelUtil.MAX_LEVEL)
                 {
                     var levelCtrl = newGO.GetComponent<EffectLevelController>();
                     if (!levelCtrl) levelCtrl = newGO.AddComponent<EffectLevelController>();
                     levelCtrl.level = ridLv;
-                    levelCtrl.nodeList = (levelCtrl.nodeList != null) ? levelCtrl.nodeList : new List<EffectLevelController.EffectLevelInfo>();
+                    levelCtrl.nodeList = (levelCtrl.nodeList != null) ? levelCtrl.nodeList : new List<EffectLevelInfo>();
                     levelCtrl.nodeList.Clear();
 
                     foreach (var node in newGO.GetComponentsInChildren<Transform>(true))
@@ -115,11 +115,12 @@ namespace ASEditor
                         {
                             if (nodeLv > ridLv)
                             {
+                                if (newGO == node.gameObject) continue;
                                 Object.DestroyImmediate(node.gameObject);
                             }
                             else
                             {
-                                var info = new EffectLevelController.EffectLevelInfo();
+                                var info = new EffectLevelInfo();
                                 info.node = node.gameObject;
                                 info.path = XGameObjectTools.GetPathByGameObject(node.gameObject, newGO);
                                 info.level = nodeLv;
@@ -165,7 +166,7 @@ namespace ASEditor
                 {
                     XFolderTools.CreateDirectory(finalPath);
                 }
-                for (int i = 1; i <= EffectLevelUtil.maxLevel; i++)
+                for (int i = 1; i <= EffectLevelUtil.MAX_LEVEL; i++)
                 {
                     string saveName = Path.Combine(finalPath, string.Format("{0}_{1:D2}.prefab", effectId, i));
                     SavePrefabByLevel(srcGO, saveName, i);

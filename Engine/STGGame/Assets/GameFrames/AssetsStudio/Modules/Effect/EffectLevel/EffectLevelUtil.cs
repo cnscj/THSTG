@@ -4,8 +4,8 @@ namespace ASGame
 {
     public static class EffectLevelUtil
     {
-        public static readonly int maxLevel = 10;
-        public static readonly int defaultLv = 1;
+        public static readonly int MAX_LEVEL = 5;
+        public static readonly int DEFAULT_LEVEL = 1;
 
         ///////////////特效分级////////////
         public static void SetEffectLevel(GameObject GO, int level)

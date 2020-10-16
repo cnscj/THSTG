@@ -5,7 +5,7 @@ using UnityEngine;
 namespace THGame
 {
     
-    public class SkillData : ScriptableObject , ISerializationCallbackReceiver
+    public class SkillData : ISerializationCallbackReceiver
     {
         public int version;
         public SkillItem[] skillItems;

@@ -9,7 +9,7 @@ using XLibrary;
 
 namespace ASEditor
 {
-    public class AssetUpdatePackageEditor : WindowGUI<AssetUpdatePackageEditor>
+    public class AssetUpdatePackageWindow : WindowGUI<AssetUpdatePackageWindow>
     {
         class AssetItem
         {
@@ -25,6 +25,7 @@ namespace ASEditor
             public int type;
             public int flag;
         }
+
         private string _saveFilePath;
         private string _manifestPath = "";
         private string _assetFolderPath = "";
@@ -55,7 +56,7 @@ namespace ASEditor
             ShowWindow("资源分包配置");
         }
 
-        public AssetUpdatePackageEditor()
+        public AssetUpdatePackageWindow()
         {
             _srcSearchTextField.OnChanged(() =>
             {
@@ -134,16 +135,16 @@ namespace ASEditor
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.TextField("依赖文件", _manifestPath);
-            if (GUILayout.Button("打开", GUILayout.Width(100)))
-            {
-                _manifestPath = EditorUtility.OpenFilePanel("OpenFile", "Assets", "manifest");
-                if (!string.IsNullOrEmpty(_manifestPath))
-                {
-                    //扫描依赖关系
-                    LoadManifestFile(_manifestPath);
-                }
-            }
+            //EditorGUILayout.TextField("依赖文件", _manifestPath);
+            //if (GUILayout.Button("打开", GUILayout.Width(100)))
+            //{
+            //    _manifestPath = EditorUtility.OpenFilePanel("OpenFile", "Assets", "manifest");
+            //    if (!string.IsNullOrEmpty(_manifestPath))
+            //    {
+            //        //扫描依赖关系
+            //        LoadManifestFile(_manifestPath);
+            //    }
+            //}
             EditorGUILayout.EndHorizontal();
 
             //2个滚动的视图
@@ -172,9 +173,9 @@ namespace ASEditor
             {
                 string fileName = Path.GetFileName(item.path);
                 EditorGUILayout.BeginHorizontal();
-                item.isSelected = GUILayout.Toggle(item.isSelected, fileName, GUILayout.Width(250));
+                //item.isSelected = GUILayout.Toggle(item.isSelected, fileName, GUILayout.Width(250));
 
-                if (GUILayout.Button(">>", GUILayout.Width(20)))
+                if (GUILayout.Button(fileName, GUILayout.Width(250)))
                 {
                     _addQueue.Enqueue(item.path);
                 }
@@ -189,7 +190,7 @@ namespace ASEditor
         {
             EditorGUILayout.BeginVertical();
             _destSearchTextField.OnGUI();
-            _scrollPos2 = EditorGUILayout.BeginScrollView(_scrollPos2, (GUIStyle)"Config Lis");
+            _scrollPos2 = EditorGUILayout.BeginScrollView(_scrollPos2, (GUIStyle)"Config List");
 
             foreach(var item in _configList)
             {
@@ -198,7 +199,7 @@ namespace ASEditor
                 if (GUILayout.Button(fileName, GUILayout.Width(250)))
                 {
                     _selectedItem = item;
-                    //TODO:需要重绘界面
+
                 }
                 if (GUILayout.Button("<<", GUILayout.Width(20)))
                 {
@@ -250,7 +251,6 @@ namespace ASEditor
                 }
                 isNeedRefresh = true;
             }
-
            
             if (isNeedRefresh)
             {
@@ -452,5 +452,4 @@ namespace ASEditor
             }
         }
     }
-
 }
