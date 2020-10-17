@@ -8,7 +8,8 @@ namespace THGame
     public class SkillAudio
     {
         public string audioKey;
-        public float timeTick;
+        public float delayTime;
+        public float playLength = -1;
 
     }
 

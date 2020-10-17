@@ -29,6 +29,8 @@ namespace ASGame
 #if UNITY_EDITOR
         public static void Make(GameObject modelWithEffect,GameObject modfxContainer)
         {
+            //TODO:需要修复ParticleSystemSimulationSpace.Custom的自定义引用节点
+
             if (modelWithEffect == null || modfxContainer == null)
                 return ;
 

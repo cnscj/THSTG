@@ -4,10 +4,14 @@ using UnityEngine;
 
 namespace THGame
 {
+    public delegate void SkillEventCallback(SkillEventContext context);
+
     public class SkillController : MonoBehaviour
     {
         public Animator animator;       //动作状态机
         public SkillData data;          //技能数据
+
+        public SkillEventCallback onEvent;
 
         public void Awake()
         {
@@ -35,18 +39,32 @@ namespace THGame
         private void Init()
         {
             animator = animator ?? GetComponentInChildren<Animator>();
+
+        }
+
+
+        //
+        protected void OnEvent()
+        {
+
+        }
+        //////////
+
+        private void InitEvent()
+        {
+
         }
 
         //////////
-        public void PlayAction()
+        private void PlayAction()
         {
 
         }
-        public void PlayEffect()
+        private void PlayEffect()
         {
 
         }
-        public void PlayAudio()
+        private void PlayAudio()
         {
 
         }

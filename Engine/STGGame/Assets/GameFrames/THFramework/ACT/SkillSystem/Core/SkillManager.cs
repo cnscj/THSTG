@@ -30,22 +30,23 @@ namespace THGame
         //音效加载器
         //特效加载器
         //动作加载器
-        public virtual void LoadEffect(string assetKey,Action<Object> callback)
+        //TODO:简单的加载器可以根据动作名,自动加载对应资源
+        public virtual void LoadEffect(SkillLoaderContext context,Action<GameObject[]> callback)
         {
 
         }
 
-        public virtual void LoadAudio(string assetKey, Action<Object> callback)
+        public virtual void LoadAudio(SkillLoaderContext context, Action<AudioClip[]> callback)
         {
 
         }
 
-        public virtual void LoadAction(string assetKey, Action<Object> callback)
+        public virtual void LoadAction(SkillLoaderContext context, Action<AnimationClip[]> callback)
         {
 
         }
 
-        public virtual void LoadConfig(string assetKey, Action<Object> callback)
+        public virtual void LoadConfig(SkillLoaderContext context, Action<SkillData> callback)
         {
 
         }

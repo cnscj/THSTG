@@ -4,22 +4,15 @@ using UnityEngine;
 
 namespace THGame
 {
-    
-    public class SkillData : ISerializationCallbackReceiver
+    [System.Serializable]
+    public class SkillData
     {
         public int version;
+        public string modelId;
         public SkillItem[] skillItems;
         public SkillCombo skillCombo;
 
-        public void OnAfterDeserialize()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void OnBeforeSerialize()
-        {
-            throw new System.NotImplementedException();
-        }
+       
     }
 
 }
