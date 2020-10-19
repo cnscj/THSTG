@@ -12,7 +12,14 @@ namespace THGame
         public SkillItem[] skillItems;
         public SkillCombo skillCombo;
 
-       
+        private Dictionary<string, SkillItem> _skillDict;
+
+        public Dictionary<string, SkillItem> GetDict()
+        {
+            _skillDict = _skillDict ?? new Dictionary<string, SkillItem>();
+            return _skillDict;
+        }
+
     }
 
 }
