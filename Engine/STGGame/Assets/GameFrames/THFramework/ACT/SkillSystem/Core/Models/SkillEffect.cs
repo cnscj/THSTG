@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
+﻿
 namespace THGame
 {
     //有可能是模型特效,也有可能是普通特效
