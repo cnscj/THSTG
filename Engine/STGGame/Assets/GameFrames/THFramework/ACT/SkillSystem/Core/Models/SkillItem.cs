@@ -7,8 +7,6 @@ namespace THGame
     public class SkillItem
     {
         public int skillId;
-        public string skillName;
-        public string skillDesc;
 
         public float cdTime;
         public int invalidFrame;
@@ -20,7 +18,6 @@ namespace THGame
         public SkillEffect skillEffect;
         public SkillAudio skillAudio;
         public SkillEvent skillEvent;
-
     }
 
 }

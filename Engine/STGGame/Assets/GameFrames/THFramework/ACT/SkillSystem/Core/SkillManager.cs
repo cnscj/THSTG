@@ -7,6 +7,20 @@ using Object = UnityEngine.Object;
 
 namespace THGame
 {
+    public class SkillLoaderContext
+    {
+        public string loadType;
+        public string skillName;
+        public string assetKey;
+    }
+
+    public class SkillEventContext
+    {
+        public Object sender;
+        public string type;
+        public string args;
+    }
+
     public class SkillFactory
     {
         public virtual void PlayEffect()
@@ -27,10 +41,6 @@ namespace THGame
 
     public class SkillLoader
     {
-        //音效加载器
-        //特效加载器
-        //动作加载器
-        //TODO:简单的加载器可以根据动作名,自动加载对应资源
         public virtual void LoadEffect(SkillLoaderContext context,Action<GameObject[]> callback)
         {
 
@@ -52,19 +62,57 @@ namespace THGame
         }
     }
 
-    public class SkillManager : Singleton<SkillManager>
+    public class SkillCache
     {
-        private SkillFactory _factory;
-        private SkillLoader _loader;
+        public SkillItem Get()
+        {
+            return default;
+        }
+    }
 
-        public SkillFactory GetFactory()
+    public class SkillParser
+    {
+        public string Convert2String(SkillData data)
+        {
+            return "";
+        }
+
+        public SkillData Convert2Data(string content)
         {
             return default;
         }
 
-        public SkillLoader GetLoader()
+    }
+
+    public class SkillScheduler
+    {
+        //采用时间片轮转的方式
+        public class Job
         {
-            return default;
+
         }
+
+        public Action onExecute;
+        public Action onFinish;
+        //一个按时间优先度排序的队列,每次检测头部
+    }
+
+    //触发器
+    public class SkillTrigger
+    {
+
+
+
+    }
+
+    public class SkillManager : MonoSingleton<SkillManager>
+    {
+        public SkillFactory Factory = new SkillFactory();
+        public SkillLoader Loader = new SkillLoader();
+        public SkillParser Parser = new SkillParser();
+        public SkillTrigger Trigger = new SkillTrigger();
+        public SkillCache Cache = new SkillCache();
+
+
     }
 }
