@@ -14,10 +14,7 @@ namespace THGame
         public string skillExStr;
         public Tuple<string, int>[] preconditions;
 
-        public SkillAction skillAction;
-        public SkillEffect skillEffect;
-        public SkillAudio skillAudio;
-        public SkillEvent skillEvent;
+        public SkillCourse skillCourse;
     }
 
 }

@@ -6,7 +6,7 @@ namespace THGame
 {
     public interface ISkillTarget
     {
-        public void Execute();
+        void Execute();
     }
 
 }

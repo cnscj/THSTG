@@ -71,20 +71,6 @@ namespace THGame
         }
     }
 
-    public class SkillParser
-    {
-        public string Convert2String(SkillData data)
-        {
-            return "";
-        }
-
-        public SkillData Convert2Data(string content)
-        {
-            return default;
-        }
-
-    }
-
     public class SkillScheduler
     {
         //采用时间片轮转的方式
@@ -115,7 +101,6 @@ namespace THGame
     {
         public SkillFactory Factory = new SkillFactory();
         public SkillLoader Loader = new SkillLoader();
-        public SkillParser Parser = new SkillParser();
         public SkillTrigger Trigger = new SkillTrigger();
         public SkillCache Cache = new SkillCache();
 
