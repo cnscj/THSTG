@@ -6,7 +6,7 @@ using UnityEngine;
 namespace THGame
 {
     [System.Serializable]
-    public class SkillCourse
+    public class SkillTimeline
     {
         //一个技能的施法过程包括前摇,施法,后摇,而且施法可能有多个
         public SkillAction[] skillActions;

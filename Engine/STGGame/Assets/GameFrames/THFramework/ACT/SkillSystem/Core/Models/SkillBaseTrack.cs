@@ -5,7 +5,7 @@ using UnityEngine;
 namespace THGame
 {
     [System.Serializable]
-    public class BseSkillBehavior
+    public class SkillBaseTrack
     {
         public float time;       //时间点
     }

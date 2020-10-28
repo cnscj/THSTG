@@ -6,18 +6,10 @@ namespace THGame
     public class SkillData
     {
         public int version;
-        public string modelId;
-        public SkillItem[] skillItems;
+
+        public SkillInfo skillInfo;
+        public SkillTimeline skillTimleline;
         public SkillCombo skillCombo;
-
-        private Dictionary<string, SkillItem> _skillDict;
-
-        public Dictionary<string, SkillItem> GetDict()
-        {
-            _skillDict = _skillDict ?? new Dictionary<string, SkillItem>();
-            return _skillDict;
-        }
-
     }
 
 }

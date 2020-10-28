@@ -2,7 +2,7 @@
 namespace THGame
 {
     [System.Serializable]
-    public class SkillAudio : BseSkillBehavior
+    public class SkillAudio : BaseSkillTrack
     {
         public string audioKey;
         public float delayTime;

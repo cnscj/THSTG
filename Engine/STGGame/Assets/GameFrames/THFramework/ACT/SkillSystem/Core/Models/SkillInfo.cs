@@ -4,7 +4,7 @@ using System;
 namespace THGame
 {
     [System.Serializable]
-    public class SkillItem
+    public class SkillInfo
     {
         public int skillId;
 
@@ -13,8 +13,6 @@ namespace THGame
         public bool canBeInterrupted;
         public string skillExStr;
         public Tuple<string, int>[] preconditions;
-
-        public SkillCourse skillCourse;
     }
 
 }

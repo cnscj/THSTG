@@ -5,45 +5,64 @@ namespace XLibrary.Package
 {
     public class MonoSingleton<T> : MonoBehaviour where T : MonoBehaviour
     {
-        private static T _instance;
-        private static object _lock = new object();
-        private static bool _applicationIsQuitting = false;
+        private static T instance = null;
+        private static readonly object locker = new object();
+        private static bool bAppQuitting;
 
         public static T GetInstance()
         {
-            if (_applicationIsQuitting) 
+            if (bAppQuitting)
             {
-                return null;
+                instance = null;
+                return instance;
             }
 
-            lock(_lock)
+            lock (locker)
             {
-                if (_instance == null)
+                if (instance == null)
                 {
-                    _instance = (T) FindObjectOfType(typeof(T));
-                    
-                    if ( FindObjectsOfType(typeof(T)).Length > 1 )
+                    // 保证场景中只有一个 单例
+                    T[] managers = FindObjectsOfType(typeof(T)) as T[];
+                    if (managers.Length != 0)
                     {
-                        return _instance;
+                        if (managers.Length == 1)
+                        {
+                            instance = managers[0];
+                            instance.gameObject.name = typeof(T).Name;
+                            return instance;
+                        }
+                        else
+                        {
+                            foreach (T manager in managers)
+                            {
+                                Destroy(manager.gameObject);
+                            }
+                        }
                     }
-                    
-                    if (_instance == null)
-                    {
-                        GameObject singleton = new GameObject();
-                        _instance = singleton.AddComponent<T>();
-                        singleton.name = "(singleton) "+ typeof(T).ToString();
-                        
-                        DontDestroyOnLoad(singleton);
-                    }
+
+
+                    var singleton = new GameObject();
+                    instance = singleton.AddComponent<T>();
+                    singleton.name = "(singleton)" + typeof(T);
+                    singleton.hideFlags = HideFlags.None;
+                    DontDestroyOnLoad(singleton);
+
                 }
-                return _instance;
+                instance.hideFlags = HideFlags.None;
+                return instance;
             }
         }
 
-        void OnDestroy () 
+        protected virtual void Awake()
         {
-            _applicationIsQuitting = true;
+            bAppQuitting = false;
         }
+
+        protected virtual void OnDestroy()
+        {
+            bAppQuitting = true;
+        }
+
     }
 }
 
