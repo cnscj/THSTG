@@ -7,8 +7,7 @@ namespace THGame
     {
         public int version;
 
-        public SkillInfo skillInfo;
-        public SkillTimeline skillTimleline;
+        public SkillItem[] skillItems;
         public SkillCombo skillCombo;
     }
 
