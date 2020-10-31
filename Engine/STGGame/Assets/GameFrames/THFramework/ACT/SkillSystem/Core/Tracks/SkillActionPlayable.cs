@@ -13,13 +13,14 @@ namespace THGame.Skill
         {
             var playable = ScriptPlayable<SkillActionBehaviour>.Create(graph);
             var skillActionBehaviour = playable.GetBehaviour();
-
+            skillActionBehaviour.animationClip = animationClip;
             return playable;
         }
     }
 
     public class SkillActionBehaviour : PlayableBehaviour
     {
+        public AnimationClip animationClip;
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
             Debug.Log(playerData);

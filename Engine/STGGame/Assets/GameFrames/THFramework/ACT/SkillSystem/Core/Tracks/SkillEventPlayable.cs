@@ -6,7 +6,7 @@ namespace THGame.Skill
 {
     public class SkillEventPlayableAsset : PlayableAsset
     {
-        public ExposedReference<GameObject> sender;
+        public ExposedReference<GameObject> sender; //引用场景对象
         public SkillEvent data;
 
 
@@ -22,7 +22,6 @@ namespace THGame.Skill
     }
 
     [TrackClipType(typeof(SkillEventPlayableAsset))]
-    //[TrackBindingType(typeof(GameObject))]
     [TrackColor(0, 1, 0)]
     public class SkillEventPlayableTrack : PlayableTrack
     {
