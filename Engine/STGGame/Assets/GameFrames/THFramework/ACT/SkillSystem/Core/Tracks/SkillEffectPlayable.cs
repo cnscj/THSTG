@@ -31,7 +31,6 @@ namespace THGame.Skill
             if (effectGo != null && receiveGo != null)
             {
                 var effectInstance = Object.Instantiate(effectGo, receiveGo.transform);
-                
             }
         }
     }

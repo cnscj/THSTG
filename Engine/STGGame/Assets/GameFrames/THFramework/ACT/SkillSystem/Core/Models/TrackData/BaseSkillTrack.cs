@@ -6,6 +6,6 @@ namespace THGame
 {
     public abstract class BaseSkillTrack
     {
-        [HideInInspector]public float time;
+        [HideInInspector] public float time;
     }
 }

@@ -12,13 +12,29 @@ namespace THGame.Skill
 
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {
-            return Playable.Create(graph);
+            var playable = ScriptPlayable<SkillEventBehaviour>.Create(graph);
+            var skillEventBehaviour = playable.GetBehaviour();
+            skillEventBehaviour.sender = sender.Resolve(graph.GetResolver());
+            skillEventBehaviour.args1 = data.args1;
+            skillEventBehaviour.eventName = data.eventName;
+
+            return playable;
         }
     }
 
     public class SkillEventBehaviour : PlayableBehaviour
     {
+        public object sender;
+        public string eventName;
+        public string args1;
 
+        public override void OnBehaviourPlay(Playable playable, FrameData info)
+        {
+            if (string.IsNullOrEmpty(eventName))
+                return;
+
+            SkillManager.GetInstance().Dispatcher.DispatchEvent(sender, eventName, args1);
+        }
     }
 
     [TrackClipType(typeof(SkillEventPlayableAsset))]

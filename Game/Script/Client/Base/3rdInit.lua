@@ -4,3 +4,4 @@
 -- bit = require "3rd.lua-bit-numberlua.lmod.bit.numberlua"
 -- xml = require "3rd.Lua-Simple-XML-Parser.xmlSimple"
 json = require "3rd.json-lua-master.json"
+promises = require "3rd.lua-promises-master.deferred"

@@ -8,19 +8,12 @@ using Object = UnityEngine.Object;
 
 namespace THGame
 {
-
-
-
- 
-
-
-
     public class SkillManager : MonoSingleton<SkillManager>
     {
         public SkillFactory Factory = new SkillFactory();
         public SkillLoader Loader = new SkillLoader();
         public SkillTrigger Trigger = new SkillTrigger();
         public SkillCache Cache = new SkillCache();
-
+        public SkillDispatcher Dispatcher = new SkillDispatcher();
     }
 }
