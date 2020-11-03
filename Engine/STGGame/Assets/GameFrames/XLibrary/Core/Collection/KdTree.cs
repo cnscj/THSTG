@@ -2,7 +2,7 @@
 
 namespace XLibrary.Collection
 {
-    public class KdTree2D<T>
+    public class KdTree<T>
     {
         
     }
