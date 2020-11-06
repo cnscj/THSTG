@@ -5,7 +5,7 @@ using UnityEngine;
 namespace THGame
 {
     [System.Serializable]
-    public class SkillItem 
+    public class SkillTreeNode 
     {
         public string skillName;    //可以是Id
         public SkillInfo skillInfo;

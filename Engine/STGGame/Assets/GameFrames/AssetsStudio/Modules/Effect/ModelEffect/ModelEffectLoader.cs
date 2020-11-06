@@ -8,11 +8,12 @@ namespace ASGame
 {
     public class ModelEffectLoader : MonoBehaviour
     {
+        public string key;
         private List<GameObject> m_effectNodes;
         private bool m_isSetuped;
         private ModelEffect m_curModelEffect;
 
-        public void Setup(GameObject modfxGo, bool isUseFullPath, bool isSetLayer)
+        public void Setup(GameObject modfxGo, bool isUseFullPath, bool isSetLayer = true)
         {
             if (modfxGo == null)
                 return;
@@ -26,7 +27,7 @@ namespace ASGame
             return m_isSetuped;
         }
 
-        public bool Setup(ModelEffect modfx ,bool isUseFullPath = true, bool isSetLayer = false)
+        public bool Setup(ModelEffect modfx ,bool isUseFullPath = true, bool isSetLayer = true)
         {
             if (modfx == null)
                 return false;
@@ -55,6 +56,7 @@ namespace ASGame
                     }
                 }
             }
+            key = modfx.name;
             m_isSetuped = true;
             return true;
 
@@ -73,6 +75,7 @@ namespace ASGame
                 }
                 m_effectNodes.Clear();
                 m_isSetuped = false;
+                key = null;
             }
 
             if (m_curModelEffect != null)
