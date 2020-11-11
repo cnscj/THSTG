@@ -98,8 +98,8 @@ namespace ASGame
             return m_curTexInfo.name;
         }
 
-        [ContextMenu("Reset")]
-        public void Reset()
+        [ContextMenu("Default")]
+        public void Default()
         {
             Change(DEFAULT_KEY);
         }
