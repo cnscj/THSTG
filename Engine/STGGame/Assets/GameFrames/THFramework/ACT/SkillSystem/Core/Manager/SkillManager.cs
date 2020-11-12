@@ -15,13 +15,6 @@ namespace THGame
         public SkillTrigger Trigger = new SkillTrigger();
         public SkillCache Cache = new SkillCache();
         public SkillDispatcher Dispatcher = new SkillDispatcher();
-        public SkillScheduler Scheduler = new SkillScheduler();
 
-
-
-        private void Update()
-        {
-            Scheduler.Update();
-        }
     }
 }
