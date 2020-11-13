@@ -9,7 +9,7 @@ namespace THGame
     {
         public string skillName;    //可以是Id
         public SkillInfo skillInfo;
-        public SkillSequence skillSequence;
+        public SkillBehaviour skillBehaviour;
 
     }
 }

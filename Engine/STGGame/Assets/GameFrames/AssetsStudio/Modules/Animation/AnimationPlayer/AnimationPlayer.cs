@@ -9,25 +9,32 @@ namespace ASGame
     public abstract class AnimationPlayer : MonoBehaviour
     {
         public float Speed { get; set; }
-        public int Type { get; }
+        public int Type { get; set; }
 
         public void Stop()
         {
 
         }
 
-        public void Play(string stateName)
+        public void Play(string stateName, float normalizedTime = 0f)
         {
-            OnPlay(stateName);
+            OnPlay(stateName, normalizedTime);
         }
 
-        public void CrossFade()
+        public void CrossFade(string stateName, float normalizedTransitionDuration, float normalizedTimeOffset = 0f)
         {
-            OnCrossFade();
+            OnCrossFade(stateName, normalizedTransitionDuration, normalizedTimeOffset);
         }
+
+        public abstract void AddEvent(string stateName, float time, string evtName);
+        public abstract void RemoveEvent(string stateName, float time, string evtName);
+
+
         ///////////
-        protected abstract void OnPlay(string stateName);
+        protected abstract void OnPlay(string stateName, float normalizedTime);
 
-        protected abstract void OnCrossFade();
+        protected abstract void OnCrossFade(string stateName, float normalizedTransitionDuration, float normalizedTimeOffset);
+
+        protected virtual void OnEvent(string stateName, float time, string evtName) { }
     }
 }

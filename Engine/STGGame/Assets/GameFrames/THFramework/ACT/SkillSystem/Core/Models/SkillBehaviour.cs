@@ -4,7 +4,8 @@ using UnityEngine;
 
 namespace THGame
 {
-    public class SkillSequence : MonoBehaviour
+    [System.Serializable]
+    public class SkillBehaviour
     {
         //一个技能的施法过程包括前摇,施法,后摇,而且施法可能有多个
         //冲刺,可以取消后摇

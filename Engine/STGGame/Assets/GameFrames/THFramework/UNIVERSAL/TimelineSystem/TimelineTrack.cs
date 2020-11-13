@@ -9,6 +9,7 @@ namespace THGame
     {
         public readonly int time;            //第几帧开始
         public readonly int duration;        //执行时长
+        public int type;
 
         public Action onStart;
         public Action<int> onUpdate;

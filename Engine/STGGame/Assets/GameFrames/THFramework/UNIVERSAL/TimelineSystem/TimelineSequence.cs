@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,6 +8,7 @@ namespace THGame
     {
         public int startFrame;       //开始帧
         public int durationFrame;    //最长时长
+
         public Action onStart;
         public Action onEnd;
 
@@ -56,6 +56,7 @@ namespace THGame
 
             durationFrame = Math.Max(durationFrame, (job.time + job.duration));
         }
+
         private void RefreshMaxTimes()  
         {
             //找出最长的结束帧

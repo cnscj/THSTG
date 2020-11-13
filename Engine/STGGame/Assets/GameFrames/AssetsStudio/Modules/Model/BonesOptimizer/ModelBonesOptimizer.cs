@@ -9,7 +9,7 @@ namespace ASGame
     public class ModelBonesOptimizer : MonoBehaviour
     {
         //节点标记类
-        public class NodeMark: MonoBehaviour{}
+        public class NodeMark : MonoBehaviour{}
 
         [SerializeField]
         public List<string> exposeBones;   //暴露的骨骼名字
@@ -24,6 +24,36 @@ namespace ASGame
                 exposeBones = exposeBones ?? new List<string>();
                 exposeBones.AddRange(bones);
             }
+        }
+
+        public void AddExposeBonesUnique(List<string> bones)
+        {
+            HashSet<string> uniqueSet = new HashSet<string>();
+            if (exposeBones != null && exposeBones.Count > 0)
+            {
+                foreach (var bonePath in exposeBones)
+                {
+                    var boneName = Path.GetFileNameWithoutExtension(bonePath);
+                    if (!uniqueSet.Contains(boneName))
+                    {
+                        uniqueSet.Add(boneName);
+                    }
+                }
+            }
+
+            if (bones != null && bones.Count > 0)
+            {
+                foreach (var bonePath in bones)
+                {
+                    var boneName = Path.GetFileNameWithoutExtension(bonePath);
+                    if (!uniqueSet.Contains(boneName))
+                    {
+                        uniqueSet.Add(boneName);
+                    }
+                }
+            }
+
+            exposeBones = uniqueSet.ToList();
         }
 
         public bool IsOptimezed()

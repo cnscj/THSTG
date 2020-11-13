@@ -5,7 +5,7 @@ namespace THGame
     public class SkillAction : BaseSkillTrack
     {
         public string actionKey;       //动作名称
-        public float duration;
+
     }
 
 }
