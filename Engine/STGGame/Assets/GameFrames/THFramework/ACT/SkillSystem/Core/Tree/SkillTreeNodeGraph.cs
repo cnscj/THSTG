@@ -9,6 +9,6 @@ namespace THGame
     [Serializable, CreateAssetMenu(fileName = "SkillGraph", menuName = "THGame/SkillEditor/SkillGraph")]
     public class SkillNodeGraph : NodeGraph
     {
-
+        public int skillId;
     }
 }

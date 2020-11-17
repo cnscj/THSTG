@@ -11,6 +11,8 @@ namespace THGame
         public readonly int duration;        //执行时长
         public int type;
 
+        public int EndTime => time + duration;
+
         public Action onStart;
         public Action<int> onUpdate;
         public Action onEnd;
@@ -35,5 +37,6 @@ namespace THGame
         {
             onEnd?.Invoke();
         }
+
     }
 }

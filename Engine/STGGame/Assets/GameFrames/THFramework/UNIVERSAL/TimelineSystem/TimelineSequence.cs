@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using XLibrary.Collection;
 
 namespace THGame
 {
@@ -9,10 +10,13 @@ namespace THGame
         public int startFrame;       //开始帧
         public int durationFrame;    //最长时长
 
+        public int EndTime => startFrame + durationFrame;
+
         public Action onStart;
         public Action onEnd;
 
         private SortedDictionary<int, HashSet<TimelineTrack>> _scheduleJobs = new SortedDictionary<int, HashSet<TimelineTrack>>();
+        private MaxHeap<TimelineTrack, int> _scheduleJobsEndTime = new MaxHeap<TimelineTrack, int>();
         private HashSet<TimelineTrack> _schedulingJobs = new HashSet<TimelineTrack>();
         private Queue<TimelineTrack> _scheduledJobs = new Queue<TimelineTrack>();
 
@@ -29,7 +33,8 @@ namespace THGame
             }
             jobSet.Add(job);
 
-            RefreshMaxTime(job);
+            _scheduleJobsEndTime.Add(job, job.EndTime);
+            durationFrame = _scheduleJobsEndTime.Max.Key.EndTime;
         }
 
         public void RemoveJob(TimelineTrack job)
@@ -46,29 +51,10 @@ namespace THGame
                 }
             }
 
-            RefreshMaxTimes();//FIXME:这里从字典中找出最长一段性能不是很好
+            _scheduleJobsEndTime.Remove(job);
+            durationFrame = _scheduleJobsEndTime.Max.Key.EndTime;
         }
 
-        private void RefreshMaxTime(TimelineTrack job)
-        {
-            if (job == null)
-                return;
-
-            durationFrame = Math.Max(durationFrame, (job.time + job.duration));
-        }
-
-        private void RefreshMaxTimes()  
-        {
-            //找出最长的结束帧
-            durationFrame = -1;
-            foreach (var jobSet in _scheduleJobs.Values)
-            {
-                foreach (var job in jobSet)
-                {
-                    RefreshMaxTime(job);
-                }
-            }
-        }
 
         public void Start()
         {
@@ -108,7 +94,7 @@ namespace THGame
                     job.Update(curFrame);
 
                     //检查结束
-                    if (curFrame >= (job.time + job.duration))
+                    if (curFrame >= job.EndTime)
                     {
                         _scheduledJobs.Enqueue(job);
                         job.End();

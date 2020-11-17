@@ -38,7 +38,7 @@ namespace THGame
                 int curFrameCount = Time.frameCount;
                 list.Update(curFrameCount);
 
-                if (curFrameCount >= list.startFrame + list.durationFrame)
+                if (curFrameCount >= list.EndTime)
                 {
                     _scheduledLists.Enqueue(list);
                     list.End();
