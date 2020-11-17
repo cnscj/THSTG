@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace THGame
 {
@@ -11,11 +8,12 @@ namespace THGame
         public readonly int duration;        //执行时长
         public int type;
 
-        public int EndTime => time + duration;
-
         public Action onStart;
         public Action<int> onUpdate;
         public Action onEnd;
+
+        public int EndTime => time + duration;
+
         public TimelineTrack(int startTime, int length)
         {
             time = startTime;

@@ -7,8 +7,11 @@ namespace THGame
 {
     public class TimelineScheduler : MonoSingleton<TimelineScheduler>
     {
+        public float frameScale = 1f;
+
         private HashSet<TimelineSequence> _scheduleLists = new HashSet<TimelineSequence>();
         private Queue<TimelineSequence> _scheduledLists = new Queue<TimelineSequence>();
+        private int lastFrameCount;
 
         public void Schedule(TimelineSequence list)
         {
@@ -33,9 +36,14 @@ namespace THGame
             if (_scheduleLists == null || _scheduleLists.Count <= 0)
                 return;
 
+            int curFrameCount = Time.frameCount;
+            curFrameCount = (int)(curFrameCount * frameScale);
+
+            if (curFrameCount == lastFrameCount)
+                return;
+
             foreach (var list in _scheduleLists)
             {
-                int curFrameCount = Time.frameCount;
                 list.Update(curFrameCount);
 
                 if (curFrameCount >= list.EndTime)
@@ -50,6 +58,8 @@ namespace THGame
                 var list = _scheduledLists.Dequeue();
                 _scheduleLists.Remove(list);
             }
+
+            lastFrameCount = curFrameCount;
         }
     }
 }

@@ -52,7 +52,7 @@ namespace THGame
             }
 
             _scheduleJobsEndTime.Remove(job);
-            durationFrame = _scheduleJobsEndTime.Max.Key.EndTime;
+            durationFrame = (_scheduleJobsEndTime.Count > 0 ?_scheduleJobsEndTime.Max.Key.EndTime : 0);
         }
 
 
