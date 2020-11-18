@@ -9,6 +9,7 @@ namespace THGame
 		public string skillName;
 		public PlayableAsset skillBehaviour;
 
+
 		protected override void Init()
 		{
 			base.Init();

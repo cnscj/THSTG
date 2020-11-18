@@ -16,12 +16,12 @@ namespace THGame
         private static readonly int DEFAULT_MUSIC_COUNT = 1;    //音乐播放最大可播放1个
         private static readonly int DEFAULT_EFFECT_COUNT = -1;   //音效播放最大可播放无限个
 
-        public static readonly string KEY_SOUND_VOLUME = "MaxSoundVolume";
-        public static readonly string KEY_MUSIC_VOLUME = "MaxMusicVolume";
-        public static readonly string KEY_EFFECT_VOLUME = "MaxEffectVolume";
-        public static readonly string KEY_SOUND_MUTE = "IsSoundMute";
-        public static readonly string KEY_MUSIC_MUTE = "IsMusicMute";
-        public static readonly string KEY_EFFECT_MUTE = "IsEffectMute";
+        private static readonly string KEY_SOUND_VOLUME = "MaxSoundVolume";
+        private static readonly string KEY_MUSIC_VOLUME = "MaxMusicVolume";
+        private static readonly string KEY_EFFECT_VOLUME = "MaxEffectVolume";
+        private static readonly string KEY_SOUND_MUTE = "IsSoundMute";
+        private static readonly string KEY_MUSIC_MUTE = "IsMusicMute";
+        private static readonly string KEY_EFFECT_MUTE = "IsEffectMute";
 
         //最大音量,静音设置
         private float m_soundMaxVolume = 1f;
