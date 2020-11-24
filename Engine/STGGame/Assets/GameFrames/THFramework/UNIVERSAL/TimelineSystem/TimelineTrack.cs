@@ -8,10 +8,6 @@ namespace THGame
         public readonly int duration;        //执行时长
         public int type;
 
-        public Action onStart;
-        public Action<int> onUpdate;
-        public Action onEnd;
-
         public int EndTime => time + duration;
 
         public TimelineTrack(int startTime, int length)
@@ -22,18 +18,17 @@ namespace THGame
 
         public virtual void Start()
         {
-            onStart?.Invoke();
+            
         }
 
         public virtual void Update(int tickTime)
         {
-            int curFrame = tickTime - time;
-            onUpdate?.Invoke(curFrame);
+            
         }
 
         public virtual void End()
         {
-            onEnd?.Invoke();
+
         }
 
     }
