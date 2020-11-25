@@ -2,14 +2,14 @@
 
 namespace THGame
 {
-    public class TrackCallback : TimelineTrack
+    public class ScheduleCallbackTrack : ScheduleTrack
     {
 
         public Action onStart;
         public Action<int> onUpdate;
         public Action onEnd;
 
-        public TrackCallback(int startTime, int length):base(startTime, length){}
+        public ScheduleCallbackTrack(int startTime, int length):base(startTime, length){}
 
         public override void Start()
         {

@@ -16,5 +16,10 @@ namespace THGame
         public SkillCache Cache = new SkillCache();
         public SkillDispatcher Dispatcher = new SkillDispatcher();
 
+
+        protected void Update()
+        {
+
+        }
     }
 }

@@ -5,7 +5,7 @@ using XLibrary.Collection;
 
 namespace THGame
 {
-    public class TimelineSequence
+    public class ScheduleSequence
     {
         public int startFrame;       //开始帧
         public int durationFrame;    //最长时长
@@ -15,20 +15,20 @@ namespace THGame
         public Action onStart;
         public Action onEnd;
 
-        private SortedDictionary<int, HashSet<TimelineTrack>> _scheduleJobs = new SortedDictionary<int, HashSet<TimelineTrack>>();
-        private MaxHeap<TimelineTrack, int> _scheduleJobsEndTime = new MaxHeap<TimelineTrack, int>();
-        private HashSet<TimelineTrack> _schedulingJobs = new HashSet<TimelineTrack>();
-        private Queue<TimelineTrack> _scheduledJobs = new Queue<TimelineTrack>();
+        private SortedDictionary<int, HashSet<ScheduleTrack>> _scheduleJobs = new SortedDictionary<int, HashSet<ScheduleTrack>>();
+        private MaxHeap<ScheduleTrack, int> _scheduleJobsEndTime = new MaxHeap<ScheduleTrack, int>();
+        private HashSet<ScheduleTrack> _schedulingJobs = new HashSet<ScheduleTrack>();
+        private Queue<ScheduleTrack> _scheduledJobs = new Queue<ScheduleTrack>();
 
-        public void AddJob(TimelineTrack job)
+        public void AddJob(ScheduleTrack job)
         {
             if (job == null)
                 return;
 
-            HashSet<TimelineTrack> jobSet;
+            HashSet<ScheduleTrack> jobSet;
             if (!_scheduleJobs.TryGetValue(job.time, out jobSet))
             {
-                jobSet = new HashSet<TimelineTrack>();
+                jobSet = new HashSet<ScheduleTrack>();
                 _scheduleJobs.Add(job.time, jobSet);
             }
             jobSet.Add(job);
@@ -37,7 +37,7 @@ namespace THGame
             durationFrame = _scheduleJobsEndTime.Max.Key.EndTime;
         }
 
-        public void RemoveJob(TimelineTrack job)
+        public void RemoveJob(ScheduleTrack job)
         {
             if (job == null)
                 return;

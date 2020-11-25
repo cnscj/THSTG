@@ -9,11 +9,11 @@ namespace THGame
     {
         public float frameScale = 1f;
 
-        private HashSet<TimelineSequence> _scheduleLists = new HashSet<TimelineSequence>();
-        private Queue<TimelineSequence> _scheduledLists = new Queue<TimelineSequence>();
+        private HashSet<ScheduleSequence> _scheduleLists = new HashSet<ScheduleSequence>();
+        private Queue<ScheduleSequence> _scheduledLists = new Queue<ScheduleSequence>();
         private int lastFrameCount;
 
-        public void Schedule(TimelineSequence list)
+        public void Schedule(ScheduleSequence list)
         {
             if (_scheduleLists.Contains(list))
                 return;
@@ -22,7 +22,7 @@ namespace THGame
             list.Start();
         }
 
-        public void UnSchedule(TimelineSequence list)
+        public void UnSchedule(ScheduleSequence list)
         {
             if (!_scheduleLists.Contains(list))
                 return;

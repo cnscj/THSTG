@@ -2,7 +2,7 @@
 
 namespace THGame
 {
-    public class TimelineTrack
+    public class ScheduleTrack
     {
         public readonly int time;            //第几帧开始
         public readonly int duration;        //执行时长
@@ -10,7 +10,7 @@ namespace THGame
 
         public int EndTime => time + duration;
 
-        public TimelineTrack(int startTime, int length)
+        public ScheduleTrack(int startTime, int length)
         {
             time = startTime;
             duration = length;
