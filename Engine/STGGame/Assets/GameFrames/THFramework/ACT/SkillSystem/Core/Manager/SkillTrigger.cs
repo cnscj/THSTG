@@ -5,10 +5,13 @@ using UnityEngine;
 namespace THGame
 {
     //触发器
-    public class SkillTrigger
+    //指令输入,状态转移
+    public class SkillTrigger : MonoBehaviour
     {
+        public void Input()
+        {
 
-
+        }
 
     }
 

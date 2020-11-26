@@ -1,25 +1,24 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using XLibrary.Collection;
+﻿using UnityEngine;
 using XLibrary.Package;
-using Object = UnityEngine.Object;
 
 namespace THGame
 {
     public class SkillManager : MonoSingleton<SkillManager>
     {
-        public SkillFactory Factory = new SkillFactory();
-        public SkillLoader Loader = new SkillLoader();
-        public SkillTrigger Trigger = new SkillTrigger();
-        public SkillCache Cache = new SkillCache();
-        public SkillDispatcher Dispatcher = new SkillDispatcher();
+        private SkillCountdownCache _skillCountdownCache;
+        private SkillCommandCache _skillCommandCache;
+
+        public SkillCountdownCache GetCountdownCache(){return _skillCountdownCache = _skillCountdownCache ?? CreateManager<SkillCountdownCache>("CountdownCache");}
+        public SkillCommandCache GetCommandCache() {return _skillCommandCache = _skillCommandCache ?? CreateManager<SkillCommandCache>("CommandCache");}
 
 
-        protected void Update()
+        protected T CreateManager<T>(string name) where T : MonoBehaviour
         {
+            GameObject managerGObj = new GameObject(name);
+            managerGObj.transform.SetParent(transform);
+            T manager = managerGObj.AddComponent<T>();
 
+            return manager;
         }
     }
 }

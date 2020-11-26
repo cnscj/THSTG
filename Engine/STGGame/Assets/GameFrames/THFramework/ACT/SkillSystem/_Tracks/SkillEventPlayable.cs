@@ -33,7 +33,6 @@ namespace THGame.Skill
             if (string.IsNullOrEmpty(eventName))
                 return;
 
-            SkillManager.GetInstance().Dispatcher.DispatchEvent(sender, eventName, args1);
         }
     }
 
