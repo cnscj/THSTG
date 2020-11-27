@@ -4,14 +4,6 @@ using UnityEngine;
 
 namespace THGame
 {
-    public class SkillEventContext
-    {
-        public object sender;
-        public string type;
-        public object args;
-    }
-    public delegate void SkillEventListener(SkillEventContext context);
-
     public class SkillDispatcher
     {
         private Dictionary<string, HashSet<SkillEventListener>> _listeners = new Dictionary<string, HashSet<SkillEventListener>>();
