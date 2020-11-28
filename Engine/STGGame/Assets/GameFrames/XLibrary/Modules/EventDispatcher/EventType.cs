@@ -2,7 +2,7 @@
 
 namespace XLibGame
 {
-    public class EventType
+    public struct EventType
     {
         private string m_type;
 
