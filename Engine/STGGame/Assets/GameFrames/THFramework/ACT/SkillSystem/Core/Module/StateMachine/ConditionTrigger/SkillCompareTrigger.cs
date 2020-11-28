@@ -1,27 +1,29 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace THGame
 {
-    public class SkillNumberValidator : MonoBehaviour
+    public class SkillCompareTrigger<T> where T : IComparable<T>
     {
         public enum Operator
         {
             Greater,
             Less,
             Equal,
+            Unequal,
         }
 
         public class Condition
         {
             public Operator opera;
-            public float value;
+            public T value;
         }
 
         public Condition[] conditions;
 
-        public bool Verify(float num)
+        public bool Verify(T val)
         {
             if (conditions == null || conditions.Length < 0)
                 return false;
@@ -29,25 +31,28 @@ namespace THGame
             bool finalRet = true;
             foreach (var condition in conditions)
             {
-                finalRet &= Calculate(condition, num);
+                finalRet &= Calculate(condition, val);
             }
 
             return finalRet;
         }
 
-        private bool Calculate(Condition condition,float value)
+        private bool Calculate(Condition condition,T value)
         {
             bool ret = false;
             switch (condition.opera)
             {
                 case Operator.Greater:
-                    ret = value > condition.value;
+                    ret = value.CompareTo(condition.value) > 0;
                     break;
                 case Operator.Less:
-                    ret = value < condition.value;
+                    ret = value.CompareTo(condition.value) < 0;
                     break;
                 case Operator.Equal:
-                    ret = value == condition.value;
+                    ret = value.CompareTo(condition.value) == 0;
+                    break;
+                case Operator.Unequal:
+                    ret = value.CompareTo(condition.value) != 0;
                     break;
             }
             return ret; 
