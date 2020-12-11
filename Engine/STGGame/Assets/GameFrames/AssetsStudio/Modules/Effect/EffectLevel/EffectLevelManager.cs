@@ -8,6 +8,7 @@ namespace ASGame
 {
     public class EffectLevelManager : Singleton<EffectLevelManager>
     {
+        public int Level { get; private set; }
         private HashSet<EffectLevelController> m_allCtrls;
 
         public void AddController(EffectLevelController ctrl)
@@ -44,6 +45,47 @@ namespace ASGame
 
             return new List<EffectLevelController>(m_allCtrls);
         }
+
+        ///////////
+
+        /// <summary>
+        /// 方式1:显隐的方式
+        /// </summary>
+        /// <param name="lv"></param>
+        public void Adjust(int lv)
+        {
+            if (m_allCtrls == null || m_allCtrls.Count <= 0)
+                return;
+
+            foreach(var ctrl in m_allCtrls)
+            {
+                if (ctrl == null)
+                    continue;
+
+                ctrl.Adjust(lv);
+            }
+            Level = lv;
+        }
+
+        /// <summary>
+        /// 方式2:节点的方式
+        /// </summary>
+        /// <param name="lv"></param>
+        public void Change(int lv)
+        {
+            if (m_allCtrls == null || m_allCtrls.Count <= 0)
+                return;
+
+            foreach (var ctrl in m_allCtrls)
+            {
+                if (ctrl == null)
+                    continue;
+
+                ctrl.Change(lv, ctrl.gameObject);
+            }
+            Level = lv;
+        }
     }
+
 }
 

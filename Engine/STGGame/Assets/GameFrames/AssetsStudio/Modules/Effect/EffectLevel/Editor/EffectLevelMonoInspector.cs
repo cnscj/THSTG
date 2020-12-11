@@ -5,10 +5,10 @@ using ASGame;
 
 namespace ASEditor
 {
-    [CustomEditor(typeof(EffectLevelMono))]
-    public class EffectLevelMonoInspector : Editor
+    [CustomEditor(typeof(EffectLevelNode))]
+    public class EffectLevelNodeInspector : Editor
     {
-        private EffectLevelMono m_editor;
+        private EffectLevelNode m_editor;
         private SerializedProperty m_level;
 
         public override void OnInspectorGUI()
@@ -26,7 +26,7 @@ namespace ASEditor
         void OnSceneGUI()
         {
             //得到test脚本的对象
-            m_editor = (EffectLevelMono)target;
+            m_editor = (EffectLevelNode)target;
 
             //开始绘制GUI
             Handles.BeginGUI();
@@ -46,9 +46,8 @@ namespace ASEditor
 
         void OnEnable()
         {
-            m_editor = (EffectLevelMono)target;
-            serializedObject.FindProperty("level");
-           
+            m_editor = (EffectLevelNode)target;
+            m_level = serializedObject.FindProperty("level");
 
         }
     }

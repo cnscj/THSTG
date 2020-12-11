@@ -9,7 +9,8 @@ namespace THGame
         public int skillId;             //Id
         public string skillName;        //技能名
 
-        public float cdTime;            //一次冷却CD时长
+        //CD触发类型应该读配置(可能有技能结束冷却,可能有其他冷却
+        public float cdTime;            //一次冷却CD时长(TODO:时长应该取读配置
         public float maxTimes;          //最大使用次数
         public bool maxDuration;        //技能最大持续时间,时间到将进入冷却
 

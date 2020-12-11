@@ -5,14 +5,16 @@ namespace THGame
 {
     public class SkillManager : MonoSingleton<SkillManager>
     {
-        private SkillCountdownCache _skillCountdownCache;
-        private SkillCommandCache _skillCommandCache;
+        private SkillInputReceiver _skillInputReceiver;     //接收器
+        private SkillCdCache _skillCdCache;                 //cd缓存池
+        private SkillCastTrigger _skillCastTrigger;         //触发器
 
-        public SkillCountdownCache GetCountdownCache(){return _skillCountdownCache = _skillCountdownCache ?? CreateManager<SkillCountdownCache>("CountdownCache");}
-        public SkillCommandCache GetCommandCache() {return _skillCommandCache = _skillCommandCache ?? CreateManager<SkillCommandCache>("CommandCache");}
+        public SkillInputReceiver GetInputReceiver() { return _skillInputReceiver = _skillInputReceiver ?? CreateManager<SkillInputReceiver>("InputReceiver"); }
+        public SkillCdCache GetCdCache(){return _skillCdCache = _skillCdCache ?? CreateManager<SkillCdCache>("CountdownCache");}
+        public SkillCastTrigger GetCastTrigger() { return _skillCastTrigger = _skillCastTrigger ?? CreateManager<SkillCastTrigger>("CastTrigger"); }
 
-
-        protected T CreateManager<T>(string name) where T : MonoBehaviour
+ 
+        private T CreateManager<T>(string name) where T : MonoBehaviour
         {
             GameObject managerGObj = new GameObject(name);
             managerGObj.transform.SetParent(transform);

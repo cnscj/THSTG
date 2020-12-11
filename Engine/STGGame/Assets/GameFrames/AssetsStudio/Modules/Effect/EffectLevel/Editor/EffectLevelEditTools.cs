@@ -69,8 +69,6 @@ namespace ASEditor
                     EditorUtility.SetDirty(GO);
                     AssetDatabase.SaveAssets();
                 }
-
-
             }
             else
             {
@@ -105,7 +103,7 @@ namespace ASEditor
                     var levelCtrl = newGO.GetComponent<EffectLevelController>();
                     if (!levelCtrl) levelCtrl = newGO.AddComponent<EffectLevelController>();
                     levelCtrl.level = ridLv;
-                    levelCtrl.nodeList = (levelCtrl.nodeList != null) ? levelCtrl.nodeList : new List<EffectLevelInfo>();
+                    levelCtrl.nodeList = (levelCtrl.nodeList != null) ? levelCtrl.nodeList : new List<EffectLevelController.NodeInfo>();
                     levelCtrl.nodeList.Clear();
 
                     foreach (var node in newGO.GetComponentsInChildren<Transform>(true))
@@ -120,7 +118,7 @@ namespace ASEditor
                             }
                             else
                             {
-                                var info = new EffectLevelInfo();
+                                var info = new EffectLevelController.NodeInfo();
                                 info.node = node.gameObject;
                                 info.path = XGameObjectTools.GetPathByGameObject(node.gameObject, newGO);
                                 info.level = nodeLv;

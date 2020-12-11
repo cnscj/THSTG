@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace THGame
 {
-    public class SkillCountdownCache : MonoBehaviour                //CD冷却Cache
+    public class SkillCdCache : MonoBehaviour                //CD冷却Cache
     {
         public class Data
         {
@@ -102,7 +102,7 @@ namespace THGame
             return 0;
         }
 
-        public void ClearCd(string key,bool isCallback = false)
+        public void ClearCd(string key,bool isCallback = true)
         {
             if (_cdDict == null || _cdDict.Count <= 0)
                 return;

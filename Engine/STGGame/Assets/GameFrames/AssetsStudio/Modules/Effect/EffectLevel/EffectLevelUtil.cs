@@ -12,10 +12,10 @@ namespace ASGame
         {
             if (GO)
             {
-                var levelEditor = GO.GetComponent<EffectLevelMono>();
+                var levelEditor = GO.GetComponent<EffectLevelNode>();
                 if (levelEditor == null)
                 {
-                    levelEditor = GO.AddComponent<EffectLevelMono>();
+                    levelEditor = GO.AddComponent<EffectLevelNode>();
                 }
                 levelEditor.level = level;
             }
@@ -25,7 +25,7 @@ namespace ASGame
         {
             int level = -1;
 
-            var levelEditor = GO.GetComponent<EffectLevelMono>();
+            var levelEditor = GO.GetComponent<EffectLevelNode>();
             if (levelEditor != null)
             {
                 return levelEditor.level;
@@ -38,7 +38,7 @@ namespace ASGame
         {
             if (GO)
             {
-                var levelEditor = GO.GetComponent<EffectLevelMono>();
+                var levelEditor = GO.GetComponent<EffectLevelNode>();
                 if (levelEditor != null)
                 {
                     Object.DestroyImmediate(levelEditor);

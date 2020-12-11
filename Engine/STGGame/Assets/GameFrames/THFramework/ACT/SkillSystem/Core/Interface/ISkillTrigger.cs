@@ -4,9 +4,12 @@ using UnityEngine;
 
 namespace THGame
 {
-    public interface ISkillTarget
+    public interface ISkillTrigger
     {
-        void Execute();
+        void ExecuteBefore();
+        void Execute(); //技能触发
+        void ExecuteAfter();
+
     }
 
 }
