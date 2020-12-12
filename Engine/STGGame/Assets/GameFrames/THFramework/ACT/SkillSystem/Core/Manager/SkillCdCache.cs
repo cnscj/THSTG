@@ -5,18 +5,10 @@ namespace THGame
 {
     public class SkillCdCache : MonoBehaviour                //CD冷却Cache
     {
-        public class Data
-        {
-            public string key;
-            public float timeStamp;
-            public float cd;
-            public Action callback;
-        }
-
         public float queryFrequentness = 0.1f;             //查询频度0.1
 
-        private Dictionary<string, Data> _cdDict;
-        private Queue<Data> _releaseQueue;
+        private Dictionary<string, SkillCdCacheData> _cdDict;
+        private Queue<SkillCdCacheData> _releaseQueue;
         private float _lastQueryTimeStamp;
 
         public void AddCd(string key,float cd, Action action = null)
@@ -30,7 +22,7 @@ namespace THGame
             var data = GetOrCreateData();
             data.key = key;
             data.timeStamp = GetCurrTimeStamp();
-            data.cd = cd;
+            data.maxCd = cd;
             data.callback = action;
 
             GetOrCreateDict()[key] = data;
@@ -59,7 +51,7 @@ namespace THGame
 
             if (_cdDict.TryGetValue(key,out var data))
             {
-                return GetCurrTimeStamp() < data.cd + data.timeStamp;
+                return GetCurrTimeStamp() < data.maxCd + data.timeStamp;
             }
 
             return false;
@@ -72,7 +64,7 @@ namespace THGame
 
             if (_cdDict.TryGetValue(key, out var data))
             {
-                return data.cd;
+                return data.maxCd;
             }
 
             return 0;
@@ -84,7 +76,7 @@ namespace THGame
 
             if (_cdDict.TryGetValue(key, out var data))
             {
-                return data.timeStamp + data.cd;
+                return data.timeStamp + data.maxCd;
             }
 
             return 0;
@@ -143,7 +135,7 @@ namespace THGame
 
             foreach(var data in _cdDict.Values)
             {
-                if (GetCurrTimeStamp() >= data.cd + data.timeStamp)
+                if (GetCurrTimeStamp() >= data.maxCd + data.timeStamp)
                 {
                     data.callback?.Invoke();
                     GetOrCreateReleaseQueue().Enqueue(data);
@@ -167,24 +159,24 @@ namespace THGame
             }
         }
 
-        protected Dictionary<string, Data> GetOrCreateDict()
+        protected Dictionary<string, SkillCdCacheData> GetOrCreateDict()
         {
-            _cdDict = _cdDict ?? new Dictionary<string, Data>();
+            _cdDict = _cdDict ?? new Dictionary<string, SkillCdCacheData>();
             return _cdDict;
         }
 
-        protected Queue<Data> GetOrCreateReleaseQueue()
+        protected Queue<SkillCdCacheData> GetOrCreateReleaseQueue()
         {
-            _releaseQueue = _releaseQueue ?? new Queue<Data>();
+            _releaseQueue = _releaseQueue ?? new Queue<SkillCdCacheData>();
             return _releaseQueue;
         }
 
-        protected Data GetOrCreateData()
+        protected SkillCdCacheData GetOrCreateData()
         {
-            return new Data();
+            return new SkillCdCacheData();
         }
 
-        protected void ReleaseData(Data data)
+        protected void ReleaseData(SkillCdCacheData data)
         {
             return;
         }

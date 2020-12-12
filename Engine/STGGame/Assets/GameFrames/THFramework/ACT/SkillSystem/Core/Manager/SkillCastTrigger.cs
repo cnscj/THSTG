@@ -4,7 +4,8 @@ using UnityEngine;
 
 namespace THGame
 {
-    //技能状态转移,及调度
+    //状态转移,及调度
+    //可能是技能触发,也可能是受击,冲刺等
     public class SkillCastTrigger : MonoBehaviour
     {
         //状态机
