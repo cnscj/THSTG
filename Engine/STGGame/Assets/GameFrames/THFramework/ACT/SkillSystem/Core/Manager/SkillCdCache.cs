@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace THGame
 {
+    //当个CD拥有使用次数,当达到使用次数时才能真正进入冷却,或者可能冷却独立算
     public class SkillCdCache : MonoBehaviour                //CD冷却Cache
     {
         public float queryFrequentness = 0.1f;             //查询频度0.1
@@ -11,21 +12,23 @@ namespace THGame
         private Queue<SkillCdCacheData> _releaseQueue;
         private float _lastQueryTimeStamp;
 
-        public void AddCd(string key,float cd, Action action = null)
+        public SkillCdCacheData AddCd(string key, float cd, Action action = null)
         {
             if (_cdDict == null || _cdDict.Count <= 0)
-                return;
+                return null;
 
             if (_cdDict.ContainsKey(key))
-                return;
+                return null;
 
             var data = GetOrCreateData();
-            data.key = key;
+
             data.timeStamp = GetCurrTimeStamp();
             data.maxCd = cd;
             data.callback = action;
 
             GetOrCreateDict()[key] = data;
+
+            return data;
         }
 
         public void RemoveCd(string key)
@@ -34,6 +37,14 @@ namespace THGame
                 return;
 
             _cdDict.Remove(key);
+        }
+
+        public SkillCdCacheData GetCd(string key)
+        {
+            if (_cdDict == null || _cdDict.Count <= 0)
+                return null;
+
+            return GetOrCreateDict()[key];
         }
 
         public bool IsHaveCd(string key)
@@ -102,6 +113,8 @@ namespace THGame
             if (_cdDict.TryGetValue(key, out var data))
             {
                 if (isCallback) data.callback?.Invoke();
+                data.usedTimes = 0;
+                data.timeStamp = -1;
                 GetOrCreateReleaseQueue().Enqueue(data);
             }
         }
@@ -138,7 +151,12 @@ namespace THGame
                 if (GetCurrTimeStamp() >= data.maxCd + data.timeStamp)
                 {
                     data.callback?.Invoke();
-                    GetOrCreateReleaseQueue().Enqueue(data);
+                    data.timeStamp = GetCurrTimeStamp();
+                    data.usedTimes++;
+                    if (data.usedTimes >= data.maxTimes)
+                    {
+                        GetOrCreateReleaseQueue().Enqueue(data);
+                    }
                 }
             }
         }

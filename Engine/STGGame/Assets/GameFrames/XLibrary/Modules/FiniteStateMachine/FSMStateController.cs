@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace THGame
+namespace XLibGame
 {
-	public class StateController
+	public class FSMStateController
 	{
 		public event Action OnEntered;
 		public event Action OnExited;

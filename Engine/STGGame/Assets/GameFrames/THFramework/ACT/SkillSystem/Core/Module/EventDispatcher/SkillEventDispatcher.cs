@@ -4,14 +4,13 @@ using UnityEngine;
 
 namespace THGame
 {
-    public class SkillDispatcher
+    public class SkillEventDispatcher
     {
         private Dictionary<string, HashSet<SkillEventListener>> _listeners = new Dictionary<string, HashSet<SkillEventListener>>();
 
         public void AddEventListener(string type, SkillEventListener listener)
         {
-            HashSet<SkillEventListener> listenerSet = null;
-            listenerSet = GetOrCreateListenerSet(type);
+            HashSet<SkillEventListener> listenerSet = GetOrCreateListenerSet(type);
             if (listenerSet != null)
             {
                 if (!listenerSet.Contains(listener))
@@ -23,8 +22,7 @@ namespace THGame
 
         public void RemoveEventListener(string type, SkillEventListener listener)
         {
-            HashSet<SkillEventListener> listenerSet = null;
-            _listeners.TryGetValue(type, out listenerSet);
+            _listeners.TryGetValue(type, out HashSet<SkillEventListener> listenerSet);
             if (listenerSet != null)
             {
                 if (!listenerSet.Contains(listener))
@@ -40,8 +38,7 @@ namespace THGame
 
         public void DispatchEvent(object sender, string type, object args = null)
         {
-            HashSet<SkillEventListener> listenerSet = null;
-            _listeners.TryGetValue(type, out listenerSet);
+            _listeners.TryGetValue(type, out HashSet<SkillEventListener> listenerSet);
             if (listenerSet != null)
             {
                 var context = new SkillEventContext();
@@ -61,8 +58,7 @@ namespace THGame
             if (string.IsNullOrEmpty(type))
                 return default;
 
-            HashSet<SkillEventListener> skillEventListeners = null;
-            if (!_listeners.TryGetValue(type,out skillEventListeners))
+            if (!_listeners.TryGetValue(type, out HashSet<SkillEventListener> skillEventListeners))
             {
                 skillEventListeners = new HashSet<SkillEventListener>();
                 _listeners[type] = skillEventListeners;

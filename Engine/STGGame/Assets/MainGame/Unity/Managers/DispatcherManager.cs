@@ -5,13 +5,13 @@ namespace STGU3D
 {
     public static class DispatcherManager
     {
-        private static Dispatcher s_dispatcher;
+        private static EventDispatcher s_dispatcher;
 
-        public static Dispatcher GetInstance()
+        public static EventDispatcher GetInstance()
         {
             if (s_dispatcher == null)
             {
-                s_dispatcher = new Dispatcher();
+                s_dispatcher = new EventDispatcher();
             }
             return s_dispatcher;
         }

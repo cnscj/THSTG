@@ -1,20 +1,19 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace THGame
 {
-    public class FSMState : IComparable
+    public class SkillFSMState
     {
-        public static readonly FSMState AnyState = new FSMState("AnyState");
-
         public string Name { get; private set; }
 
         public event Action OnEntered;
         public event Action OnExited;
 
-        public FSMState(string name) 
+        public SkillFSMState(IComparable comparable):this(comparable.ToString())
+        {
+
+        }
+        public SkillFSMState(string name)
         {
             Name = name;
         }
@@ -42,4 +41,5 @@ namespace THGame
             return string.Compare(obj.ToString(), Name);
         }
     }
+
 }

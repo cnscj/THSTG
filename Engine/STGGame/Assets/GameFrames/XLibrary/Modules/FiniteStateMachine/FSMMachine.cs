@@ -6,7 +6,7 @@ using UnityEngine;
 using System.Reflection;
 #endif
 
-namespace THGame
+namespace XLibGame
 {
 	/// <summary>
 	/// A lightweight finite state machine implementation that supports custom and conditional transitions
@@ -28,7 +28,7 @@ namespace THGame
 	/// fsm.CurrentState; // will equal open
 	/// </summary>
 	/// <typeparam name="TState">The type that is used to identify states</typeparam>
-	public class FiniteStateMachine<TState> where TState : IComparable
+	public class FSMMachine<TState> where TState : IComparable
 	{
 		/// <summary>
 		/// Gets the current state
@@ -42,9 +42,9 @@ namespace THGame
 
 		public string Name { get; set; }
 
-		private Transition<TState> currentTransition;
-		private readonly Dictionary<TState, StateController> states;
-		private readonly Dictionary<TState, Dictionary<string, Transition<TState>>> transitions;
+		private FSMTransition<TState> currentTransition;
+		private readonly Dictionary<TState, FSMStateController> states;
+		private readonly Dictionary<TState, Dictionary<string, FSMTransition<TState>>> transitions;
 		private bool isInitialisingState;
 		private string stateMachineName;
 
@@ -53,11 +53,11 @@ namespace THGame
 		private event Action<TState, TState> OnStateChange;
 
 		/// <summary>
-		/// Instantiates a new FiniteStateMachine using the enum values in an enum defined by the type parameter.
+		/// Instantiates a new FSMMachine using the enum values in an enum defined by the type parameter.
 		/// The type parameter must be an enum type
 		/// </summary>
 		/// <returns></returns>
-		public static FiniteStateMachine<TState> FromEnum()
+		public static FSMMachine<TState> FromEnum()
 		{
 			if (!typeof(Enum).IsAssignableFrom(typeof(TState)))
 			{
@@ -70,25 +70,26 @@ namespace THGame
 				states.Add(value);
 			}
 
-			return new FiniteStateMachine<TState>(states.ToArray());
+			return new FSMMachine<TState>(states.ToArray());
 		}
 
 		/// <summary>
 		/// Instantiates a new state machine using the provied states.
 		/// </summary>
 		/// <param name="states">The states that are used for the state machine</param>
-		public FiniteStateMachine(params TState[] states)
+		public FSMMachine(params TState[] states)
 		{
-			if (states.Length < 1) { throw new ArgumentException("A FiniteStateMachine needs at least 1 state", "states"); }
+			if (states.Length < 1) { throw new ArgumentException("A FSMMachine needs at least 1 state", "states"); }
 
-			transitions = new Dictionary<TState, Dictionary<string, Transition<TState>>>();
-			this.states = new Dictionary<TState, StateController>();
+			transitions = new Dictionary<TState, Dictionary<string, FSMTransition<TState>>>();
+			this.states = new Dictionary<TState, FSMStateController>();
 			foreach (var value in states)
 			{
-				this.states.Add(value, new StateController());
-				transitions.Add(value, new Dictionary<string, Transition<TState>>());
+				this.states.Add(value, new FSMStateController());
+				transitions.Add(value, new Dictionary<string, FSMTransition<TState>>());
 			}
 		}
+
 
 		/// <summary>
 		/// Adds a new transition between the 2 given states when the given command is issued.
@@ -98,13 +99,13 @@ namespace THGame
 		/// <param name="command">The command that will trigger this transition</param>
 		/// <param name="transition">[Optional] transition, if not provided, a DefaultTransition is used, that completes instantly</param>
 		/// <returns>The instance of FiniteStatemachine to comply with fluent interface pattern</returns>
-		public FiniteStateMachine<TState> AddTransition(TState from, TState to, string command, Transition<TState> transition = null)
+		public FSMMachine<TState> AddTransition(TState from, TState to, string command, FSMTransition<TState> transition = null)
 		{
 			if (!states.ContainsKey(from)) { throw new ArgumentException("unknown state", "from"); }
 			if (!states.ContainsKey(to)) { throw new ArgumentException("unknown state", "to"); }
 
 			// add the transition to the db (new it if it does not exist)
-			transitions[from][command] = transition ?? new DefaultStateTransition<TState>(from, to);
+			transitions[from][command] = transition ?? new FSMDefaultStateTransition<TState>(from, to);
 
 			return this;
 		}
@@ -117,7 +118,7 @@ namespace THGame
 		/// <param name="command">The command that will trigger this transition</param>
 		/// <param name="condition">A condition function to test when the specified command is received. The transition will only begin if this function returns true</param>
 		/// <returns>The instance of FiniteStatemachine to comply with fluent interface pattern</returns>
-		public FiniteStateMachine<TState> AddTransition(TState from, TState to, string command, Func<bool> condition)
+		public FSMMachine<TState> AddTransition(TState from, TState to, string command, Func<bool> condition)
 		{
 			if (from == null) { throw new ArgumentNullException("state"); }
 			if (to == null) { throw new ArgumentNullException("to"); }
@@ -126,7 +127,7 @@ namespace THGame
 			if (string.IsNullOrEmpty(command)) { throw new ArgumentException("command cannot be null or empty", "command"); }
 
 			// add a default transition to the db
-			transitions[from][command] = new DefaultStateTransition<TState>(from, to, condition);
+			transitions[from][command] = new FSMDefaultStateTransition<TState>(from, to, condition);
 
 			return this;
 		}
@@ -137,7 +138,7 @@ namespace THGame
 		/// <param name="state">The state to handle entry for</param>
 		/// <param name="handler">The handler</param>
 		/// <returns>The instance of FiniteStatemachine to comply with fluent interface pattern</returns>
-		public FiniteStateMachine<TState> OnEnter(TState state, Action handler)
+		public FSMMachine<TState> OnEnter(TState state, Action handler)
 		{
 			if (state == null) { throw new ArgumentNullException("state"); }
 			if (handler == null) { throw new ArgumentNullException("handler"); }
@@ -160,7 +161,7 @@ namespace THGame
 		/// <param name="state">The state to handle exit from</param>
 		/// <param name="handler">The handler</param>
 		/// <returns>The instance of FiniteStatemachine to comply with fluent interface pattern</returns>
-		public FiniteStateMachine<TState> OnExit(TState state, Action handler)
+		public FSMMachine<TState> OnExit(TState state, Action handler)
 		{
 			if (state == null) { throw new ArgumentNullException("state"); }
 			if (handler == null) { throw new ArgumentNullException("handler"); }
@@ -181,7 +182,7 @@ namespace THGame
 		/// </summary>
 		/// <param name="handler">A handler that provides the previous and new state</param>
 		/// <returns>The instance of FiniteStatemachine to comply with fluent interface pattern</returns>
-		public FiniteStateMachine<TState> OnChange(Action<TState, TState> handler)
+		public FSMMachine<TState> OnChange(Action<TState, TState> handler)
 		{
 			if (handler == null) { throw new ArgumentNullException("handler"); }
 
@@ -197,7 +198,7 @@ namespace THGame
 		/// <param name="to">The to state</param>
 		/// <param name="handler">The handler</param>
 		/// <returns>The instance of FiniteStatemachine to comply with fluent interface pattern</returns>
-		public FiniteStateMachine<TState> OnChange(TState from, TState to, Action handler)
+		public FSMMachine<TState> OnChange(TState from, TState to, Action handler)
 		{
 			if (from == null) { throw new ArgumentNullException("from"); }
 			if (to == null) { throw new ArgumentNullException("to"); }
@@ -230,7 +231,7 @@ namespace THGame
 		}
 
 		/// <summary>
-		/// Issues a new command to the FiniteStateMachine, invoking any necessary transitions.
+		/// Issues a new command to the FSMMachine, invoking any necessary transitions.
 		/// </summary>
 		/// <param name="command"></param>
 		public void IssueCommand(string command)
@@ -289,5 +290,5 @@ namespace THGame
 
 			isInitialisingState = false;
 		}
-	}
+    }
 }

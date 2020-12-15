@@ -9,9 +9,9 @@ namespace XLibGame
         public string evt;
 
         [HideInInspector]
-        private Dispatcher GetDispatcher()
+        private EventDispatcher GetDispatcher()
         {
-            return Dispatcher.GetInstance();
+            return EventDispatcher.GetInstance();
         }
 
         public void DispatchEvent(int e)

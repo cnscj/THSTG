@@ -4,6 +4,7 @@ using FairyGUI;
 using FairyGUI.Utils;
 using XLibGame;
 using EventCallback1 = XLibGame.EventCallback1;
+using EventDispatcher = XLibGame.EventDispatcher;
 namespace THGame.UI
 {
     //用于带Dispose的扩展组件
@@ -32,7 +33,7 @@ namespace THGame.UI
 
         public void AddEventListener(int eventId, EventCallback1 listener)
         {
-            Dispatcher.GetInstance().AddListener(eventId, listener);
+            EventDispatcher.GetInstance().AddListener(eventId, listener);
             __listener = (__listener != null) ? __listener : new List<Tuple<int, EventCallback1>>();
             __listener.Add(new Tuple<int, EventCallback1>(eventId, listener));
         }
@@ -106,7 +107,7 @@ namespace THGame.UI
             {
                 foreach (var pair in __listener)
                 {
-                    Dispatcher.GetInstance().RemoveListener(pair.Item1, pair.Item2);
+                   EventDispatcher.GetInstance().RemoveListener(pair.Item1, pair.Item2);
                 }
             }
         }

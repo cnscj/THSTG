@@ -1,10 +1,11 @@
 ﻿
 using System;
+using UnityEngine;
 
 namespace THGame
 {
     [System.Serializable]
-    public class SkillInfo
+    public class SkillInfo : ScriptableObject
     {
         public int skillId;             //Id
         public string skillName;        //技能名

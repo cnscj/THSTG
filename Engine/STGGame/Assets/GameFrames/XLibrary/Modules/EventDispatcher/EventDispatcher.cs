@@ -7,7 +7,7 @@ namespace XLibGame
     /// <summary>
     /// 游戏事件分发器，用于监听、广播游戏事件。
     /// </summary>
-    public class Dispatcher : Singleton<Dispatcher>
+    public class EventDispatcher : Singleton<EventDispatcher>
     {
 
         private Dictionary<EventType, EventListener> m_listeners = new Dictionary<EventType, EventListener>();

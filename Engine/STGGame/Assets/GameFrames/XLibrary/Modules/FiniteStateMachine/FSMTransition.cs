@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace THGame
+namespace XLibGame
 {
 	/// <summary>
 	/// Controls a transition from a FromState to a ToState.
 	/// </summary>
 	/// <typeparam name="TState"></typeparam>
-	public abstract class Transition<TState> where TState : IComparable
+	public abstract class FSMTransition<TState> where TState : IComparable
 	{
 		public TState FromState { get; private set; }
 		public TState ToState { get; private set; }
@@ -15,7 +15,7 @@ namespace THGame
 
 		public event Action OnComplete;
 
-		protected Transition(TState from, TState to, Func<bool> testConditionFunction = null)
+		protected FSMTransition(TState from, TState to, Func<bool> testConditionFunction = null)
 		{
 			FromState = from;
 			ToState = to;
@@ -35,9 +35,9 @@ namespace THGame
 		}
 	}
 
-	public class DefaultStateTransition<TState> : Transition<TState> where TState : IComparable
+	public class FSMDefaultStateTransition<TState> : FSMTransition<TState> where TState : IComparable
 	{
-		public DefaultStateTransition(TState from, TState to, Func<bool> testConditionFunction = null) 
+		public FSMDefaultStateTransition(TState from, TState to, Func<bool> testConditionFunction = null) 
 			: base(from, to, testConditionFunction)
 		{
 		}
