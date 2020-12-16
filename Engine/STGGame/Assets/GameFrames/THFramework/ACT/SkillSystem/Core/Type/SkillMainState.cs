@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace THGame
 {
-
     public enum SkillMainState
     {
 
