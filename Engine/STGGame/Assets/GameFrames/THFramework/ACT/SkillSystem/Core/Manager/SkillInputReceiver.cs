@@ -13,21 +13,10 @@ namespace THGame
         public static readonly int KEYSTATE_NONE = 0x0;
         public static readonly int KEYSTATE_PRESS = 0x1;
 
-        public class StateInfo
-        {
-            public IComparable keyCode;
-            public int state;
-            public float timeStamp;
+        public float shortPressResponseTime = INTERVAL_SHOT_PRESS;      //根据实际情况决定长按短按响应
 
-            public Action onKeyUp;
-            public Action onKeyDown;
-            public Action onShotAction;
-            public Action onLongAction;
-            public bool callbackEnabled;
-        }
-
-        public Dictionary<IComparable, StateInfo> _keyStateDict;      //指令状态
-        public HashSet<StateInfo> _pressingSet = new HashSet<StateInfo>();
+        private Dictionary<IComparable, SkillInputStateInfo> _keyStateDict;       //指令状态
+        private HashSet<SkillInputStateInfo> _pressingSet = new HashSet<SkillInputStateInfo>();
 
         public int GetKeyState(IComparable keyCode)
         {
@@ -42,7 +31,7 @@ namespace THGame
             return KEYSTATE_NONE;
         }
 
-        public StateInfo GetStateInfo(IComparable keyCode)
+        public SkillInputStateInfo GetStateInfo(IComparable keyCode)
         {
             if (_keyStateDict == null || _keyStateDict.Count <= 0)
                 return default;
@@ -53,7 +42,6 @@ namespace THGame
             return default;
         }
 
-        //TODO:执行多次会出BUG
         public void PressKey(IComparable keyCode)
         {
             if (!enabled) return;
@@ -65,6 +53,7 @@ namespace THGame
             stateInfo.onKeyDown?.Invoke();
             stateInfo.callbackEnabled = true;
 
+            if (_pressingSet.Contains(stateInfo)) return;
             _pressingSet.Add(stateInfo);
 
         }
@@ -73,8 +62,10 @@ namespace THGame
         {
             if (!enabled) return;
 
-            DealCallbackTime(keyCode, false);
             var stateInfo = GetOrCreateStateInfo(keyCode);
+            if (!_pressingSet.Contains(stateInfo)) return;
+
+            DealCallbackTime(keyCode, false);
 
             stateInfo.timeStamp = GetTimeStamp();
             stateInfo.state = KEYSTATE_NONE;
@@ -109,14 +100,14 @@ namespace THGame
             if (_keyStateDict == null || _keyStateDict.Count <= 0)
                 return;
 
-            if (!_keyStateDict.TryGetValue(keyCode, out StateInfo stateInfo))
+            if (!_keyStateDict.TryGetValue(keyCode, out SkillInputStateInfo stateInfo))
                 return;
 
             if (!stateInfo.callbackEnabled)
                 return;
 
             var durationTime = GetTimeStamp() - stateInfo.timeStamp;
-            if (durationTime > INTERVAL_SHOT_PRESS)
+            if (durationTime > shortPressResponseTime)
             {
                 stateInfo.onLongAction?.Invoke();
             }
@@ -139,13 +130,13 @@ namespace THGame
             }
         }
 
-        private StateInfo GetOrCreateStateInfo(IComparable keyCode)
+        private SkillInputStateInfo GetOrCreateStateInfo(IComparable keyCode)
         {
             var dict = GetStateDict();
-            StateInfo stateInfo;
+            SkillInputStateInfo stateInfo;
             if (!dict.TryGetValue(keyCode, out stateInfo))
             {
-                stateInfo = new StateInfo();
+                stateInfo = new SkillInputStateInfo();
                 stateInfo.keyCode = keyCode;
 
                 dict[keyCode] = stateInfo;
@@ -153,9 +144,9 @@ namespace THGame
             return stateInfo;
         }
 
-        private Dictionary<IComparable, StateInfo> GetStateDict()
+        private Dictionary<IComparable, SkillInputStateInfo> GetStateDict()
         {
-            _keyStateDict = _keyStateDict ?? new Dictionary<IComparable, StateInfo>();
+            _keyStateDict = _keyStateDict ?? new Dictionary<IComparable, SkillInputStateInfo>();
             return _keyStateDict;
         }
 

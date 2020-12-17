@@ -42,10 +42,11 @@ namespace THGame
 
         private void OnSkillTouch(SkillSkillType skillType,SkillInputType inputType)
         {
-           //获取触发的技能类型 FIXME:同一个技能会有多个阶段
-           //获取对应skillId
-           //获取skillInfo,
-           //检查CD
+            //FIXME:同一个技能会有多个阶段,并且可能会按照不同的技能时长决定长短按
+            //获取触发的技能类型 
+            //获取对应skillId
+            //获取skillInfo,
+            //检查CD
         }
 
         private T CreateManager<T>(string name) where T : MonoBehaviour
