@@ -13,7 +13,11 @@ namespace THGame
         public static readonly int KEYSTATE_NONE = 0x0;
         public static readonly int KEYSTATE_PRESS = 0x1;
 
-        public float shortPressResponseTime = INTERVAL_SHOT_PRESS;      //根据实际情况决定长按短按响应
+        public float pressResponseTime = INTERVAL_SHOT_PRESS;      //短按响应时间
+        public event Action<SkillInputStateInfo> onKeyDown;
+        public event Action<SkillInputStateInfo> onKeyUp;
+        public event Action<SkillInputStateInfo> onShotPress;
+        public event Action<SkillInputStateInfo> onLongPress;
 
         private Dictionary<IComparable, SkillInputStateInfo> _keyStateDict;       //指令状态
         private HashSet<SkillInputStateInfo> _pressingSet = new HashSet<SkillInputStateInfo>();
@@ -50,8 +54,9 @@ namespace THGame
 
             stateInfo.timeStamp = GetTimeStamp();
             stateInfo.state |= KEYSTATE_PRESS;
-            stateInfo.onKeyDown?.Invoke();
             stateInfo.callbackEnabled = true;
+
+            onKeyDown?.Invoke(stateInfo);
 
             if (_pressingSet.Contains(stateInfo)) return;
             _pressingSet.Add(stateInfo);
@@ -69,25 +74,12 @@ namespace THGame
 
             stateInfo.timeStamp = GetTimeStamp();
             stateInfo.state = KEYSTATE_NONE;
-            stateInfo.onKeyUp?.Invoke();
             stateInfo.callbackEnabled = false;
+
+            onKeyUp?.Invoke(stateInfo);
 
             _pressingSet.Remove(stateInfo);
 
-        }
-
-        public void SetStateCallback(IComparable keyCode, Action onKeyDownCall, Action onKeyUpCall)
-        {
-            var stateInfo = GetOrCreateStateInfo(keyCode);
-            stateInfo.onKeyUp = onKeyUpCall;
-            stateInfo.onKeyDown = onKeyDownCall;
-        }
-
-        public void SetPressCallback(IComparable keyCode,Action onShotCall,Action onLongCall)
-        {
-            var stateInfo = GetOrCreateStateInfo(keyCode);
-            stateInfo.onShotAction = onShotCall;
-            stateInfo.onLongAction = onLongCall;
         }
 
         private void Update()
@@ -107,14 +99,14 @@ namespace THGame
                 return;
 
             var durationTime = GetTimeStamp() - stateInfo.timeStamp;
-            if (durationTime > shortPressResponseTime)
+            if (durationTime > pressResponseTime)
             {
-                stateInfo.onLongAction?.Invoke();
+                onLongPress?.Invoke(stateInfo);
             }
             else
             {
                 if (isSustain) return;
-                stateInfo.onShotAction?.Invoke();
+                onShotPress?.Invoke(stateInfo);
             }
             stateInfo.callbackEnabled = false;
         }

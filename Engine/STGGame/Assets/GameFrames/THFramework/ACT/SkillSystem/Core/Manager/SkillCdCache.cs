@@ -7,6 +7,8 @@ namespace THGame
     public class SkillCdCache : MonoBehaviour                   //CD冷却Cache
     {
         public float queryFrequentness = 0.1f;                  //查询频度0.1
+        public event Action<SkillCdCacheData> onCdDone;         //
+
 
         private Dictionary<string, SkillCdCacheData> _cdDict;
 
@@ -15,11 +17,11 @@ namespace THGame
 
         private float _lastQueryTimeStamp;
 
-        public SkillCdCacheData AddCd(string key, float cd, Action action = null)
+        public SkillCdCacheData AddCd(string key, float maxCd,int maxTImes = 1)
         {
             var data = AddCd(key);
-            data.maxCd = cd;
-            data.callback = action;
+            data.maxCd = maxCd;
+            data.maxTimes = maxTImes;
             data.timeStamp = GetCurrTimeStamp();
 
             if (!_cdingDict.Contains(data))
@@ -111,14 +113,14 @@ namespace THGame
             return 0;
         }
 
-        public void ClearCd(string key,bool isCallback = true)
+        public void ClearCd(string key, bool isCallback = true)
         {
             if (_cdDict == null || _cdDict.Count <= 0)
                 return;
 
             if (_cdDict.TryGetValue(key, out var data))
             {
-                if (isCallback) data.callback?.Invoke();
+                if (isCallback) onCdDone?.Invoke(data);
                 data.usedTimes = 0;
                 data.timeStamp = -1;
 
@@ -158,7 +160,7 @@ namespace THGame
             {
                 if (GetCurrTimeStamp() >= data.maxCd + data.timeStamp)
                 {
-                    data.callback?.Invoke();
+                    onCdDone?.Invoke(data);
                     data.timeStamp = GetCurrTimeStamp();
                     data.usedTimes++;
                     if (data.usedTimes >= data.maxTimes)

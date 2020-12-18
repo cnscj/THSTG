@@ -24,29 +24,39 @@ namespace THGame
         public SkillEventDispatcher GetEventDispatcher() { return _skillDispatcher = _skillDispatcher ?? new SkillEventDispatcher(); }
 
 
+        public void SetSkillData(SkillData data)
+        {
+            _curSkillData = data;
+            //TODO:设置短按长按的响应时间
+
+        }
+
+        public SkillData GetSkillData()
+        {
+            return _curSkillData;
+        }
+
         private void Start()
         {
             InitInputSetting();//初始化按键信息
-            
-            
         }
 
         private void InitInputSetting()
         {
-            foreach (SkillSkillType skillType in Enum.GetValues(typeof(SkillSkillType)))
-            {
-                GetInputReceiver().SetStateCallback(skillType, () => { OnSkillTouch(skillType, SkillInputType.KeyDown); }, () => { OnSkillTouch(skillType, SkillInputType.KeyUp); });
-                GetInputReceiver().SetPressCallback(skillType, () => { OnSkillTouch(skillType, SkillInputType.ShotPress); }, () => { OnSkillTouch(skillType, SkillInputType.LongPress); });
-            }
+            GetInputReceiver().onKeyDown += (stateInfo) => { OnSkillTouch((SkillSkillType)stateInfo.keyCode, SkillInputType.KeyDown); };
+            GetInputReceiver().onKeyUp += (stateInfo) => { OnSkillTouch((SkillSkillType)stateInfo.keyCode, SkillInputType.KeyUp); };
+            GetInputReceiver().onShotPress += (stateInfo) => { OnSkillTouch((SkillSkillType)stateInfo.keyCode, SkillInputType.ShotPress); };
+            GetInputReceiver().onLongPress += (stateInfo) => { OnSkillTouch((SkillSkillType)stateInfo.keyCode, SkillInputType.LongPress); };
         }
 
         private void OnSkillTouch(SkillSkillType skillType,SkillInputType inputType)
         {
-            //FIXME:同一个技能会有多个阶段,并且可能会按照不同的技能时长决定长短按
+            //TODO:同一个技能会有多个阶段,并且可能会按照不同的技能时长决定长短按
             //获取触发的技能类型 
             //获取对应skillId
             //获取skillInfo,
             //检查CD
+            Debug.LogFormat("{0},{1}", skillType, inputType);
         }
 
         private T CreateManager<T>(string name) where T : MonoBehaviour

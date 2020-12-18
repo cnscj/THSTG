@@ -11,7 +11,7 @@ namespace THGame
         //释放技能
         public void Cast(int skillId)
         {
-
+            //如果在前摇时间被打断技能,则释放无效
         }
 
         //打断释放
