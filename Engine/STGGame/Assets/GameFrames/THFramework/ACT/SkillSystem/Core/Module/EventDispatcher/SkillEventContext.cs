@@ -1,15 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System;
 
 namespace THGame
 {
     public class SkillEventContext
     {
-        public object sender;
-        public string type;
+        public IComparable type;
         public object args;
     }
-
-
 }

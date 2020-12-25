@@ -2,20 +2,16 @@
 
 namespace THGame
 {
-    public class SkillFSMState
+    public class SkillFSMState : IComparable
     {
-        public string Name { get; private set; }
+        public IComparable Name { get; private set; }
 
         public event Action OnEntered;
         public event Action OnExited;
 
-        public SkillFSMState(IComparable comparable):this(comparable.ToString())
+        public SkillFSMState(IComparable comparable)
         {
-
-        }
-        public SkillFSMState(string name)
-        {
-            Name = name;
+            Name = comparable;
         }
 
         public void Enter()
@@ -28,17 +24,13 @@ namespace THGame
             if (OnExited != null) OnExited();
         }
 
-        public override string ToString()
-        {
-            return Name;
-        }
 
         public int CompareTo(object obj)
         {
             if (obj == this)
                 return 0;
 
-            return string.Compare(obj.ToString(), Name);
+            return Name.CompareTo(obj);
         }
     }
 

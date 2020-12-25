@@ -1,15 +1,13 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿
+using System;
 
 namespace XLibGame
 {
     public class EventContext
     {
-        public EventType type;
-
-        public System.Object sender;
-
-        public System.Object[] args;
+        public IComparable type;
+        public object sender;
+        public object[] args;
 
         public override string ToString()
         {
@@ -37,18 +35,18 @@ namespace XLibGame
             return new EventContext(type, args, sender);
         }
 
-        public EventContext(EventType type)
+        public EventContext(IComparable type)
         {
             this.type = type;
         }
 
-        public EventContext(EventType type, params System.Object[] args)
+        public EventContext(IComparable type, params object[] args)
         {
             this.type = type;
             this.args = args;
         }
 
-        public EventContext(EventType type, System.Object sender, params System.Object[] args)
+        public EventContext(IComparable type, object sender, params System.Object[] args)
         {
             this.type = type;
             this.sender = sender;

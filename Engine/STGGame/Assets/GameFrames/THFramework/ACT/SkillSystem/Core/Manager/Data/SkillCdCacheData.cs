@@ -1,9 +1,11 @@
 ﻿
+using System;
+
 namespace THGame
 {
     public class SkillCdCacheData
     {
-        public string key;
+        public IComparable key;
         public int maxTimes;
         public float maxCd;
 

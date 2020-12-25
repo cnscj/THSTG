@@ -7,36 +7,46 @@ namespace THGame
     public class SkillCdCache : MonoBehaviour                   //CD冷却Cache
     {
         public float queryFrequentness = 0.1f;                  //查询频度0.1
-        public event Action<SkillCdCacheData> onCdDone;         //
+        public event Action<SkillCdCacheData> OnCdDone;         //
 
+        private Dictionary<IComparable, SkillCdCacheData> _cdDict;
 
-        private Dictionary<string, SkillCdCacheData> _cdDict;
-
-        private HashSet<SkillCdCacheData> _cdingDict;
+        private HashSet<SkillCdCacheData> _tickDict;
         private Queue<SkillCdCacheData> _releaseQueue;
 
         private float _lastQueryTimeStamp;
 
-        public SkillCdCacheData AddCd(string key, float maxCd,int maxTImes = 1)
+        public SkillCdCacheData TickCd(IComparable key)
         {
             var data = AddCd(key);
-            data.maxCd = maxCd;
-            data.maxTimes = maxTImes;
-            data.timeStamp = GetCurrTimeStamp();
-
-            if (!_cdingDict.Contains(data))
+            var tickDict = GetOrCreateTickDict();
+            if (!tickDict.Contains(data))
             {
-                _cdingDict.Add(data);
+                data.usedTimes = 0;
+                data.timeStamp = GetCurrTimeStamp();
+                tickDict.Add(data);
             }
+
             return data;
         }
 
-        public SkillCdCacheData AddCd(string key)
+        public SkillCdCacheData TickCd(IComparable key, float maxCd, int maxTimes = 1)
         {
-            SkillCdCacheData data;
-            if (!_cdDict.TryGetValue(key, out data))
+            var data = AddCd(key);
+            data.maxCd = maxCd;
+            data.maxTimes = maxTimes;
+            
+            return TickCd(key);
+        }
+
+        public SkillCdCacheData AddCd(IComparable key)
+        {
+            var cdCahce = GetOrCreateDict();
+            if (!cdCahce.TryGetValue(key, out SkillCdCacheData data))
             {
                 data = GetOrCreateData();
+                data.key = key;
+
                 GetOrCreateDict()[key] = data;
             }
 
@@ -50,7 +60,7 @@ namespace THGame
 
             if (_cdDict.TryGetValue(key, out SkillCdCacheData data))
             {
-                _cdingDict?.Remove(data);
+                _tickDict?.Remove(data);
                 _cdDict.Remove(key);
             }
         }
@@ -88,6 +98,7 @@ namespace THGame
 
             return 0;
         }
+
         public float GetCdEndTime(string key)
         {
             if (_cdDict == null || _cdDict.Count <= 0)
@@ -100,6 +111,7 @@ namespace THGame
 
             return 0;
         }
+
         public float GetCdBeginTime(string key)
         {
             if (_cdDict == null || _cdDict.Count <= 0)
@@ -120,17 +132,17 @@ namespace THGame
 
             if (_cdDict.TryGetValue(key, out var data))
             {
-                if (isCallback) onCdDone?.Invoke(data);
+                if (isCallback) OnCdDone?.Invoke(data);
                 data.usedTimes = 0;
                 data.timeStamp = -1;
 
-                _cdingDict?.Remove(data);
+                _tickDict?.Remove(data);
             }
         }
 
         public void Clear()
         {
-            _cdingDict?.Clear();
+            _tickDict?.Clear();
             _releaseQueue?.Clear();
             _cdDict?.Clear();
         }
@@ -153,14 +165,14 @@ namespace THGame
 
         protected void UpdateExect()
         {
-            if (_cdingDict == null || _cdingDict.Count <= 0)
+            if (_tickDict == null || _tickDict.Count <= 0)
                 return;
 
-            foreach(var data in _cdingDict)
+            foreach(var data in _tickDict)
             {
                 if (GetCurrTimeStamp() >= data.maxCd + data.timeStamp)
                 {
-                    onCdDone?.Invoke(data);
+                    OnCdDone?.Invoke(data);
                     data.timeStamp = GetCurrTimeStamp();
                     data.usedTimes++;
                     if (data.usedTimes >= data.maxTimes)
@@ -182,20 +194,20 @@ namespace THGame
             while(_releaseQueue.Count > 0)
             {
                 var data = _releaseQueue.Dequeue();
-                _cdingDict.Remove(data);
+                _tickDict.Remove(data);
             }
         }
 
-        protected Dictionary<string, SkillCdCacheData> GetOrCreateDict()
+        protected Dictionary<IComparable, SkillCdCacheData> GetOrCreateDict()
         {
-            _cdDict = _cdDict ?? new Dictionary<string, SkillCdCacheData>();
+            _cdDict = _cdDict ?? new Dictionary<IComparable, SkillCdCacheData>();
             return _cdDict;
         }
 
-        protected HashSet<SkillCdCacheData> GetOrCreateCdingDict()
+        protected HashSet<SkillCdCacheData> GetOrCreateTickDict()
         {
-            _cdingDict = _cdingDict ?? new HashSet<SkillCdCacheData>();
-            return _cdingDict;
+            _tickDict = _tickDict ?? new HashSet<SkillCdCacheData>();
+            return _tickDict;
         }
 
         protected Queue<SkillCdCacheData> GetOrCreateReleaseQueue()

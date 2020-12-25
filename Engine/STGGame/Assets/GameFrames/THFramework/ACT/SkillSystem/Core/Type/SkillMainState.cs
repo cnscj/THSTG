@@ -6,6 +6,7 @@ namespace THGame
 {
     public enum SkillMainState
     {
-
+        Enter,
+        Exit,
     }
 }

@@ -1,14 +1,13 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace THGame
 {
     public class SkillEventDispatcher
     {
-        private Dictionary<string, HashSet<SkillEventListener>> _listeners = new Dictionary<string, HashSet<SkillEventListener>>();
+        private Dictionary<IComparable, HashSet<SkillEventListener>> _listeners = new Dictionary<IComparable, HashSet<SkillEventListener>>();
 
-        public void AddEventListener(string type, SkillEventListener listener)
+        public void AddEventListener(IComparable type, SkillEventListener listener)
         {
             HashSet<SkillEventListener> listenerSet = GetOrCreateListenerSet(type);
             if (listenerSet != null)
@@ -20,7 +19,7 @@ namespace THGame
             }
         }
 
-        public void RemoveEventListener(string type, SkillEventListener listener)
+        public void RemoveEventListener(IComparable type, SkillEventListener listener)
         {
             _listeners.TryGetValue(type, out HashSet<SkillEventListener> listenerSet);
             if (listenerSet != null)
@@ -36,13 +35,12 @@ namespace THGame
             }
         }
 
-        public void DispatchEvent(object sender, string type, object args = null)
+        public void DispatchEvent(IComparable type, params object[] args)
         {
             _listeners.TryGetValue(type, out HashSet<SkillEventListener> listenerSet);
             if (listenerSet != null)
             {
                 var context = new SkillEventContext();
-                context.sender = sender;
                 context.type = type;
                 context.args = args;
 
@@ -53,10 +51,9 @@ namespace THGame
             }
         }
 
-        private HashSet<SkillEventListener> GetOrCreateListenerSet(string type)
+        private HashSet<SkillEventListener> GetOrCreateListenerSet(IComparable type)
         {
-            if (string.IsNullOrEmpty(type))
-                return default;
+            if (type == null) return default;
 
             if (!_listeners.TryGetValue(type, out HashSet<SkillEventListener> skillEventListeners))
             {

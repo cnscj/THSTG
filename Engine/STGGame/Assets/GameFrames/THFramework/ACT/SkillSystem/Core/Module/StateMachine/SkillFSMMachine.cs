@@ -17,20 +17,53 @@ namespace THGame
 
 		public bool IsTransitioning { get { return CurrentTransition != null; } }
 
-		private HashSet<SkillFSMState> _states = new HashSet<SkillFSMState>();
+		private Dictionary<IComparable,SkillFSMState> _states = new Dictionary<IComparable, SkillFSMState>();
 		private Dictionary<SkillFSMState, Dictionary<string, SkillFSMTransition>> _transitions = new Dictionary<SkillFSMState, Dictionary<string, SkillFSMTransition>>();
 
+		//TODO:全局监听状态转移
 		private bool isInitialisingState;
 		private event Action<SkillFSMState> OnStateEnter;
 		private event Action<SkillFSMState> OnStateExit;
 		private event Action<SkillFSMState, SkillFSMState> OnStateChange;
 
+		public static SkillFSMMachine FromEnum<TState>() where TState : IComparable
+		{
+			if (!typeof(Enum).IsAssignableFrom(typeof(TState)))
+			{
+				throw new Exception("Cannot create finite");
+			}
+
+			var states = new List<SkillFSMState>();
+			foreach (TState value in Enum.GetValues(typeof(TState)))
+			{
+				var fsmState = new SkillFSMState(value);
+				states.Add(fsmState);
+			}
+
+			return new SkillFSMMachine(states.ToArray());
+		}
+		public SkillFSMMachine()
+		{
+			
+		}
+
+		public SkillFSMMachine(SkillFSMState[] fSMStates)
+        {
+			if (fSMStates == null && fSMStates.Length <= 0)
+				return;
+
+			foreach(var fSMState in fSMStates)
+            {
+				AddState(fSMState);
+			}
+        }
+
 		public SkillFSMMachine AddState(SkillFSMState fSMState)
 		{
 			if (fSMState == null) return this;
-			if (_states.Contains(fSMState)) return this;
+			if (_states.ContainsValue(fSMState)) return this;
 
-			_states.Add(fSMState);
+			_states.Add(fSMState, fSMState);
 
 			return this;
 		}
@@ -38,10 +71,10 @@ namespace THGame
 		public SkillFSMMachine AddTransition(SkillFSMTransition fSMTransition, string command = null)
 		{
 			if (fSMTransition == null) return this;
-			if (!_states.Contains(fSMTransition.FromState)) return this;
-			if (!_states.Contains(fSMTransition.ToState)) return this;
+			if (!_states.ContainsValue(fSMTransition.FromState)) return this;
+			if (!_states.ContainsValue(fSMTransition.ToState)) return this;
 
-			command = string.IsNullOrEmpty(command) ? fSMTransition.ToState.Name : command;
+			command = string.IsNullOrEmpty(command) ? fSMTransition.ToState.Name.ToString() : command;
 
 			_transitions[fSMTransition.FromState] = _transitions.ContainsKey(fSMTransition.FromState) ? _transitions[fSMTransition.FromState] : new Dictionary<string, SkillFSMTransition>();
 			_transitions[fSMTransition.FromState][command] = fSMTransition;
@@ -49,9 +82,20 @@ namespace THGame
 			return this;
 		}
 
+		public SkillFSMMachine AddTransition(IComparable formState, IComparable toStete, string command = null, Func<bool> testConditionFunction = null)
+        {
+			_states.TryGetValue(formState, out var formFsmState);
+			_states.TryGetValue(toStete, out var toFsmState);
+
+			SkillFSMTransition fSMTransition = new SkillFSMTransition(formFsmState, toFsmState, testConditionFunction);
+			AddTransition(fSMTransition, command);
+
+			return this;
+        }
+
 		public void DefalutState(SkillFSMState state)
 		{
-			if (!_states.Contains(state)) return;
+			if (!_states.ContainsValue(state)) return;
 
 			CurrentState = state;
 		}
@@ -108,7 +152,7 @@ namespace THGame
 		public SkillFSMMachine OnEnter(SkillFSMState state, Action handler)
 		{
 			if (handler == null) { throw new ArgumentNullException("handler"); }
-			if (!_states.Contains(state)) { throw new ArgumentException("unknown state", "state"); }
+			if (!_states.ContainsValue(state)) { throw new ArgumentException("unknown state", "state"); }
 
 			OnStateEnter += enteredState =>
 			{
@@ -124,7 +168,7 @@ namespace THGame
 		public SkillFSMMachine OnExit(SkillFSMState state, Action handler)
 		{
 			if (handler == null) { throw new ArgumentNullException("handler"); }
-			if (!_states.Contains(state)) { throw new ArgumentException("unknown state", "state"); }
+			if (!_states.ContainsValue(state)) { throw new ArgumentException("unknown state", "state"); }
 
 			OnStateExit += exitedState =>
 			{
@@ -148,8 +192,8 @@ namespace THGame
 
 		public SkillFSMMachine OnChange(SkillFSMState fromState, SkillFSMState toState, Action handler)
 		{
-			if (!_states.Contains(fromState)) { throw new ArgumentException("unknown state", "from"); }
-			if (!_states.Contains(toState)) { throw new ArgumentException("unknown state", "to"); }
+			if (!_states.ContainsValue(fromState)) { throw new ArgumentException("unknown state", "from"); }
+			if (!_states.ContainsValue(toState)) { throw new ArgumentException("unknown state", "to"); }
 			if (handler == null) { throw new ArgumentNullException("handler"); }
 
 			OnStateChange += (from, to) =>

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,10 +13,10 @@ namespace THGame
         public static readonly int KEYSTATE_PRESS = 0x1;
 
         public float pressResponseTime = INTERVAL_SHOT_PRESS;      //短按响应时间
-        public event Action<SkillInputStateInfo> onKeyDown;
-        public event Action<SkillInputStateInfo> onKeyUp;
-        public event Action<SkillInputStateInfo> onShotPress;
-        public event Action<SkillInputStateInfo> onLongPress;
+        public event Action<SkillInputStateInfo> OnKeyDown;
+        public event Action<SkillInputStateInfo> OnKeyUp;
+        public event Action<SkillInputStateInfo> OnShotPress;
+        public event Action<SkillInputStateInfo> OnLongPress;
 
         private Dictionary<IComparable, SkillInputStateInfo> _keyStateDict;       //指令状态
         private HashSet<SkillInputStateInfo> _pressingSet = new HashSet<SkillInputStateInfo>();
@@ -56,7 +55,7 @@ namespace THGame
             stateInfo.state |= KEYSTATE_PRESS;
             stateInfo.callbackEnabled = true;
 
-            onKeyDown?.Invoke(stateInfo);
+            OnKeyDown?.Invoke(stateInfo);
 
             if (_pressingSet.Contains(stateInfo)) return;
             _pressingSet.Add(stateInfo);
@@ -76,7 +75,7 @@ namespace THGame
             stateInfo.state = KEYSTATE_NONE;
             stateInfo.callbackEnabled = false;
 
-            onKeyUp?.Invoke(stateInfo);
+            OnKeyUp?.Invoke(stateInfo);
 
             _pressingSet.Remove(stateInfo);
 
@@ -101,12 +100,12 @@ namespace THGame
             var durationTime = GetTimeStamp() - stateInfo.timeStamp;
             if (durationTime > pressResponseTime)
             {
-                onLongPress?.Invoke(stateInfo);
+                OnLongPress?.Invoke(stateInfo);
             }
             else
             {
                 if (isSustain) return;
-                onShotPress?.Invoke(stateInfo);
+                OnShotPress?.Invoke(stateInfo);
             }
             stateInfo.callbackEnabled = false;
         }

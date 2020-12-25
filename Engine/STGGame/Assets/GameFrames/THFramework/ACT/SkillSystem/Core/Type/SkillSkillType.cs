@@ -2,9 +2,9 @@
 {
     public enum SkillSkillType
     {
-        Unknow,//未定义
-        Burst,//大招
-        Skill1,//技能1
-        Skill2,//技能2
+        Burst,      //大招
+        Skill1,     //技能1
+        Skill2,     //技能2
+        Aattack,    //普通攻击
     }
 }

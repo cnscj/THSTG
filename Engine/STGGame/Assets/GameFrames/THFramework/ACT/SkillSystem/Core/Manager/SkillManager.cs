@@ -16,6 +16,7 @@ namespace THGame
 
         private SkillData _curSkillData;                    //当前使用的技能数据
 
+
         public SkillInputReceiver GetInputReceiver() { return _skillInputReceiver = _skillInputReceiver ?? CreateManager<SkillInputReceiver>("InputReceiver"); }
         public SkillCdCache GetCdCache(){ return _skillCdCache = _skillCdCache ?? CreateManager<SkillCdCache>("CountdownCache"); }
         public SkillCastTrigger GetCastTrigger() { return _skillCastTrigger = _skillCastTrigger ?? CreateManager<SkillCastTrigger>("CastTrigger"); }
@@ -39,18 +40,26 @@ namespace THGame
         private void Start()
         {
             InitInputSetting();//初始化按键信息
+
+
         }
 
         private void InitInputSetting()
         {
-            GetInputReceiver().onKeyDown += (stateInfo) => { OnSkillTouch((SkillSkillType)stateInfo.keyCode, SkillInputType.KeyDown); };
-            GetInputReceiver().onKeyUp += (stateInfo) => { OnSkillTouch((SkillSkillType)stateInfo.keyCode, SkillInputType.KeyUp); };
-            GetInputReceiver().onShotPress += (stateInfo) => { OnSkillTouch((SkillSkillType)stateInfo.keyCode, SkillInputType.ShotPress); };
-            GetInputReceiver().onLongPress += (stateInfo) => { OnSkillTouch((SkillSkillType)stateInfo.keyCode, SkillInputType.LongPress); };
+            GetInputReceiver().OnKeyDown += (stateInfo) => { OnSkillTouch((SkillSkillType)stateInfo.keyCode, SkillInputType.KeyDown); };
+            GetInputReceiver().OnKeyUp += (stateInfo) => { OnSkillTouch((SkillSkillType)stateInfo.keyCode, SkillInputType.KeyUp); };
+            GetInputReceiver().OnShotPress += (stateInfo) => { OnSkillTouch((SkillSkillType)stateInfo.keyCode, SkillInputType.ShotPress); };
+            GetInputReceiver().OnLongPress += (stateInfo) => { OnSkillTouch((SkillSkillType)stateInfo.keyCode, SkillInputType.LongPress); };
         }
 
         private void OnSkillTouch(SkillSkillType skillType,SkillInputType inputType)
         {
+            //可能会定义一些技能之外的响应,但是这里只处理技能的
+            var skillData = GetSkillData();
+            if (skillData == null)
+                return;
+
+
             //TODO:同一个技能会有多个阶段,并且可能会按照不同的技能时长决定长短按
             //获取触发的技能类型 
             //获取对应skillId
