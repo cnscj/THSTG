@@ -52,12 +52,12 @@ namespace XNodeEditor {
             for (int i = 0; i < guids.Length; i++) {
                 string assetpath = AssetDatabase.GUIDToAssetPath (guids[i]);
                 XNode.NodeGraph graph = AssetDatabase.LoadAssetAtPath (assetpath, typeof (XNode.NodeGraph)) as XNode.NodeGraph;
-                graph.nodes.RemoveAll(x => x == null); //Remove null items
+                if (graph && graph.nodes != null) graph.nodes.RemoveAll(x => x == null); //Remove null items
                 Object[] objs = AssetDatabase.LoadAllAssetRepresentationsAtPath (assetpath);
                 // Ensure that all sub node assets are present in the graph node list
                 for (int u = 0; u < objs.Length; u++) {
                     // Ignore null sub assets
-                    if (objs[u] == null) continue;
+                    if (objs!= null && objs[u] == null) continue;
                     if (!graph.nodes.Contains (objs[u] as XNode.Node)) graph.nodes.Add(objs[u] as XNode.Node);
                 }
             }

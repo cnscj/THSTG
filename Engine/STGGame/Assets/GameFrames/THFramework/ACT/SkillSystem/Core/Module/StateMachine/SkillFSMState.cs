@@ -2,7 +2,7 @@
 
 namespace THGame
 {
-    public class SkillFSMState : IComparable
+    public class SkillFSMState : IComparable<SkillFSMState>,IEquatable<SkillFSMState>
     {
         public IComparable Name { get; private set; }
 
@@ -24,13 +24,20 @@ namespace THGame
             if (OnExited != null) OnExited();
         }
 
-
-        public int CompareTo(object obj)
+        public int CompareTo(SkillFSMState other)
         {
-            if (obj == this)
+            if (other == this)
                 return 0;
 
-            return Name.CompareTo(obj);
+            return Name.CompareTo(other.Name);
+        }
+
+        public bool Equals(SkillFSMState other)
+        {
+            if (other == this)
+                return true;
+
+            return Name.Equals(other.Name);
         }
     }
 

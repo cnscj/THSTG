@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 #if UNITY_WSA
@@ -18,9 +19,8 @@ namespace THGame
 		public bool IsTransitioning { get { return CurrentTransition != null; } }
 
 		private Dictionary<IComparable,SkillFSMState> _states = new Dictionary<IComparable, SkillFSMState>();
-		private Dictionary<SkillFSMState, Dictionary<string, SkillFSMTransition>> _transitions = new Dictionary<SkillFSMState, Dictionary<string, SkillFSMTransition>>();
+		private Dictionary<SkillFSMState, Dictionary<IComparable, SkillFSMTransition>> _transitions = new Dictionary<SkillFSMState, Dictionary<IComparable, SkillFSMTransition>>();
 
-		//TODO:全局监听状态转移
 		private bool isInitialisingState;
 		private event Action<SkillFSMState> OnStateEnter;
 		private event Action<SkillFSMState> OnStateExit;
@@ -28,6 +28,23 @@ namespace THGame
 
 		public static SkillFSMMachine FromEnum<TState>() where TState : IComparable
 		{
+			SkillFSMMachine machine = new SkillFSMMachine();
+			machine.AddStates<TState>();
+			return machine;
+		}
+
+		public SkillFSMMachine()
+		{
+			
+		}
+
+		public SkillFSMMachine(SkillFSMState[] fSMStates)
+		{
+			AddStates(fSMStates);
+		}
+
+		public SkillFSMMachine AddStates<TState>() where TState : IComparable
+        {
 			if (!typeof(Enum).IsAssignableFrom(typeof(TState)))
 			{
 				throw new Exception("Cannot create finite");
@@ -39,59 +56,71 @@ namespace THGame
 				var fsmState = new SkillFSMState(value);
 				states.Add(fsmState);
 			}
+			AddStates(states.ToArray());
 
-			return new SkillFSMMachine(states.ToArray());
-		}
-		public SkillFSMMachine()
-		{
-			
+			return this;
 		}
 
-		public SkillFSMMachine(SkillFSMState[] fSMStates)
+		public SkillFSMMachine AddStates(SkillFSMState[] fSMStates)
         {
 			if (fSMStates == null && fSMStates.Length <= 0)
-				return;
+				return this;
 
-			foreach(var fSMState in fSMStates)
-            {
+			foreach (var fSMState in fSMStates)
+			{
 				AddState(fSMState);
 			}
-        }
+
+			return this;
+		}
 
 		public SkillFSMMachine AddState(SkillFSMState fSMState)
 		{
 			if (fSMState == null) return this;
 			if (_states.ContainsValue(fSMState)) return this;
 
-			_states.Add(fSMState, fSMState);
+			_states.Add(fSMState.Name, fSMState);
+			CurrentState = CurrentState ?? fSMState;
 
 			return this;
 		}
 
-		public SkillFSMMachine AddTransition(SkillFSMTransition fSMTransition, string command = null)
+		public SkillFSMMachine AddTransition(SkillFSMTransition fSMTransition, IComparable command = null)
 		{
 			if (fSMTransition == null) return this;
 			if (!_states.ContainsValue(fSMTransition.FromState)) return this;
 			if (!_states.ContainsValue(fSMTransition.ToState)) return this;
 
-			command = string.IsNullOrEmpty(command) ? fSMTransition.ToState.Name.ToString() : command;
+			command = (command == null) ? fSMTransition.ToState.Name : command;
 
-			_transitions[fSMTransition.FromState] = _transitions.ContainsKey(fSMTransition.FromState) ? _transitions[fSMTransition.FromState] : new Dictionary<string, SkillFSMTransition>();
+			_transitions[fSMTransition.FromState] = _transitions.ContainsKey(fSMTransition.FromState) ? _transitions[fSMTransition.FromState] : new Dictionary<IComparable, SkillFSMTransition>();
 			_transitions[fSMTransition.FromState][command] = fSMTransition;
 
 			return this;
 		}
 
-		public SkillFSMMachine AddTransition(IComparable formState, IComparable toStete, string command = null, Func<bool> testConditionFunction = null)
+		public SkillFSMMachine AddTransition(IComparable fromState, IComparable toStete, IComparable command , Func<bool> testConditionFunction = null)
         {
-			_states.TryGetValue(formState, out var formFsmState);
+			_states.TryGetValue(fromState, out var fromFsmState);
 			_states.TryGetValue(toStete, out var toFsmState);
 
-			SkillFSMTransition fSMTransition = new SkillFSMTransition(formFsmState, toFsmState, testConditionFunction);
-			AddTransition(fSMTransition, command);
+			if (fromFsmState != null && toFsmState != null)
+            {
+				SkillFSMTransition fSMTransition = new SkillFSMTransition(fromFsmState, toFsmState, testConditionFunction);
+				AddTransition(fSMTransition, command);
+            }
+            else
+            {
+				Debug.LogWarning("Do not have fromState or toStete");
+			}
 
 			return this;
         }
+
+		public SkillFSMMachine AddTransition(IComparable fromState, IComparable toStete, Func<bool> testConditionFunction = null)
+		{
+			return AddTransition(fromState, toStete, null, testConditionFunction);
+		}
 
 		public void DefalutState(SkillFSMState state)
 		{
@@ -100,7 +129,7 @@ namespace THGame
 			CurrentState = state;
 		}
 
-		public bool Transfer(string command)
+		public bool Transfer(IComparable command)
 		{
 			if (IsTransitioning) return false;
 			if (CurrentState == null)
@@ -109,6 +138,7 @@ namespace THGame
 			}
 			else
 			{
+				if (!_transitions.ContainsKey(CurrentState)) return false;
 				if (!_transitions[CurrentState].ContainsKey(command)) return false;
 
 				if (isInitialisingState)
@@ -127,6 +157,22 @@ namespace THGame
 					transition.Begin();
 				}
 				return true;
+			}
+		}
+
+		public bool TransferNext()
+        {
+			if (IsTransitioning) return false;
+			if (CurrentState == null)
+			{
+				return false;
+			}
+			else
+			{
+				if (!_transitions.ContainsKey(CurrentState)) return false;
+				IComparable nextCommand = _transitions[CurrentState].Keys.FirstOrDefault();
+				
+				return Transfer(nextCommand);
 			}
 		}
 
