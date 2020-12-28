@@ -38,7 +38,7 @@ namespace THGame
 			
 		}
 
-		public SkillFSMMachine(SkillFSMState[] fSMStates)
+		public SkillFSMMachine(SkillFSMState[] fSMStates) : this()
 		{
 			AddStates(fSMStates);
 		}
@@ -122,14 +122,14 @@ namespace THGame
 			return AddTransition(fromState, toStete, null, testConditionFunction);
 		}
 
-		public void DefalutState(SkillFSMState state)
+		public void Begin(SkillFSMState state)
 		{
 			if (!_states.ContainsValue(state)) return;
 
 			CurrentState = state;
 		}
 
-		public bool Transfer(IComparable command)
+		public bool IssueCommand(IComparable command)
 		{
 			if (IsTransitioning) return false;
 			if (CurrentState == null)
@@ -160,7 +160,7 @@ namespace THGame
 			}
 		}
 
-		public bool TransferNext()
+		public bool IssueNext()
         {
 			if (IsTransitioning) return false;
 			if (CurrentState == null)
@@ -170,9 +170,15 @@ namespace THGame
 			else
 			{
 				if (!_transitions.ContainsKey(CurrentState)) return false;
-				IComparable nextCommand = _transitions[CurrentState].Keys.FirstOrDefault();
-				
-				return Transfer(nextCommand);
+
+				foreach(var command in _transitions[CurrentState].Keys)
+                {
+					if (IssueCommand(command))
+                    {
+						return true;
+                    }	
+				}
+				return false;
 			}
 		}
 

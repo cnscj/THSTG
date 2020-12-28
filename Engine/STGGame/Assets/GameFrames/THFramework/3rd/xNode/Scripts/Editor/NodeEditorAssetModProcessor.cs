@@ -58,7 +58,7 @@ namespace XNodeEditor {
                 for (int u = 0; u < objs.Length; u++) {
                     // Ignore null sub assets
                     if (objs!= null && objs[u] == null) continue;
-                    if (!graph.nodes.Contains (objs[u] as XNode.Node)) graph.nodes.Add(objs[u] as XNode.Node);
+                    if (graph != null && graph.nodes != null && !graph.nodes.Contains (objs[u] as XNode.Node)) graph.nodes.Add(objs[u] as XNode.Node);
                 }
             }
         }

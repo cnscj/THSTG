@@ -7,12 +7,11 @@ namespace THGame
 {
     public class SkillManager : MonoSingleton<SkillManager>
     {
-        private SkillConfiger _skillConfiger;               //配置器
         private SkillInputReceiver _skillInputReceiver;     //接收器
         private SkillCdCache _skillCdCache;                 //cd缓存池
         private SkillCastTrigger _skillCastTrigger;         //触发器
-        private SkillFSMMachine _skillStateMachine;         //状态机
         private SkillEventDispatcher _skillDispatcher;      //派发器
+
 
         private SkillData _curSkillData;                    //当前使用的技能数据
 
@@ -20,8 +19,6 @@ namespace THGame
         public SkillInputReceiver GetInputReceiver() { return _skillInputReceiver = _skillInputReceiver ?? CreateManager<SkillInputReceiver>("InputReceiver"); }
         public SkillCdCache GetCdCache(){ return _skillCdCache = _skillCdCache ?? CreateManager<SkillCdCache>("CountdownCache"); }
         public SkillCastTrigger GetCastTrigger() { return _skillCastTrigger = _skillCastTrigger ?? CreateManager<SkillCastTrigger>("CastTrigger"); }
-        public SkillConfiger GetConfiger() { return _skillConfiger = _skillConfiger ?? new SkillConfiger(); }
-        public SkillFSMMachine GetStateMachine() { return _skillStateMachine = _skillStateMachine ?? new SkillFSMMachine(); }
         public SkillEventDispatcher GetEventDispatcher() { return _skillDispatcher = _skillDispatcher ?? new SkillEventDispatcher(); }
 
 
@@ -59,13 +56,16 @@ namespace THGame
             if (skillData == null)
                 return;
 
+            //调用触发器,如果在某个时间段内进行操作才能进入相应状态,否则超过则进入默认退出状态(应该是等动画自然状态回归)
+            //从对应太进入,到自然释放过程会有一个空窗期(冷却期(_空窗期)_触发期s(_空窗期)_回归期,回归期计时可能从冷却期结束开始计时
+            var trigger = GetCastTrigger();
+
 
             //TODO:同一个技能会有多个阶段,并且可能会按照不同的技能时长决定长短按
             //获取触发的技能类型 
             //获取对应skillId
             //获取skillInfo,
             //检查CD
-            Debug.LogFormat("{0},{1}", skillType, inputType);
         }
 
         private T CreateManager<T>(string name) where T : MonoBehaviour

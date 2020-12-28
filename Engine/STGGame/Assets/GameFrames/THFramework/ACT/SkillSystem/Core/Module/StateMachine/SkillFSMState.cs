@@ -5,7 +5,6 @@ namespace THGame
     public class SkillFSMState : IComparable<SkillFSMState>,IEquatable<SkillFSMState>
     {
         public IComparable Name { get; private set; }
-
         public event Action OnEntered;
         public event Action OnExited;
 
@@ -16,12 +15,12 @@ namespace THGame
 
         public void Enter()
         {
-            if (OnEntered != null) OnEntered();
+            OnEntered?.Invoke();
         }
 
         public void Exit()
         {
-            if (OnExited != null) OnExited();
+            OnExited?.Invoke();
         }
 
         public int CompareTo(SkillFSMState other)

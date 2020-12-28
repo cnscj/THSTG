@@ -6,12 +6,7 @@ namespace THGame
 {
     public class SkillController : MonoBehaviour
     {
-        public SkillData skillData;
- 
-        private void Start()
-        {
-            
-        }
+        public SkillData skillData;     //技能数据
 
         //触发技能
         public void Cast(int skillId)

@@ -51,11 +51,11 @@ namespace THGame
 
             var stateInfo = GetOrCreateStateInfo(keyCode);
 
+            OnKeyDown?.Invoke(stateInfo);
+
             stateInfo.timeStamp = GetTimeStamp();
             stateInfo.state |= KEYSTATE_PRESS;
             stateInfo.callbackEnabled = true;
-
-            OnKeyDown?.Invoke(stateInfo);
 
             if (_pressingSet.Contains(stateInfo)) return;
             _pressingSet.Add(stateInfo);
@@ -70,12 +70,11 @@ namespace THGame
             if (!_pressingSet.Contains(stateInfo)) return;
 
             DealCallbackTime(keyCode, false);
+            OnKeyUp?.Invoke(stateInfo);
 
             stateInfo.timeStamp = GetTimeStamp();
             stateInfo.state = KEYSTATE_NONE;
             stateInfo.callbackEnabled = false;
-
-            OnKeyUp?.Invoke(stateInfo);
 
             _pressingSet.Remove(stateInfo);
 

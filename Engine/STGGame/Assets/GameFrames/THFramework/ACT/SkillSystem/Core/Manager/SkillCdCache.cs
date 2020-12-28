@@ -7,7 +7,7 @@ namespace THGame
     public class SkillCdCache : MonoBehaviour                   //CD冷却Cache
     {
         public float queryFrequentness = 0.1f;                  //查询频度0.1
-        public event Action<SkillCdCacheData> OnCdDone;         //
+        public event Action<SkillCdCacheData> OnCdDone;         //cd完一次的回调
 
         private Dictionary<IComparable, SkillCdCacheData> _cdDict;
 

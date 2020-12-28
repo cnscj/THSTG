@@ -105,7 +105,7 @@ namespace XLibGame
 			if (!states.ContainsKey(to)) { throw new ArgumentException("unknown state", "to"); }
 
 			// add the transition to the db (new it if it does not exist)
-			transitions[from][command] = transition ?? new FSMDefaultStateTransition<TState>(from, to);
+			transitions[from][command] = transition ?? new FSMTransition<TState>(from, to);
 
 			return this;
 		}
@@ -127,7 +127,7 @@ namespace XLibGame
 			if (string.IsNullOrEmpty(command)) { throw new ArgumentException("command cannot be null or empty", "command"); }
 
 			// add a default transition to the db
-			transitions[from][command] = new FSMDefaultStateTransition<TState>(from, to, condition);
+			transitions[from][command] = new FSMTransition<TState>(from, to, condition);
 
 			return this;
 		}

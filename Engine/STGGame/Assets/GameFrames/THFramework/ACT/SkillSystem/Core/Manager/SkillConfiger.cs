@@ -5,7 +5,7 @@ using XLibrary.Package;
 
 namespace THGame
 {
-    public class SkillConfiger
+    public class SkillConfiger : Singleton<SkillConfiger>
     {
 
     }

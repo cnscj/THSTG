@@ -6,10 +6,9 @@ namespace THGame
     {
 		public SkillFSMState FromState { get; private set; }
 		public SkillFSMState ToState { get; private set; }
+		public object data;
 
 		public event Action<SkillFSMTransition> OnComplete;
-		public event Action<SkillFSMTransition> OnTransiting;
-
 		private readonly Func<bool> testConditionFunc;
 
 		public SkillFSMTransition(SkillFSMState from, SkillFSMState to, Func<bool> testConditionFunction = null)
