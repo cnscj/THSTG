@@ -11,53 +11,52 @@ namespace THGame
         private SkillCdCache _skillCdCache;                 //cd缓存池
         private SkillCastTrigger _skillCastTrigger;         //触发器
         private SkillEventDispatcher _skillDispatcher;      //派发器
-
-
-        private SkillData _curSkillData;                    //当前使用的技能数据
-
+        private SkillController _curentSkillController;     //控制器
 
         public SkillInputReceiver GetInputReceiver() { return _skillInputReceiver = _skillInputReceiver ?? CreateManager<SkillInputReceiver>("InputReceiver"); }
         public SkillCdCache GetCdCache(){ return _skillCdCache = _skillCdCache ?? CreateManager<SkillCdCache>("CountdownCache"); }
         public SkillCastTrigger GetCastTrigger() { return _skillCastTrigger = _skillCastTrigger ?? CreateManager<SkillCastTrigger>("CastTrigger"); }
         public SkillEventDispatcher GetEventDispatcher() { return _skillDispatcher = _skillDispatcher ?? new SkillEventDispatcher(); }
-
-
-        public void SetSkillData(SkillData data)
+        private SkillController CurentSkillController
         {
-            _curSkillData = data;
-            //TODO:设置短按长按的响应时间
-
+            set
+            {
+                //TODO:需要设置时间相应时间
+                _curentSkillController = value;
+            }
+            get
+            {
+                return _curentSkillController;
+            }
         }
 
-        public SkillData GetSkillData()
-        {
-            return _curSkillData;
-        }
 
         private void Start()
         {
             InitInputSetting();//初始化按键信息
 
-
+           
         }
 
         private void InitInputSetting()
         {
-            GetInputReceiver().OnKeyDown += (stateInfo) => { OnSkillTouch((SkillSkillType)stateInfo.keyCode, SkillInputType.KeyDown); };
-            GetInputReceiver().OnKeyUp += (stateInfo) => { OnSkillTouch((SkillSkillType)stateInfo.keyCode, SkillInputType.KeyUp); };
-            GetInputReceiver().OnShotPress += (stateInfo) => { OnSkillTouch((SkillSkillType)stateInfo.keyCode, SkillInputType.ShotPress); };
-            GetInputReceiver().OnLongPress += (stateInfo) => { OnSkillTouch((SkillSkillType)stateInfo.keyCode, SkillInputType.LongPress); };
+            GetInputReceiver().OnKeyDown += (stateInfo) => { OnInput(stateInfo,  SkillInputType.KeyDown); };
+            GetInputReceiver().OnKeyUp += (stateInfo) => { OnInput(stateInfo, SkillInputType.KeyUp); };
+            GetInputReceiver().OnShotPress += (stateInfo) => { OnInput(stateInfo, SkillInputType.ShotPress); };
+            GetInputReceiver().OnLongPress += (stateInfo) => { OnInput(stateInfo, SkillInputType.LongPress); };
         }
 
-        private void OnSkillTouch(SkillSkillType skillType,SkillInputType inputType)
+        private void OnInput(SkillInputStateInfo stateInfo, SkillInputType inputType)
         {
             //可能会定义一些技能之外的响应,但是这里只处理技能的
-            var skillData = GetSkillData();
+            var skillData = CurentSkillController.skillData;
             if (skillData == null)
                 return;
 
+            SkillCastType skillCastType = (SkillCastType)stateInfo.keyCode;
             //调用触发器,如果在某个时间段内进行操作才能进入相应状态,否则超过则进入默认退出状态(应该是等动画自然状态回归)
             //从对应太进入,到自然释放过程会有一个空窗期(冷却期(_空窗期)_触发期s(_空窗期)_回归期,回归期计时可能从冷却期结束开始计时
+            
             var trigger = GetCastTrigger();
 
 

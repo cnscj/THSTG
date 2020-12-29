@@ -6,11 +6,11 @@ namespace THGame
 {
     public interface ISkillTrigger
     {
-        void ExecuteBefore();
-        void Execute();         //技能触发
-        void ExecuteAfter();
+        void CastBefore(SkillCastType type);
+        void Cast(SkillCastType type);         //技能触发
+        void CastAfter(SkillCastType type);
 
-        void ExecuteInterrupt();
+        void CastInterrupt();
 
     }
 

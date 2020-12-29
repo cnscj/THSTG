@@ -50,6 +50,7 @@ namespace THGame
             if (!enabled) return;
 
             var stateInfo = GetOrCreateStateInfo(keyCode);
+            stateInfo.durationTime = 0;
 
             OnKeyDown?.Invoke(stateInfo);
 
@@ -68,6 +69,7 @@ namespace THGame
 
             var stateInfo = GetOrCreateStateInfo(keyCode);
             if (!_pressingSet.Contains(stateInfo)) return;
+            stateInfo.durationTime = GetTimeStamp() - stateInfo.timeStamp;
 
             DealCallbackTime(keyCode, false);
             OnKeyUp?.Invoke(stateInfo);

@@ -6,6 +6,7 @@ namespace THGame
         public IComparable keyCode;
         public int state;
 
+        public float durationTime;
         public float timeStamp;
         public bool callbackEnabled;
     }

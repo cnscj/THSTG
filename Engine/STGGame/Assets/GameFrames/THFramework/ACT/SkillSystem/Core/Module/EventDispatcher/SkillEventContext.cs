@@ -2,7 +2,7 @@
 
 namespace THGame
 {
-    public class SkillEventContext
+    public struct SkillEventContext
     {
         public IComparable type;
         public object args;

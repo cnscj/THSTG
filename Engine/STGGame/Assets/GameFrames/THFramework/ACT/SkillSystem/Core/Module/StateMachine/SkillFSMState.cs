@@ -7,6 +7,7 @@ namespace THGame
         public IComparable Name { get; private set; }
         public event Action OnEntered;
         public event Action OnExited;
+        public object Data { get; set; }
 
         public SkillFSMState(IComparable comparable)
         {

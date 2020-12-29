@@ -94,7 +94,7 @@ namespace ASGame
             else
             {
                 _downloadRetryTimes++;
-                DownloadFiles(packageIndex,urlPaths.ToArray(), savePaths.ToArray());
+                DownloadFiles(packageIndex, urlPaths.ToArray(), savePaths.ToArray());
                 return;
             }
 

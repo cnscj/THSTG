@@ -6,7 +6,7 @@ namespace THGame
     {
 		public SkillFSMState FromState { get; private set; }
 		public SkillFSMState ToState { get; private set; }
-		public object data;
+		public object Data { get; set; }
 
 		public event Action<SkillFSMTransition> OnComplete;
 		private readonly Func<bool> testConditionFunc;
@@ -28,7 +28,7 @@ namespace THGame
 			Complete();
 		}
 
-		public bool TestCondition()
+		public virtual bool TestCondition()
 		{
 			return testConditionFunc == null || testConditionFunc();
 		}

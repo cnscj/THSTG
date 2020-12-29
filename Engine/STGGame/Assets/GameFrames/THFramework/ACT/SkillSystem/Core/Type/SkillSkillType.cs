@@ -1,6 +1,6 @@
 ﻿namespace THGame
 {
-    public enum SkillSkillType
+    public enum SkillCastType
     {
         Burst,      //大招
         Skill1,     //技能1

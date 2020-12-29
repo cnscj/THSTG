@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace THGame
 {
-    public class SkillConditionComparer<T> where T : IComparable
+    public class SkillConditionComparer<T1,T2> where T1 : ISkillComparableCondition<T2> where T2 : IComparable
     {
-        public List<SkillComparableCondition<T>> conditions;
+        [SerializeField] public List<T1> conditions;
 
-        public void AddCondition(SkillComparableCondition<T> condition)
+        public void AddCondition(T1 condition)
         {
             var list = GetConditions();
             list.Add(condition);
         }
 
-        public bool Verify(T val)
+        public bool Verify(T2 val)
         {
             if (conditions == null || conditions.Count <= 0)
                 return false;
@@ -21,8 +22,9 @@ namespace THGame
             bool finalRet = true;
             foreach (var condition in conditions)
             {
+                var logicIoerator = SkillLogicalOperator.And;   //
                 var ret = condition.Verify(val);
-                switch(condition.logicalOperator)
+                switch(logicIoerator)
                 {
                     case SkillLogicalOperator.And:
                         finalRet &= ret;
@@ -36,9 +38,9 @@ namespace THGame
             return finalRet;
         }
 
-        private List<SkillComparableCondition<T>> GetConditions()
+        private List<T1> GetConditions()
         {
-            conditions = conditions ?? new List<SkillComparableCondition<T>>();
+            conditions = conditions ?? new List<T1>();
             return conditions;
         }
     }

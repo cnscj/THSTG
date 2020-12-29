@@ -25,6 +25,7 @@ namespace THGame
 		private event Action<SkillFSMState> OnStateEnter;
 		private event Action<SkillFSMState> OnStateExit;
 		private event Action<SkillFSMState, SkillFSMState> OnStateChange;
+		private event Func<SkillFSMTransition,bool> OnStateTransitive;
 
 		public static SkillFSMMachine FromEnum<TState>() where TState : IComparable
 		{
@@ -148,7 +149,9 @@ namespace THGame
 				}
 
 				var transition = _transitions[CurrentState][command];
-				if (transition.TestCondition())
+				var ret1 = transition.TestCondition();
+				var ret2 = OnStateTransitive == null || OnStateTransitive.Invoke(transition);
+				if (ret1 && ret2)
 				{
 					CurrentTransition = transition;
 					transition.OnComplete += HandleTransitionComplete;
@@ -241,6 +244,14 @@ namespace THGame
 			return this;
 		}
 
+		public SkillFSMMachine OnTransition(Func<SkillFSMTransition, bool> handler)
+		{
+			if (handler == null) { throw new ArgumentNullException("handler"); }
+
+			OnStateTransitive += handler;
+
+			return this;
+		}
 
 		public SkillFSMMachine OnChange(SkillFSMState fromState, SkillFSMState toState, Action handler)
 		{
