@@ -5,7 +5,7 @@ namespace THGame
     [System.Serializable]
     public class SkillEffect : BaseSkillTrack
     {
-        public string effectKey;                //特效节点
+        public string resKey;                //特效节点
         public int maxCount = -1;               //最大同特效数量
         public float liveTime = -1;             //生存时间
         public int flag;                        //条件

@@ -6,9 +6,7 @@ namespace THGame
 {
 	public class SkillTreeNodeNode : Node
 	{
-		public string skillName;
-		public PlayableAsset skillBehaviour;
-
+		public SkillBean skillBean;
 
 		protected override void Init()
 		{

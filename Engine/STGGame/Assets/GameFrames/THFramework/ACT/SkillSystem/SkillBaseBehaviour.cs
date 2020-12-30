@@ -1,38 +1,50 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 
 namespace THGame
 {
-    public abstract class SkillBaseBehaviour
+    public abstract class SkillBaseBehaviour : MonoBehaviour
     {
-        //创建一个状态机
+        public Action<SkillFSMState, SkillFSMState> onStateChanged;
         private SkillFSMMachine _skillMachine;
 
-        public void BuildStateMachine()
+        public void BuildStateMachine(SkillBean[] skillBeans)
         {
+            if (skillBeans == null || skillBeans.Length <= 0)
+                return;
+
             //根据配置,构建对应的状态机
+            _skillMachine = new SkillFSMMachine();
+            _skillMachine.OnChange(StateChanged);
+            _skillMachine.OnTransition(StateTransition);
+
+            foreach (var skillBean in skillBeans)
+            {
+
+            }
         }
 
-        protected virtual void OnTransitive(SkillFSMTransition transition)
+        private bool StateTransition(SkillFSMTransition transition)
+        {
+            return OnStateTransition(transition);
+        }
+
+        private void StateChanged(SkillFSMState fromState, SkillFSMState toState)
+        {
+            onStateChanged?.Invoke(fromState, toState);
+            OnStateChanged(fromState, toState);
+        }
+
+        protected virtual bool OnStateTransition(SkillFSMTransition transition)
+        {
+            return true;
+        }
+
+        protected virtual void OnStateChanged(SkillFSMState fromState, SkillFSMState toState)
         {
 
         }
 
-        protected virtual void OnChanged(SkillFSMState fromState, SkillFSMState toState)
-        {
-
-        }
-
-        protected virtual void OnEnter(SkillFSMState state)
-        {
-
-        }
-
-        protected virtual void OnExit(SkillFSMState state)
-        {
-
-        }
     }
 }
 

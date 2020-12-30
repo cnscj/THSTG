@@ -11,6 +11,8 @@ namespace ASGame
 {
     public abstract class AssetBaseRef<T> where T : UnityEngine.Object
     {
+        public static event Action<string,Action<T>> OnLoader;
+
         [SerializeField, SetProperty("Asset")] private T _asset;
         [HideInInspector] [SerializeField] private string _path;
 
@@ -54,15 +56,19 @@ namespace ASGame
             {
                 if (!string.IsNullOrEmpty(_path))
                 {
-                    //TODO:
-                    if (callback != null) callback(default);
+                    if (callback != null)
+                    {
+                        OnLoader?.Invoke(_path, callback);
+                    }
                     else return default;   
                 }
             }
             else
             {
-                //TODO:
-                if (callback != null) callback(_asset);
+                if (callback != null)
+                {
+                    callback(_asset);
+                }
                 else return _asset;
             }
             callback?.Invoke(default);

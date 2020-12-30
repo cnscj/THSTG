@@ -14,6 +14,17 @@ namespace THGame
             list.Add(condition);
         }
 
+        public void AddConditions(T1[] conditions)
+        {
+            if (conditions == null || conditions.Length <= 0)
+                return;
+
+            foreach(var condition in conditions)
+            {
+                AddCondition(condition);
+            }
+        }
+
         public bool Verify(T2 val)
         {
             if (conditions == null || conditions.Count <= 0)
