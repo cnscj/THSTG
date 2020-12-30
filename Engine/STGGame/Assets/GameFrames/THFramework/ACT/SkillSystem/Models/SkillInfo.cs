@@ -5,7 +5,7 @@ using UnityEngine;
 namespace THGame
 {
     [System.Serializable]
-    public class SkillInfo : ScriptableObject
+    public class SkillInfo
     {
         public int skillId;             //Id
         public string skillName;        //技能名

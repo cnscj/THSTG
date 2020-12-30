@@ -3,7 +3,7 @@
 namespace THGame
 {
     [System.Serializable]
-    public class SkillCombo : ScriptableObject
+    public class SkillCombo
     {
         public int skillId;
         public SkillCastType castType;              //技能类型
