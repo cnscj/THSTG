@@ -6,6 +6,6 @@ namespace THGame
     //触发技能,如果X秒没有触发下一个,则可能直接进入冷却
     public class SkillCastTrigger : MonoBehaviour
     {
-
+        //触发方式:点按,长按蓄力(可能根据蓄力程度不同触发的不一样),状态进入(有超时限制
     }
 }
