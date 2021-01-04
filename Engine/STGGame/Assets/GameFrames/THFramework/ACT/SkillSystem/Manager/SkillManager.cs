@@ -21,7 +21,6 @@ namespace THGame
         {
             set
             {
-                //TODO:需要设置时间相应时间
                 _curentSkillController = value;
             }
             get
@@ -53,7 +52,7 @@ namespace THGame
             if (skillData == null)
                 return;
 
-            SkillCastType skillCastType = (SkillCastType)stateInfo.keyCode;
+            SkillType skillCastType = (SkillType)stateInfo.keyCode;
             //调用触发器,如果在某个时间段内进行操作才能进入相应状态,否则超过则进入默认退出状态(应该是等动画自然状态回归)
             //从对应太进入,到自然释放过程会有一个空窗期(冷却期(_空窗期)_触发期s(_空窗期)_回归期,回归期计时可能从冷却期结束开始计时
             

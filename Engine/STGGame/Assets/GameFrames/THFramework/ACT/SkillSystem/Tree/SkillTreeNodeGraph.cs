@@ -6,7 +6,7 @@ using XNode;
 
 namespace THGame
 {
-    [Serializable, CreateAssetMenu(fileName = "SkillGraph", menuName = "THGame/SkillEditor/SkillGraph")]
+    [Serializable, CreateAssetMenu(fileName = "SkillGraph", menuName = "THGame/SkillEditor/Create SkillGraph")]
     public class SkillNodeGraph : NodeGraph
     {
         

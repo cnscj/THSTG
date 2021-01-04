@@ -5,12 +5,12 @@ using UnityEngine;
 
 namespace THEditor
 {
-    public class SkillDataEditor : EditorWindow
+    public class SkillEditorWindow : EditorWindow
     {
         [MenuItem("THEditor/Skill Data Editor")]
         static void ShowWindow()
         {
-            EditorWindow.GetWindow(typeof(SkillDataEditor));
+            EditorWindow.GetWindow(typeof(SkillEditorWindow));
         }
     }
 }
