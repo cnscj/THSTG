@@ -11,7 +11,7 @@ namespace THGame
         public SkillCdTrigger cdTrigger;            //cd触发类型
         public float timeoutToCd;                   //超时进入CD
 
-        
+        //CD触发类型应该读配置(可能有技能结束冷却,可能有其他冷却
         public float cdTime = 1f;                   //一次冷却CD时长
         public int maxTimes = 1;                    //最大使用次数
         public float maxDuration = 90;              //技能最大持续时间,时间到将进入冷却
@@ -20,9 +20,5 @@ namespace THGame
 
         public SkillFloatCondition[] conditions;    //触发条件
 
-
-
-
     }
-
 }
