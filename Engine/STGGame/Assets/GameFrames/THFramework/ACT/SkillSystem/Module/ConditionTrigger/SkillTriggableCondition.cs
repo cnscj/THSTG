@@ -1,16 +1,18 @@
 ﻿using System;
+using System.Collections;
 
 namespace THGame
 {
-    public class SkillComparableCondition<T> : ISkillComparableCondition<T>, IComparable<SkillComparableCondition<T>> where T : IComparable
+    [System.Serializable]
+    public class SkillTriggableCondition : IComparable<SkillTriggableCondition>
     {
-        public SkillComparisonOperator comparisonOperator;
-        public T value;
+        public SkillComparisonOperator operation;
+        public IComparable value;
 
-        public bool Verify(T otherValue)
+        public bool Verify(IComparable otherValue)
         {
             bool ret = false;
-            switch (comparisonOperator)
+            switch (operation)
             {
                 case SkillComparisonOperator.Greater:
                     ret = otherValue.CompareTo(value) > 0;
@@ -28,7 +30,7 @@ namespace THGame
             return ret;
         }
 
-        public int CompareTo(SkillComparableCondition<T> other)
+        public int CompareTo(SkillTriggableCondition other)
         {
             if (other == this)
                 return 0;
@@ -36,4 +38,5 @@ namespace THGame
             return value.CompareTo(other.value);
         }
     }
+
 }
