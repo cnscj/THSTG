@@ -1,13 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace THGame
 {
     [System.Serializable]
     public class SkillTriggerParameters
     {
-        public class KeyVlaue
+        public class KeyVlaue : ScriptableObject
         {
             public string key;
             public SkillTriggerParameter param;

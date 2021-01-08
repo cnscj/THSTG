@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections;
+using UnityEngine;
 
 namespace THGame
 {
@@ -7,24 +7,27 @@ namespace THGame
     public class SkillTriggableCondition : IComparable<SkillTriggableCondition>
     {
         public SkillComparisonOperator operation;
-        public IComparable value;
+        public float threshold;
 
         public bool Verify(IComparable otherValue)
         {
+            if (otherValue == null)
+                return false;
+
             bool ret = false;
             switch (operation)
             {
                 case SkillComparisonOperator.Greater:
-                    ret = otherValue.CompareTo(value) > 0;
+                    ret = otherValue.CompareTo(threshold) > 0;
                     break;
                 case SkillComparisonOperator.Less:
-                    ret = otherValue.CompareTo(value) < 0;
+                    ret = otherValue.CompareTo(threshold) < 0;
                     break;
                 case SkillComparisonOperator.Equal:
-                    ret = otherValue.CompareTo(value) == 0;
+                    ret = otherValue.CompareTo(threshold) == 0;
                     break;
                 case SkillComparisonOperator.NotEqual:
-                    ret = otherValue.CompareTo(value) != 0;
+                    ret = otherValue.CompareTo(threshold) != 0;
                     break;
             }
             return ret;
@@ -35,7 +38,7 @@ namespace THGame
             if (other == this)
                 return 0;
 
-            return value.CompareTo(other.value);
+            return threshold.CompareTo(other.threshold);
         }
     }
 

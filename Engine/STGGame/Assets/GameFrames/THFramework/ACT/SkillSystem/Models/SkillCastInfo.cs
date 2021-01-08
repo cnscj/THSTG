@@ -18,7 +18,7 @@ namespace THGame
         public float interruptedPrec = 20;          //抗打断能力
 
 
-        public SkillFloatCondition[] conditions;    //触发条件
+        public SkillTriggerParameters conditions;   //触发条件
 
     }
 }

@@ -5,8 +5,41 @@ namespace THGame
 {
     public class SkillParametersTrigger
     {
+        public static bool VerifyTo(SkillTriggerParameters parameters, SkillTriggableConditions conditions)
+        {
+            if (parameters == null)
+                return false;
+
+            if (conditions == null)
+                return false;
+
+            if (conditions.list == null || conditions.list.Count <= 0)
+                return false;
+
+            bool ret = true;
+            foreach (var keyValue in conditions.list)
+            {
+                var param = parameters.GetParam(keyValue.key);
+                var value = param?.value ?? 0;
+                ret &= keyValue.condition.Verify(value);
+            }
+
+            return ret;
+        }
         //触发器类型的,判断完所有后下一帧直接置false
-        public SkillTriggerParameters parameters;
+        private SkillTriggerParameters _parameters;
+        private Queue<SkillTriggerParameter> _triggerReleaseList;
+
+        public SkillTriggableConditions CreateConditions()
+        {
+            var conditions = new SkillTriggableConditions();
+            return conditions;
+        }
+
+        public void AddParam(string key, SkillTriggableParameterType type)
+        {
+            GetParameters().AddParam(key, new SkillTriggerParameter() { type = type });
+        }
 
         public void SetInt(string key, int value)
         {
@@ -25,30 +58,53 @@ namespace THGame
 
         public void Trigge(string key)
         {
-
+            var param = GetParameters().GetParam(key);
+            if (param != null)
+            {
+                param.SetValue(true);
+                GetTriggerReleaseList().Enqueue(param);
+            }
         }
 
         public bool Verify(SkillTriggableConditions conditions)
         {
-            if (conditions == null)
-                return false;
-            if (conditions.list == null || conditions.list.Count <= 0)
-                return false;
+            return VerifyTo(_parameters, conditions);
+        }
 
-            foreach(var condition in conditions.list)
+        //帧后处理
+        public void Purge() 
+        {
+            if (_triggerReleaseList == null || _triggerReleaseList.Count <= 0)
+                return;
+
+            while(_triggerReleaseList.Count > 0)
             {
-                var param = parameters.GetParam(condition.key);
-
+                var param = _triggerReleaseList.Dequeue();
+                param.SetValue(false);
             }
-
-
-            return false;
         }
 
         private void SetNumber<T>(string key, T value)
         {
-
+            var param = GetParameters().GetParam(key);
+            if (param != null)
+            {
+                param.SetValue(value);
+            }
         }
+
+        private SkillTriggerParameters GetParameters()
+        {
+            _parameters = _parameters ?? new SkillTriggerParameters();
+            return _parameters;
+        }
+
+        private Queue<SkillTriggerParameter> GetTriggerReleaseList()
+        {
+            _triggerReleaseList = _triggerReleaseList ?? new Queue<SkillTriggerParameter>();
+            return _triggerReleaseList;
+        }
+
     }
 
 
