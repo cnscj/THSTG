@@ -8,21 +8,21 @@ namespace THGame
     public class SkillTriggerParameter
     {
         public SkillTriggableParameterType type;
-        public IComparable value;
+        [NonSerialized]public float value;
 
-        public void SetValue<T>(T newVal)
+        public void SetInt(int newVal)
         {
-            value = (IComparable)newVal;
+            value = (int)newVal;
         }
 
-        public void SetValue(float newVal)
+        public void SetFloat(float newVal)
         {
-            switch(type)
-            {
-                case SkillTriggableParameterType.Int:
-                    value = (int)newVal;
-                    break;
-            }
+            value = newVal;
+        }
+
+        public void SetBool(bool newVal)
+        {
+            value = newVal ? 1f : 0f;
         }
     }
 

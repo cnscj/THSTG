@@ -41,19 +41,36 @@ namespace THGame
             GetParameters().AddParam(key, new SkillTriggerParameter() { type = type });
         }
 
+        public void RemoveParam(string key)
+        {
+            GetParameters().RemoveParam(key);
+        }
+
         public void SetInt(string key, int value)
         {
-            SetNumber(key, value);
+            var param = GetParameters().GetParam(key);
+            if (param != null)
+            {
+                param.SetInt(value);
+            }
         }
 
         public void SetFloat(string key, float value)
         {
-            SetNumber(key, value);
+            var param = GetParameters().GetParam(key);
+            if (param != null)
+            {
+                param.SetFloat(value);
+            }
         }
 
         public void SetBool(string key, bool value)
         {
-            SetNumber(key, value);
+            var param = GetParameters().GetParam(key);
+            if (param != null)
+            {
+                param.SetBool(value);
+            }
         }
 
         public void Trigge(string key)
@@ -61,7 +78,7 @@ namespace THGame
             var param = GetParameters().GetParam(key);
             if (param != null)
             {
-                param.SetValue(true);
+                param.SetBool(true);
                 GetTriggerReleaseList().Enqueue(param);
             }
         }
@@ -71,25 +88,21 @@ namespace THGame
             return VerifyTo(_parameters, conditions);
         }
 
+        public void UpdateLate()
+        {
+            Purge();
+        }
+
         //帧后处理
-        public void Purge() 
+        private void Purge()
         {
             if (_triggerReleaseList == null || _triggerReleaseList.Count <= 0)
                 return;
 
-            while(_triggerReleaseList.Count > 0)
+            while (_triggerReleaseList.Count > 0)
             {
                 var param = _triggerReleaseList.Dequeue();
-                param.SetValue(false);
-            }
-        }
-
-        private void SetNumber<T>(string key, T value)
-        {
-            var param = GetParameters().GetParam(key);
-            if (param != null)
-            {
-                param.SetValue(value);
+                param.SetBool(false);
             }
         }
 
