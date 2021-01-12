@@ -30,12 +30,6 @@ namespace THGame
         private SkillTriggerParameters _parameters;
         private Queue<SkillTriggerParameter> _triggerReleaseList;
 
-        public SkillTriggableConditions CreateConditions()
-        {
-            var conditions = new SkillTriggableConditions();
-            return conditions;
-        }
-
         public void AddParam(string key, SkillTriggableParameterType type)
         {
             GetParameters().AddParam(key, new SkillTriggerParameter() { type = type });
@@ -117,9 +111,5 @@ namespace THGame
             _triggerReleaseList = _triggerReleaseList ?? new Queue<SkillTriggerParameter>();
             return _triggerReleaseList;
         }
-
-    }
-
-
-    
+    }  
 }
