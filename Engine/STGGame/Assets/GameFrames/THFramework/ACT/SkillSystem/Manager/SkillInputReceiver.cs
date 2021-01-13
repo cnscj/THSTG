@@ -7,12 +7,8 @@ namespace THGame
     //长按,短按,按下,弹起
     public class SkillInputReceiver : MonoBehaviour
     {
-        public static readonly float INTERVAL_SHOT_PRESS = 0.65f;    //这个数以下判定为短按,以上判断为长按
 
-        public static readonly int KEYSTATE_NONE = 0x0;
-        public static readonly int KEYSTATE_PRESS = 0x1;
 
-        public float pressResponseTime = INTERVAL_SHOT_PRESS;      //短按响应时间
         public event Action<SkillInputStateInfo> OnKeyDown;
         public event Action<SkillInputStateInfo> OnKeyUp;
         public event Action<SkillInputStateInfo> OnShotPress;
@@ -20,18 +16,19 @@ namespace THGame
 
         private Dictionary<IComparable, SkillInputStateInfo> _keyStateDict;       //指令状态
         private HashSet<SkillInputStateInfo> _pressingSet = new HashSet<SkillInputStateInfo>();
+        private Queue<SkillInputStateInfo> _releaseQueue = new Queue<SkillInputStateInfo>();
 
         public int GetKeyState(IComparable keyCode)
         {
             if (_keyStateDict == null || _keyStateDict.Count <= 0)
-                return KEYSTATE_NONE;
+                return SkillInputStateInfo.KEYSTATE_NONE;
 
             if (_keyStateDict.TryGetValue(keyCode, out var stateInfo))
             {
                 return stateInfo.state;
             }
 
-            return KEYSTATE_NONE;
+            return SkillInputStateInfo.KEYSTATE_NONE;
         }
 
         public SkillInputStateInfo GetStateInfo(IComparable keyCode)
@@ -55,7 +52,7 @@ namespace THGame
             OnKeyDown?.Invoke(stateInfo);
 
             stateInfo.timeStamp = GetTimeStamp();
-            stateInfo.state |= KEYSTATE_PRESS;
+            stateInfo.state |= SkillInputStateInfo.KEYSTATE_PRESS;
             stateInfo.callbackEnabled = true;
 
             if (_pressingSet.Contains(stateInfo)) return;
@@ -71,11 +68,11 @@ namespace THGame
             if (!_pressingSet.Contains(stateInfo)) return;
             stateInfo.durationTime = GetTimeStamp() - stateInfo.timeStamp;
 
-            DealCallbackTime(keyCode, false);
             OnKeyUp?.Invoke(stateInfo);
+            DealCallbackTime(keyCode, false);
 
             stateInfo.timeStamp = GetTimeStamp();
-            stateInfo.state = KEYSTATE_NONE;
+            stateInfo.state = SkillInputStateInfo.KEYSTATE_NONE;
             stateInfo.callbackEnabled = false;
 
             _pressingSet.Remove(stateInfo);
@@ -85,6 +82,7 @@ namespace THGame
         private void Update()
         {
             UpdateStateInfo();
+            PurgeStateInfo();
         }
 
         private void DealCallbackTime(IComparable keyCode, bool isSustain)
@@ -99,7 +97,7 @@ namespace THGame
                 return;
 
             var durationTime = GetTimeStamp() - stateInfo.timeStamp;
-            if (durationTime > pressResponseTime)
+            if (durationTime > stateInfo.responTime)
             {
                 OnLongPress?.Invoke(stateInfo);
             }
@@ -118,7 +116,27 @@ namespace THGame
 
             foreach(var stateInfo in _pressingSet)
             {
-                DealCallbackTime(stateInfo.keyCode,true);
+                //超时自动释放
+                if (stateInfo.releaseTimeout > 0f)
+                {
+                    var durationTime = GetTimeStamp() - stateInfo.timeStamp;
+                    if (durationTime >= stateInfo.releaseTimeout)
+                    {
+                        _releaseQueue.Enqueue(stateInfo);
+                    }
+                }
+            }
+        }
+
+        private void PurgeStateInfo()
+        {
+            if (_releaseQueue == null || _releaseQueue.Count <= 0)
+                return;
+
+            while(_releaseQueue.Count > 0)
+            {
+                var stateInfo = _releaseQueue.Dequeue();
+                ReleaseKey(stateInfo.keyCode);
             }
         }
 
