@@ -7,6 +7,11 @@ namespace THGame
     //长按,短按,按下,弹起
     public class SkillInputReceiver : MonoBehaviour
     {
+        public static readonly float INTERVAL_SHOT_PRESS = 0.65f;    //这个数以下判定为短按,以上判断为长按
+
+        public float responseTime = INTERVAL_SHOT_PRESS;
+        public float releaseTimeout = -1f;
+
         public event Action<SkillInputStateInfo> OnKeyDown;
         public event Action<SkillInputStateInfo> OnKeyUp;
         public event Action<SkillInputStateInfo> OnShotPress;
@@ -95,7 +100,7 @@ namespace THGame
                 return;
 
             var durationTime = GetTimeStamp() - stateInfo.timeStamp;
-            if (durationTime > stateInfo.responTime)
+            if (durationTime > responseTime)
             {
                 OnLongPress?.Invoke(stateInfo);
             }
@@ -115,10 +120,10 @@ namespace THGame
             foreach(var stateInfo in _pressingSet)
             {
                 //超时自动释放
-                if (stateInfo.releaseTimeout > 0f)
+                if (releaseTimeout > 0f)
                 {
                     var durationTime = GetTimeStamp() - stateInfo.timeStamp;
-                    if (durationTime >= stateInfo.releaseTimeout)
+                    if (durationTime >= releaseTimeout)
                     {
                         _releaseQueue.Enqueue(stateInfo);
                     }

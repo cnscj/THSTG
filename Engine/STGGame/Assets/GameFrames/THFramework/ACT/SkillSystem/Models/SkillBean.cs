@@ -9,6 +9,7 @@ namespace THGame
     {
         public int skillId;
         public SkillType skillType;
+
         public SkillBaseInfo skillBaseInfo;
         public SkillCastInfo skillCastInfo;
         public SkillActionInfo skillActionInfo;

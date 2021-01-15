@@ -11,7 +11,7 @@ namespace THGame
         public string skillIcon;
         public string skillExStr;
 
-
+        public float interruptedPrec = 20;          //抗打断能力
     }
 
 }

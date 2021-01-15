@@ -19,7 +19,6 @@ namespace THGame
 
         }
 
-
         //触发入口
         public void InputKey(SkillInputStateInfo stateInfo, SkillInputType inputType)
         {

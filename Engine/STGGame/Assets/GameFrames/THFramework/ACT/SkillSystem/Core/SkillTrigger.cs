@@ -7,31 +7,36 @@ namespace THGame
 {
     public class SkillTrigger : MonoBehaviour
     {
-        private Dictionary<IComparable, SkillBaseHandler> _skillHandlerDict;
+        private Dictionary<IComparable, SkillBehaviour> _skillBehaviourDict;
 
         public void GenStateMachine(SkillData skillData)
         {
 
         }
 
-        public void Cast(IComparable state)
+        public void CastKeyUp(IComparable state)
         {
  
         }
 
-        public SkillBaseHandler GetHandler(IComparable key)
+        public void CastKeyDown(IComparable state)
         {
-            if (_skillHandlerDict == null || _skillHandlerDict.Count <= 0)
+
+        }
+
+        public SkillBehaviour GetHandler(IComparable key)
+        {
+            if (_skillBehaviourDict == null || _skillBehaviourDict.Count <= 0)
                 return default;
 
-            _skillHandlerDict.TryGetValue(key, out var handler);
+            _skillBehaviourDict.TryGetValue(key, out var handler);
             return handler;
         }
 
-        private Dictionary<IComparable, SkillBaseHandler> GetHandlerDict()
+        private Dictionary<IComparable, SkillBehaviour> GetBehaviourDict()
         {
-            _skillHandlerDict = _skillHandlerDict ?? new Dictionary<IComparable, SkillBaseHandler>();
-            return _skillHandlerDict;
+            _skillBehaviourDict = _skillBehaviourDict ?? new Dictionary<IComparable, SkillBehaviour>();
+            return _skillBehaviourDict;
         }
     }
 }
