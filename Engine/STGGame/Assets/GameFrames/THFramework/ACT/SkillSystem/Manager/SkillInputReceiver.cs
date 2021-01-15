@@ -7,8 +7,6 @@ namespace THGame
     //长按,短按,按下,弹起
     public class SkillInputReceiver : MonoBehaviour
     {
-
-
         public event Action<SkillInputStateInfo> OnKeyDown;
         public event Action<SkillInputStateInfo> OnKeyUp;
         public event Action<SkillInputStateInfo> OnShotPress;

@@ -38,15 +38,10 @@ namespace THGame
 
         private void InitInputSetting()
         {
-            //GetInputReceiver().OnKeyDown += (stateInfo) => { OnInput(stateInfo,  SkillInputType.KeyDown); };
-            //GetInputReceiver().OnKeyUp += (stateInfo) => { OnInput(stateInfo, SkillInputType.KeyUp); };
-            //GetInputReceiver().OnShotPress += (stateInfo) => { OnInput(stateInfo, SkillInputType.ShotPress); };
-            //GetInputReceiver().OnLongPress += (stateInfo) => { OnInput(stateInfo, SkillInputType.LongPress); };
-
-            GetInputReceiver().OnKeyDown += (stateInfo) => { Debug.Log("!!!!"); };
-            GetInputReceiver().OnKeyUp += (stateInfo) => { Debug.Log("@@@"); };
-            GetInputReceiver().OnShotPress += (stateInfo) => { Debug.Log("###"); };
-            GetInputReceiver().OnLongPress += (stateInfo) => { Debug.Log("$$$$"); };
+            GetInputReceiver().OnKeyDown += (stateInfo) => { OnInput(stateInfo, SkillInputType.KeyDown); };
+            GetInputReceiver().OnKeyUp += (stateInfo) => { OnInput(stateInfo, SkillInputType.KeyUp); };
+            GetInputReceiver().OnShotPress += (stateInfo) => { OnInput(stateInfo, SkillInputType.ShotPress); };
+            GetInputReceiver().OnLongPress += (stateInfo) => { OnInput(stateInfo, SkillInputType.LongPress); };
         }
 
         private void OnInput(SkillInputStateInfo stateInfo, SkillInputType inputType)
