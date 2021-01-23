@@ -2,9 +2,8 @@
 
 namespace THGame
 {
-    public class ScheduleCallbackTrack : ScheduleTrack
+    public class ScheduleCallbackTrack : AbstractScheduleTrack
     {
-
         public Action onStart;
         public Action<int> onUpdate;
         public Action onEnd;
@@ -18,7 +17,7 @@ namespace THGame
 
         public override void Update(int tickTime)
         {
-            int curFrame = tickTime - time;
+            int curFrame = tickTime - StartTime;
             onUpdate?.Invoke(curFrame);
         }
 

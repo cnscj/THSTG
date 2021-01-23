@@ -5,74 +5,75 @@ using XLibrary.Collection;
 
 namespace THGame
 {
-    public class ScheduleSequence
+    public class ScheduleSequence : AbstractScheduleTrack
     {
-        public int startFrame;       //开始帧
-        public int durationFrame;    //最长时长
-
-        public int EndTime => startFrame + durationFrame;
-
         public Action onStart;
         public Action onEnd;
 
-        private SortedDictionary<int, HashSet<ScheduleTrack>> _scheduleJobs = new SortedDictionary<int, HashSet<ScheduleTrack>>();
-        private MaxHeap<ScheduleTrack, int> _scheduleJobsEndTime = new MaxHeap<ScheduleTrack, int>();
-        private HashSet<ScheduleTrack> _schedulingJobs = new HashSet<ScheduleTrack>();
-        private Queue<ScheduleTrack> _scheduledJobs = new Queue<ScheduleTrack>();
+        private SortedDictionary<int, HashSet<AbstractScheduleTrack>> _scheduleJobs = new SortedDictionary<int, HashSet<AbstractScheduleTrack>>();
+        private MaxHeap<AbstractScheduleTrack, int> _scheduleJobsEndTime = new MaxHeap<AbstractScheduleTrack, int>();
+        private HashSet<AbstractScheduleTrack> _schedulingJobs = new HashSet<AbstractScheduleTrack>();
+        private Queue<AbstractScheduleTrack> _scheduledJobs = new Queue<AbstractScheduleTrack>();
 
-        public void AddJob(ScheduleTrack job)
+        public ScheduleSequence() : base(0, 1) { }
+        public ScheduleSequence(int start, int length) : base(start, length)
+        {
+
+        }
+
+        public void AddJob(AbstractScheduleTrack job)
         {
             if (job == null)
                 return;
 
-            HashSet<ScheduleTrack> jobSet;
-            if (!_scheduleJobs.TryGetValue(job.time, out jobSet))
+            HashSet<AbstractScheduleTrack> jobSet;
+            if (!_scheduleJobs.TryGetValue(job.StartTime, out jobSet))
             {
-                jobSet = new HashSet<ScheduleTrack>();
-                _scheduleJobs.Add(job.time, jobSet);
+                jobSet = new HashSet<AbstractScheduleTrack>();
+                _scheduleJobs.Add(job.StartTime, jobSet);
             }
             jobSet.Add(job);
 
             _scheduleJobsEndTime.Add(job, job.EndTime);
-            durationFrame = _scheduleJobsEndTime.Max.Key.EndTime;
+            StartTime = _scheduleJobsEndTime.Max.Key.EndTime;
         }
 
-        public void RemoveJob(ScheduleTrack job)
+        public void RemoveJob(AbstractScheduleTrack job)
         {
             if (job == null)
                 return;
 
-            if (_scheduleJobs.TryGetValue(job.time, out var jobSet))
+            if (_scheduleJobs.TryGetValue(job.StartTime, out var jobSet))
             {
                 jobSet.Remove(job);
                 if (jobSet.Count <= 0)
                 {
-                    _scheduleJobs.Remove(job.time);
+                    _scheduleJobs.Remove(job.StartTime);
                 }
             }
 
             _scheduleJobsEndTime.Remove(job);
-            durationFrame = (_scheduleJobsEndTime.Count > 0 ?_scheduleJobsEndTime.Max.Key.EndTime : 0);
+            DurationTime = (_scheduleJobsEndTime.Count > 0 ?_scheduleJobsEndTime.Max.Key.EndTime : 0);
         }
 
 
-        public void Start()
+        public override void Start()
         {
-            startFrame = Time.frameCount;
+            StartTime = Time.frameCount;
             onStart?.Invoke();
         }
 
-        public void End()
+        public override void End()
         {
             onEnd?.Invoke();
         }
 
-        public void Update(int timeTick)
+        public override void Update(int timeTick)
         {
             if (_scheduleJobs == null || _scheduleJobs.Count <= 0)
                 return;
 
-            int curFrame = timeTick - startFrame;
+            int curFrame = timeTick - StartTime;
 
             //帧列表
             if (_scheduleJobs.TryGetValue(curFrame, out var jobList))

@@ -9,13 +9,13 @@ namespace THGame
     {
         private SkillInputReceiver _skillInputReceiver;     //接收器
         private SkillCdCache _skillCdCache;                 //cd缓存池
-        private SkillCastTrigger _skillCastTrigger;         //触发器
+        private SkillComboStriker skillComboStriker;         //连招触发
         private SkillEventDispatcher _skillDispatcher;      //派发器
         private SkillController _curentSkillController;     //控制器
 
         public SkillInputReceiver GetInputReceiver() { return _skillInputReceiver = _skillInputReceiver ?? CreateManager<SkillInputReceiver>("InputReceiver"); }
         public SkillCdCache GetCdCache(){ return _skillCdCache = _skillCdCache ?? CreateManager<SkillCdCache>("CountdownCache"); }
-        public SkillCastTrigger GetCastTrigger() { return _skillCastTrigger = _skillCastTrigger ?? CreateManager<SkillCastTrigger>("CastTrigger"); }
+        public SkillComboStriker GetComboStriker() { return skillComboStriker = skillComboStriker ?? CreateManager<SkillComboStriker>("ComboStriker"); }
         public SkillEventDispatcher GetEventDispatcher() { return _skillDispatcher = _skillDispatcher ?? new SkillEventDispatcher(); }
         public SkillController CurentSkillController
         {
