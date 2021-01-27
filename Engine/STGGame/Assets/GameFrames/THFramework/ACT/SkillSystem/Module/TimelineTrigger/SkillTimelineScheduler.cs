@@ -1,17 +1,26 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 
 namespace THGame
 {
     public class SkillTimelineScheduler : MonoBehaviour 
     {
+        //TODO:
         public float frameScale = 1f;
-        private SkillTimelineSequence _skillTimelineSequence = new SkillTimelineSequence(0,1);
-        private int _startTime;
+        public int frameRate = 24;
+        public event Action onCompleted;
+
+        private SkillTimelineSequence _skillTimelineSequence = new SkillTimelineSequence();
+        private int _startFrame;
+        private int _offsetFrame;
         private int _lastFrameCount;
 
-        public bool IsCompleted => GetCurFrameCount() >= _skillTimelineSequence.EndTime;
+        public bool IsCompleted => GetCurFrameCount() > _skillTimelineSequence.EndFrame;
+
+        public SkillTimelineScheduler()
+        {
+            _skillTimelineSequence.onEnd += OnSequenceCompleted;
+        }
 
         public void AddTrack(SkillTimelineTrack track)
         {
@@ -23,26 +32,26 @@ namespace THGame
             _skillTimelineSequence.RemoveTrack(track);
         }
 
-        public void Schedule(int offset)
+        public void Schedule(int offsetFrame = 0)
         {
-            _startTime = offset + GetGameFrameCount();
-
+            _offsetFrame = Mathf.Max(0, offsetFrame);
+            _startFrame = GetGameFrameCount();
+            _skillTimelineSequence.Play(offsetFrame);
         }
 
         private void Update()
         {
-            if (_startTime <= 0)
-                return;
-
-            int curFrameCount = GetCurFrameCount();
-
-            if (curFrameCount < 0)
-                return;
-
-            if (curFrameCount == _lastFrameCount)
+            if (_skillTimelineSequence.TotalCount <= 0)
                 return;
 
             if (IsCompleted)
+                return;
+
+            int curFrameCount = GetCurFrameCount();
+            if (curFrameCount < 0)
+                return;
+
+            if (curFrameCount > 0 && curFrameCount == _lastFrameCount)
                 return;
 
             _skillTimelineSequence.Update(curFrameCount);
@@ -57,10 +66,15 @@ namespace THGame
 
         private int GetCurFrameCount()
         {
-            int curFrameCount = GetGameFrameCount() - _startTime;
+            int curFrameCount = GetGameFrameCount() - _startFrame;
             curFrameCount = (int)(curFrameCount * frameScale);
 
-            return curFrameCount;
+            return curFrameCount + _offsetFrame;
+        }
+
+        private void OnSequenceCompleted()
+        {
+            onCompleted?.Invoke();
         }
     }
 }
