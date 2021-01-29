@@ -11,11 +11,11 @@ namespace THGame
         private HashSet<SkillTimelineTrack> _schedulingTracks = new HashSet<SkillTimelineTrack>();
         private Queue<SkillTimelineTrack> _scheduledTracks = new Queue<SkillTimelineTrack>();
 
+        public SkillTimelineDirector Director;
         public int TotalCount => _scheduleTracks.Count;
         public int ExecuteCount => _schedulingTracks.Count;
 
-        public SkillTimelineSequence(int start) : base(start, 1) { }
-        public SkillTimelineSequence() : base(0, 1) { }
+        public SkillTimelineSequence(float startTime = 0 ,int durationTime = -1) : base(startTime, durationTime) { }
 
         public void AddTrack(SkillTimelineTrack track)
         {
@@ -56,34 +56,44 @@ namespace THGame
             RefreshExecuteFrame();
         }
 
-        public void Clear()
+        public void ClearTracks()
         {
             _scheduleTracks.Clear();
             _scheduleTracksEndFrame = new MaxHeap<SkillTimelineTrack, int>();
             _scheduleTracksStartFrame = new MinHeap<SkillTimelineTrack, int>();
             _schedulingTracks.Clear();
             _scheduledTracks.Clear();
+
+            StartFrame = 0;
+            DurationFrame = 1;
         }
 
-        public void Play(int frame)
+        public override void Reset()
         {
-            if (_scheduleTracks == null || _scheduleTracks.Count <= 0)
-                return;
-
             _schedulingTracks.Clear();
             _scheduledTracks.Clear();
 
-            foreach(var trackSet in _scheduleTracks.Values)
+            RefreshExecuteFrame();
+        }
+
+        public override void Seek(int tickFrame)
+        {
+            _schedulingTracks.Clear();
+            _scheduledTracks.Clear();
+
+            if (_scheduleTracks == null || _scheduleTracks.Count <= 0)
+                return;
+
+            if (tickFrame < 0)
+                return;
+
+            foreach (var trackSet in _scheduleTracks.Values)
             {
                 foreach(var track in trackSet)
                 {
-                    if (frame > track.StartFrame && frame <= track.EndFrame)
+                    if (tickFrame > track.StartFrame && tickFrame <= track.EndFrame)
                     {
-                        if (!_schedulingTracks.Contains(track))
-                        {
-                            _schedulingTracks.Add(track);
-                            track.IsExecuting = true;
-                        }
+                        PushTrackInSchedulingList(track);
                     }
                 }
             }
@@ -94,18 +104,17 @@ namespace THGame
             DurationFrame = (_scheduleTracksEndFrame.Count > 0 ? _scheduleTracksEndFrame.Max.Key.EndFrame : 0) + 1;
         }
 
-        protected override void OnUpdate(int timeTick)
+        protected override void OnUpdate(int tickFrame)
         {
             if (_scheduleTracks == null || _scheduleTracks.Count <= 0)
                 return;
 
-            int curFrame = timeTick;
-            if (curFrame < 0)
+            if (tickFrame < 0)
                 return;
 
-            QueryTracksUpdate(curFrame);
-            ExecuteTracksUpdate(curFrame);
-            PurgeTracksUpdate(curFrame);
+            QueryTracksUpdate(tickFrame);
+            ExecuteTracksUpdate(tickFrame);
+            PurgeTracksUpdate(tickFrame);
         }
 
         protected void QueryTracksUpdate(int tickFrame)
@@ -116,11 +125,7 @@ namespace THGame
                 //扔进执行表执行
                 foreach (var track in trackList)
                 {
-                    if (!_schedulingTracks.Contains(track))
-                    {
-                        _schedulingTracks.Add(track);
-                        track.IsExecuting = true;
-                    }
+                    PushTrackInSchedulingList(track);
                 }
             }
         }
@@ -132,14 +137,14 @@ namespace THGame
             {
                 foreach (var track in _schedulingTracks)
                 {
-                    var curFrame = tickFrame - track.StartFrame;
-                    if (curFrame <= track.EndFrame)
+                    if (tickFrame <= track.EndFrame)
                     {
-                        track.Update(curFrame);//每帧执行
+                        var subTickFrame = tickFrame - track.StartFrame;
+                        track.Update(subTickFrame);//每帧执行
                     }
 
                     //检查结束
-                    if (curFrame >= track.EndFrame)
+                    if (tickFrame >= track.EndFrame)
                     {
                         _scheduledTracks.Enqueue(track); 
                     }
@@ -153,11 +158,27 @@ namespace THGame
             while (_scheduledTracks.Count > 0)
             {
                 var track = _scheduledTracks.Dequeue();
-                _schedulingTracks.Remove(track);
-                track.IsExecuting = false;
+                DequeueTrackInSchedulingList(track);
             }
         }
 
+        private void PushTrackInSchedulingList(SkillTimelineTrack track)
+        {
+            if (!_schedulingTracks.Contains(track))
+            {
+                _schedulingTracks.Add(track);
+                track.Start(Director);
+            }
+        }
+
+        private void DequeueTrackInSchedulingList(SkillTimelineTrack track)
+        {
+            if (_schedulingTracks.Contains(track))
+            {
+                _schedulingTracks.Remove(track);
+                track.End();
+            }
+        }
     }
 
 }
