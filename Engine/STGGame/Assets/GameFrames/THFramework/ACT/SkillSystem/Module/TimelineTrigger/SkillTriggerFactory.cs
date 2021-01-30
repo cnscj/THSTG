@@ -4,26 +4,27 @@ using UnityEngine;
 
 namespace THGame
 {
-    public class SkillTriggerFactory<T> : ISkillTriggerFactory where T : AbstractSkillTrigger,new() 
+    public class SkillTriggerFactory<T> : ISkillTriggerFactory where T : AbstractSkillTrigger, new() 
     {
         public int maxNum = 40;
         private Queue<T> _triggerPool;
 
-        public T GetOrCreateInstance()
+        public string Type { get ; set ; }
+
+        public AbstractSkillTrigger CreateTrigger()
         {
             var pool = GetOrCreatePool();
             T instance = null;
             if (pool.Count <= 0)
             {
                 instance = new T();
-                RecycleInstance(instance);
+                RecycleTrigger(instance);
             }
             instance = pool.Dequeue();
             return instance;
-
         }
 
-        public void RecycleInstance(T instance)
+        public void RecycleTrigger(AbstractSkillTrigger instance)
         {
             if (instance == null)
                 return;
@@ -32,7 +33,8 @@ namespace THGame
             if (maxNum > 0 && pool.Count >= maxNum)
                 return;
 
-            pool.Enqueue(instance);
+            instance.Type = Type;
+            pool.Enqueue((T)instance);
         }
 
         private Queue<T> GetOrCreatePool()

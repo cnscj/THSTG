@@ -7,7 +7,6 @@ namespace THGame
     {
         private SortedDictionary<int, HashSet<SkillTimelineTrack>> _scheduleTracks = new SortedDictionary<int, HashSet<SkillTimelineTrack>>();
         private MaxHeap<SkillTimelineTrack, int> _scheduleTracksEndFrame = new MaxHeap<SkillTimelineTrack, int>();
-        private MinHeap<SkillTimelineTrack, int> _scheduleTracksStartFrame = new MinHeap<SkillTimelineTrack, int>();
         private HashSet<SkillTimelineTrack> _schedulingTracks = new HashSet<SkillTimelineTrack>();
         private Queue<SkillTimelineTrack> _scheduledTracks = new Queue<SkillTimelineTrack>();
 
@@ -31,7 +30,6 @@ namespace THGame
             trackSet.Add(track);
 
             _scheduleTracksEndFrame.Add(track, track.EndFrame);
-            _scheduleTracksStartFrame.Add(track, track.StartFrame);
 
             RefreshExecuteFrame();
         }
@@ -51,7 +49,6 @@ namespace THGame
             }
 
             _scheduleTracksEndFrame.Remove(track);
-            _scheduleTracksStartFrame.Remove(track);
 
             RefreshExecuteFrame();
         }
@@ -60,7 +57,6 @@ namespace THGame
         {
             _scheduleTracks.Clear();
             _scheduleTracksEndFrame = new MaxHeap<SkillTimelineTrack, int>();
-            _scheduleTracksStartFrame = new MinHeap<SkillTimelineTrack, int>();
             _schedulingTracks.Clear();
             _scheduledTracks.Clear();
 

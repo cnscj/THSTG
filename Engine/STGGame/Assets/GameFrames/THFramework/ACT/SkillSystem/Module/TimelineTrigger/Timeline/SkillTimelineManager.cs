@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using XLibrary.Package;
 
 namespace THGame
@@ -14,6 +15,16 @@ namespace THGame
                 int finalFrame = (int)(Time.frameCount * frameScale);
                 return finalFrame;
             }
+        }
+
+        public int Time2Frame(float time)
+        {
+            return (int)Math.Ceiling(frameRate * time); //向上取整一帧
+        }
+
+        public float Frame2Time(int frame)
+        {
+            return  frame / frameRate;
         }
     }
 
