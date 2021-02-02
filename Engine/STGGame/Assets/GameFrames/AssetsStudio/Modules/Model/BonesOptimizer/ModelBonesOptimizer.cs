@@ -2,8 +2,16 @@
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using XLibrary;
 
+/*
+
+1: Animator 组件和SkinnedMeshRenderer必须在同一个对象中。
+2：OptimizeTransformHierarchy 接口的参数 exposedTransforms是 需要暴露的骨骼名称数组，并且暴露骨骼名称不能带空格，否则模型会出现显示问题（unity自己接口这样，我也没办法）
+3：模型fbx设置Optimize选项必须勾选
+4：对SkinnedMeshRenderer中参数bones进行赋值时，必须保证对应transform存在，因为优化接口会删掉所有对象，然后从新生成骨骼节点对象。如果骨骼对象下有挂点，需要对挂点进行保存，优化完成后再对挂点或者其他额外模型进行还原。
+https://www.cnblogs.com/hengsoft/p/10283628.html
+
+*/
 namespace ASGame
 {
     public class ModelBonesOptimizer : MonoBehaviour

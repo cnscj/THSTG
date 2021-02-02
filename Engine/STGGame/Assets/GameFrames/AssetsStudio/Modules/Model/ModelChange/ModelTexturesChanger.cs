@@ -4,6 +4,10 @@ using UnityEngine;
 
 namespace ASGame
 {
+/*
+    实际上,如果有些特效和模型绑定,通过换贴图并不是最优解
+    而且如果只是改变材质球的属性(如变色),换贴图可能不起作用
+*/
     public class ModelTexturesChanger : MonoBehaviour
     {
         private static string DEFAULT_KEY = "default";
@@ -116,7 +120,7 @@ namespace ASGame
                 if (materials != null)
                 {
                     MaterialPropertyBlock materialPropertyBlock = new MaterialPropertyBlock();
-                    for (int i = 0; i < materials.Length; i++)
+                    for (int i = 0; i < materials.Length; ++i)
                     {
                         materialPropertyBlock.Clear();
                         smr.GetPropertyBlock(materialPropertyBlock, i);

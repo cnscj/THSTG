@@ -6,17 +6,14 @@ namespace THGame.Skill
 {
     public class SkillEffectPlayableAsset : PlayableAsset
     {
-        public ExposedReference<GameObject> receiveGo;
-        public GameObject effectGo;
-        public SkillEffect data;
+        public string effectId;
 
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {
             var playable = ScriptPlayable<SkillEffectBehaviour>.Create(graph);
             var skillEffectBehaviour = playable.GetBehaviour();
 
-            skillEffectBehaviour.receiveGo = receiveGo.Resolve(graph.GetResolver());
-            skillEffectBehaviour.effectGo = effectGo;
+            skillEffectBehaviour.effectId = effectId;
 
             return playable;
         }
@@ -24,14 +21,10 @@ namespace THGame.Skill
 
     public class SkillEffectBehaviour : PlayableBehaviour
     {
-        public GameObject effectGo;
-        public GameObject receiveGo;
+        public string effectId;
         public override void OnBehaviourPlay(Playable playable, FrameData info)
         {
-            if (effectGo != null && receiveGo != null)
-            {
-                var effectInstance = Object.Instantiate(effectGo, receiveGo.transform);
-            }
+
         }
     }
 

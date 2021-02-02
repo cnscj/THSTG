@@ -7,7 +7,6 @@ namespace THGame.Skill
     public class SkillAudioPlayableAsset : PlayableAsset
     {
         public AudioClip audioClip;
-        public SkillAudio data;
 
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {

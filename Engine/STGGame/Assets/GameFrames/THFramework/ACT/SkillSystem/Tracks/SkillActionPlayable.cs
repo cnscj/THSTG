@@ -7,7 +7,6 @@ namespace THGame.Skill
     public class SkillActionPlayableAsset : PlayableAsset
     {
         public AnimationClip animationClip;
-        public SkillAction data;
 
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {

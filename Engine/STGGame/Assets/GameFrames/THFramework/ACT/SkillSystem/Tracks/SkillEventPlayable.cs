@@ -7,16 +7,16 @@ namespace THGame.Skill
     public class SkillEventPlayableAsset : PlayableAsset
     {
         public ExposedReference<GameObject> sender; //引用场景对象
-        public SkillEvent data;
-
+        public string eventName;
+        public string args1;
 
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {
             var playable = ScriptPlayable<SkillEventBehaviour>.Create(graph);
             var skillEventBehaviour = playable.GetBehaviour();
             skillEventBehaviour.sender = sender.Resolve(graph.GetResolver());
-            skillEventBehaviour.args1 = data.args1;
-            skillEventBehaviour.eventName = data.eventName;
+            skillEventBehaviour.args1 = args1;
+            skillEventBehaviour.eventName = eventName;
 
             return playable;
         }

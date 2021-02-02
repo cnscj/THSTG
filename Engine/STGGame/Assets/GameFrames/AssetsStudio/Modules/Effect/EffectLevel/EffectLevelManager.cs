@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.IO;
-using XLibrary.Package;
+﻿using XLibrary.Package;
 using System.Collections.Generic;
 
 namespace ASGame
@@ -10,7 +7,7 @@ namespace ASGame
     {
         public int Level { get; private set; }
         private HashSet<EffectLevelController> m_allCtrls;
-
+      
         public void AddController(EffectLevelController ctrl)
         {
             if (ctrl == null)
@@ -52,7 +49,7 @@ namespace ASGame
         /// 方式1:显隐的方式
         /// </summary>
         /// <param name="lv"></param>
-        public void Adjust(int lv)
+        public void AdjustControllers(int lv)
         {
             if (m_allCtrls == null || m_allCtrls.Count <= 0)
                 return;
@@ -71,7 +68,7 @@ namespace ASGame
         /// 方式2:节点的方式
         /// </summary>
         /// <param name="lv"></param>
-        public void Change(int lv)
+        public void ChangeControllers(int lv)
         {
             if (m_allCtrls == null || m_allCtrls.Count <= 0)
                 return;

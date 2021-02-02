@@ -14,6 +14,7 @@ namespace THGame
         public int TotalCount => _scheduleTracks.Count;
         public int ExecuteCount => _schedulingTracks.Count;
 
+
         public SkillTimelineSequence(float startTime = 0 ,int durationTime = -1) : base(startTime, durationTime) { }
 
         public void AddTrack(SkillTimelineTrack track)
