@@ -12,9 +12,13 @@ namespace THGame
 
         public string Name { get; set; }
         public string[] Args { get; protected set; }
+
         public int EndFrame => (StartFrame + DurationFrame - 1);
         public bool Enabled { get; set; } = true;
         public bool IsExecuting { get; protected set ; }
+
+        public float StartTime { get => _startTime; protected set { _startTime = value; }}
+        public float DurationTime { get => _durationTime; protected set { _durationTime = value; } }
 
         public int StartFrame
         {
@@ -45,27 +49,32 @@ namespace THGame
             _durationTime = durationTime;
         }
 
-        public virtual void Parse(string[] args)
+        public virtual void Parse(string[] info,string[] args)
         {
+            if (info != null && info.Length > 0)
+            {
+                if (info.Length > 1) float.TryParse(info[0], out _startTime);
+                if (info.Length > 2) float.TryParse(info[1], out _durationTime);
+            }
             Args = args;
-            OnPares(args);
+            OnPares(info,args);
         }
 
         public virtual void Seek(int startFrame) { }
 
         public virtual void Reset() { }
 
-        public void Start(SkillTimelineDirector director)
+        public virtual void Start(object owner)
         {
             IsExecuting = true;
             if (!Enabled)
                 return;
 
             onStart?.Invoke();
-            OnStart(director);
+            OnStart(owner);
         }
 
-        public void Update(int tickFrame)
+        public virtual void Update(int tickFrame)
         {
             if (!Enabled)
                 return;
@@ -73,7 +82,7 @@ namespace THGame
             OnUpdate(tickFrame);
         }
 
-        public void End()
+        public virtual void End()
         {
             IsExecuting = false;
             if (!Enabled)
@@ -84,11 +93,11 @@ namespace THGame
 
         }
 
-        protected virtual void OnStart(SkillTimelineDirector director) {}
+        protected virtual void OnStart(object owner) {}
         protected virtual void OnUpdate(int tickFrame){}
         protected virtual void OnEnd(){}
 
-        protected virtual void OnPares(string[] args) { }
+        protected virtual void OnPares(string[] info, string[] args) { }
     }
 
 }

@@ -164,7 +164,7 @@ namespace THGame
             if (!_schedulingTracks.Contains(track))
             {
                 _schedulingTracks.Add(track);
-                track.Start(Director);
+                track.Start(Director.gameObject);
             }
         }
 

@@ -6,7 +6,6 @@ namespace THGame
     {
         public SkillData skillData;                 //技能数据
         public SkillTrigger skillTrigger;           //技能行为触发器
-        public SkillTrackPlayer skillTrackPlayer;   //轨道播放器
 
         //控制行为动作,碰撞检测应该是被动式的
         public void Start()
