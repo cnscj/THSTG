@@ -32,7 +32,7 @@ namespace THGame.Skill
             if (triggerFactor != null)
             {
                 _trigger = triggerFactor.CreateTrigger();
-                _trigger.Parse(null,clip.args);
+                _trigger?.Initialize(null,clip.args);
             }
         }
 
@@ -44,6 +44,7 @@ namespace THGame.Skill
             var triggerFactor = SkillTriggerManager.GetInstance().GetFactory(clip.type);
             if (triggerFactor != null)
             {
+                _trigger?.Dispose();
                 triggerFactor.RecycleTrigger(_trigger);
                 _trigger = null;
             }

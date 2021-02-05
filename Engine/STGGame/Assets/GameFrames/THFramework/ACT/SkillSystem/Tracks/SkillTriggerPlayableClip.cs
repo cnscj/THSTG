@@ -18,6 +18,5 @@ namespace THGame.Skill
 
             return playable;
         }
-
     }
 }

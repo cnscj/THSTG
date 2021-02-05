@@ -15,7 +15,6 @@ namespace THEditor
         void OnEnable()
         {
             m_target = (SkillTriggerPlayableClip)target;
-            m_type = serializedObject.FindProperty("type");
             m_args = serializedObject.FindProperty("args");
 
         }

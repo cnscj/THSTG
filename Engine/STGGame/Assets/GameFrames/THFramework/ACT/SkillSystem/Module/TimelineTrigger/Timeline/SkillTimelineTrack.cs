@@ -49,7 +49,7 @@ namespace THGame
             _durationTime = durationTime;
         }
 
-        public virtual void Parse(string[] info,string[] args)
+        public virtual void Initialize(string[] info,string[] args)
         {
             if (info != null && info.Length > 0)
             {
@@ -57,7 +57,7 @@ namespace THGame
                 if (info.Length > 2) float.TryParse(info[1], out _durationTime);
             }
             Args = args;
-            OnPares(info,args);
+            OnCreate(info,args);
         }
 
         public virtual void Seek(int startFrame) { }
@@ -93,11 +93,17 @@ namespace THGame
 
         }
 
+        public virtual void Dispose()
+        {
+            OnDestroy();
+        }
+
         protected virtual void OnStart(object owner) {}
         protected virtual void OnUpdate(int tickFrame){}
         protected virtual void OnEnd(){}
 
-        protected virtual void OnPares(string[] info, string[] args) { }
+        protected virtual void OnCreate(string[] info, string[] args) { }
+        protected virtual void OnDestroy() { }
     }
 
 }

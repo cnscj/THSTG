@@ -4,7 +4,7 @@ namespace THGame
 {
     public class SkillTriggerFactory<T> : ISkillTriggerFactory where T : AbstractSkillTrigger, new() 
     {
-        public int maxNum = 40;
+        public int maxNum = 50;
         private Queue<T> _triggerPool;
 
         public string Type { get ; set ; }

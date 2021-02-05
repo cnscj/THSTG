@@ -5,9 +5,9 @@ namespace THGame
     public class SkillPrintTrigger : AbstractSkillTrigger
     {
         public string outStr;
-        protected override void OnPares(string[] info,string[] args)
+        protected override void OnCreate(string[] info,string[] args)
         {
-            outStr = args[0];
+            outStr = args.Length > 0 ? args[0] : "";
         }
         protected override void OnStart(object sender)
         {

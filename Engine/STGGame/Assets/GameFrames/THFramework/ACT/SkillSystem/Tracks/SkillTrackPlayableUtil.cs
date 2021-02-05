@@ -1,16 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
-using UnityEngine.Playables;
 using UnityEngine.Timeline;
 using THGame.Skill;
 
-namespace THEditor
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+namespace THGame
 {
     public static class SkillTrackPlayableUtil
     {
-        public static void ExportPlayable2Json(string playblePath,string savePath)
+#if UNITY_EDITOR
+        public static void ExportPlayableToJson(string playblePath, string savePath)
         {
             if (string.IsNullOrEmpty(playblePath))
                 return;
@@ -41,6 +44,21 @@ namespace THEditor
             }
 
         }
+
+        public static void CreatePlayableByJson(string jsonPath, string playablePath)
+        {
+            if (string.IsNullOrEmpty(jsonPath))
+                return;
+
+            if (string.IsNullOrEmpty(playablePath))
+                return;
+
+
+        }
     }
+#endif
+
+
+
 
 }
