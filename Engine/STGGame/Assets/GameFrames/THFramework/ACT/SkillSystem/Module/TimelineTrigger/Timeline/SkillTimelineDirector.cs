@@ -6,7 +6,7 @@ namespace THGame
     public class SkillTimelineDirector : MonoBehaviour 
     {
         public event Action onCompleted;
-        public SkillTimelineSequence timelineSequence;
+        public ISkillTimelinePlayable timelineSequence;
 
         private int _startFrame;
         private int _offsetFrame;
@@ -40,7 +40,8 @@ namespace THGame
                 return;
 
             var tickFrame = curFrameCount - timelineSequence.StartFrame;
-            timelineSequence.Director = this;
+
+            timelineSequence.Owner = this;
             timelineSequence.Seek(tickFrame);
         }
 
@@ -82,9 +83,6 @@ namespace THGame
             if (IsPause)
                 return;
 
-            if (timelineSequence.TotalCount <= 0)
-                return;
-
             if (IsCompleted)
                 return;
 
@@ -93,9 +91,14 @@ namespace THGame
                 return;
 
             var tickFrame = curFrameCount - timelineSequence.StartFrame;
+            if (tickFrame == timelineSequence.StartFrame)
+            {
+                timelineSequence.Start(gameObject);
+            }
             timelineSequence.Update(tickFrame);
             if (curFrameCount >= timelineSequence.EndFrame)
             {
+                timelineSequence.End();
                 onCompleted?.Invoke();
             }
         }

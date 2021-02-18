@@ -10,10 +10,8 @@ namespace THGame
         private HashSet<SkillTimelineTrack> _schedulingTracks = new HashSet<SkillTimelineTrack>();
         private Queue<SkillTimelineTrack> _scheduledTracks = new Queue<SkillTimelineTrack>();
 
-        public SkillTimelineDirector Director;
         public int TotalCount => _scheduleTracks.Count;
         public int ExecuteCount => _schedulingTracks.Count;
-
 
         public SkillTimelineSequence(float startTime = 0 ,int durationTime = -1) : base(startTime, durationTime) { }
 
@@ -164,7 +162,7 @@ namespace THGame
             if (!_schedulingTracks.Contains(track))
             {
                 _schedulingTracks.Add(track);
-                track.Start(Director.gameObject);
+                track.Start(((SkillTimelineDirector)Owner).gameObject);
             }
         }
 

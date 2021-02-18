@@ -71,12 +71,12 @@ namespace THGame
                 return command;
 
             string infoStr = "";
-            infoStr = string.Format("{0},{1}", trigger.StartTime, trigger.DurationTime);
+            infoStr = string.Format("{0},{1}", trigger.startTime, trigger.durationTime);
 
             string argsStr = "";
-            if (trigger.Args != null && trigger.Args.Length > 0)
+            if (trigger.args != null && trigger.args.Length > 0)
             {
-                foreach (var arg in trigger.Args)
+                foreach (var arg in trigger.args)
                 {
                     argsStr += arg;
                     argsStr += ",";

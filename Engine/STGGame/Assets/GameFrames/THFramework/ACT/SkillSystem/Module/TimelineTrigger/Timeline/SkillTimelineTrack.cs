@@ -2,61 +2,54 @@
 
 namespace THGame
 {
-    public abstract class SkillTimelineTrack
+    public abstract class SkillTimelineTrack : SkillTimelineAsset, ISkillTimelinePlayable
     {
         public event Action onStart;
         public event Action onEnd;
-
-        protected float _startTime;
-        protected float _durationTime;
-
-        public string Name { get; set; }
-        public string[] Args { get; protected set; }
 
         public int EndFrame => (StartFrame + DurationFrame - 1);
         public bool Enabled { get; set; } = true;
         public bool IsExecuting { get; protected set ; }
 
-        public float StartTime { get => _startTime; protected set { _startTime = value; }}
-        public float DurationTime { get => _durationTime; protected set { _durationTime = value; } }
-
         public int StartFrame
         {
             get
             {
-                return Math.Max(0, SkillTimelineManager.GetInstance().Time2Frame(_startTime));
+                return Math.Max(0, SkillTimelineManager.GetInstance().Time2Frame(startTime));
             }
             protected set
             {
-                _startTime = SkillTimelineManager.GetInstance().Frame2Time(value);
+                startTime = SkillTimelineManager.GetInstance().Frame2Time(value);
             }
         }
         public int DurationFrame
         {
             get
             {
-                return Math.Max(1, SkillTimelineManager.GetInstance().Time2Frame(_durationTime));
+                return Math.Max(1, SkillTimelineManager.GetInstance().Time2Frame(durationTime));
             }
             protected set
             {
-                _durationTime = SkillTimelineManager.GetInstance().Frame2Time(value);
+                durationTime = SkillTimelineManager.GetInstance().Frame2Time(value);
             }
         }
 
+        public object Owner { get; set ; }
+
         public SkillTimelineTrack(float startTime = 0 , float durationTime = -1)
         {
-            _startTime = startTime;
-            _durationTime = durationTime;
+            this.startTime = startTime;
+            this.durationTime = durationTime;
         }
 
         public virtual void Initialize(string[] info,string[] args)
         {
             if (info != null && info.Length > 0)
             {
-                if (info.Length > 1) float.TryParse(info[0], out _startTime);
-                if (info.Length > 2) float.TryParse(info[1], out _durationTime);
+                if (info.Length > 1) float.TryParse(info[0], out startTime);
+                if (info.Length > 2) float.TryParse(info[1], out durationTime);
             }
-            Args = args;
+            this.args = args;
             OnCreate(info,args);
         }
 
