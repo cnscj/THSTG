@@ -522,6 +522,9 @@ namespace ASEditor
     {
         public static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
         {
+            if (!AssetBuildConfiger.GetInstance())
+                return;
+
             if (!AssetBuildConfiger.GetInstance().isUseDependenciesCache)
                 return;
 
