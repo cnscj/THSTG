@@ -9,10 +9,7 @@ namespace THGame
 
         public SkillTriggerManager()
         {
-#if UNITY_EDITOR
-            RegisterFactory<SkillPrintTrigger>("Print");
-            RegisterFactory<SkillPlayEffectTrigger>("PlayEffect");
-#endif
+
         }
 
         //NOTE:这里无法通过发射生成实例,估无法使用特性
