@@ -7,15 +7,13 @@
 */
 
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 using XLua;
 using System;
 
 namespace SEGame
 {
     [System.Serializable]
-    public class Injection
+    public class LuaInjection
     {
         public string name;
         public GameObject value;
@@ -25,7 +23,7 @@ namespace SEGame
     public class LuaBehaviour : MonoBehaviour
     {
         public TextAsset luaScript;
-        public Injection[] injections;
+        public LuaInjection[] injections;
 
         internal static float lastGCTime = 0;
         internal const float gcInterval = 1;    //1 second 
@@ -36,33 +34,71 @@ namespace SEGame
 
         private LuaTable scriptEnv;
 
-        void Awake()
+        void Create(LuaTable luaTable, LuaInjection[] injections)
         {
-            scriptEnv = GetLuaEnv().NewTable();
+            Release();
 
-            // 为每个脚本设置一个独立的环境，可一定程度上防止脚本间全局变量、函数冲突
-            LuaTable meta = GetLuaEnv().NewTable();
-            meta.Set("__index", GetLuaEnv().Global);
-            scriptEnv.SetMetaTable(meta);
-            meta.Dispose();
+            scriptEnv = luaTable;
+            Action luaAwake = luaTable.Get<Action>("awake");
+            luaTable.Get("start", out luaStart);
+            luaTable.Get("update", out luaUpdate);
+            luaTable.Get("onDestroy", out luaOnDestroy);
 
-            scriptEnv.Set("self", this);
-            foreach (var injection in injections)
+            if (injections != null && injections.Length > 0)
             {
-                scriptEnv.Set(injection.name, injection.value);
+                foreach (var injection in injections)
+                {
+                    luaTable.Set(injection.name, injection.value);
+                }
             }
-
-            GetLuaEnv().DoString(luaScript.text, "chunk", scriptEnv);
-
-            Action luaAwake = scriptEnv.Get<Action>("awake");
-            scriptEnv.Get("start", out luaStart);
-            scriptEnv.Get("update", out luaUpdate);
-            scriptEnv.Get("ondestroy", out luaOnDestroy);
 
             if (luaAwake != null)
             {
                 luaAwake();
             }
+        }
+
+        void Release()
+        {
+            if (luaOnDestroy != null)
+            {
+                luaOnDestroy();
+            }
+            luaOnDestroy = null;
+            luaUpdate = null;
+            luaStart = null;
+            scriptEnv?.Dispose();
+            injections = null;
+
+            scriptEnv = null;
+        }
+
+        void Awake()
+        {
+            LoadFromTextAsset(this.luaScript,this.injections);
+        }
+
+        void LoadFromString(string context, LuaInjection[] injection)
+        {
+            LuaTable luaTable = GetLuaEnv().NewTable();
+            // 为每个脚本设置一个独立的环境，可一定程度上防止脚本间全局变量、函数冲突
+            LuaTable meta = GetLuaEnv().NewTable();
+            meta.Set("__index", GetLuaEnv().Global);
+            luaTable.SetMetaTable(meta);
+            meta.Dispose();
+
+            luaTable.Set("self", this);
+
+            GetLuaEnv().DoString(context, "chunk", scriptEnv);
+
+            Create(luaTable, injection);
+        }
+
+
+        void LoadFromTextAsset(TextAsset textAsset, LuaInjection[] injection)
+        {
+            if (!textAsset) return;
+            LoadFromString(textAsset.text, injection);
         }
 
         // Use this for initialization
@@ -90,15 +126,7 @@ namespace SEGame
 
         void OnDestroy()
         {
-            if (luaOnDestroy != null)
-            {
-                luaOnDestroy();
-            }
-            luaOnDestroy = null;
-            luaUpdate = null;
-            luaStart = null;
-            scriptEnv.Dispose();
-            injections = null;
+            Release();
         }
 
         //all lua behaviour shared one luaenv only!

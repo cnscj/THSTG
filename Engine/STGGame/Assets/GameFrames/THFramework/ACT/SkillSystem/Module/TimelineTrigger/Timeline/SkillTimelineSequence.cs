@@ -3,27 +3,25 @@ using XLibrary.Collection;
 
 namespace THGame
 {
-    public class SkillTimelineSequence : SkillTimelineTrack
+    public class SkillTimelineSequence : SkillTimelineClip
     {
-        private SortedDictionary<int, HashSet<SkillTimelineTrack>> _scheduleTracks = new SortedDictionary<int, HashSet<SkillTimelineTrack>>();
-        private MaxHeap<SkillTimelineTrack, int> _scheduleTracksEndFrame = new MaxHeap<SkillTimelineTrack, int>();
-        private HashSet<SkillTimelineTrack> _schedulingTracks = new HashSet<SkillTimelineTrack>();
-        private Queue<SkillTimelineTrack> _scheduledTracks = new Queue<SkillTimelineTrack>();
+        private SortedDictionary<int, HashSet<SkillTimelineClip>> _scheduleTracks = new SortedDictionary<int, HashSet<SkillTimelineClip>>();
+        private MaxHeap<SkillTimelineClip, int> _scheduleTracksEndFrame = new MaxHeap<SkillTimelineClip, int>();
+        private HashSet<SkillTimelineClip> _schedulingTracks = new HashSet<SkillTimelineClip>();
+        private Queue<SkillTimelineClip> _scheduledTracks = new Queue<SkillTimelineClip>();
 
         public int TotalCount => _scheduleTracks.Count;
         public int ExecuteCount => _schedulingTracks.Count;
 
-        public SkillTimelineSequence(float startTime = 0 ,int durationTime = -1) : base(startTime, durationTime) { }
-
-        public void AddTrack(SkillTimelineTrack track)
+        public void AddTrack(SkillTimelineClip track)
         {
             if (track == null)
                 return;
 
-            HashSet<SkillTimelineTrack> trackSet;
+            HashSet<SkillTimelineClip> trackSet;
             if (!_scheduleTracks.TryGetValue(track.StartFrame, out trackSet))
             {
-                trackSet = new HashSet<SkillTimelineTrack>();
+                trackSet = new HashSet<SkillTimelineClip>();
                 _scheduleTracks.Add(track.StartFrame, trackSet);
             }
             trackSet.Add(track);
@@ -33,7 +31,7 @@ namespace THGame
             RefreshExecuteFrame();
         }
 
-        public void RemoveTrack(SkillTimelineTrack track)
+        public void RemoveTrack(SkillTimelineClip track)
         {
             if (track == null)
                 return;
@@ -55,7 +53,7 @@ namespace THGame
         public void ClearTracks()
         {
             _scheduleTracks.Clear();
-            _scheduleTracksEndFrame = new MaxHeap<SkillTimelineTrack, int>();
+            _scheduleTracksEndFrame = new MaxHeap<SkillTimelineClip, int>();
             _schedulingTracks.Clear();
             _scheduledTracks.Clear();
 
@@ -99,7 +97,7 @@ namespace THGame
             DurationFrame = (_scheduleTracksEndFrame.Count > 0 ? _scheduleTracksEndFrame.Max.Key.EndFrame : 0) + 1;
         }
 
-        protected override void OnUpdate(int tickFrame)
+        public override void OnUpdate(int tickFrame)
         {
             if (_scheduleTracks == null || _scheduleTracks.Count <= 0)
                 return;
@@ -157,7 +155,7 @@ namespace THGame
             }
         }
 
-        private void PushTrackInSchedulingList(SkillTimelineTrack track)
+        private void PushTrackInSchedulingList(SkillTimelineClip track)
         {
             if (!_schedulingTracks.Contains(track))
             {
@@ -166,7 +164,7 @@ namespace THGame
             }
         }
 
-        private void DequeueTrackInSchedulingList(SkillTimelineTrack track)
+        private void DequeueTrackInSchedulingList(SkillTimelineClip track)
         {
             if (_schedulingTracks.Contains(track))
             {

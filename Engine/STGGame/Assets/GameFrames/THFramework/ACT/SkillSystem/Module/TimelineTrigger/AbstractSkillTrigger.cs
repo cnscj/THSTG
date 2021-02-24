@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace THGame
 {
-    public abstract class AbstractSkillTrigger : SkillTimelineTrack
+    public abstract class AbstractSkillTrigger : SkillTimelineClip
     {
-        public AbstractSkillTrigger(float startTime = 0,float durationTime = -1) : base(startTime, durationTime) { }
+        public AbstractSkillTrigger() { }
         public string Type { get; set; }
     }
 

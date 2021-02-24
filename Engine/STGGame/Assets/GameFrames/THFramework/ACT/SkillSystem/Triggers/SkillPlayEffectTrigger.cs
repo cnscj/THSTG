@@ -5,11 +5,11 @@ namespace THGame
     public class SkillPlayEffectTrigger : AbstractSkillTrigger
     {
         public string effectId;
-        protected override void OnCreate(string[] info,string[] args)
+        public override void OnCreate(string[] info,string[] args)
         {
             effectId = args.Length > 0 ? args[0] : "";
         }
-        protected override void OnStart(object owner)
+        public override void OnStart(object owner)
         {
             var go = owner as GameObject;
             string resPath = string.Format("Assets/ZCustom_Test/Res/Effects/Prefabs/{0}.prefab", effectId);

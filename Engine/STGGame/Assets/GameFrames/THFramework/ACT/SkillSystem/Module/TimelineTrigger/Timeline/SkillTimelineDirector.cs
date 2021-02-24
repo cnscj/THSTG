@@ -6,7 +6,7 @@ namespace THGame
     public class SkillTimelineDirector : MonoBehaviour 
     {
         public event Action onCompleted;
-        public ISkillTimelinePlayable timelineSequence;
+        public SkillTimelineSequence timelineSequence;
 
         private int _startFrame;
         private int _offsetFrame;
