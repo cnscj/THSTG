@@ -1,12 +1,12 @@
 ﻿namespace THGame
 {
-    public interface SkillTimelineBehaviour
+    public abstract class SkillTimelineBehaviour : SkillTimelineAsset
     {
-        void OnStart(object owner);
-        void OnUpdate(int tickFrame);
-        void OnEnd();
+        public virtual void OnStart(object owner) { }
+        public virtual void OnUpdate(int tickFrame) { }
+        public virtual void OnEnd() { }
 
-        void OnCreate(string[] info, string[] args);
-        void OnDestroy();
+        public virtual void OnCreate(string[] info, string[] args) { }
+        public virtual void OnDestroy() { }
     }
 }

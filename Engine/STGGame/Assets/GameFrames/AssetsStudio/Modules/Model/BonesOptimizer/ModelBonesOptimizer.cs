@@ -17,7 +17,7 @@ namespace ASGame
     public class ModelBonesOptimizer : MonoBehaviour
     {
         //节点标记类
-        public class NodeMark : MonoBehaviour{}
+        public class NodeMark : MonoBehaviour { }
 
         [SerializeField]
         public List<string> exposeBones;   //暴露的骨骼名字
@@ -69,7 +69,7 @@ namespace ASGame
             return m_isOptimezed;
         }
 
-        public void Optimize(bool isEffectChildren = true)
+        public void Optimize()
         {
             if (!IsCanOptmizeOrDeoptmize())
                 return;
@@ -89,19 +89,10 @@ namespace ASGame
 
             m_isOptimezed = true;
 
-            //复原回相应的地方去
-            var childOptimizerList = PutBackChildren(nodeDict);
-
-            //递归去
-            if (isEffectChildren)
-            {
-                foreach (var optimizer in childOptimizerList)
-                {
-                    optimizer.Optimize(isEffectChildren);
-                }
-            }
+            //取出所有含animator的节点到同级父节点去
+            PutBackChildren(nodeDict);
         }
-        public void Deoptimize(bool isEffectChildren = true)
+        public void Deoptimize()
         {
             if (!IsCanOptmizeOrDeoptmize())
                 return;
@@ -117,27 +108,19 @@ namespace ASGame
             }
             m_isOptimezed = false;
 
-            //复原回相应的地方去
-            var childOptimizerList = PutBackChildren(nodeDict);
-
-            if (isEffectChildren)
-            {
-                foreach(var optimizer in childOptimizerList)
-                {
-                    optimizer.Deoptimize(isEffectChildren);
-                }
-            }
+            //复原所有含animator的节点回相应的地方去
+            PutBackChildren(nodeDict);
         }
 
         /////
-        
-        private List<ModelBonesOptimizer> GetOptimizerNodeInChildren()
+
+        private List<Animator> GetOptimizerNodeInChildren()
         {
             //采用深度递归
             Stack<GameObject> parentNodes = new Stack<GameObject>();
             parentNodes.Push(gameObject);
 
-            var nodeDict = new List<ModelBonesOptimizer>();
+            var nodeDict = new List<Animator>();
             while (parentNodes.Count > 0)
             {
                 var curNode = parentNodes.Pop();
@@ -146,7 +129,7 @@ namespace ASGame
                     var itNode = curNode.transform.GetChild(i).gameObject;
                     if (curNode == itNode) continue;
 
-                    var optimizer = itNode.GetComponent<ModelBonesOptimizer>();
+                    var optimizer = itNode.GetComponent<Animator>();
                     if (optimizer != null)
                     {
                         nodeDict.Add(optimizer);
@@ -160,12 +143,11 @@ namespace ASGame
         }
 
         //取出优化器所在节点
-        private Dictionary<ModelBonesOptimizer, GameObject> TakeOutChildren()
+        private Dictionary<Animator, GameObject> TakeOutChildren()
         {
-            Dictionary<ModelBonesOptimizer, GameObject> nodeDict = new Dictionary<ModelBonesOptimizer, GameObject>();
+            Dictionary<Animator, GameObject> nodeDict = new Dictionary<Animator, GameObject>();
             var children = GetOptimizerNodeInChildren();
-            //var parentNode = transform.parent;
-            foreach(var child in children)
+            foreach (var child in children)
             {
                 var childParent = child.transform.parent;
                 var chuldParentNode = childParent != null ? childParent.gameObject : null;
@@ -183,10 +165,13 @@ namespace ASGame
         }
 
         //返回去有2种情况,优化时返回去,和还原时放回去
-        private List<ModelBonesOptimizer> PutBackChildren(Dictionary<ModelBonesOptimizer, GameObject> nodeDict)
+        private List<Animator> PutBackChildren(Dictionary<Animator, GameObject> nodeDict)
         {
-            List<ModelBonesOptimizer> nodeList = new List<ModelBonesOptimizer>();//有些节点可能在还原回去的时候失败了
-            foreach(var dictPair in nodeDict)
+            if (nodeDict == null || nodeDict.Count <= 0)
+                return null;
+
+            List<Animator> nodeList = new List<Animator>();//有些节点可能在还原回去的时候失败了
+            foreach (var dictPair in nodeDict)
             {
                 var parentNode = dictPair.Value;
                 if (parentNode != null)
@@ -219,13 +204,13 @@ namespace ASGame
             return nodeList;
         }
 
-        private string[] GetExposeBones(Dictionary<ModelBonesOptimizer, GameObject> dict)
+        private string[] GetExposeBones(Dictionary<Animator, GameObject> dict)
         {
             List<string> exNodes = null;
             if (dict != null && dict.Count > 0)
             {
                 exNodes = new List<string>();
-                foreach(var node in dict.Values)
+                foreach (var node in dict.Values)
                 {
                     if (node != null)
                     {
@@ -239,7 +224,7 @@ namespace ASGame
         private string[] GetExposeBones(List<string> exNodes = null)
         {
             HashSet<string> exposeList = new HashSet<string>();
-            
+
             if (exposeBones != null && exposeBones.Count > 0)
             {
                 foreach (var nodePath in exposeBones)

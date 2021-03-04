@@ -1,13 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace THGame
+﻿namespace THGame
 {
-    public abstract class AbstractSkillTrigger : SkillTimelineClip
+    public abstract class AbstractSkillTrigger : SkillTimelineSequence
     {
-        public AbstractSkillTrigger() { }
-        public string Type { get; set; }
+
     }
 
 }

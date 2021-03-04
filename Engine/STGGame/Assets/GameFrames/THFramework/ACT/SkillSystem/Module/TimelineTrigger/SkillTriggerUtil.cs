@@ -1,11 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
+﻿
 namespace THGame
 {
     public static class SkillTriggerUtil
     {
+        //TODO:下面函数负责各种序列化与反序列化
+
         public static AbstractSkillTrigger GenerateTrigger(string command)
         {
             if (string.IsNullOrEmpty(command))
@@ -70,7 +69,7 @@ namespace THGame
             if (trigger == null)
                 return command;
 
-            string infoStr = "";
+            string infoStr;
             infoStr = string.Format("{0},{1}", trigger.startTime, trigger.durationTime);
 
             string argsStr = "";
@@ -83,7 +82,7 @@ namespace THGame
                 }
                 argsStr = argsStr.Substring(0, argsStr.Length - 1);
             }
-            command = string.Format("{0}[{1}]({2})", trigger.Type, infoStr, argsStr);
+            command = string.Format("{0}[{1}]({2})", trigger.type, infoStr, argsStr);
 
             return command;
         }

@@ -2,7 +2,7 @@
 
 namespace THGame
 {
-    public class SkillTimelineClip : SkillTimelineAsset, SkillTimelineBehaviour
+    public class SkillTimelineClip : SkillTimelineBehaviour
     {
         public event Action onStart;
         public event Action onEnd;
@@ -99,14 +99,6 @@ namespace THGame
         {
             behaviour?.OnDestroy();
         }
-
-
-        public virtual void OnStart(object owner){}
-        public virtual void OnUpdate(int tickFrame){}
-        public virtual void OnEnd(){}
-
-        public virtual void OnCreate(string[] info, string[] args){}
-        public virtual void OnDestroy(){}
     }
 
 }

@@ -12,7 +12,7 @@ namespace THGame
         public AbstractSkillTrigger CreateTrigger()
         {
             var pool = GetOrCreatePool();
-            T instance = null;
+            T instance;
             if (pool.Count <= 0)
             {
                 instance = new T();
@@ -31,7 +31,7 @@ namespace THGame
             if (maxNum > 0 && pool.Count >= maxNum)
                 return;
 
-            instance.Type = Type;
+            instance.type = Type;
             pool.Enqueue((T)instance);
         }
 
