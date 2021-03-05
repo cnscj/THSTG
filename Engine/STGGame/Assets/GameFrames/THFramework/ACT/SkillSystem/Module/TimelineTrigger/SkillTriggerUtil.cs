@@ -3,7 +3,7 @@ namespace THGame
 {
     public static class SkillTriggerUtil
     {
-        //TODO:下面函数负责各种序列化与反序列化
+        //下面函数负责各种序列化与反序列化
 
         public static AbstractSkillTrigger GenerateTrigger(string command)
         {
@@ -85,6 +85,44 @@ namespace THGame
             command = string.Format("{0}[{1}]({2})", trigger.type, infoStr, argsStr);
 
             return command;
+        }
+
+        public static void SaveSequence(SkillTimelineSequence skillTimelineSequence, string savePath)
+        {
+            if (skillTimelineSequence == null)
+                return;
+
+            if (string.IsNullOrEmpty(savePath))
+                return;
+
+            SkillTimelineData data = new SkillTimelineData();
+
+            var clips = skillTimelineSequence.GetClips();
+            data.sequence = clips.ToArray();
+
+            SkillTimelineData.SaveToFile(data, savePath);
+        }
+
+        public static SkillTimelineSequence LoadSequence(string loadPath)
+        {
+            if (string.IsNullOrEmpty(loadPath))
+                return default;
+
+            SkillTimelineSequence sequence = new SkillTimelineSequence();
+            var data = SkillTimelineData.LoadFromFile(loadPath);
+            if (data.sequence != null)
+            {
+                foreach( var asset in data.sequence)
+                {
+                    var trigger = AbstractSkillTrigger.Create(asset);
+                    if (trigger != null)
+                    {
+                        sequence.AddClip(trigger);
+                    }
+                }
+            }
+
+            return sequence;
         }
 
     }

@@ -10,12 +10,11 @@ namespace THEditor
     public class SkillTriggerPlayableClipInspector : Editor
     {
         SkillTriggerPlayableClip m_target;
-        private SerializedProperty m_args;
+        string[] m_argsDesc;
 
         void OnEnable()
         {
             m_target = (SkillTriggerPlayableClip)target;
-            m_args = serializedObject.FindProperty("args");
         }
 
         public override void OnInspectorGUI()
@@ -25,10 +24,40 @@ namespace THEditor
 
             serializedObject.Update();//属性序列化
 
-            m_target.type = EnumPopupStr(m_target.type);
-            m_target.args = PropertyStringList(m_target.args);
+
+            var oriTypeStr = m_target.type;
+            var argsDesc = m_argsDesc;
+
+            m_target.type = EnumPopupStr(oriTypeStr);
+
+
+            if (string.Compare(m_target.type, oriTypeStr) != 0)
+            {
+                m_argsDesc = GetDescList();
+                argsDesc = m_argsDesc;
+            }
+
+            m_target.args = PropertyStringList(m_target.args, argsDesc);
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private string[] GetDescList()
+        {
+            //:貌似不是很友好
+            string[] descList = null;
+            //根据type实例化一个clip,然后获取相应数据
+            var triggerFactor = SkillTriggerManager.GetInstance().GetFactory(m_target.type);
+            if (triggerFactor != null)
+            {
+                var trigger = triggerFactor.CreateTrigger();
+                if (trigger != null)
+                {
+                    descList = trigger.OnArgsDesc();
+                }
+                triggerFactor.RecycleTrigger(trigger);
+            }
+            return descList;
         }
 
         private string EnumPopupStr(string oriTypeStr)
@@ -36,7 +65,7 @@ namespace THEditor
             var oriType = SkillTriggerType.Nop;
             if (!string.IsNullOrEmpty(oriTypeStr))
             {
-                oriType = (SkillTriggerType)Enum.Parse(typeof(SkillTriggerType), oriTypeStr);
+                 Enum.TryParse(oriTypeStr, out oriType);
             }
 
             var triggerType = (SkillTriggerType)EditorGUILayout.EnumPopup("Type", oriType);
@@ -45,10 +74,29 @@ namespace THEditor
             return triggerStr;
         }
 
-        private string[] PropertyStringList(string[] argsList)
+        private string[] PropertyStringList(string[] argsList,string[] argsDesc = null)
         {
             //这里应该数据驱动,否则默认使用Args数组,如有特殊说明用自定义
-            EditorGUILayout.PropertyField(m_args, new GUIContent("Args"), true);
+            string[] customArgs = argsDesc;
+
+            if (customArgs != null && customArgs.Length > 0)
+            {
+                if (argsList == null || argsList.Length != customArgs.Length)
+                {
+                    argsList = new string[customArgs.Length];
+                }
+                for (int i = 0;i < customArgs.Length;i++)
+                {
+                    var desc = customArgs[i];
+                    argsList[i] = EditorGUILayout.TextField(desc, argsList[i]);
+                }
+            }
+            else
+            {
+                SerializedProperty args = serializedObject.FindProperty("args");
+                EditorGUILayout.PropertyField(args, new GUIContent("Args"), true);
+            }
+
 
             return argsList;
         }

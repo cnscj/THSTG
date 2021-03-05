@@ -8,7 +8,8 @@ namespace THGame
         public string type;
         public string[] args;
 
-        public float startTime = 0;
-        public float durationTime = -1;
+        public float startTime = 0f;
+        public float durationTime = -1f;
+
     }
 }

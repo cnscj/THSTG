@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Timeline;
 using THGame.Skill;
+using System;
+using XLibrary;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -24,6 +26,7 @@ namespace THGame
             var playable = AssetDatabase.LoadAssetAtPath<TimelineAsset>(playblePath);
             var bindings = playable.outputs;
 
+            List<SkillTimelineAsset> sequence = new List<SkillTimelineAsset>();
             foreach (var pb in bindings)
             {
                 var track = pb.sourceObject as TrackAsset;
@@ -31,18 +34,30 @@ namespace THGame
                 {
                     foreach (TimelineClip clip in track.GetClips())
                     {
-                        //TODO:
+                        
                         if(clip.asset is SkillTriggerPlayableClip)
                         {
-                            var newClip = clip.asset as SkillTriggerPlayableClip;
-                            Debug.Log(newClip.type);
+                            var triggerClip = clip.asset as SkillTriggerPlayableClip;
+                            var asset = new SkillTimelineAsset();
+
+                            asset.type = triggerClip.type;
+                            asset.args = triggerClip.args;
+
+                            asset.startTime = (float)clip.start;
+                            asset.durationTime = (float)clip.duration;
+
+                            sequence.Add(asset);
                         }
-                        
-                        Debug.Log("name:" + clip.displayName + "时间:" + clip.duration);
+
+                        //Debug.Log("name:" + clip.displayName+ "开始:" + clip.start + "时间:" + clip.duration);
                     }
                 }
             }
 
+            var timelineData = new SkillTimelineData();
+            timelineData.sequence = sequence.ToArray();
+
+            SkillTimelineData.SaveToFile(timelineData,savePath);
         }
 
         public static void CreatePlayableByJson(string jsonPath, string playablePath)
@@ -53,7 +68,9 @@ namespace THGame
             if (string.IsNullOrEmpty(playablePath))
                 return;
 
+            var timelineData = SkillTimelineData.LoadFromFile(jsonPath);
 
+            //TODO:
         }
     }
 #endif

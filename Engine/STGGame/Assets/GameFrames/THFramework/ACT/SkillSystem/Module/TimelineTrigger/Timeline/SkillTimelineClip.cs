@@ -62,10 +62,6 @@ namespace THGame
             behaviour?.OnCreate(info,args);
         }
 
-        public virtual void Seek(int startFrame) { }
-
-        public virtual void Reset() { }
-
         public virtual void Start(object owner)
         {
             IsExecuting = true;

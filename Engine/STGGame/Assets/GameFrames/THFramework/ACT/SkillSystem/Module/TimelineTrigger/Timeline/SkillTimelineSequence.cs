@@ -59,15 +59,15 @@ namespace THGame
         public void ClearClips()
         {
             _scheduleClips?.Clear();
-            _scheduleClipsEndFrame = null;
             _schedulingClips?.Clear();
             _scheduledClips?.Clear();
+            _scheduleClipsEndFrame = null;
 
             StartFrame = 0;
             DurationFrame = 1;
         }
 
-        public override void Reset()
+        public void Reset()
         {
             _schedulingClips?.Clear();
             _scheduledClips?.Clear();
@@ -75,10 +75,9 @@ namespace THGame
             RefreshExecuteFrame();
         }
 
-        public override void Seek(int tickFrame)
+        public void Seek(int tickFrame)
         {
-            _schedulingClips?.Clear();
-            _scheduledClips?.Clear();
+            Reset();
 
             if (_scheduleClips == null || _scheduleClips.Count <= 0)
                 return;
@@ -98,7 +97,7 @@ namespace THGame
             }
         }
 
-        public List<SkillTimelineClip> ToList()
+        public List<SkillTimelineClip> GetClips()
         {
             var clipList = new List<SkillTimelineClip>();
 
