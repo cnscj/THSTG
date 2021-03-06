@@ -2,6 +2,7 @@
 
 namespace THGame
 {
+    [System.Serializable]
     public class SkillTimelineClip : SkillTimelineBehaviour
     {
         public event Action onStart;
@@ -39,24 +40,39 @@ namespace THGame
 
         public object Owner { get; set ; }
 
+        public static SkillTimelineClip Create(SkillTimelineAsset asset, SkillTimelineBehaviour behaviour)
+        {
+            var clip = new SkillTimelineClip(asset, behaviour);
+            return clip;
+        }
+
         public SkillTimelineClip()
         {
             this.asset = this;
             this.behaviour = this;
         }
 
-        public SkillTimelineClip(SkillTimelineAsset asset, SkillTimelineBehaviour behaviour)
+        protected SkillTimelineClip(SkillTimelineAsset asset, SkillTimelineBehaviour behaviour)
         {
             this.asset = asset;
             this.behaviour = behaviour;
+        }
+
+        public void AssetValues(SkillTimelineAsset timelineAsset)
+        {
+            type = timelineAsset.type;
+            args = timelineAsset.args;
+
+            startTime = (float)timelineAsset.startTime;
+            durationTime = (float)timelineAsset.durationTime;
         }
 
         public virtual void Initialize(string[] info,string[] args)
         {
             if (info != null && info.Length > 0)
             {
-                if (info.Length > 1) float.TryParse(info[0], out asset.startTime);
-                if (info.Length > 2) float.TryParse(info[1], out asset.durationTime);
+                if (info.Length > 1) double.TryParse(info[0], out asset.startTime);
+                if (info.Length > 2) double.TryParse(info[1], out asset.durationTime);
             }
             asset.args = args;
             behaviour?.OnCreate(info,args);

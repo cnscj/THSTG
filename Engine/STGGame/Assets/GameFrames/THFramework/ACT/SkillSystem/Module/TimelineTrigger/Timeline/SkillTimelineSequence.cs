@@ -3,8 +3,10 @@ using XLibrary.Collection;
 
 namespace THGame
 {
+    [System.Serializable]
     public class SkillTimelineSequence : SkillTimelineClip
     {
+        public SkillTimelineClip[] clips;
         private SortedDictionary<int, HashSet<SkillTimelineClip>> _scheduleClips;
 
         private HashSet<SkillTimelineClip> _schedulingClips;
@@ -14,6 +16,11 @@ namespace THGame
 
         public int TotalCount => _scheduleClips != null ?_scheduleClips.Count : 0;
         public int ExecuteCount => _schedulingClips != null ? _schedulingClips.Count : 0;
+
+        public SkillTimelineSequence()
+        {
+            type = "_sequence_";
+        }
 
         public void AddClip(SkillTimelineClip clip)
         {
@@ -113,6 +120,20 @@ namespace THGame
             }
 
             return clipList;
+        }
+
+        public void Refresh()
+        {
+            this.clips = GetClips().ToArray();
+        }
+
+        public void SetClips(List<SkillTimelineClip> clips)
+        {
+            ClearClips();
+            foreach (var clip in clips)
+            {
+                AddClip(clip);
+            }
         }
 
         protected void RefreshExecuteFrame()

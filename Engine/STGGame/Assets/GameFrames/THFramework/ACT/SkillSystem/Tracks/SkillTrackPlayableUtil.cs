@@ -26,38 +26,46 @@ namespace THGame
             var playable = AssetDatabase.LoadAssetAtPath<TimelineAsset>(playblePath);
             var bindings = playable.outputs;
 
-            List<SkillTimelineAsset> sequence = new List<SkillTimelineAsset>();
+            var skillTimelineSequence = new SkillTimelineSequence();
+            skillTimelineSequence.name = playable.name;
+            skillTimelineSequence.type = "_playable_";
+
+            var skillTimelineData = new SkillTimelineData();
+            
             foreach (var pb in bindings)
             {
                 var track = pb.sourceObject as TrackAsset;
                 if (track != null)
                 {
+                    SkillTimelineSequence skillTimelineTrack = new SkillTimelineSequence();
+                    skillTimelineTrack.name = track.name;
+                    skillTimelineTrack.type = "_track_";
+
                     foreach (TimelineClip clip in track.GetClips())
                     {
-                        
                         if(clip.asset is SkillTriggerPlayableClip)
                         {
                             var triggerClip = clip.asset as SkillTriggerPlayableClip;
-                            var asset = new SkillTimelineAsset();
+                            var skillTimelineClip = new SkillTimelineClip();
 
-                            asset.type = triggerClip.type;
-                            asset.args = triggerClip.args;
+                            skillTimelineClip.name = triggerClip.name;
+                            skillTimelineClip.type = triggerClip.type;
+                            skillTimelineClip.args = triggerClip.args;
 
-                            asset.startTime = (float)clip.start;
-                            asset.durationTime = (float)clip.duration;
+                            skillTimelineClip.startTime = clip.start;
+                            skillTimelineClip.durationTime = clip.duration;
 
-                            sequence.Add(asset);
+                            skillTimelineTrack.AddClip(skillTimelineClip);
                         }
-
-                        //Debug.Log("name:" + clip.displayName+ "开始:" + clip.start + "时间:" + clip.duration);
                     }
+                    skillTimelineTrack.Refresh();
+                    skillTimelineSequence.AddClip(skillTimelineTrack);
                 }
             }
+            skillTimelineSequence.Refresh();
 
-            var timelineData = new SkillTimelineData();
-            timelineData.sequence = sequence.ToArray();
-
-            SkillTimelineData.SaveToFile(timelineData,savePath);
+            skillTimelineData.sequences = new SkillTimelineSequence[] { skillTimelineSequence };
+            SkillTimelineData.SaveToFile(skillTimelineData, savePath);  //FIXME:貌似不支持多余3层的嵌套
         }
 
         public static void CreatePlayableByJson(string jsonPath, string playablePath)
@@ -69,8 +77,34 @@ namespace THGame
                 return;
 
             var timelineData = SkillTimelineData.LoadFromFile(jsonPath);
+            if (timelineData != null)
+            {
+                var timelineAsset = TimelineAsset.CreateInstance<TimelineAsset>();
+                AssetDatabase.CreateAsset(timelineAsset, playablePath);
 
-            //TODO:
+                var playableInfo = timelineData.sequences[0]; 
+                foreach (var trackInfo in playableInfo.clips)
+                {
+                    var trackSequence = (SkillTimelineSequence)trackInfo;//FIXME:这里转换存在问题,应该是与上面的问题一致
+                    var timelineTrack = timelineAsset.CreateTrack<SkillTriggerPlayableTrack>(null, trackInfo.name);
+                    foreach (var clipInfo in trackSequence.clips)
+                    {
+                        var timelineClip = timelineTrack.CreateClip<SkillTriggerPlayableClip>();
+                        var triggerClip = timelineClip.asset as SkillTriggerPlayableClip;
+
+                        timelineClip.displayName = clipInfo.name;
+                        triggerClip.type = clipInfo.type;
+                        triggerClip.name = clipInfo.name;
+                        triggerClip.args = clipInfo.args;
+
+                        timelineClip.start = clipInfo.startTime;
+                        timelineClip.duration = clipInfo.durationTime;
+
+                    }
+                }
+                AssetDatabase.SaveAssets();
+            }
+
         }
     }
 #endif

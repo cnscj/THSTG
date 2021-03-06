@@ -53,7 +53,7 @@ namespace THEditor
                 var trigger = triggerFactor.CreateTrigger();
                 if (trigger != null)
                 {
-                    descList = trigger.OnArgsDesc();
+                    descList = trigger.ArgsDesc;
                 }
                 triggerFactor.RecycleTrigger(trigger);
             }

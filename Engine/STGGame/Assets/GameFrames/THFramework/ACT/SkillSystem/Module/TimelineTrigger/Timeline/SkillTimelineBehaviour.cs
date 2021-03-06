@@ -1,6 +1,6 @@
 ﻿namespace THGame
 {
-    public abstract class SkillTimelineBehaviour : SkillTimelineAsset
+    public class SkillTimelineBehaviour : SkillTimelineAsset
     {
         public virtual void OnStart(object owner) { }
         public virtual void OnUpdate(int tickFrame) { }

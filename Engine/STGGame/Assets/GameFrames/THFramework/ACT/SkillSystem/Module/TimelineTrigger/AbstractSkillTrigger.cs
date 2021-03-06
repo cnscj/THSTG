@@ -2,6 +2,18 @@
 {
     public abstract class AbstractSkillTrigger : SkillTimelineSequence
     {
+        public string[] ArgsDesc
+        {
+            get
+            {
+#if UNITY_EDITOR
+                return OnArgsDesc();
+#else
+        return null;
+#endif
+            }
+        }
+
         public static AbstractSkillTrigger Create(SkillTimelineAsset asset)
         {
             var triggerFactor = SkillTriggerManager.GetInstance().GetFactory(asset.type);
@@ -22,7 +34,8 @@
             }
             return default;
         }
-        public virtual string[] OnArgsDesc()
+
+        protected virtual string[] OnArgsDesc()
         {
             return default;
         }

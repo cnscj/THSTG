@@ -8,7 +8,7 @@ namespace THGame
     public class SkillTimelineData
     {
         public string version = "1.0";
-        public SkillTimelineAsset[] sequence;
+        public SkillTimelineSequence[] sequences;
 
         public static SkillTimelineData LoadFromFile(string filePath)
         {
@@ -19,7 +19,7 @@ namespace THGame
 
         public static void SaveToFile(SkillTimelineData timelineData, string filePath)
         {
-            string content = JsonUtility.ToJson(timelineData);
+            string content = JsonUtility.ToJson(timelineData,true);
             XFileTools.WriteAllText(filePath, content);
         }
     }

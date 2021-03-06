@@ -17,12 +17,12 @@ namespace THGame
             }
         }
 
-        public int Time2Frame(float time)
+        public int Time2Frame(double time)
         {
             return (int)Math.Ceiling(frameRate * time); //向上取整一帧
         }
 
-        public float Frame2Time(int frame)
+        public double Frame2Time(int frame)
         {
             return  frame / frameRate;
         }

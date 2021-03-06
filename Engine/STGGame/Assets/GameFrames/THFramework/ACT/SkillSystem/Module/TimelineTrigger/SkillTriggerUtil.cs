@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Generic;
+
 namespace THGame
 {
     public static class SkillTriggerUtil
@@ -87,42 +89,45 @@ namespace THGame
             return command;
         }
 
-        public static void SaveSequence(SkillTimelineSequence skillTimelineSequence, string savePath)
+        public static void SaveSequence(SkillTimelineSequence[] skillTimelineSequences, string savePath)
         {
-            if (skillTimelineSequence == null)
+            if (skillTimelineSequences == null)
                 return;
 
             if (string.IsNullOrEmpty(savePath))
                 return;
 
             SkillTimelineData data = new SkillTimelineData();
-
-            var clips = skillTimelineSequence.GetClips();
-            data.sequence = clips.ToArray();
+            data.sequences = skillTimelineSequences;
 
             SkillTimelineData.SaveToFile(data, savePath);
         }
 
-        public static SkillTimelineSequence LoadSequence(string loadPath)
+        public static SkillTimelineSequence[] LoadSequence(string loadPath)
         {
             if (string.IsNullOrEmpty(loadPath))
                 return default;
 
-            SkillTimelineSequence sequence = new SkillTimelineSequence();
+            List<SkillTimelineSequence> sequence = new List<SkillTimelineSequence>();
             var data = SkillTimelineData.LoadFromFile(loadPath);
-            if (data.sequence != null)
+            if (data.sequences != null)
             {
-                foreach( var asset in data.sequence)
+                foreach( var sequenceAsset in data.sequences)
                 {
-                    var trigger = AbstractSkillTrigger.Create(asset);
-                    if (trigger != null)
+                    var skillTimelineSequence = new SkillTimelineSequence();
+                    foreach (var clipAsset in sequenceAsset.clips)
                     {
-                        sequence.AddClip(trigger);
+                        var trigger = AbstractSkillTrigger.Create(clipAsset);
+                        if (trigger != null)
+                        {
+                            skillTimelineSequence.AddClip(trigger);
+                        }
                     }
+                    sequence.Add(skillTimelineSequence);
                 }
             }
 
-            return sequence;
+            return sequence.ToArray();
         }
 
     }
