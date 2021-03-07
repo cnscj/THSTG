@@ -46,7 +46,7 @@ namespace THGame
                         if(clip.asset is SkillTriggerPlayableClip)
                         {
                             var triggerClip = clip.asset as SkillTriggerPlayableClip;
-                            var skillTimelineClip = new SkillTimelineClip();
+                            var skillTimelineClip = new SkillTimelineSequence();
 
                             skillTimelineClip.name = triggerClip.name;
                             skillTimelineClip.type = triggerClip.type;
@@ -55,11 +55,11 @@ namespace THGame
                             skillTimelineClip.startTime = clip.start;
                             skillTimelineClip.durationTime = clip.duration;
 
-                            skillTimelineTrack.AddClip(skillTimelineClip);
+                            skillTimelineTrack.AddSequence(skillTimelineClip);
                         }
                     }
                     skillTimelineTrack.Refresh();
-                    skillTimelineSequence.AddClip(skillTimelineTrack);
+                    skillTimelineSequence.AddSequence(skillTimelineTrack);
                 }
             }
             skillTimelineSequence.Refresh();
@@ -83,11 +83,11 @@ namespace THGame
                 AssetDatabase.CreateAsset(timelineAsset, playablePath);
 
                 var playableInfo = timelineData.sequences[0]; 
-                foreach (var trackInfo in playableInfo.clips)
+                foreach (var trackInfo in playableInfo.sequences)
                 {
                     var trackSequence = (SkillTimelineSequence)trackInfo;//FIXME:这里转换存在问题,应该是与上面的问题一致
                     var timelineTrack = timelineAsset.CreateTrack<SkillTriggerPlayableTrack>(null, trackInfo.name);
-                    foreach (var clipInfo in trackSequence.clips)
+                    foreach (var clipInfo in trackSequence.sequences)
                     {
                         var timelineClip = timelineTrack.CreateClip<SkillTriggerPlayableClip>();
                         var triggerClip = timelineClip.asset as SkillTriggerPlayableClip;

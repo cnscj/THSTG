@@ -115,12 +115,12 @@ namespace THGame
                 foreach( var sequenceAsset in data.sequences)
                 {
                     var skillTimelineSequence = new SkillTimelineSequence();
-                    foreach (var clipAsset in sequenceAsset.clips)
+                    foreach (var clipAsset in sequenceAsset.sequences)
                     {
                         var trigger = AbstractSkillTrigger.Create(clipAsset);
                         if (trigger != null)
                         {
-                            skillTimelineSequence.AddClip(trigger);
+                            skillTimelineSequence.AddSequence(trigger);
                         }
                     }
                     sequence.Add(skillTimelineSequence);

@@ -6,69 +6,69 @@ namespace THGame
     [System.Serializable]
     public class SkillTimelineSequence : SkillTimelineClip
     {
-        public SkillTimelineClip[] clips;
-        private SortedDictionary<int, HashSet<SkillTimelineClip>> _scheduleClips;
+        public SkillTimelineSequence[] sequences;
+        private SortedDictionary<int, HashSet<SkillTimelineSequence>> _scheduleSequences;
 
-        private HashSet<SkillTimelineClip> _schedulingClips;
-        private Queue<SkillTimelineClip> _scheduledClips;
+        private HashSet<SkillTimelineSequence> _schedulingSequences;
+        private Queue<SkillTimelineSequence> _scheduledSequences;
 
-        private MaxHeap<SkillTimelineClip, int> _scheduleClipsEndFrame;
+        private MaxHeap<SkillTimelineSequence, int> _scheduleSequencesEndFrame;
 
-        public int TotalCount => _scheduleClips != null ?_scheduleClips.Count : 0;
-        public int ExecuteCount => _schedulingClips != null ? _schedulingClips.Count : 0;
+        public int TotalCount => _scheduleSequences != null ?_scheduleSequences.Count : 0;
+        public int ExecuteCount => _schedulingSequences != null ? _schedulingSequences.Count : 0;
 
         public SkillTimelineSequence()
         {
             type = "_sequence_";
         }
 
-        public void AddClip(SkillTimelineClip clip)
+        public void AddSequence(SkillTimelineSequence sequence)
         {
-            if (clip == null)
+            if (sequence == null)
                 return;
 
-            var scheduleClips = GetClipSortDict();
-            HashSet<SkillTimelineClip> clipSet;
-            if (!scheduleClips.TryGetValue(clip.StartFrame, out clipSet))
+            var scheduleSequences = GetSequenceSortDict();
+            HashSet<SkillTimelineSequence> sequenceSet;
+            if (!scheduleSequences.TryGetValue(sequence.StartFrame, out sequenceSet))
             {
-                clipSet = new HashSet<SkillTimelineClip>();
-                scheduleClips.Add(clip.StartFrame, clipSet);
+                sequenceSet = new HashSet<SkillTimelineSequence>();
+                scheduleSequences.Add(sequence.StartFrame, sequenceSet);
             }
-            clipSet.Add(clip);
+            sequenceSet.Add(sequence);
 
-            GetLengthHeap().Add(clip, clip.EndFrame);
+            GetLengthHeap().Add(sequence, sequence.EndFrame);
 
             RefreshExecuteFrame();
         }
 
-        public void RemoveClip(SkillTimelineClip clip)
+        public void RemoveSequence(SkillTimelineSequence sequence)
         {
-            if (clip == null)
+            if (sequence == null)
                 return;
 
-            if (_scheduleClips == null || _scheduleClips.Count <= 0)
+            if (_scheduleSequences == null || _scheduleSequences.Count <= 0)
                 return;
 
-            if (_scheduleClips.TryGetValue(clip.StartFrame, out var clipSet))
+            if (_scheduleSequences.TryGetValue(sequence.StartFrame, out var sequenceSet))
             {
-                clipSet.Remove(clip);
-                if (clipSet.Count <= 0)
+                sequenceSet.Remove(sequence);
+                if (sequenceSet.Count <= 0)
                 {
-                    _scheduleClips.Remove(clip.StartFrame);
+                    _scheduleSequences.Remove(sequence.StartFrame);
                 }
             }
 
-            _scheduleClipsEndFrame?.Remove(clip);
+            _scheduleSequencesEndFrame?.Remove(sequence);
 
             RefreshExecuteFrame();
         }
 
-        public void ClearClips()
+        public void ClearSequences()
         {
-            _scheduleClips?.Clear();
-            _schedulingClips?.Clear();
-            _scheduledClips?.Clear();
-            _scheduleClipsEndFrame = null;
+            _scheduleSequences?.Clear();
+            _schedulingSequences?.Clear();
+            _scheduledSequences?.Clear();
+            _scheduleSequencesEndFrame = null;
 
             StartFrame = 0;
             DurationFrame = 1;
@@ -76,8 +76,8 @@ namespace THGame
 
         public void Reset()
         {
-            _schedulingClips?.Clear();
-            _scheduledClips?.Clear();
+            _schedulingSequences?.Clear();
+            _scheduledSequences?.Clear();
 
             RefreshExecuteFrame();
         }
@@ -86,171 +86,171 @@ namespace THGame
         {
             Reset();
 
-            if (_scheduleClips == null || _scheduleClips.Count <= 0)
+            if (_scheduleSequences == null || _scheduleSequences.Count <= 0)
                 return;
 
             if (tickFrame < 0)
                 return;
 
-            foreach (var clipSet in _scheduleClips.Values)
+            foreach (var sequenceSet in _scheduleSequences.Values)
             {
-                foreach(var clip in clipSet)
+                foreach(var sequence in sequenceSet)
                 {
-                    if (tickFrame > clip.StartFrame && tickFrame <= clip.EndFrame)
+                    if (tickFrame > sequence.StartFrame && tickFrame <= sequence.EndFrame)
                     {
-                        PushClipInSchedulingList(clip);
+                        PushSequenceInSchedulingList(sequence);
                     }
                 }
             }
         }
 
-        public List<SkillTimelineClip> GetClips()
+        public List<SkillTimelineSequence> GetSequences()
         {
-            var clipList = new List<SkillTimelineClip>();
+            var sequenceList = new List<SkillTimelineSequence>();
 
-            if (_scheduleClips != null)
+            if (_scheduleSequences != null)
             {
-                foreach (var clipSet in _scheduleClips.Values)
+                foreach (var sequenceSet in _scheduleSequences.Values)
                 {
-                    foreach (var clip in clipSet)
+                    foreach (var sequence in sequenceSet)
                     {
-                        clipList.Add(clip);
+                        sequenceList.Add(sequence);
                     }
                 }
             }
 
-            return clipList;
+            return sequenceList;
         }
 
         public void Refresh()
         {
-            this.clips = GetClips().ToArray();
+            this.sequences = GetSequences().ToArray();
         }
 
-        public void SetClips(List<SkillTimelineClip> clips)
+        public void SetSequences(List<SkillTimelineSequence> sequences)
         {
-            ClearClips();
-            foreach (var clip in clips)
+            ClearSequences();
+            foreach (var sequence in sequences)
             {
-                AddClip(clip);
+                AddSequence(sequence);
             }
         }
 
         protected void RefreshExecuteFrame()
         {
-            DurationFrame = ((_scheduleClipsEndFrame != null &&_scheduleClipsEndFrame.Count > 0) ? _scheduleClipsEndFrame.Max.Key.EndFrame : 0) + 1;
+            DurationFrame = ((_scheduleSequencesEndFrame != null &&_scheduleSequencesEndFrame.Count > 0) ? _scheduleSequencesEndFrame.Max.Key.EndFrame : 0) + 1;
         }
 
         public override void OnUpdate(int tickFrame)
         {
-            if (_scheduleClips == null || _scheduleClips.Count <= 0)
+            if (_scheduleSequences == null || _scheduleSequences.Count <= 0)
                 return;
 
             if (tickFrame < 0)
                 return;
 
-            QueryClipsUpdate(tickFrame);
-            ExecuteClipsUpdate(tickFrame);
-            PurgeClipsUpdate(tickFrame);
+            QuerySequencesUpdate(tickFrame);
+            ExecuteSequencesUpdate(tickFrame);
+            PurgeSequencesUpdate(tickFrame);
         }
 
-        protected void QueryClipsUpdate(int tickFrame)
+        protected void QuerySequencesUpdate(int tickFrame)
         {
             //帧列表
-            if (_scheduleClips == null || _scheduleClips.Count <= 0)
+            if (_scheduleSequences == null || _scheduleSequences.Count <= 0)
                 return;
 
-            if (_scheduleClips.TryGetValue(tickFrame, out var clipList))
+            if (_scheduleSequences.TryGetValue(tickFrame, out var sequenceList))
             {
                 //扔进执行表执行
-                foreach (var clip in clipList)
+                foreach (var sequence in sequenceList)
                 {
-                    PushClipInSchedulingList(clip);
+                    PushSequenceInSchedulingList(sequence);
                 }
             }
         }
 
-        protected void ExecuteClipsUpdate(int tickFrame)
+        protected void ExecuteSequencesUpdate(int tickFrame)
         {
             //持续执行
-            if (_schedulingClips == null || _schedulingClips.Count <= 0)
+            if (_schedulingSequences == null || _schedulingSequences.Count <= 0)
                 return;
 
-            foreach (var clip in _schedulingClips)
+            foreach (var sequence in _schedulingSequences)
             {
-                if (tickFrame <= clip.EndFrame)
+                if (tickFrame <= sequence.EndFrame)
                 {
-                    var subTickFrame = tickFrame - clip.StartFrame;
-                    clip.Update(subTickFrame);//每帧执行
+                    var subTickFrame = tickFrame - sequence.StartFrame;
+                    sequence.Update(subTickFrame);//每帧执行
                 }
 
                 //检查结束
-                if (tickFrame >= clip.EndFrame)
+                if (tickFrame >= sequence.EndFrame)
                 {
-                    GetScheduledClipList().Enqueue(clip); 
+                    GetScheduledSequenceList().Enqueue(sequence); 
                 }
             }
             
         }
 
-        protected void PurgeClipsUpdate(int tickFrame)
+        protected void PurgeSequencesUpdate(int tickFrame)
         {
             //检查是否结束
-            if (_scheduledClips == null)
+            if (_scheduledSequences == null)
                 return;
 
-            while (_scheduledClips.Count > 0)
+            while (_scheduledSequences.Count > 0)
             {
-                var clip = _scheduledClips.Dequeue();
-                DequeueClipInSchedulingList(clip);
+                var sequence = _scheduledSequences.Dequeue();
+                DequeueSequenceInSchedulingList(sequence);
             }
         }
 
-        private void PushClipInSchedulingList(SkillTimelineClip clip)
+        private void PushSequenceInSchedulingList(SkillTimelineSequence sequence)
         {
-            var schedulingClips = GetSchedulingClipList();
-            if (!schedulingClips.Contains(clip))
+            var schedulingSequences = GetSchedulingSequenceList();
+            if (!schedulingSequences.Contains(sequence))
             {
-                schedulingClips.Add(clip);
-                clip.Start(((SkillTimelineDirector)Owner).gameObject);
+                schedulingSequences.Add(sequence);
+                sequence.Start(((SkillTimelineDirector)Owner).gameObject);
             }
         }
 
-        private void DequeueClipInSchedulingList(SkillTimelineClip clip)
+        private void DequeueSequenceInSchedulingList(SkillTimelineSequence sequence)
         {
-            if (_schedulingClips == null || _schedulingClips.Count <= 0)
+            if (_schedulingSequences == null || _schedulingSequences.Count <= 0)
                 return;
 
-            if (_schedulingClips.Contains(clip))
+            if (_schedulingSequences.Contains(sequence))
             {
-                _schedulingClips.Remove(clip);
-                clip.End();
+                _schedulingSequences.Remove(sequence);
+                sequence.End();
             }
         }
 
         ///
-        private SortedDictionary<int, HashSet<SkillTimelineClip>> GetClipSortDict()
+        private SortedDictionary<int, HashSet<SkillTimelineSequence>> GetSequenceSortDict()
         {
-            _scheduleClips = _scheduleClips ?? new SortedDictionary<int, HashSet<SkillTimelineClip>>();
-            return _scheduleClips;
+            _scheduleSequences = _scheduleSequences ?? new SortedDictionary<int, HashSet<SkillTimelineSequence>>();
+            return _scheduleSequences;
         }
 
-        private HashSet<SkillTimelineClip> GetSchedulingClipList()
+        private HashSet<SkillTimelineSequence> GetSchedulingSequenceList()
         {
-            _schedulingClips = _schedulingClips ?? new HashSet<SkillTimelineClip>();
-            return _schedulingClips;
+            _schedulingSequences = _schedulingSequences ?? new HashSet<SkillTimelineSequence>();
+            return _schedulingSequences;
         }
 
-        private Queue<SkillTimelineClip> GetScheduledClipList()
+        private Queue<SkillTimelineSequence> GetScheduledSequenceList()
         {
-            _scheduledClips = _scheduledClips ?? new Queue<SkillTimelineClip>();
-            return _scheduledClips;
+            _scheduledSequences = _scheduledSequences ?? new Queue<SkillTimelineSequence>();
+            return _scheduledSequences;
         }
 
-        private MaxHeap<SkillTimelineClip, int> GetLengthHeap()
+        private MaxHeap<SkillTimelineSequence, int> GetLengthHeap()
         {
-            _scheduleClipsEndFrame = _scheduleClipsEndFrame ?? new MaxHeap<SkillTimelineClip, int>();
-            return _scheduleClipsEndFrame;
+            _scheduleSequencesEndFrame = _scheduleSequencesEndFrame ?? new MaxHeap<SkillTimelineSequence, int>();
+            return _scheduleSequencesEndFrame;
         }
     }
 
