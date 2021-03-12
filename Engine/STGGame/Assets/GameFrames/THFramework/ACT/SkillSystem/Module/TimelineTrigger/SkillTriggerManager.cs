@@ -3,13 +3,13 @@ using XLibrary.Package;
 
 namespace THGame
 {
-    public class SkillTriggerManager : Singleton<SkillTriggerManager>
+    public class SkillTriggerManager : Singleton<SkillTriggerManager>, ISkillTimelineBinder
     {
         private Dictionary<string, ISkillTriggerFactory> _factoryDict;
 
         public SkillTriggerManager()
         {
-
+            SkillTimelineManager.GetInstance().SetBinder(this);
         }
 
         //NOTE:这里无法通过发射生成实例,估无法使用特性
@@ -43,12 +43,23 @@ namespace THGame
             _factoryDict.TryGetValue(funcName, out var factory);
             return factory;
         }
-
        
         private Dictionary<string, ISkillTriggerFactory> GetFactoryDict()
         {
             _factoryDict = _factoryDict ?? new Dictionary<string, ISkillTriggerFactory>();
             return _factoryDict;
+        }
+
+        public SkillTimelineBehaviour Conver(string type)
+        {
+            var factory = GetFactory(type);
+            if (factory != null)
+            {
+                var skillTrigger = factory.CreateTrigger();
+                return skillTrigger;
+
+            }
+            return default;
         }
     }
 }

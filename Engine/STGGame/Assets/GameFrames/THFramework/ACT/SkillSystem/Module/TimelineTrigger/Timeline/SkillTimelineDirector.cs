@@ -6,7 +6,7 @@ namespace THGame
     public class SkillTimelineDirector : MonoBehaviour 
     {
         public event Action onCompleted;
-        public SkillTimelineSequence timelineSequence;
+        public SkillTimelinePlayable playable;
 
         private int _startFrame;
         private int _offsetFrame;
@@ -17,17 +17,17 @@ namespace THGame
         {
             get
             {
-                if (timelineSequence == null)
+                if (playable == null)
                     return true;
 
-                return GetCurFrameTick() > timelineSequence.EndFrame;
+                return GetCurFrameTick() > playable.EndFrame;
             }
         }
         public bool IsPause { get; protected set; } = false;
 
         public void Play(int offsetFrame = 0)
         {
-            if (timelineSequence == null)
+            if (playable == null)
                 return;
 
             IsPause = false;
@@ -39,10 +39,7 @@ namespace THGame
             if (curFrameCount < 0)
                 return;
 
-            var tickFrame = curFrameCount - timelineSequence.StartFrame;
-
-            timelineSequence.Owner = this;
-            timelineSequence.Seek(tickFrame);
+            playable.Seek(curFrameCount);
         }
 
         public void Pause()
@@ -67,17 +64,16 @@ namespace THGame
 
         public void Stop()
         {
-            if (timelineSequence == null)
+            if (playable == null)
                 return;
 
-
             IsPause = true;
-            timelineSequence.Reset();
+            playable.Reset();
         }
 
         private void Update()
         {
-            if (timelineSequence == null)
+            if (playable == null)
                 return;
 
             if (IsPause)
@@ -90,17 +86,8 @@ namespace THGame
             if (curFrameCount < 0)
                 return;
 
-            var tickFrame = curFrameCount - timelineSequence.StartFrame;
-            if (tickFrame == timelineSequence.StartFrame)
-            {
-                timelineSequence.Start(gameObject);
-            }
-            timelineSequence.Update(tickFrame);
-            if (curFrameCount >= timelineSequence.EndFrame)
-            {
-                timelineSequence.End();
-                onCompleted?.Invoke();
-            }
+            playable.Update(curFrameCount, this);
+            if (IsCompleted) onCompleted?.Invoke();
         }
 
         private int GetFrameTick()

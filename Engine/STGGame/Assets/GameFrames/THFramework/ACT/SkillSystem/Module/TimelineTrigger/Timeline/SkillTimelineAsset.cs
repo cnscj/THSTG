@@ -10,6 +10,5 @@ namespace THGame
 
         public double startTime = 0f;
         public double durationTime = -1f;
-
     }
 }

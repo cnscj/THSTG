@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 
 namespace THGame
@@ -89,7 +90,51 @@ namespace THGame
             return command;
         }
 
-        public static void SaveSequence(SkillTimelineSequence[] skillTimelineSequences, string savePath)
+        public static SkillTimelineSequence[] LoadSequenceFromData(SkillTimelineData data)
+        {
+            if (data == null)
+                return default;
+
+            var playableList = new List<SkillTimelineSequence>();
+            foreach(var playableData in data.sequences)
+            {
+                var rootTrigger = AbstractSkillTrigger.Create(playableData) ?? playableData;
+                var breadthFirstQueue = new Queue<Tuple<SkillTimelineSequence, SkillTimelineSequence>>();
+                breadthFirstQueue.Enqueue(new Tuple<SkillTimelineSequence, SkillTimelineSequence>(playableData, rootTrigger));
+
+                while (breadthFirstQueue.Count > 0)
+                {
+                    var nodeTuple = breadthFirstQueue.Dequeue();
+
+                    if (nodeTuple.Item1.sequences != null && nodeTuple.Item1.sequences.Length > 0)
+                    {
+                        foreach(var childSequenceData in nodeTuple.Item1.sequences)
+                        {
+                            var childTrigger = AbstractSkillTrigger.Create(childSequenceData) ?? childSequenceData;
+                            nodeTuple.Item2.AddSequence(childTrigger);
+
+                            breadthFirstQueue.Enqueue(new Tuple<SkillTimelineSequence, SkillTimelineSequence>(childSequenceData, childTrigger));
+                        }
+                    }
+                }
+                playableList.Add(rootTrigger);
+            }
+
+            return playableList.ToArray();
+        }
+
+        public static void SaveDataToFile(SkillTimelineData skillTimelineData, string savePath)
+        {
+            if (skillTimelineData == null)
+                return;
+
+            if (string.IsNullOrEmpty(savePath))
+                return;
+
+            SkillTimelineData.SaveToFile(skillTimelineData, savePath);
+        }
+
+        public static void SaveSequenceToFile(SkillTimelineSequence[] skillTimelineSequences, string savePath)
         {
             if (skillTimelineSequences == null)
                 return;
@@ -97,38 +142,22 @@ namespace THGame
             if (string.IsNullOrEmpty(savePath))
                 return;
 
-            SkillTimelineData data = new SkillTimelineData();
+            var data = new SkillTimelineData();
             data.sequences = skillTimelineSequences;
 
-            SkillTimelineData.SaveToFile(data, savePath);
+            SaveDataToFile(data, savePath);
         }
 
-        public static SkillTimelineSequence[] LoadSequence(string loadPath)
+        public static SkillTimelineSequence[] LoadSequenceFromFile(string loadPath)
         {
             if (string.IsNullOrEmpty(loadPath))
                 return default;
 
-            List<SkillTimelineSequence> sequence = new List<SkillTimelineSequence>();
             var data = SkillTimelineData.LoadFromFile(loadPath);
-            if (data.sequences != null)
-            {
-                foreach( var sequenceAsset in data.sequences)
-                {
-                    var skillTimelineSequence = new SkillTimelineSequence();
-                    foreach (var clipAsset in sequenceAsset.sequences)
-                    {
-                        var trigger = AbstractSkillTrigger.Create(clipAsset);
-                        if (trigger != null)
-                        {
-                            skillTimelineSequence.AddSequence(trigger);
-                        }
-                    }
-                    sequence.Add(skillTimelineSequence);
-                }
-            }
-
-            return sequence.ToArray();
+            return LoadSequenceFromData(data);
         }
+
+        
 
     }
 

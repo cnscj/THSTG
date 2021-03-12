@@ -58,14 +58,14 @@ namespace THGame
                             skillTimelineTrack.AddSequence(skillTimelineClip);
                         }
                     }
-                    skillTimelineTrack.Refresh();
+                    skillTimelineTrack.RefreshSequence();
                     skillTimelineSequence.AddSequence(skillTimelineTrack);
                 }
             }
-            skillTimelineSequence.Refresh();
+            skillTimelineSequence.RefreshSequence();
 
             skillTimelineData.sequences = new SkillTimelineSequence[] { skillTimelineSequence };
-            SkillTimelineData.SaveToFile(skillTimelineData, savePath);  //FIXME:貌似不支持多余3层的嵌套
+            SkillTimelineData.SaveToFile(skillTimelineData, savePath); 
         }
 
         public static void CreatePlayableByJson(string jsonPath, string playablePath)
@@ -85,7 +85,7 @@ namespace THGame
                 var playableInfo = timelineData.sequences[0]; 
                 foreach (var trackInfo in playableInfo.sequences)
                 {
-                    var trackSequence = (SkillTimelineSequence)trackInfo;//FIXME:这里转换存在问题,应该是与上面的问题一致
+                    var trackSequence = (SkillTimelineSequence)trackInfo;//
                     var timelineTrack = timelineAsset.CreateTrack<SkillTriggerPlayableTrack>(null, trackInfo.name);
                     foreach (var clipInfo in trackSequence.sequences)
                     {

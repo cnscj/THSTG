@@ -9,6 +9,7 @@ namespace THGame
         public SkillTimelineSequence[] sequences;
         private SortedDictionary<int, HashSet<SkillTimelineSequence>> _scheduleSequences;
 
+        private HashSet<SkillTimelineSequence> _initSequences;
         private HashSet<SkillTimelineSequence> _schedulingSequences;
         private Queue<SkillTimelineSequence> _scheduledSequences;
 
@@ -65,6 +66,7 @@ namespace THGame
 
         public void ClearSequences()
         {
+            _initSequences?.Clear();
             _scheduleSequences?.Clear();
             _schedulingSequences?.Clear();
             _scheduledSequences?.Clear();
@@ -76,19 +78,21 @@ namespace THGame
 
         public void Reset()
         {
+            _initSequences?.Clear();
             _schedulingSequences?.Clear();
             _scheduledSequences?.Clear();
 
             RefreshExecuteFrame();
         }
 
-        public void Seek(int tickFrame)
+        public void Seek(int frameCount)
         {
             Reset();
 
             if (_scheduleSequences == null || _scheduleSequences.Count <= 0)
                 return;
 
+            var tickFrame = frameCount;// - StartFrame;
             if (tickFrame < 0)
                 return;
 
@@ -98,13 +102,14 @@ namespace THGame
                 {
                     if (tickFrame > sequence.StartFrame && tickFrame <= sequence.EndFrame)
                     {
+                        GetInitSequenceList().Add(sequence);
                         PushSequenceInSchedulingList(sequence);
                     }
                 }
             }
         }
 
-        public List<SkillTimelineSequence> GetSequences()
+        public SkillTimelineSequence[] GetSequences()
         {
             var sequenceList = new List<SkillTimelineSequence>();
 
@@ -119,16 +124,24 @@ namespace THGame
                 }
             }
 
-            return sequenceList;
+            return sequenceList.ToArray();
         }
 
-        public void Refresh()
+        public void RefreshSequence()
         {
-            this.sequences = GetSequences().ToArray();
+            var sequence = GetSequences();
+            if (sequence != null && sequence.Length > 0)
+            {
+                this.sequences = sequence;
+            }
         }
 
-        public void SetSequences(List<SkillTimelineSequence> sequences)
+        
+        public void SetSequences(SkillTimelineSequence[] sequences)
         {
+            if (sequences == null || sequences.Length <= 0)
+                return;
+
             ClearSequences();
             foreach (var sequence in sequences)
             {
@@ -141,36 +154,38 @@ namespace THGame
             DurationFrame = ((_scheduleSequencesEndFrame != null &&_scheduleSequencesEndFrame.Count > 0) ? _scheduleSequencesEndFrame.Max.Key.EndFrame : 0) + 1;
         }
 
-        public override void OnUpdate(int tickFrame)
+        public override void OnUpdate(SkillTimelineContext context)
         {
             if (_scheduleSequences == null || _scheduleSequences.Count <= 0)
                 return;
 
-            if (tickFrame < 0)
+            if (context.tick < 0)
                 return;
 
-            QuerySequencesUpdate(tickFrame);
-            ExecuteSequencesUpdate(tickFrame);
-            PurgeSequencesUpdate(tickFrame);
+            QuerySequencesUpdate(context);
+            ExecuteSequencesUpdate(context);
+            PurgeSequencesUpdate(context);
         }
 
-        protected void QuerySequencesUpdate(int tickFrame)
+        protected void QuerySequencesUpdate(SkillTimelineContext context)
         {
             //帧列表
             if (_scheduleSequences == null || _scheduleSequences.Count <= 0)
                 return;
 
+            var tickFrame = context.tick - StartFrame;
             if (_scheduleSequences.TryGetValue(tickFrame, out var sequenceList))
             {
                 //扔进执行表执行
                 foreach (var sequence in sequenceList)
                 {
+                    GetInitSequenceList().Add(sequence);
                     PushSequenceInSchedulingList(sequence);
                 }
             }
         }
 
-        protected void ExecuteSequencesUpdate(int tickFrame)
+        protected void ExecuteSequencesUpdate(SkillTimelineContext context)
         {
             //持续执行
             if (_schedulingSequences == null || _schedulingSequences.Count <= 0)
@@ -178,31 +193,43 @@ namespace THGame
 
             foreach (var sequence in _schedulingSequences)
             {
+                var tickFrame = context.tick;
+
+                if (_initSequences != null && _initSequences.Contains(sequence))
+                {
+                    sequence.Start(context);
+                }
+
                 if (tickFrame <= sequence.EndFrame)
                 {
-                    var subTickFrame = tickFrame - sequence.StartFrame;
-                    sequence.Update(subTickFrame);//每帧执行
+                    sequence.Update(context);//每帧执行
                 }
 
                 //检查结束
                 if (tickFrame >= sequence.EndFrame)
                 {
-                    GetScheduledSequenceList().Enqueue(sequence); 
+                    GetScheduledSequenceList().Enqueue(sequence);
+                    sequence.End(context);
                 }
             }
             
         }
 
-        protected void PurgeSequencesUpdate(int tickFrame)
+        protected void PurgeSequencesUpdate(SkillTimelineContext context)
         {
             //检查是否结束
-            if (_scheduledSequences == null)
-                return;
-
-            while (_scheduledSequences.Count > 0)
+            if (_scheduledSequences != null)
             {
-                var sequence = _scheduledSequences.Dequeue();
-                DequeueSequenceInSchedulingList(sequence);
+                while (_scheduledSequences.Count > 0)
+                {
+                    var sequence = _scheduledSequences.Dequeue();
+                    DequeueSequenceInSchedulingList(sequence);
+                }
+            }
+
+            if (_initSequences != null)
+            {
+                _initSequences.Clear();
             }
         }
 
@@ -212,7 +239,6 @@ namespace THGame
             if (!schedulingSequences.Contains(sequence))
             {
                 schedulingSequences.Add(sequence);
-                sequence.Start(((SkillTimelineDirector)Owner).gameObject);
             }
         }
 
@@ -224,7 +250,6 @@ namespace THGame
             if (_schedulingSequences.Contains(sequence))
             {
                 _schedulingSequences.Remove(sequence);
-                sequence.End();
             }
         }
 
@@ -233,6 +258,12 @@ namespace THGame
         {
             _scheduleSequences = _scheduleSequences ?? new SortedDictionary<int, HashSet<SkillTimelineSequence>>();
             return _scheduleSequences;
+        }
+
+        private HashSet<SkillTimelineSequence> GetInitSequenceList()
+        {
+            _initSequences = _initSequences ?? new HashSet<SkillTimelineSequence>();
+            return _initSequences;
         }
 
         private HashSet<SkillTimelineSequence> GetSchedulingSequenceList()

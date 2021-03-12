@@ -13,7 +13,7 @@
 #endif
             }
         }
-
+        
         public static AbstractSkillTrigger Create(SkillTimelineAsset asset)
         {
             var triggerFactor = SkillTriggerManager.GetInstance().GetFactory(asset.type);
@@ -28,7 +28,7 @@
                     trigger.startTime = asset.startTime;
                     trigger.durationTime = asset.durationTime;
 
-                    trigger.Initialize(null, trigger.args);
+                    trigger.Initialize(null, asset.args);
                     return trigger;
                 }
             }

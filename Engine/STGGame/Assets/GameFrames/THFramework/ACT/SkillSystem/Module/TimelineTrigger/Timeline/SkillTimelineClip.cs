@@ -9,36 +9,48 @@ namespace THGame
         public event Action onEnd;
 
         public readonly SkillTimelineAsset asset;
-        public readonly SkillTimelineBehaviour behaviour;
+        public SkillTimelineBehaviour behaviour;
 
         public int EndFrame => (StartFrame + DurationFrame - 1);
         public bool Enabled { get; set; } = true;
         public bool IsExecuting { get; protected set ; }
 
+
         public int StartFrame
         {
             get
             {
+                if (asset == null)
+                    return 0;
+
                 return Math.Max(0, SkillTimelineManager.GetInstance().Time2Frame(asset.startTime));
             }
             protected set
             {
+                if (asset == null)
+                    return ;
+
                 asset.startTime = SkillTimelineManager.GetInstance().Frame2Time(value);
             }
         }
+
         public int DurationFrame
         {
             get
             {
+                if (asset == null)
+                    return 0;
+
                 return Math.Max(1, SkillTimelineManager.GetInstance().Time2Frame(asset.durationTime));
             }
             protected set
             {
+                if (asset == null)
+                    return;
+
                 asset.durationTime = SkillTimelineManager.GetInstance().Frame2Time(value);
             }
         }
-
-        public object Owner { get; set ; }
 
         public static SkillTimelineClip Create(SkillTimelineAsset asset, SkillTimelineBehaviour behaviour)
         {
@@ -78,32 +90,32 @@ namespace THGame
             behaviour?.OnCreate(info,args);
         }
 
-        public virtual void Start(object owner)
+        public virtual void Start(SkillTimelineContext context)
         {
             IsExecuting = true;
             if (!Enabled)
                 return;
 
             onStart?.Invoke();
-            behaviour?.OnStart(owner);
+            behaviour?.OnStart(context);
         }
 
-        public virtual void Update(int tickFrame)
+        public virtual void Update(SkillTimelineContext context)
         {
             if (!Enabled)
                 return;
 
-            behaviour?.OnUpdate(tickFrame);
+            behaviour?.OnUpdate(context);
         }
 
-        public virtual void End()
+        public virtual void End(SkillTimelineContext context)
         {
             IsExecuting = false;
             if (!Enabled)
                 return;
 
             onEnd?.Invoke();
-            behaviour?.OnEnd();
+            behaviour?.OnEnd(context);
 
         }
 

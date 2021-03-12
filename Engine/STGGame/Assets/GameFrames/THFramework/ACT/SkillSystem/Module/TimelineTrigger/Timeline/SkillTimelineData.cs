@@ -8,7 +8,15 @@ namespace THGame
     public class SkillTimelineData
     {
         public string version = "1.0";
+        public SkillTimelinePlayable playable;
+
         public SkillTimelineSequence[] sequences;
+
+        public static SkillTimelineData Create(string content)
+        {
+            var data = JsonUtility.FromJson<SkillTimelineData>(content);
+            return data;
+        }
 
         public static SkillTimelineData LoadFromFile(string filePath)
         {
