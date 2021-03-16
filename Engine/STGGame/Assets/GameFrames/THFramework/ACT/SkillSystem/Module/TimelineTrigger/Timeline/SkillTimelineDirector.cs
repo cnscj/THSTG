@@ -20,9 +20,22 @@ namespace THGame
                 if (playable == null)
                     return true;
 
+                return GetCurFrameTick() >= playable.EndFrame;
+            }
+        }
+
+        public bool IsEnd
+        {
+            get
+            {
+                if (playable == null)
+                    return true;
+
                 return GetCurFrameTick() > playable.EndFrame;
             }
         }
+
+
         public bool IsPause { get; protected set; } = false;
 
         public void Play(int offsetFrame = 0)
@@ -79,7 +92,7 @@ namespace THGame
             if (IsPause)
                 return;
 
-            if (IsCompleted)
+            if (IsEnd)
                 return;
 
             int curFrameCount = GetCurFrameTick();

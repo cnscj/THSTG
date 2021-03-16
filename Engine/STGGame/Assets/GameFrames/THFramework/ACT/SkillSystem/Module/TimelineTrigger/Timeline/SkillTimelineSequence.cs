@@ -193,7 +193,7 @@ namespace THGame
 
             foreach (var sequence in _schedulingSequences)
             {
-                var tickFrame = context.tick;
+                var tickFrame = context.tick - StartFrame; ;
 
                 if (_initSequences != null && _initSequences.Contains(sequence))
                 {

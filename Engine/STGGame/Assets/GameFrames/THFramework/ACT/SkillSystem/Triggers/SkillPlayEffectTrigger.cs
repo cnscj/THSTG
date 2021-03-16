@@ -9,9 +9,9 @@ namespace THGame
         {
             effectId = args.Length > 0 ? args[0] : "";
         }
-        public override void OnStart(object owner)
+        public override void OnStart(SkillTimelineContext context)
         {
-            var go = owner as GameObject;
+            var go = context.owner as GameObject;
             string resPath = string.Format("Assets/ZCustom_Test/Res/Effects/Prefabs/{0}.prefab", effectId);
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(resPath);
 

@@ -48,7 +48,7 @@ namespace THGame
                             var triggerClip = clip.asset as SkillTriggerPlayableClip;
                             var skillTimelineClip = new SkillTimelineSequence();
 
-                            skillTimelineClip.name = triggerClip.name;
+                            skillTimelineClip.name = clip.displayName;
                             skillTimelineClip.type = triggerClip.type;
                             skillTimelineClip.args = triggerClip.args;
 

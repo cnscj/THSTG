@@ -9,7 +9,7 @@ namespace THGame
         public string name;
         public SkillTimelineSequence sequence;
 
-        private SkillTimelineContext _context = new SkillTimelineContext();
+        private readonly SkillTimelineContext _context = new SkillTimelineContext();
         public SerializationDictionary<string, SkillTimelineSequence> dict;
         public int StartFrame
         {
@@ -46,7 +46,7 @@ namespace THGame
             _context.tick = tickFrame;
             _context.owner = director.gameObject;
 
-            if (tickFrame == sequence.StartFrame)//FIXME:大概率会不执行
+            if (tickFrame == sequence.StartFrame)//XXX:大概率会不执行
             {
                 sequence.Start(_context);
             }

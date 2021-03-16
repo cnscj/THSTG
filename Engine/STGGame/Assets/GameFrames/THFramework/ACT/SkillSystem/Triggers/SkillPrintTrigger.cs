@@ -9,7 +9,7 @@ namespace THGame
         {
             outStr = args.Length > 0 ? args[0] : "";
         }
-        public override void OnStart(object sender)
+        public override void OnStart(SkillTimelineContext context)
         {
             Debug.Log(outStr);
         }

@@ -6,21 +6,23 @@ namespace THGame.Skill
     {
         public SkillTriggerPlayableClip clip;
         private AbstractSkillTrigger _trigger;
+        private SkillTimelineContext _context = new SkillTimelineContext();
         public override void OnBehaviourPlay(Playable playable, FrameData info)
         {
             var director = playable.GetGraph().GetResolver() as PlayableDirector;
-
-            _trigger?.Start(director.gameObject);
+            _context.owner = director.gameObject;
+            _trigger?.Start(_context);
         }
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
-            _trigger?.Update((int)info.deltaTime);
+            _context.tick = (int)info.deltaTime;
+            _trigger?.Update(_context);
         }
 
         public override void OnBehaviourPause(Playable playable, FrameData info)
         {
-            _trigger?.End();
+            _trigger?.End(_context);
         }
 
         public new void OnPlayableCreate(Playable playable)
