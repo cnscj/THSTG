@@ -46,7 +46,7 @@ namespace THGame
             _context.tick = tickFrame;
             _context.owner = director.gameObject;
 
-            if (tickFrame == sequence.StartFrame)//XXX:大概率会不执行
+            if (tickFrame == sequence.StartFrame)//XXX:首次执行包括起始帧
             {
                 sequence.Start(_context);
             }

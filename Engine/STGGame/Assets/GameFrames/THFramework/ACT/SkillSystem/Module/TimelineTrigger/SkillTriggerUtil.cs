@@ -90,7 +90,7 @@ namespace THGame
             return command;
         }
 
-        public static SkillTimelineSequence[] LoadSequenceFromData(SkillTimelineData data)
+        public static SkillTimelineSequence[] LoadSequencesFromData(SkillTimelineData data)
         {
             if (data == null)
                 return default;
@@ -134,7 +134,7 @@ namespace THGame
             SkillTimelineData.SaveToFile(skillTimelineData, savePath);
         }
 
-        public static void SaveSequenceToFile(SkillTimelineSequence[] skillTimelineSequences, string savePath)
+        public static void SaveSequencesToFile(SkillTimelineSequence[] skillTimelineSequences, string savePath)
         {
             if (skillTimelineSequences == null)
                 return;
@@ -148,16 +148,40 @@ namespace THGame
             SaveDataToFile(data, savePath);
         }
 
-        public static SkillTimelineSequence[] LoadSequenceFromFile(string loadPath)
+        public static SkillTimelineSequence[] LoadSequencesFromFile(string loadPath)
         {
             if (string.IsNullOrEmpty(loadPath))
                 return default;
 
             var data = SkillTimelineData.LoadFromFile(loadPath);
-            return LoadSequenceFromData(data);
+            return LoadSequencesFromData(data);
         }
 
-        
+
+        public static SkillTimelinePlayable LoadPlayableFromData(SkillTimelineData skillTimelineData)
+        {
+            var playable = new SkillTimelinePlayable();
+            var sequences = LoadSequencesFromData(skillTimelineData);
+            var playableSequence = sequences[0];
+            playable.name = playableSequence.name;
+            playable.sequence = playableSequence;
+
+            return playable;
+        }
+
+        public static void SavePlayableToFile(SkillTimelinePlayable skillTimelinePlayable, string savePath)
+        {
+            var sequences = new SkillTimelineSequence[] { skillTimelinePlayable.sequence };
+            SaveSequencesToFile(sequences, savePath);
+        }
+
+        public static SkillTimelinePlayable LoadPlayableFromFile(string loadPath)
+        {
+            var timelineData = SkillTimelineData.LoadFromFile(loadPath);
+            var playable = LoadPlayableFromData(timelineData);
+
+            return playable;
+        }
 
     }
 
