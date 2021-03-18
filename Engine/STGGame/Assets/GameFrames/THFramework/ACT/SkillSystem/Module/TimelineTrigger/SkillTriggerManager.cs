@@ -9,7 +9,9 @@ namespace THGame
 
         public SkillTriggerManager()
         {
+
             SkillTimelineManager.GetInstance().SetBinder(this);
+
         }
 
         //NOTE:这里无法通过发射生成实例,估无法使用特性

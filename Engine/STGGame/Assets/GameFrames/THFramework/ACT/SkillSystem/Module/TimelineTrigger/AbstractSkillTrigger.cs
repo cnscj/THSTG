@@ -6,11 +6,7 @@
         {
             get
             {
-#if UNITY_EDITOR
                 return OnArgsDesc();
-#else
-        return null;
-#endif
             }
         }
         

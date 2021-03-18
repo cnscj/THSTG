@@ -5,6 +5,7 @@ namespace THGame
     public class SkillTimelineAsset
     {
         public string name;
+        public string displayName;
         public string type;
         public string[] args;
 

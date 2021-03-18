@@ -37,6 +37,8 @@ namespace THGame
                 var track = pb.sourceObject as TrackAsset;
                 if (track != null)
                 {
+                    if (track.muted) continue;
+
                     SkillTimelineSequence skillTimelineTrack = new SkillTimelineSequence();
                     skillTimelineTrack.name = track.name;
                     skillTimelineTrack.type = "_track_";
@@ -48,7 +50,8 @@ namespace THGame
                             var triggerClip = clip.asset as SkillTriggerPlayableClip;
                             var skillTimelineClip = new SkillTimelineSequence();
 
-                            skillTimelineClip.name = clip.displayName;
+                            skillTimelineClip.displayName = clip.displayName;
+                            skillTimelineClip.name = triggerClip.name;
                             skillTimelineClip.type = triggerClip.type;
                             skillTimelineClip.args = triggerClip.args;
 
@@ -92,7 +95,7 @@ namespace THGame
                         var timelineClip = timelineTrack.CreateClip<SkillTriggerPlayableClip>();
                         var triggerClip = timelineClip.asset as SkillTriggerPlayableClip;
 
-                        timelineClip.displayName = clipInfo.name;
+                        timelineClip.displayName = clipInfo.displayName;
                         triggerClip.type = clipInfo.type;
                         triggerClip.name = clipInfo.name;
                         triggerClip.args = clipInfo.args;
