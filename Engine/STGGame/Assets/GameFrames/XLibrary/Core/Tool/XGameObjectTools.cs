@@ -70,11 +70,14 @@ namespace XLibrary
                 return;
 
             Stack<GameObject> parentNodes = new Stack<GameObject>();
+            Stack<GameObject> transNodes = new Stack<GameObject>();
             parentNodes.Push(obj);
 
             while (parentNodes.Count > 0)
             {
                 var curNode = parentNodes.Pop();
+                transNodes.Push(curNode);
+
                 for (int i = 0; i < curNode.transform.childCount; i++)
                 {
                     var itNode = curNode.transform.GetChild(i).gameObject;
@@ -83,7 +86,11 @@ namespace XLibrary
 
                     parentNodes.Push(itNode);
                 }
+            }
 
+            while(transNodes.Count > 0)
+            {
+                var curNode = transNodes.Pop();
                 action.Invoke(curNode);
             }
 
