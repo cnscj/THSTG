@@ -2,8 +2,8 @@
 ---@class Timer
 local M = class("Timer")
 
-require "Game.Utils.Collections.Array"
-require "Game.Utils.Timer.TimerProfiler"
+require "System.Lang.Collection.Array"
+require "System.Lang.Helper.TimerProfiler"
 
 local pairs = pairs
 local getCurrentTime = getCurrentTime

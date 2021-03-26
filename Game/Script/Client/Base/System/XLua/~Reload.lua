@@ -8,24 +8,36 @@ local tracebackPath = "/Users/alonso/work/jz3d/Project/100/Client/Scripts/Base/S
 
 
 function reloadView()
-    local refreshPack = {
-        -- "UI",
-        "Test",
-    }
-    local refreshView = {
-        "TestView",
-        "PlayerView",
-    }
+    -- local refreshPack = {
+    --     -- "UI",
+    --     "Test",
+    --     "Mirror",
+    --     "Team",
+    --     "Marry",
+    --     "ActivityRebate",
+    -- }
+    
+    -- local refreshView = {
+    --     "TestView",
+    --     "PlayerView",
+    --     "ArenaView",
+    --     "TeamView",
+    --     "AffectionView",
+    -- }
 
-    for k, v in ipairs(refreshPack) do
-        UIPackageManager.removePackage(v)
-        UIPackageManager.addPackage(v)
-    end
+    -- for k, v in ipairs(refreshPack) do
+    --     UIPackageManager.removePackage(v)
+    --     UIPackageManager.addPackage(v)
+    -- end
 
-    for k, v in ipairs(refreshView) do
-        ViewManager.close(v)
-        -- ViewManager.open(v)
-    end
+    -- for k, v in ipairs(refreshView) do
+    --     ViewManager.close(v)
+    --     ViewManager.open(v)
+    -- end
+
+    ViewManager.closeAll(false, true)
+    UIPackageManager.clearExcepPublicPackage()
+    
 
 end
 
@@ -52,6 +64,7 @@ function reloadLua()
         "Game.Utils",
         "Game.Manager",
         "Game.UI",
+        "SkillConfig"
     }
 
     -- 多数manager不能刷，UIDUtil不能刷
@@ -83,7 +96,8 @@ function reloadLua()
         "ServerTimeCache",
         "ItemData",
         "Headwear",
-        "MapConfig"
+        "MapConfig",
+        "Alert",
     }
     
 
@@ -172,9 +186,15 @@ function reloadLua()
         ViewManager.reload()
     end
     
+    World:reloadFile("Game.Modules.Map.Entity.Util.SkillEffectHandler")
+    AI:clear()
+    World:reloadFile("Game.Modules.MapAI.AI")
+    AI:refreshHero()
     World:reload()
     UIWorld:reload()
-
+    ClientWorld:reload()
+    TurnBasedWorld:reload()
+    SDK.init()
     __RELOADING_LUA__ = false
 end
 
