@@ -1,26 +1,37 @@
 local M = class("ObjectPool")
 
 function M:ctor(Type)
-    self.type = Type
     self.maxCount = 40
 
+    self._type = Type
     self._queue = Queue.new()
 end
 
 function M:getOrCreate()
     local obj
     if self._queue:size() <= 0 then
-        local newObj = self.type.new()
-        self:release(newObj)
+        if self._type then
+            local newObj = self._type.new()
+            self:release(newObj)
+        end
+    end
+    if self._queue:size() > 0 then
+        obj = self:dequeue()
     end
 
-    obj = self:dequeue()
     return obj
 end
---TODO:
+
 function M:release(obj)
     if not obj then
         return
+    end
+    if not self._type then
+        return 
+    end
+
+    if obj.__cname ~= self._type.cname then
+        return 
     end
 
     if self.maxCount >= 0 then
@@ -33,5 +44,5 @@ function M:release(obj)
 end
 
 function M:clearAll()
-
+    self._queue:clear()
 end

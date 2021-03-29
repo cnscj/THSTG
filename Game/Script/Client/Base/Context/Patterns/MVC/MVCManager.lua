@@ -21,4 +21,4 @@ function M.clearAll()
 
 end
 
-
+rawset(_G, "MVCManager", M)

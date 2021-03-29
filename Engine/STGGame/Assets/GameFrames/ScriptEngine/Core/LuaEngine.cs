@@ -122,7 +122,7 @@ namespace SEGame
             m_luaLateUpdateCallback = null;
         }
 
-        public void SetLuaTrunkAndBrench(string trunk, string brench)
+        public void SetLuaTrunkAndBranch(string trunk, string brench)
         {
             trunkRoot = trunk;
             branchRoot = brench;

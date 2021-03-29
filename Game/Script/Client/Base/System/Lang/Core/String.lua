@@ -290,7 +290,7 @@ function string.split2Num( str, sep )
     return fields
 end
 
-string.empty = ""
+string.Empty = ""
 function string.isEmpty(str)
-    return not str or string.empty == str
+    return not str or string.Empty == str
 end

@@ -11,5 +11,5 @@ function M:clear()
     
 end
 
-rawset(_G, "Cache", M)
+rawset(_G, "Cache", false)
 Cache = M

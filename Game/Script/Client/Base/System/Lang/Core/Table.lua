@@ -392,5 +392,18 @@ function table.deepcopy(orig)
     end
     return _copy(orig)
 end
--- dump(__PRINT_TYPE__, "禁用clone")
-----------
+
+local ReadOnly_Empty_Table = false
+local ReadOnly_Empty_Metatable = {
+    __newindex = function()
+        printError( "不能给只读的空表添加元素" )
+    end
+}
+function table.getReadOnlyEmptyTable()
+    if not ReadOnly_Empty_Table then
+        ReadOnly_Empty_Table = {}
+        setmetatable(ReadOnly_Empty_Table, ReadOnly_Empty_Metatable)
+    end
+    return ReadOnly_Empty_Table
+end
+table.Empty = table.getReadOnlyEmptyTable()
