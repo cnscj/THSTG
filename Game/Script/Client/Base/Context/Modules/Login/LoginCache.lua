@@ -1,3 +1,3 @@
-local M = class("LoginCache")
+local M = class("LoginCache",BaseCache)
 
 return M

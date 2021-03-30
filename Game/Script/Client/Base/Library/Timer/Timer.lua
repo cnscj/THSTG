@@ -3,7 +3,7 @@
 local M = class("Timer")
 
 require "System.Lang.Collection.Array"
-require "System.Lang.Helper.TimerProfiler"
+require "System.Lang.Tool.TimerProfiler"
 
 local pairs = pairs
 local getCurrentTime = getCurrentTime

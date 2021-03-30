@@ -1,26 +1,29 @@
-local M = {}
+local M = class("ObjectPoolManager")
 
-local _poolDict = {}
+function M:ctor()
+    self._poolDict = {}
+end
 
-function M.createPool(Type)
+function M:createPool(Type)
     if not Type then return end 
     if not Type.new then return end --是个类而不是实例
 
-    if not _poolDict[Type] then
-        _poolDict[Type] = ObjectPool.new(Type)
+    if not self._poolDict[Type] then
+        self._poolDict[Type] = ObjectPool.new(Type)
     end
-    return _poolDict[Type]
+    return self._poolDict[Type]
 end
 
-function M.getPool(Type)
-    return _poolDict[Type]
+function M:getPool(Type)
+    return self._poolDict[Type]
 end
 
-function M.clearAll()
-    for _,pool in pairs(_poolDict) do 
+function M:clearAll()
+    for _,pool in pairs(self._poolDict) do 
         pool:clearAll()
     end
-    _poolDict = {}
+    self._poolDict = {}
 end
 
-rawset(_G, "ObjectPoolManager", M)
+rawset(_G, "ObjectPoolManager", false)
+ObjectPoolManager = M.new()

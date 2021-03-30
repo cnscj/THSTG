@@ -1,0 +1,1 @@
+require("Config.GameDef.GameDef")   --动态加载,不需要在往里加了

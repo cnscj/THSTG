@@ -1,5 +1,5 @@
 ---@class BaseCache
-local M = class("Cache")
+local M = class("BaseCache")
 
 --
 function M:ctor()
@@ -11,5 +11,5 @@ function M:clear()
     
 end
 
-rawset(_G, "Cache", false)
-Cache = M
+rawset(_G, "BaseCache", false)
+BaseCache = M

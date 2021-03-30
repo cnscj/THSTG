@@ -1,23 +1,23 @@
-local M = {}
+local M = class("MVCManager")
 
-function M.addController()
+function M:addController()
 
 end
 
-function M.addCache()
+function M:addCache()
     
 end
 
-function M.clearCaches()
+function M:clearCaches()
 
 end
 
 
-function M.clearControllers()
+function M:clearControllers()
 
 end
 
-function M.clearAll()
+function M:clearAll()
 
 end
 

@@ -16,6 +16,7 @@ end
 function setup()
     --游戏依赖加载
     require("3rdInit")
+    require("ConfigInit")
     require("SystemInit")
     require("LibraryInit")
 
