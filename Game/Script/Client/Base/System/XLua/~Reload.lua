@@ -55,12 +55,7 @@ function reloadLua()
 
     -- 带字样
     local includePattern = {
-        -- "Controller",
-        -- "Util",
-        -- "MsgManager",
-        -- "Config", -- 太卡
         "Game.Modules",
-        -- "Game.ConfigReaders", -- 太卡
         "Game.Utils",
         "Game.Manager",
         "Game.UI",
@@ -122,7 +117,7 @@ function reloadLua()
         if type(data) == "table" and type(data.super) == "table" and data.super.cname == "Controller" then
             package.loaded[pack] = nil
             local newCls = require(pack)
-            ControllerManager.reloadController(pack, newCls)
+            ControllerManager:reloadController(pack, newCls)
             a = 1
 
         -- 刷新Cache

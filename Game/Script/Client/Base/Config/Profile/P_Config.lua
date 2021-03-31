@@ -1,3 +1,3 @@
 return {
-    {name = "TestConfig",path = "Context.ConfigReaders.TestConfig"}
+    {name = "testConfig",path = "Context.ConfigReaders.TestConfig"}
 }

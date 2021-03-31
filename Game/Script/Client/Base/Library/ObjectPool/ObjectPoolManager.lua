@@ -2,6 +2,7 @@ local M = class("ObjectPoolManager")
 
 function M:ctor()
     self._poolDict = {}
+    --TODO:注册一个轮询函数
 end
 
 function M:createPool(Type)
@@ -23,6 +24,13 @@ function M:clearAll()
         pool:clearAll()
     end
     self._poolDict = {}
+end
+
+function M:update(dt)
+    -- 自动清理的轮询
+    for _,pool in pairs(self._poolDict) do 
+        pool:update(dt)
+    end
 end
 
 rawset(_G, "ObjectPoolManager", false)

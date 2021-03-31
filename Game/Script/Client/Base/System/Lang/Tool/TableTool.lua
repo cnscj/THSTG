@@ -314,5 +314,5 @@ function M.clearArray(t)
     end
 end
 
-rawset(_G, "TableUtil", false)
-TableUtil = M
+rawset(_G, "TableTool", false)
+TableTool = M

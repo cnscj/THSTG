@@ -1,10 +1,14 @@
 local M = class("ObjectPool")
 
 function M:ctor(Type)
-    self.maxCount = 40
+    self.maxCount = 60
+    self.minCount = 10
+    self.idleCleanTime = 60
 
     self._type = Type
     self._queue = Queue.new()
+
+    self._lastCleanTime = 0
 end
 
 function M:getOrCreate()
@@ -45,4 +49,9 @@ end
 
 function M:clearAll()
     self._queue:clear()
+end
+
+--TODO:
+function M:update(dt)
+
 end

@@ -13,6 +13,7 @@ function init()
     --设置游戏逻辑更新
     CSharp.LuaEngine:RegisterLuaUpdateListeners(update)
 end
+
 function setup()
     --游戏依赖加载
     require("3rdInit")
@@ -20,6 +21,7 @@ function setup()
     require("SystemInit")
     require("LibraryInit")
 
+    --游戏环境
     require("ContextInit")
 end
 
@@ -27,6 +29,8 @@ function start()
     --启动
     print(string.format("Engine Name:%s Engine Version:%s\nProject Name:%s Project Version:%s",__ENGINE_NAME__,__ENGINE_VERSION__,__PROJECT_NAME__,__SCRIPT_VERSION__))
     print(string.format("Launch Finish!"))
+
+    GameManager:start()
 end
 
 function main()
@@ -37,7 +41,7 @@ function main()
 end
 
 function update(dt)
-
+    GameManager:update(dt)
 end
 
 main()

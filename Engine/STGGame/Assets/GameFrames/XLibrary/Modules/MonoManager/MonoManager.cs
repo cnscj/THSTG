@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using XLibrary.Package;
+﻿using XLibrary.Package;
 
 namespace XLibGame
 {
@@ -14,7 +11,7 @@ namespace XLibGame
         private MonoCallback _lateUpdateCallback;
 
 
-        private void Awake()
+        private new void Awake()
         {
             _awakeCallback?.Invoke();
         }

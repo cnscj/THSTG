@@ -27,6 +27,10 @@ local _getter = {
     Object = function() return UnityEngine.Object end,
     GameObject = function() return UnityEngine.GameObject end,
     Debug = function() return UnityEngine.Debug end,
+    Time = function() return UnityEngine.Time end,
+
+    --XLibrary
+    MonoManager = function() return XLibGame.MonoManager end,
 
     --自定义
     LuaEngine = function() return SEGame.LuaEngine.GetInstance() end,  

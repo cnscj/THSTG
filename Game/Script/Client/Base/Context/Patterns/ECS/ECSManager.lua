@@ -76,7 +76,6 @@ function M:recycleEntity(entity)
     entity._id = 0
     entityPool:release(entity)
     self._entityIdDict[entityId] = nil
-    
 
 end
 
