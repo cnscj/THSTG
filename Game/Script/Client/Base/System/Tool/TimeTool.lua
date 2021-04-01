@@ -23,10 +23,7 @@ function M.getTimeStamp()
 end
 
 function M.getTimeStampMs()
-    local start_time = socket.gettime()
-    local end_time= socket.gettime()
-    local use_time = (end_time - start_time )*1000
-    return use_time
+    return socket.gettime() * 1000
 end
 
 -- params = {

@@ -6,9 +6,6 @@
         2. 部分类只是为了设置一些全局参数，可以在C#那边封装一些工具方法来设置，不需要直接调用对应的类去设置，除非是后期加的功能，前期功能比较明确的时候，尽量通过工具类去做
 --]]
 
---测试时间的函数，拿出来
--- local startProfile = ProfilerUtil.start
--- local stopProfile = ProfilerUtil.stopAndPrint
 
 --命名空间
 local UnityEngine = CS.UnityEngine
@@ -30,11 +27,11 @@ local _getter = {
     Time = function() return UnityEngine.Time end,
 
     --XLibrary
-    MonoManager = function() return XLibGame.MonoManager end,
+    MonoManagerIns = function() return XLibGame.MonoManager.GetInstance() end,
 
     --自定义
-    LuaEngine = function() return SEGame.LuaEngine.GetInstance() end,  
-    GameEngine = function() return STGGame.GameEngine.GetInstance() end, 
+    LuaEngineIns = function() return SEGame.LuaEngine.GetInstance() end,  
+    GameEngineIns = function() return STGGame.GameEngine.GetInstance() end, 
 }
 
 

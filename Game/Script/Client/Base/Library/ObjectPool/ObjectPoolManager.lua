@@ -2,7 +2,14 @@ local M = class("ObjectPoolManager")
 
 function M:ctor()
     self._poolDict = {}
-    --TODO:注册一个轮询函数
+
+    --注册一个轮询函数
+    self._updateFunction = function ( ... )
+        self:update(CSharp.Time.deltaTime)
+    end
+
+    --注册更新
+    CSharp.MonoManagerIns:AddUpdateListener(self._updateFunction)
 end
 
 function M:createPool(Type)
@@ -17,6 +24,10 @@ end
 
 function M:getPool(Type)
     return self._poolDict[Type]
+end
+
+function M:getOrCreatePool(Type)
+   return self:getPool(Type) or self:createPool(Type)
 end
 
 function M:clearAll()

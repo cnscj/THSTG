@@ -1,18 +1,11 @@
---XLua相关
-require("System.XLua.Debug")
-require("System.XLua.Profiler")
--- require("System.XLua.Tdr")
-require("System.XLua.Strict")
-require("System.XLua.Util")
+
 
 --Lang相关
 require("System.Lang.Core.Class")
 require("System.Lang.Core.Coroutine")
 require("System.Lang.Core.Delegate")
-require("System.Lang.Core.Functions")
 require("System.Lang.Core.String")
 require("System.Lang.Core.Table")
-
 
 require("System.Lang.Math.Math")
 require("System.Lang.Math.Quaternion")
@@ -35,10 +28,19 @@ require("System.Lang.Utility.Color")
 require("System.Lang.Utility.Date")
 require("System.Lang.Utility.Time")
 
-
+--工具函数相关
 require("System.Tool.ConfigOptimizer")
+require("System.Tool.TimerProfiler")
 require("System.Tool.TimeTool")
 
 --Unity相关
 require("System.Engine.UnityComponent")
 require("System.Engine.UnityGameObject")
+
+--XLua相关
+require("System.XLua.Debug")
+require("System.XLua.Profiler")
+-- require("System.XLua.Tdr")
+require("System.XLua.Util")
+require("System.XLua.Functions")
+require("System.XLua.Strict")   --这里开始不能在设置全局变量了

@@ -2,14 +2,15 @@
 ---@class Timer
 local M = class("Timer")
 
-require "System.Lang.Collection.Array"
-require "System.Lang.Tool.TimerProfiler"
-
 local pairs = pairs
-local getCurrentTime = getCurrentTime
+--local getCurrentTime = getCurrentTime
 
 function M:ctor()
-    self._nextTimerId = 1
+    self._timerId = 0
+    self._isScaled = false
+
+    --TimeNode池
+    self._timerNodePool = ObjectPoolManager:getOrCreatePool(TimerNode)
 
     -- self.MIN_INTERVAL = 0.0166666  --1/60帧率设置变了要接收ON_FRAME_RATE_CHANGED事件。这边用不到。
 
@@ -45,20 +46,24 @@ function M:ctor()
     self._waitingClearAll = false
 
     --注册update回调.
-    self._updateId = false
+    self._updateFunc = false
 
     --开关
-    TimerProfiler.setEnable(__ENBALE_PROFILER__)
+    TimerProfiler.setEnable(__ENABLE_PROFILER__)
 end
 
 function M:init()
-    if not self._updateId then
-        self._updateId = Engine:registerUpdateHandler(function(dt, currentTime, preTime)
-            self:update(dt, currentTime, preTime)
-        end)
-    end
+    self:_registerUpdateHandler()
 end
 
+function M:_registerUpdateHandler()
+    if not self._updateFunc then
+        self._updateFunc = function()
+            self:update(CSharp.Time.deltaTime)
+        end
+        CSharp.MonoManagerIns:AddUpdateListener(self._updateFunc)
+    end
+end
 
 function M:_removeWorkingQueueAt(i)
     return self._workingTimerQueue:quickRemove(i)
@@ -138,8 +143,8 @@ function M:_addWaitingTimers()
 end
 
 local frameId = 0
-function M:update(dt, currentTime, preTime)
-    if __ENBALE_PROFILER__ then
+function M:update(dt)
+    if __ENABLE_PROFILER__ then
         frameId = frameId + 1
         TimerProfiler.start(frameId)
     end
@@ -150,13 +155,13 @@ function M:update(dt, currentTime, preTime)
     self._isRunning = true
 
     --1. next frame timers
-    self:_updateNextFrameTimers(dt, currentTime, preTime)
+    self:_updateNextFrameTimers(dt)
 
     --2. each frame timers
-    self:_updateEachFrameTimers(dt, currentTime, preTime)
+    self:_updateEachFrameTimers(dt)
 
     --3. common timers
-    self:_updateCommonTimers(dt, currentTime, preTime)
+    self:_updateCommonTimers(dt)
 
     self._isRunning = false
 
@@ -167,7 +172,7 @@ function M:update(dt, currentTime, preTime)
 end
 
 --下一帧执行的，也是一次性，执行完就回收
-function M:_updateNextFrameTimers(dt, currentTime, preTime)
+function M:_updateNextFrameTimers()
     if self._nextFrameTimers:size() > 0 then
         -- local startTime = os.clock()
         local node
@@ -185,14 +190,14 @@ function M:_updateNextFrameTimers(dt, currentTime, preTime)
 end
 
 --每一帧执行，这边对顺序不敏感，可以倒顺遍历
-function M:_updateEachFrameTimers(dt, currentTime, preTime)
+function M:_updateEachFrameTimers(dt)
     if self._eachFrameTimers:size() > 0 then
         local node
         for i = self._eachFrameTimers:size(), 1, -1 do
             node = self._eachFrameTimers:get(i)
 
             if not node:isAborted() then
-                node:update(dt, currentTime, preTime)
+                node:update(dt)
             end
 
             --直接回收.
@@ -205,7 +210,6 @@ function M:_updateEachFrameTimers(dt, currentTime, preTime)
 
     end
 end
-
 
 function M:_updateCommonTimers(dt, curTime, preTime)
     curTime = curTime or self:_getTime()
@@ -296,19 +300,21 @@ function M:_updateCommonTimers(dt, curTime, preTime)
 end
 
 function M:_getTime()
-    return getCurrentTime()
+    return millisecondNow()
 end
 
 function M:_newTimerId()
-    local timerId = self._nextTimerId
-    self._nextTimerId = self._nextTimerId + 1
-    return timerId
+    self._timerId = self._timerId + 1
+    return self._timerId
 end
 
+function M:_getTimerNodePool()
+    return self._timerNodePool
+end
 --object pool
 function M:_getTimerNode()
-    if TimerNodePool then
-        return TimerNodePool:get()
+    if self:_getTimerNodePool() then
+        return self:_getTimerNodePool():getOrCreate()
     else
         return TimerNode.new()
     end
@@ -317,8 +323,8 @@ function M:_releaseTimerNode(timerNode)
     --从查询字典中删除.
     self:_removeTimerNodeFromSearchDict(timerNode:getId())
 
-    if TimerNodePool then
-        TimerNodePool:release(timerNode)
+    if self:_getTimerNodePool() then
+        self:_getTimerNodePool():release(timerNode)
     else
         timerNode:reset()
     end
@@ -355,6 +361,13 @@ function M:_abortTimerNodeBySearchDict(timerId)
         -- print(101, string.format("[warning] Where is the TimerNode (%d) from? It may be already removed, or never be scheduled.", timerId))
     end
     return false
+end
+
+function M:isTimerAborted(timerId)
+    if self._timerDict[timerId] then
+        return self._timerDict[timerId]:isAborted()
+    end
+    return true
 end
 
 ---------------APIs-------------
@@ -456,8 +469,25 @@ function M:unschedule(timerId)
         return false
     end
 
+    if self:_abortTimerNodeBySearchDict(timerId) then
+        return true
+    end
+
+    if self._isScaled then
+        if Timer:_abortTimerNodeBySearchDict(timerId) then
+            --printWarning("[BaseTimer] 定时器unschedule，应该用Timer解除，发给立斌")
+            return true
+        end
+    else
+        if TimerScaled:_abortTimerNodeBySearchDict(timerId) then
+            --printWarning("[BaseTimer] 定时器unschedule，应该用TimerScaled解除，发给立斌")
+            return true
+        end
+    end
+    
+    return false
     -- 在查询字典中找比较快.
-    return self:_abortTimerNodeBySearchDict(timerId)
+    --return self:_abortTimerNodeBySearchDict(timerId)
 end
 
 --Async Operation，异步操作
@@ -468,7 +498,7 @@ function M:unscheduleAll()
     end
 
     --清空查询字典.
-    for k,v in pairs(self._timerDict) do
+    for k, v in pairs(self._timerDict) do
         v:abort()
         self:_releaseTimerNode(v)
     end
@@ -495,7 +525,6 @@ function M:unscheduleAll()
 
     --waiting common
     self._waitingCommonTimers:clear()
-
 
     self._waitingClearAll = false
 end
@@ -530,27 +559,28 @@ end
 
 --执行到duration为止,每interval执行一次
 --配合缓动类做效果
-function M:scheduleDuration(interval,duration,pollFunc,endCall)
+function M:scheduleDuration(interval, duration, pollFunc, endCall)
     local T = {}
     T.useTime = 0
     T.timer = false
-    T.timer = self:schedule(function (...)
+    T.timer = self:schedule(function(...)
         if T.useTime > duration then
             if T.timer then
-                Timer:unschedule(T.timer)
+                self:unschedule(T.timer)
                 T.timer = false
                 if (type(endCall) == "function") then
                     endCall(T.useTime)
                 end
-                return 
+                return
             end
         end
         pollFunc(T.useTime) --耗时
         T.useTime = T.useTime + interval
-    end,interval)
+    end, interval)
 
     return T.timer
 end
+
 
 rawset(_G, "Timer", false)
 Timer = M.new()

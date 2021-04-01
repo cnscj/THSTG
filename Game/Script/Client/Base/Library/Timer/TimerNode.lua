@@ -1,6 +1,6 @@
 --定时器实体
 ---@class TimerNode
-local M = simpleClass("TimerNode")
+local M = class("TimerNode")
 
 function M:ctor()
     --所有字段reset()都包含
@@ -108,7 +108,7 @@ local time0, time1
 local logWarn = CS.GYGame.Logger.LogWarning or print
 
 function M:trigger()
-    if __DEBUG__ or __ENBALE_PROFILER__ then
+    if __DEBUG__ or __ENABLE_PROFILER__ then
         time0 = millisecondNow()
     end
 
@@ -119,7 +119,7 @@ function M:trigger()
 
     self._callback()
 
-    if __ENBALE_PROFILER__ then
+    if __ENABLE_PROFILER__ then
         time1 = millisecondNow()  --ms
 
         local info = debug.getinfo(self._callback, "Sln")

@@ -3,12 +3,12 @@ local M = class("ObjectPool")
 function M:ctor(Type)
     self.maxCount = 60
     self.minCount = 10
-    self.idleCleanTime = 60
+    self.idleCleanTimeMs = 60000
 
     self._type = Type
     self._queue = Queue.new()
 
-    self._lastCleanTime = 0
+    self._lastCleanTimestampMs = 0
 end
 
 function M:getOrCreate()
@@ -19,10 +19,17 @@ function M:getOrCreate()
             self:release(newObj)
         end
     end
+    obj = self:get()
+    return obj
+end
+
+function M:get()
+    local obj
     if self._queue:size() > 0 then
-        obj = self:dequeue()
+        obj = self._queue:dequeue()
     end
 
+    self:_refreshTimestamp()
     return obj
 end
 
@@ -45,13 +52,37 @@ function M:release(obj)
     end
 
     self._queue:enqueue(obj)
+
+    self:_refreshTimestamp()
 end
 
 function M:clearAll()
     self._queue:clear()
+
+    self:_refreshTimestamp()
 end
 
---TODO:
 function M:update(dt)
+    if self.idleCleanTimeMs <= 0 then 
+        return 
+    end
 
+    local curTimestamp = millisecondNow()
+    if self._lastCleanTimestampMs + self.idleCleanTimeMs < curTimestamp then
+        return 
+    end
+
+    --清空到最小
+    while (self._queue:size() > 0 and self._queue:size() > self.minCount) do 
+        self._queue:dequeue()
+    end
+
+    self._lastCleanTimestampMs = curTimestamp
 end
+
+function M:_refreshTimestamp()
+    local curTimestamp = millisecondNow()
+    self._lastCleanTimestampMs = curTimestamp
+end
+
+rawset(_G, "ObjectPool", M)

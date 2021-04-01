@@ -206,7 +206,7 @@ local function optimizeRow(tRow, tColumn, tDefaults)
 end
 
 
-ConfigOptimizer = {
+local M = {
 	getNormalConfigTable = getNormalConfigTable,
 	getSpecialConfigTable = getSpecialConfigTable,
 	-- addIterFunc = addIterFunc,
@@ -216,3 +216,4 @@ ConfigOptimizer = {
 	useOptimizedTable = useOptimizedTable,
 	optimizeRow = optimizeRow,
 }
+rawset(_G, "ConfigOptimizer", M)

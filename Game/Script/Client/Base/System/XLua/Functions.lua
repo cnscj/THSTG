@@ -224,9 +224,7 @@ function os.date(format, time)
     if not time then
         time = os.localTime()
     end
-
-
-    time = time + (os.timeZone() + Cache.serverTimeCache:getCurTimeZone()) * 3600
+    time = time + (os.timeZone() - Cache.serverTimeCache:getCurTimeZone()) * 3600
     return os.localDate(format, time)
 end
 
@@ -235,7 +233,7 @@ local timeZone
 function os.timeZone()
     if not timeZone then
         local time = os.localTime()
-        timeZone = os.difftime(time, os.localTime(os.localDate("!*t", time))) / 3600
+        timeZone = -os.difftime(time, os.localTime(os.localDate("!*t", time))) / 3600
     end
     return timeZone
 end
@@ -252,7 +250,7 @@ function os.time(timeTb)
         if date.isdst == true then
             dst = 1
         end
-        return time + (math.floor(os.timeZone()) + Cache.serverTimeCache:getCurTimeZone() + dst) * 3600
+        return time + (math.floor(os.timeZone()) - Cache.serverTimeCache:getCurTimeZone() + dst) * 3600
     end
 end
 
