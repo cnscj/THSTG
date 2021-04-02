@@ -1,6 +1,6 @@
 local M = class("ECSManager")
 local OBJECT_POOL_CONFIG = {        --对象池配置
-    [Entity] = {maxCount = -1},
+    [Entity] = {maxCount = -1, minCount = 20},
 }
 
 function M:ctor()
@@ -22,6 +22,7 @@ function M:_getOrCreatePool(Type)
         local poolConfig = OBJECT_POOL_CONFIG[Type]
         if poolConfig then
             pool.maxCount = poolConfig.maxCount
+            pool.minCount = poolConfig.minCount
         end
     end
     return pool

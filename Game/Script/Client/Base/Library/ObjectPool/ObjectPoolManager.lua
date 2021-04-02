@@ -7,7 +7,9 @@ function M:ctor()
     self._updateFunction = function ( ... )
         self:update(CSharp.Time.deltaTime)
     end
+end
 
+function M:init()
     --注册更新
     CSharp.MonoManagerIns:AddUpdateListener(self._updateFunction)
 end

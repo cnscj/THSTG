@@ -2,6 +2,7 @@
 
 --Lang相关
 require("System.Lang.Core.Class")
+require("System.Lang.Core.Functions")
 require("System.Lang.Core.Coroutine")
 require("System.Lang.Core.Delegate")
 require("System.Lang.Core.String")
@@ -42,5 +43,4 @@ require("System.XLua.Debug")
 require("System.XLua.Profiler")
 -- require("System.XLua.Tdr")
 require("System.XLua.Util")
-require("System.XLua.Functions")
 require("System.XLua.Strict")   --这里开始不能在设置全局变量了

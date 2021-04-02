@@ -299,10 +299,10 @@ function M:_updateCommonTimers(dt, curTime, preTime)
     --end working queue
 end
 
+local socket = require "socket"
 function M:_getTime()
-    return millisecondNow()
+    return socket.gettime()
 end
-
 function M:_newTimerId()
     self._timerId = self._timerId + 1
     return self._timerId

@@ -6,7 +6,9 @@ end
 
 function M:start()
     --在Login界面之前,可以先加载一部分模块
-
+    ControllerManager:initialize()
+    CacheManager:initialize()
+    ConfigManager:initialize()
 end
 
 function M:update(dt)
@@ -33,7 +35,7 @@ end
 function M:unregisterUpdateListener(listener)
     if self._updateListeners then
         if listener then
-            for i,handler in ipairs(self._updateListeners) do 
+            for i,handler in pairs(self._updateListeners) do 
                 if handler == listener then
                     table.remove(self._updateListeners,i) 
                 end
@@ -44,7 +46,7 @@ end
 
 function M:_updateListener(dt)
     if self._updateListeners then
-        for _,listener in ipairs(self._updateListeners) do 
+        for _,listener in pairs(self._updateListeners) do 
             listener(dt)
         end
     end

@@ -1,3 +1,3 @@
 return {
-    {name = "loginCache",path = "Context.Modules.Login.LoginCache"},
+    {name = "testCache",path = "Context.Modules.Test.TestCache"},
 }

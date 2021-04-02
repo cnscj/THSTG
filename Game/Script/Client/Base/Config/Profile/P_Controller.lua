@@ -1,3 +1,3 @@
 return {
-    {path = "Context.Modules.Login.LoginController"},
+    {path = "Context.Modules.Test.TestController"},
 }

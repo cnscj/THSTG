@@ -50,4 +50,3 @@ ThrowTextType = {
     NormalHit = "HurtText6",
 }
 
-rawset(_G, "LuaEnum", false)
