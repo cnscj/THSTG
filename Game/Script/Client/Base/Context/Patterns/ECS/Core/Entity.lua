@@ -4,7 +4,8 @@ function M:ctor()
     self._id = 0
     self._owner = false  --所属世界
 
-    self._dirtyComps = {}
+    self._components = false
+    self._archetype = false
 end
 
 function M:addComponent(typeName)
@@ -19,17 +20,18 @@ function M:getComponent(typeName)
 
 end
 
-function M:replaceComponent(comp)
-    return true
+function M:replaceComponent(typeName,comp)
+    
 end
-
 
 function M:clear()
 
 end
 
 function M:removeFromWorld()
-
+    if self._owner then
+        self._owner:removeEntity()
+    end
 end
 
 rawset(_G, "Entity", false)

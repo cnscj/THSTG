@@ -4,7 +4,7 @@ local M = class("UnityComponent")
 function M:ctor(owner)
 	self._type = false
 	self._entity = false  --Unity Component instance
-	self._owner = owner   --Node
+	self._owner = owner   --UGO
 	
 	self._enabled = -1
 end

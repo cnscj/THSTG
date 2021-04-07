@@ -29,6 +29,9 @@ local _getter = {
     --XLibrary
     MonoManagerIns = function() return XLibGame.MonoManager.GetInstance() end,
 
+    --AssetStudio
+    AssetLoaderManagerIns = function() return ASGame.AssetLoaderManager.GetInstance() end,
+
     --自定义
     LuaEngineIns = function() return SEGame.LuaEngine.GetInstance() end,  
     GameEngineIns = function() return STGGame.GameEngine.GetInstance() end, 

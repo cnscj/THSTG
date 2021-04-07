@@ -104,7 +104,6 @@ end
 
 local millisecondNow = millisecondNow
 local time0, time1
--- local logError = CS.GYGame.Logger.LogError or print
 local logWarn = CS.GYGame.Logger.LogWarning or print
 
 function M:trigger()

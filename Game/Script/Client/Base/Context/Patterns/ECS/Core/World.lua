@@ -2,7 +2,11 @@ local M = class("World")
 --持有所有entity和system和负责收集对应的entity
 function M:ctor()
     self._systems = {}
+    self._entities = {}
+
+    self._archetypeManager = false
 end
+
 function M:getEntities(...)
 
 end

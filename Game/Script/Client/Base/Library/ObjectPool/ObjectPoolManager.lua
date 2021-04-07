@@ -28,6 +28,13 @@ function M:getPool(Type)
     return self._poolDict[Type]
 end
 
+function M:addPool(pool)
+    if not pool then return end
+    local Type = pool._type
+
+    self._poolDict[Type] = pool
+end
+
 function M:getOrCreatePool(Type)
    return self:getPool(Type) or self:createPool(Type)
 end

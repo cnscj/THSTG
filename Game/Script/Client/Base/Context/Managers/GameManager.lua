@@ -37,7 +37,8 @@ function M:unregisterUpdateListener(listener)
         if listener then
             for i,handler in pairs(self._updateListeners) do 
                 if handler == listener then
-                    table.remove(self._updateListeners,i) 
+                    table.remove(self._updateListeners,i)
+                    break
                 end
             end
         end
