@@ -25,9 +25,11 @@ local _getter = {
     GameObject = function() return UnityEngine.GameObject end,
     Debug = function() return UnityEngine.Debug end,
     Time = function() return UnityEngine.Time end,
+    AssetBundle = function() return UnityEngine.AssetBundle end,
 
     --XLibrary
     MonoManagerIns = function() return XLibGame.MonoManager.GetInstance() end,
+    TimerIns = function() return XLibGame.Timer.GetInstance() end,
 
     --AssetStudio
     AssetLoaderManagerIns = function() return ASGame.AssetLoaderManager.GetInstance() end,

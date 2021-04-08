@@ -54,5 +54,5 @@ end
 
 -- 暂停一会
 Coroutine.delayTime = Coroutine.asyncToSync(function(time, cb)
-	Timer:scheduleOnce(time, cb)
+	CSharp.TimerIns:ScheduleOnce(cb,time)
 end)

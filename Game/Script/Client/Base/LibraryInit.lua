@@ -6,4 +6,4 @@ require("Library.ObjectPool.ObjectPoolManager")
 require("Library.Timer.TimerNode")
 require("Library.Timer.Timer")
 
-require("Library.AssetManager.AssetManager")
+require("Library.FairyGUI.FairyGUIInit")

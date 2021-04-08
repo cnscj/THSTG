@@ -5,4 +5,5 @@ function M:ctor(itemStrip)
 
 end
 
-return M
+rawset(_G, "ItemData", false)
+ItemData = M

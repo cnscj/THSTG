@@ -6,7 +6,7 @@ function M:ctor()
 
     self.data = false
 
-    self._isEnd = false     --是否算一个完整节点
+    self._isEnd = false     --是否算一个结束点
 end
 
 

@@ -23,11 +23,13 @@ function M:unregister(...)
     local node = self:_search(...)
     if node then 
         node.callback = false
+        node.data = false
+       self:remove(...)
     end
 end
 
-function M:refresh(...)
-    self._touch(self._touchFunc, ...)
+function M:update(...)
+    self:_touch(self._touchFunc, ...)
 end
 
 --
@@ -43,7 +45,7 @@ function M:_insert(...)
         for i = 1, argsNum do
             local arg = select(i, ...)
             if not arg then return end
-            
+
             node.children = node.children or {}
             local nextNode = node.children[arg]
             if not nextNode then
@@ -63,7 +65,8 @@ function M:_insert(...)
     return false
 end
 
-function M:_remove( ... )
+--直接销毁某个节点
+function M:_destroy( ... )
     local argsNum = select("#", ...)
     if argsNum > 0 then
         local node = self:_getRoot()
@@ -78,8 +81,50 @@ function M:_remove( ... )
             node = nextNode
         end
 
+        --从父节点中移除
         local arg = select(argsNum, ...)
         if node.children then node.children[arg] = nil end
+
+    end
+end
+
+--移除节点:回溯移除其父节点
+function M:remove( ... )
+    local argsNum = select("#", ...)
+    if argsNum > 0 then
+        local node = self:_getRoot()
+        local pathNodes = {}
+        table.insert(pathNodes,node)
+        for i = 1, argsNum do
+            local arg = select(i, ...)
+            if not arg then return end
+
+            local nextNode = false
+            if node.children then nextNode = node.children[arg] end
+
+            if not nextNode then return end
+            node = nextNode
+
+            table.insert(pathNodes,node)
+        end
+
+        for i = #pathNodes - 1, 1, -1  do 
+            local node = pathNodes[i]
+            local nextNode = pathNodes[i + 1]
+            
+            if not nextNode.children or not next(nextNode.children) then
+                if not nextNode._isEnd or nextNode == pathNodes[#pathNodes] then
+                    node.children[nextNode.name] = nil
+                    if not next(node.children) then node.children = false end
+                end
+            else
+                if nextNode == pathNodes[#pathNodes] then
+                    nextNode._isEnd = false
+                end
+                return
+            end
+
+        end
 
     end
 end
@@ -110,30 +155,30 @@ function M:_touch(func, ... )
     local argsNum = select("#", ...)
     if argsNum > 0 then
         local node = self:_getRoot()
-        local nodePath = {}
-        for i = 1, argsNum - 1 do
+        local pathNodes = {}
+        for i = 1, argsNum do
             local arg = select(i, ...)
             if not arg then return end
             
             local nextNode = false
             if node.children then nextNode = node.children[arg] end
 
-            if not nextNode then return false end
+            if not nextNode then return end
             node = nextNode
 
-            if node._isEnd then
-                table.insert(nodePath,node)
-            end
+            table.insert(pathNodes,node)
         end
 
         --从后面向父节点触发
         if func then
-            for i = #nodePath, 1 do 
-                func(nodePath[i])
+            for i = #pathNodes, 1,-1 do 
+                local node = pathNodes[i]
+                if node._isEnd then
+                    func(node)
+                end
             end
         end
-
-        return nodePath
+        return nodeList
     end
     return false
 end
@@ -145,4 +190,5 @@ function M:_getRoot()
     return self._root
 end
 
-return M
+rawset(_G, "RedDotManager", false)
+RedDotManager = M.new()

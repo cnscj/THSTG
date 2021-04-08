@@ -1,9 +1,12 @@
 local M = class("TestController",Controller)
+local RedDotTest = require("Context.Modules.Test.Modules.RedDotTest")
 
 function M:ctor()
     Timer:scheduleOnce(10,function ( ... )
         self:dispatchEvent(EventType.TEST_1)
     end)
+
+    self.redDotTest = RedDotTest.new()
 end
 
 function M:_initListeners()
