@@ -64,7 +64,7 @@ end
 -- 删除所有侦听的事件
 function M:__clearEventListeners()
     for _, event in ipairs(self._eventListeners) do
-        Dispatcher.removeEventListener(event.name, event.listener)
+        Dispatcher.removeEventListener(event.name, event.listener, self)
     end
 end
 
