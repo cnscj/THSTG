@@ -1,4 +1,4 @@
-local M = class("Component")
+local M = class("Archetype")
 
 function M:ctor()
     

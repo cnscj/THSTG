@@ -1,7 +1,7 @@
 local M = class("ConfigManager")
 local GLOBAL_PACKAGE = "Config"
 local _LIST = require("Config.Profile.P_Config")
-
+--XXX:配置文件可能会优先与Game启动,不应该受Manager管理,比如资源配置,语言配置
 function M:ctor()
     self._configsDict = {}
 end

@@ -34,5 +34,4 @@ function M:removeFromWorld()
     end
 end
 
-rawset(_G, "Entity", false)
-Entity = M
+return M

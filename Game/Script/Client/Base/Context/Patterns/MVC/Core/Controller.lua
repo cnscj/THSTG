@@ -13,19 +13,8 @@ end
 function M:_initListeners()
 end
 
--- 事件侦听方法，主要用于侦听服务端下推
-function M:addListener(name, listener, priority)
+function M:addEventListener(name, listener, priority)
     Dispatcher:addEventListener(name, listener, self, priority)
-    self:__pushListener(name, listener)
-end
-
-function M:removeListener(name, listener)
-    Dispatcher:removeEventListener(name, listener, self)
-    self:__popListener(name, listener)
-end
-
-function M:addEventListener(name, listener, listenerCaller, priority)
-    Dispatcher:addEventListener(name, listener, listenerCaller, priority)
     self:__pushListener(name, listener)
 end
 
@@ -64,6 +53,4 @@ function M:reloadClear()
     end
 end
 
-
-rawset(_G, "Controller", false)
-Controller = M
+return M

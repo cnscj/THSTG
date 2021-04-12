@@ -31,5 +31,4 @@ function M:removeEventListener(name, listener)
     self.__eventListeners = t
 end
 
-rawset(_G, "View", false)
-View = M
+return M

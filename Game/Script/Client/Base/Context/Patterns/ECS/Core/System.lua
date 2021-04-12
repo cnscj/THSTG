@@ -14,5 +14,4 @@ function M:update(dt)
 
 end
 
-rawset(_G, "System", false)
-System = M
+return M

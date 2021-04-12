@@ -41,5 +41,4 @@ function M:update(dt)
     end 
 end
 
-rawset(_G, "World", false)
-World = M
+return M

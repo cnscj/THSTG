@@ -3,18 +3,47 @@ local AssetLoaderManager = CSharp.AssetLoaderManager
 
 function M:ctor()
 
-
 end
 
-function M:loadAssetBundle(abPath,onSuccess,onFailed)
+function M:loadAssetBundle(isAsync,objType,abPath,onSuccess,onFailed)
     onSuccess = self:_createSuccessCallback(onSuccess)
     onFailed = self:_createFailedCallback(onFailed)
     
+    if isAsync then
+        self:loadAssetBundleAsync(objType,abPath,onSuccess,onFailed)
+    else
+        self:loadAssetBundleSync(objType,abPath,onSuccess,onFailed)
+    end
 end
 
-function M:loadAssetBundleResource(abPath,resPath,onSuccess,onFailed)
+function M:loadAssetBundleResource(isAsync,objType,abPath,resPath,onSuccess,onFailed)
     onSuccess = self:_createSuccessCallback(onSuccess)
     onFailed = self:_createFailedCallback(onFailed)
+
+    if isAsync then
+        self:loadAssetBundleResourceAsync(objType,abPath,onSuccess,onFailed)
+    else
+        self:loadAssetBundleResourceSync(objType,abPath,onSuccess,onFailed)
+    end
+end
+
+function M:loadAssetBundleAsync(objType,abPath,onSuccess,onFailed)
+    onSuccess = self:_createSuccessCallback(onSuccess)
+    onFailed = self:_createFailedCallback(onFailed)
+
+end
+
+function M:loadAssetBundleSync(objType,abPath,onSuccess,onFailed)
+
+end
+
+function M:loadAssetBundleResourceAsync(objType,abPath,resPath,onSuccess,onFailed)
+    onSuccess = self:_createSuccessCallback(onSuccess)
+    onFailed = self:_createFailedCallback(onFailed)
+
+end
+
+function M:loadAssetBundleResourceSync(objType,abPath,resPath,onSuccess,onFailed)
 
 end
 

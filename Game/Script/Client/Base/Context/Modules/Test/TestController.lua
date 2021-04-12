@@ -10,7 +10,7 @@ function M:ctor()
 end
 
 function M:_initListeners()
-    self:addEventListener(EventType.TEST_1, self._print, self)
+    self:addEventListener(EventType.TEST_1, self._print)
 end
 
 function M:_print(e,params)
