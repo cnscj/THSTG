@@ -1,6 +1,6 @@
 local M = class("ECSManager")
 local OBJECT_POOL_CONFIG = {        --对象池配置
-    [Entity] = {maxCount = -1, minCount = 20},
+    [ECS.Entity] = {maxCount = -1, minCount = 20},
 }
 
 function M:ctor()

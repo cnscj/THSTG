@@ -1,5 +1,6 @@
 require("Context.UtilInit")
-require("Context.ComponentInit")
 require("Context.PatternInit")
+require("Context.ComponentInit")
+require("Context.PluginInit")
 require("Context.ManagerInit")
 require("Context.UIInit")

@@ -6,7 +6,7 @@ using System.Threading;
 using UnityEngine;
 using System.Diagnostics;
 
-namespace ASGame
+namespace SEGame
 {
     public class ConsoleHelper
     {

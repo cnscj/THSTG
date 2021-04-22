@@ -1,7 +1,6 @@
 --[[
     利用前缀树实现
 ]]
-local RedDotNode = require("Context.Components.RedDot.RedDotNode")
 local M = class("RedDotManager")
 
 function M:ctor()

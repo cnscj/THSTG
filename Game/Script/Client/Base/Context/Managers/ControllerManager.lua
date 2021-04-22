@@ -1,25 +1,37 @@
 local M = class("ControllerManager")
 local _LIST = require("Config.Profile.P_Controller")
 function M:ctor()
-    self._allControllers = {}
+
 end
 
 function M:initialize()
     for _,info in ipairs(_LIST) do 
-        local cls = require(info.path)
+        local classPath = info.path
+        local cls = require(classPath)
         if cls then
             local ins = cls.new()
-            table.insert(self._allControllers, ins)
+            MVCManager:addController(classPath,ins)
         else
-            printWarning(string.format( "%s not find",info.path))
+            printWarning(string.format("%s not find",classPath))
         end
     end
 end
 
-function M:clear( ... )
+-- 暂时只是用来刷reload
+function M.reloadController(classPath, newClass)
+    local cls = MVCManager:getController(classPath)
 
+    if cls then
+        MVCManager:removeController(classPath)
+
+        local ins = cls.new()
+        MVCManager:removeController(classPath,ins)
+    end
 end
 
+function M:clear()
+    
+end
 
 rawset(_G, "ControllerManager", false)
 ControllerManager = M.new()

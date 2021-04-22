@@ -10,7 +10,7 @@ function M:ctor( ... )
 
     RedDotManager:unregister("tt","aa","ff")
     -- RedDotManager:update("tt","aa","ff")
-    dump(15,RedDotManager._root)
+    dump(0,RedDotManager._root)
 end
 
 return M

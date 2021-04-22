@@ -10,6 +10,7 @@
 --命名空间
 local UnityEngine = CS.UnityEngine
 local FairyGUI = CS.FairyGUI
+local XLua = CS.XLua
 
 local XLibGame = CS.XLibGame
 local SEGame = CS.SEGame
@@ -26,6 +27,8 @@ local _getter = {
     Debug = function() return UnityEngine.Debug end,
     Time = function() return UnityEngine.Time end,
     AssetBundle = function() return UnityEngine.AssetBundle end,
+
+    --
 
     --XLibrary
     MonoManagerIns = function() return XLibGame.MonoManager.GetInstance() end,

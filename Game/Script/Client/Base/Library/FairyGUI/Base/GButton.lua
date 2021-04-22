@@ -8,7 +8,6 @@ function M:ctor(obj)
     self.effect = false
     self.cdBar = false
 
-    OverseaConfig.resetLabelShield(obj)
 end
 
 function M:init(obj, args)
@@ -79,8 +78,6 @@ function M:showEffect(effectCode, scaleX, scaleY)
             scaleX = self._obj.width / 150
             scaleY = self._obj.height / 60
             cloneMaterial = true
-        else
-            -- print(9, "TODO: 根据effectCode和按钮大小内部设置scale effectCode=", effectCode)
         end
 
         -- 默认最顶层，基类放不了太多层级数据
@@ -144,7 +141,6 @@ function M:setSelectedIcon(url)
 end
 
 function M:setText(text)
-    text = OverseaConfig.isLabelShield(text)
     self._obj.title = text
 end
 

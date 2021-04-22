@@ -44,7 +44,7 @@ function M:__popListener(name, listener)
     end
 end
 
-function M:reloadClear()
+function M:clear()
     for k1, v1 in pairs(self.__eventListeners) do
         for k2, v2 in pairs(v1) do
             Dispatcher:removeEventListener(k1, k2, self)

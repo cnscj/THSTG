@@ -1,5 +1,6 @@
-local M = class("TestController",Controller)
+local M = class("TestController",MVC.Controller)
 local RedDotTest = require("Context.Modules.Test.Modules.RedDotTest")
+local CoroutineTest = require("Context.Modules.Test.Modules.CoroutineTest")
 
 function M:ctor()
     Timer:scheduleOnce(10,function ( ... )

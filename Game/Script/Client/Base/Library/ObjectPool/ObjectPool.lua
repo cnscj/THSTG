@@ -5,6 +5,10 @@ function M:ctor(Type)
     self.minCount = 10
     self.idleCleanTime = 60 --s
 
+    self.getCallback = false
+    self.releaseCallback = false
+    self.destroyCallback = false
+
     self._type = Type
     self._queue = Queue.new()
 
@@ -20,6 +24,7 @@ function M:getOrCreate()
         end
     end
     obj = self:get()
+    
     return obj
 end
 
@@ -28,7 +33,9 @@ function M:get()
     if self._queue:size() > 0 then
         obj = self._queue:dequeue()
     end
-
+    if self.getCallback then
+        self.getCallback(obj)
+    end
     self:_refreshTimestamp()
     return obj
 end
@@ -52,7 +59,9 @@ function M:release(obj)
     end
 
     self._queue:enqueue(obj)
-
+    if self.releaseCallback then
+        self.releaseCallback(obj)
+    end
     self:_refreshTimestamp()
 end
 
@@ -74,8 +83,18 @@ function M:update(dt)
 
     --清空到最小
     --一次性清空会出问题,建议分几帧清
+    local startClearTimeMS = millisecondNow()
     while (self._queue:size() > 0 and self._queue:size() > self.minCount) do 
-        self._queue:dequeue()
+        --取一个硬件时间,如果硬件时间过长则跳出
+        local curClearTimeMS = millisecondNow()
+        if curClearTimeMS - startClearTimeMS >= 100 then    --100ms才没有明显卡顿
+            break
+        end
+
+        local obj = self._queue:dequeue()
+        if self.destroyCallback then 
+            self.destroyCallback(obj)
+        end
     end
 
     self._lastCleanTimestampMs = curTimestamp

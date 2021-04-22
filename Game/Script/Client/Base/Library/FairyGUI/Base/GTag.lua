@@ -23,7 +23,6 @@ function M:setIcon(url)
 end
 
 function M:setText(text)
-    text = OverseaConfig.isLabelShield(text, self._obj)
     text = text or ""
     self._obj.text = text
 end

@@ -406,17 +406,9 @@ function M:onClick(func)
         -- self._traceStr = getTraceback("", 1)
     end
 
-    local isReportClick, isGuideUI = false, false
-    local guideKey = Cache.guideCache:saveUI(self)
     local path = ViewManager.getObjPath(self)
-    local clickId = PhpReportConfig.getPhpClickByIcon(path)
-    if guideKey then
-        isGuideUI = true
-    end
-    if clickId then
-        isReportClick = true
-    end
-    if not DEBUG_UI and not isReportClick then
+
+    if not DEBUG_UI then
         self._clickFunc = func
         self._obj.onClick:Set(self._clickFunc)
         return
@@ -430,19 +422,12 @@ function M:onClick(func)
                 printStack(self._uniqueOnClick, self._traceStr)
             end
 
-            if clickId then
-                PHPUtil.reportClick(clickId)
-            end
-
             if self._uniqueOnClick then
                 self._uniqueOnClick(...)
             end
         end
     end
     self._obj.onClick:Set(self._clickFunc)
-    if isGuideUI then
-        Dispatcher.dispatchEvent(EventType.GUIDE_SAVE_UI, guideKey)
-    end
 end
 
 function M:getOnClick()

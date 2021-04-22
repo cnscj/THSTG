@@ -1,3 +1,3 @@
-local M = class("TestConfig",BaseConfig)
+local M = {}
 
-return M
+rawset(_G, "TestConfig", M)

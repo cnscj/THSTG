@@ -1,4 +1,4 @@
-local M = class("TestCache",BaseCache)
+local M = class("TestCache",MVC.Cache)
 
 function M:ctor()
     self._testVal = 1

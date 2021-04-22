@@ -8,7 +8,8 @@ function M:start()
     --在Login界面之前,可以先加载一部分模块
     ControllerManager:initialize()
     CacheManager:initialize()
-    ConfigManager:initialize()
+    ViewManager:initialize()
+
 end
 
 function M:update(dt)
@@ -21,6 +22,10 @@ end
 
 function M:clear()
     self._updateListeners = false
+
+    ControllerManager:clear()
+    CacheManager:clear()
+    ViewManager:clear()
 end
 
 ---

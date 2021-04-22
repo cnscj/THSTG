@@ -12,6 +12,9 @@ namespace ASGame
         private BaseLoader m_editorLoader;
         private BaseLoader m_resourceLoader;
         private BaseLoader m_bundleLoader;
+
+        public bool isUseBundleLoader;
+
         public void LoadBundleMainfest(string mainfestPath)
         {
             GetOrCreateBundleLoader().LoadMainfest(mainfestPath);//然而大多数情况下下Mainfest是加密的,可能需要先用到二进制打开
@@ -61,6 +64,19 @@ namespace ASGame
             return handler.id;
         }
 
+        public int LoadAssetSync(string path, Action<object> onSuccess = null, Action<int> onFailed = null)
+        {
+            var loader = LoadAssetSync<object>(path, (obj)=>
+            {
+                if (onSuccess != null)
+                {
+                    onSuccess(obj);
+                }
+            }, onFailed);
+            return loader;
+
+        }
+
         public int LoadAssetAsync<T>(string path, Action<T> onSuccess = null, Action<int> onFailed = null) where T : class
         {
             path = AssetPathUtil.NormalizePath(path);
@@ -81,6 +97,17 @@ namespace ASGame
             return handler.id;
         }
 
+        public int LoadAssetAsync(string path, Action<object> onSuccess = null, Action<int> onFailed = null)
+        {
+            var loader = LoadAssetAsync<object>(path, (obj) =>
+            {
+                if (onSuccess != null)
+                {
+                    onSuccess(obj);
+                }
+            }, onFailed);
+            return loader;
+        }
 
         public void LoadAbort(int id)
         {
@@ -141,11 +168,20 @@ namespace ASGame
                 //如果是双路径
                 if (path.IndexOf('|') >= 0)
                 {
-#if UNITY_EDITOR    //编辑器下直接加载源路径
-                    loader = GetOrCreateEditorLoader();
-                    string[] pathPairs = path.Split('|');
-                    string assetName = pathPairs[1];
-                    realpath = assetName;
+#if UNITY_EDITOR
+                    //编辑器下直接加载源路径
+                    if (!isUseBundleLoader)
+                    {
+                        loader = GetOrCreateEditorLoader();
+                        string[] pathPairs = path.Split('|');
+                        string assetName = pathPairs[1];
+                        realpath = assetName;
+                    }
+                    else
+                    {
+                        loader = GetOrCreateBundleLoader();
+                        realpath = path;
+                    }
 #else
                 loader =  GetOrCreateBundleLoader();
                 realpath = path;

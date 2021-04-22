@@ -3,15 +3,12 @@ local M = class("GLabel", GComponent)
 
 function M:ctor(obj)
     self.__text = false
-
-    OverseaConfig.resetLabelShield(obj)
 end
 
 function M:init(obj)
 end
 
 function M:setText(text)
-    text = OverseaConfig.isLabelShield(text, self._obj)
     text = text or ""
     if self.__text == text then
         return

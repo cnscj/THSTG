@@ -10,4 +10,5 @@ function M:ctor()
 end
 
 
-return M
+rawset(_G, "RedDotNode", false)
+RedDotNode = M

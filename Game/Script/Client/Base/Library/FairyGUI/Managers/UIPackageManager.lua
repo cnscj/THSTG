@@ -4,19 +4,11 @@ function M:ctor()
     
 end
 
-function M:loadPackage(package, callback)
-   
+function M:loadPackage(packageName, callback)
+
 end
 
-function M:reloadPackage()
- 
-end
-
-function M.isLoadedPackage(package)
-    local info = UIPackageManager.getPackageInfo(package)
-    if info and info.isReleased == false then
-        return true
-    end 
+function M.isLoadedPackage(packageName)
     return false
 end
 
