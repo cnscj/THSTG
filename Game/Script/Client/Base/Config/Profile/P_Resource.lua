@@ -1,8 +1,9 @@
 return 
 {
     resDict = {
-        modelFolder = "Resource/{platform}/model",
-        effectFolder = "Resource/{platform}/effect",
+        manifestPattern = "Resource/{platform}/{platform}.manifest",
+        modelFolder = {abPattern = "Resource/{platform}/model",resPattern = "Assets/GameAssets/Effect/{id}.prefab"},
+        effectFolder = {abPattern = "Resource/{platform}/effect/{id}.ab",resPattern = "Assets/GameAssets/Effect/{id}.prefab"},
     }
 
 

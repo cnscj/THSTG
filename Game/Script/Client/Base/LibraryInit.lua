@@ -1,3 +1,5 @@
+
+require("Library.AssetLoader.AssetLoader")
 require("Library.EventCenter.Dispatcher")
 
 require("Library.ObjectPool.ObjectPool")

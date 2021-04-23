@@ -1,9 +1,10 @@
 local M = class("AssetLoader")
-local AssetLoaderManager = CSharp.AssetLoaderManager
+local AssetLoaderManagerIns = CSharp.AssetLoaderManagerIns
 
 function M:ctor()
 
 end
+
 
 function M:loadAssetBundleAsync(abPath,onSuccess,onFailed)
     onSuccess = self:_createSuccessCallback(onSuccess)

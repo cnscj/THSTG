@@ -1,13 +1,14 @@
 local M = class("TestController",MVC.Controller)
 local RedDotTest = require("Context.Modules.Test.Modules.RedDotTest")
 local CoroutineTest = require("Context.Modules.Test.Modules.CoroutineTest")
-
+local ResLoadTest = require("Context.Modules.Test.Modules.ResLoadTest")
 function M:ctor()
     Timer:scheduleOnce(10,function ( ... )
         self:dispatchEvent(EventType.TEST_1)
     end)
 
     self.redDotTest = RedDotTest.new()
+    self.resLoadTest = ResLoadTest.new()
 end
 
 function M:_initListeners()
