@@ -1,11 +1,18 @@
-local M = class("Archetype")    --一个无限大的数,2^n次方
-
-function M:ctor()
-    
+local M = class("Archetype")
+function M:ctor(bit)
+   self._value = BitNum.new(bit)
 end
 
-function M:clear()
-
+function M:toString()
+   self._value:toString()
 end
+
+function M:clone()
+   local newArchetype = M.new()
+   newArchetype._value = self._value:clone()
+
+   return newArchetype
+end
+
 
 return M

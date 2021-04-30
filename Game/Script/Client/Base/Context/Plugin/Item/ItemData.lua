@@ -1,7 +1,15 @@
 local M = class("ItemData")
 
---itemStrip:{type,code,amount}
-function M:ctor(itemStrip)
+--itemInfo:{type,code,amount}
+function M.createFromInfo(itemInfo)
+
+end
+
+function M.createFromCode(code)
+    return M.createFromInfo({type = 0, code = code, amount = 1})
+end
+
+function M:ctor()
 
 end
 

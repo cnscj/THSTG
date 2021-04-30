@@ -7,18 +7,21 @@ function M:ctor()
     self._worlds = {}
     self._entities = {}
 
-
+    self._componentIds = 0
+    self._componentClassExInfo = {}
     self._compCName2TypeDict = {}
-    self._entityUID = 0
+
+    self._entityIds = 0
 end
 
 --
 function M:registerComponent(Type)
     --TODO:给每个component分配一个2^n次方作为flag,之后查找时只要|下即可
     if not Type then return end 
-    if not Type.isTypeOf("Component") then return end 
+    if not Type.isTypeOf("ECS.Component") then return end 
 
-    self:_addComponentTypeByType(Type)
+    --TODO:注册额外的信息
+    self:_addComponentByType(Type)
 end
 
 function M:createComponent(typeName)
@@ -29,6 +32,22 @@ function M:createComponent(typeName)
     end
     return comp
 end
+
+function M:_getNewComponentId()
+    self._componentIds = self._componentIds + 1
+    return self._componentIds
+end
+function M:_getComponentTypeByName(cname)
+    return self._compCName2TypeDict[cname]
+end
+
+function M:_addComponentByType(Type)
+    local cname = Type.cname
+    if not M:_getComponentTypeByName(cname) then
+        self._compCName2TypeDict[cname] = Type
+    end
+end
+
 
 --
 function M:createEntity()
@@ -64,16 +83,6 @@ function M:addWorld(world)
     table.insert(self._worlds, world)
 end
 ---
-function M:_getComponentTypeByName(cname)
-    return self._compCName2TypeDict[cname]
-end
-
-function M:_addComponentTypeByType(Type)
-    local cname = Type.cname
-    if not M:_getComponentTypeByName(cname) then
-        self._compCName2TypeDict[cname] = Type
-    end
-end
 
 function M:_getPool(Type)
     local pool = ObjectPoolManager:getPool(Type)
@@ -94,9 +103,10 @@ function M:_getOrCreatePool(Type)
 end
 
 function M:_getNewEntityId()
-    self._entityUID = self._entityUID + 1
-    return self._entityUID 
+    self._entityIds = self._entityIds + 1
+    return self._entityIds 
 end
+
 
 function M:_getEntityPool()
     local entityPool = self:_getOrCreatePool(Entity)

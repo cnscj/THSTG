@@ -1,10 +1,17 @@
-local M = class("RedDot",FComponent)
+local M = class("ItemCell",FComponent)
 
 
 function M:ctor()
     
 end
 
+function M:setItemData()
+
+end
+
+function M:getItemData()
+
+end
 
 function M:_initUI()
 

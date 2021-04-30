@@ -1,10 +1,12 @@
 ---@class BitNum
+local MAX_BIT_NUM = 64
 local M = class("BitNum")
 
 ---@param n number@位数
 function M:ctor(n)
     self.num1 = 0
     self.num2 = 0
+
     self._str = false
     self._isDirty = true
     self.isReadOnly = false
@@ -16,12 +18,13 @@ function M:ctor(n)
         printError("[BitNum] n不应该为负数")
         return
     end
-    if n < 51 then
+    
+    if n < MAX_BIT_NUM then
         self.num1 = 1 << n
         return
     end
-    if n < 101 then
-        self.num2 = 1 << n - 51
+    if n < 2*MAX_BIT_NUM then
+        self.num2 = 1 << (n - MAX_BIT_NUM)
         return
     end
     printErrorNoTraceback("[BitNum] 分配给component的位数不够了，加一下num3!!!")
@@ -88,5 +91,16 @@ function M:clear()
     self.num2 = 0
     self._isDirty = true
 end
+--
+local _readOnlyZero = false
+local function _getReadOnlyZero()
+    if not _readOnlyZero then 
+        _readOnlyZero = M.new(0)
+        _readOnlyZero.isReadOnly = true
+    end
+    return _readOnlyZero
+end
+
+M.Zero = _getReadOnlyZero()
 
 return M
