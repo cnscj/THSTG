@@ -1,6 +1,6 @@
 local M = class("ObjectPool")
 
-function M:ctor(Type)
+function M:ctor(Cls)
     self.maxCount = 60
     self.minCount = 10
     self.idleCleanTime = 60 --s
@@ -9,7 +9,7 @@ function M:ctor(Type)
     self.releaseCallback = false
     self.destroyCallback = false
 
-    self._type = Type
+    self._cls = Cls
     self._queue = Queue.new()
 
     self._lastCleanTimestampMs = 0
@@ -18,8 +18,8 @@ end
 function M:getOrCreate()
     local obj
     if self._queue:size() <= 0 then
-        if self._type then
-            local newObj = self._type.new()
+        if self._cls then
+            local newObj = self._cls.new()
             self:release(newObj)
         end
     end
@@ -44,11 +44,11 @@ function M:release(obj)
     if not obj then
         return
     end
-    if not self._type then
+    if not self._cls then
         return 
     end
 
-    if obj.__cname ~= self._type.cname then
+    if obj.__cname ~= self._cls.cname then
         return 
     end
 

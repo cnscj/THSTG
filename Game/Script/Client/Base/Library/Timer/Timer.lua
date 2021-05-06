@@ -50,9 +50,7 @@ function M:ctor()
 
     --开关
     TimerProfiler.setEnable(__ENABLE_PROFILER__)
-end
 
-function M:init()
     self:_registerUpdateHandler()
 end
 

@@ -7,36 +7,34 @@ function M:ctor()
     self._updateFunction = function ( ... )
         self:update(CSharp.Time.deltaTime)
     end
-end
 
-function M:init()
     --注册更新
     CSharp.MonoManagerIns:AddUpdateListener(self._updateFunction)
 end
 
-function M:createPool(Type)
-    if not Type then return end 
-    if not Type.new then return end --是个类而不是实例
+function M:createPool(Cls)
+    if not Cls then return end 
+    if not Cls.new then return end --是个类而不是实例
 
-    if not self._poolDict[Type] then
-        self._poolDict[Type] = ObjectPool.new(Type)
+    if not self._poolDict[Cls] then
+        self._poolDict[Cls] = ObjectPool.new(Cls)
     end
-    return self._poolDict[Type]
+    return self._poolDict[Cls]
 end
 
-function M:getPool(Type)
-    return self._poolDict[Type]
+function M:getPool(Cls)
+    return self._poolDict[Cls]
 end
 
 function M:addPool(pool)
     if not pool then return end
-    local Type = pool._type
+    local Cls = pool._cls
 
-    self._poolDict[Type] = pool
+    self._poolDict[Cls] = pool
 end
 
-function M:getOrCreatePool(Type)
-   return self:getPool(Type) or self:createPool(Type)
+function M:getOrCreatePool(Cls)
+   return self:getPool(Cls) or self:createPool(Cls)
 end
 
 function M:clearAll()

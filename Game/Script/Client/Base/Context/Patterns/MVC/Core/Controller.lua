@@ -5,12 +5,14 @@ function M:ctor()
     self.__eventListeners = {}
 end
 
-function M:init()
+function M:initialize()
+    self:clear()
     self:_initListeners()
 end
 
 -- 初始化Listener时调用，待子类重写
 function M:_initListeners()
+    
 end
 
 function M:addEventListener(name, listener, priority)

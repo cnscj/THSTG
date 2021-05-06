@@ -9,23 +9,33 @@ function M:ctor()
 
     self._componentIds = 0
     self._componentClassExInfo = {}
-    self._compCName2TypeDict = {}
 
     self._entityIds = 0
 end
 
 --
-function M:registerComponent(Type)
-    --TODO:给每个component分配一个2^n次方作为flag,之后查找时只要|下即可
-    if not Type then return end 
-    if not Type.isTypeOf("ECS.Component") then return end 
+function M:registerComponent(Cls)
+    if not Cls then return end 
+    if not Cls.isTypeOf("Component") then return end 
 
-    --TODO:注册额外的信息
-    self:_addComponentByType(Type)
+    --注册额外的信息
+    local cname = Cls.cname
+    if not self._componentClassExInfo[cname] then
+        --给每个component分配一个id作为唯一标识
+        local compId = self:_getNewComponentId()
+        local archetype = Archetype.new(compId)
+
+        self._componentClassExInfo[cname] = {
+            id = compId,
+            cname = cname,
+            cls = Cls,
+            archetype = archetype
+        }
+    end
 end
 
-function M:createComponent(typeName)
-    local pool = self:_tryGetComponentPool(typeName)
+function M:createComponent(className)
+    local pool = self:_tryGetComponentPool(className)
     local comp = false
     if pool then
         comp = pool:getOrCreate()
@@ -37,15 +47,28 @@ function M:_getNewComponentId()
     self._componentIds = self._componentIds + 1
     return self._componentIds
 end
-function M:_getComponentTypeByName(cname)
-    return self._compCName2TypeDict[cname]
+
+function M:_getComponentClassByName(cname)
+    local exInfo = self._componentClassExInfo[cname]
+    if exInfo then
+        return exInfo.type
+    end
 end
 
-function M:_addComponentByType(Type)
-    local cname = Type.cname
-    if not M:_getComponentTypeByName(cname) then
-        self._compCName2TypeDict[cname] = Type
+function M:_tryGetComponentPool(className)
+    local Cls = self:_getComponentClassByName(className)
+    local componentPool = false
+    if Cls then
+        componentPool = self:_getOrCreatePool(Cls)
     end
+    return componentPool
+end
+
+--
+function M:_recycleComponent(comp)
+    local cname = comp.__cname
+    local pool = self:_tryGetComponentPool(cname) 
+    if pool then pool:release(comp) end
 end
 
 
@@ -59,7 +82,6 @@ function M:createEntity()
     
     return entity
 end
-
 
 function M:getEntityById(entityId)
     return self._entities[entityId]
@@ -84,16 +106,16 @@ function M:addWorld(world)
 end
 ---
 
-function M:_getPool(Type)
-    local pool = ObjectPoolManager:getPool(Type)
+function M:_getPool(Cls)
+    local pool = ObjectPoolManager:getPool(Cls)
     return pool
 end
 
-function M:_getOrCreatePool(Type)
-    local pool = ObjectPoolManager:getPool(Type)
+function M:_getOrCreatePool(Cls)
+    local pool = ObjectPoolManager:getPool(Cls)
     if not pool then
-        pool = ObjectPoolManager:createPool(Type)
-        local poolConfig = OBJECT_POOL_CONFIG[Type]
+        pool = ObjectPoolManager:createPool(Cls)
+        local poolConfig = OBJECT_POOL_CONFIG[Cls]
         if poolConfig then
             pool.maxCount = poolConfig.maxCount
             pool.minCount = poolConfig.minCount
@@ -113,21 +135,6 @@ function M:_getEntityPool()
     return entityPool
 end
 
-function M:_tryGetComponentPool(typeName)
-    local Type = self:_getComponentTypeByName(typeName)
-    local componentPool = false
-    if Type then
-        componentPool = self:_getOrCreatePool(Type)
-    end
-    return componentPool
-end
-
---
-function M:_recycleComponent(comp)
-    local cname = comp.__cname
-    local pool = self:_tryGetComponentPool(cname) 
-    if pool then pool:release(comp) end
-end
 
 --
 function M:update(dt)

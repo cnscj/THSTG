@@ -22,10 +22,8 @@ function M.reloadController(classPath, newClass)
     local cls = MVCManager:getController(classPath)
 
     if cls then
-        MVCManager:removeController(classPath)
-
         local ins = cls.new()
-        MVCManager:removeController(classPath,ins)
+        MVCManager:replaceController(classPath,ins)
     end
 end
 

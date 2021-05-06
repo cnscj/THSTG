@@ -40,8 +40,7 @@ function M:reloadCache(classPath, newClass)
         end
     end
     
-    MVCManager:removeCache(key)
-    MVCManager:addCache(key,newCache)
+    MVCManager:replaceCache(key,newCache)
 end
 
 

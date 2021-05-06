@@ -6,14 +6,18 @@ local M = class("BitNum")
 function M:ctor(n)
     self.num1 = 0
     self.num2 = 0
-
-    self._str = false
-    self._isDirty = true
     self.isReadOnly = false
 
+    self._str = false
+
+    self:bit(n)
+end
+
+function M:bit( bit )
     if not n then
         return
     end
+
     if n < 0 then
         printError("[BitNum] n不应该为负数")
         return
@@ -23,11 +27,13 @@ function M:ctor(n)
         self.num1 = 1 << n
         return
     end
+
     if n < 2*MAX_BIT_NUM then
         self.num2 = 1 << (n - MAX_BIT_NUM)
         return
     end
-    printErrorNoTraceback("[BitNum] 分配给component的位数不够了，加一下num3!!!")
+    
+    printErrorNoTraceback("[BitNum] 分配给value的位数不够了，加一下num3!!!")
 end
 
 ---@param b BitNum@ self|b
@@ -38,7 +44,8 @@ function M:add(b)
     end
     self.num1 = self.num1 | b.num1
     self.num2 = self.num2 | b.num2
-    self._isDirty = true
+    
+    self._str = false
     return self
 end
 
@@ -50,7 +57,8 @@ function M:del(b)
     end
     self.num1 = self.num1 & (~b.num1)
     self.num2 = self.num2 & (~b.num2)
-    self._isDirty = true
+
+    self._str = false
     return self
 end
 
@@ -69,7 +77,7 @@ function M:containAny(b)
 end
 
 function M:toString()
-    if self._isDirty then
+    if not self._str then
         self._str = string.format("%d|%d", self.num2, self.num1)
     end
     return self._str
@@ -89,18 +97,12 @@ end
 function M:clear()
     self.num1 = 0
     self.num2 = 0
-    self._isDirty = true
+
+    self._str = false
 end
 --
-local _readOnlyZero = false
-local function _getReadOnlyZero()
-    if not _readOnlyZero then 
-        _readOnlyZero = M.new(0)
-        _readOnlyZero.isReadOnly = true
-    end
-    return _readOnlyZero
-end
 
-M.Zero = _getReadOnlyZero()
+M.Zero = M.new(0)
+M.Zero.isReadOnly = true
 
 return M

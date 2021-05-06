@@ -14,6 +14,7 @@ function M:addController(key,ctrl)
     end
 
     if not self._ctrlDict[key] then
+        ctrl:initialize()
         self._ctrlDict[key] = ctrl
     end
     return true
@@ -29,6 +30,11 @@ function M:removeController(key)
         ctrl:clear()
         self._ctrlDict[key] = nil
     end
+end
+
+function M:replaceController(key,ctrl)
+    self:removeController(key)
+    self:addController(key,ctrl)
 end
 
 function M:getControllerDict()
@@ -55,6 +61,11 @@ function M:removeCache(key)
         cache:clear()
         self._cacheDict[key] = nil
     end
+end
+
+function M:replaceCache(key,cache)
+    self:removeCache(key)
+    self:addCache(key,cache)
 end
 
 function M:getCache(key)
