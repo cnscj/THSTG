@@ -11,15 +11,23 @@ function M:ctor()
     self._componentClassExInfo = {}
 
     self._entityIds = 0
+
+    --注册一个轮询函数
+    self._updateFunction = function ( ... )
+        self:update(CSharp.Time.deltaTime)
+    end
+
+    --注册更新
+    CSharp.MonoManagerIns:AddUpdateListener(self._updateFunction)
 end
 
 --
-function M:registerComponent(Cls)
-    if not Cls then return end 
-    if not Cls.isTypeOf("Component") then return end 
+function M:registerComponentClass(cls)
+    if not cls then return end 
+    if not cls.isTypeOf("Component") then return end 
 
     --注册额外的信息
-    local cname = Cls.cname
+    local cname = cls.cname
     if not self._componentClassExInfo[cname] then
         --给每个component分配一个id作为唯一标识
         local compId = self:_getNewComponentId()
@@ -28,10 +36,14 @@ function M:registerComponent(Cls)
         self._componentClassExInfo[cname] = {
             id = compId,
             cname = cname,
-            cls = Cls,
+            cls = cls,
             archetype = archetype
         }
     end
+end
+
+function M:isComponentClassRegistered(className)
+    return self._componentClassExInfo[className]
 end
 
 function M:createComponent(className)
@@ -39,8 +51,25 @@ function M:createComponent(className)
     local comp = false
     if pool then
         comp = pool:getOrCreate()
+        comp:clear()
     end
     return comp
+end
+
+function M:getComponentClassArchetype(className)
+    if not className then return false end 
+    local classExInfo = self._componentClassExInfo[className]
+    if classExInfo then
+        return classExInfo.archetype
+    end
+end
+
+function M:recycleComponent(comp)
+    local cname = comp.__cname
+    local pool = self:_tryGetComponentPool(cname) 
+    if pool then 
+        pool:release(comp) 
+    end
 end
 
 function M:_getNewComponentId()
@@ -56,19 +85,12 @@ function M:_getComponentClassByName(cname)
 end
 
 function M:_tryGetComponentPool(className)
-    local Cls = self:_getComponentClassByName(className)
+    local cls = self:_getComponentClassByName(className)
     local componentPool = false
-    if Cls then
-        componentPool = self:_getOrCreatePool(Cls)
+    if cls then
+        componentPool = self:_getOrCreatePool(cls)
     end
     return componentPool
-end
-
---
-function M:_recycleComponent(comp)
-    local cname = comp.__cname
-    local pool = self:_tryGetComponentPool(cname) 
-    if pool then pool:release(comp) end
 end
 
 
@@ -79,6 +101,7 @@ function M:createEntity()
     entity._id = self:_getNewEntityId()
 
     self._entities[entity._id] = entity
+    entity:clear()
     
     return entity
 end
@@ -96,37 +119,34 @@ function M:recycleEntity(entity)
     entityPool:release(entity)
 end
 
---
-function M:createWorld()
-
+function M:_getNewEntityId()
+    self._entityIds = self._entityIds + 1
+    return self._entityIds 
 end
 
+
+--
 function M:addWorld(world)
     table.insert(self._worlds, world)
 end
 ---
 
-function M:_getPool(Cls)
-    local pool = ObjectPoolManager:getPool(Cls)
+function M:_getPool(cls)
+    local pool = ObjectPoolManager:getPool(cls)
     return pool
 end
 
-function M:_getOrCreatePool(Cls)
-    local pool = ObjectPoolManager:getPool(Cls)
+function M:_getOrCreatePool(cls)
+    local pool = ObjectPoolManager:getPool(cls)
     if not pool then
-        pool = ObjectPoolManager:createPool(Cls)
-        local poolConfig = OBJECT_POOL_CONFIG[Cls]
+        pool = ObjectPoolManager:createPool(cls)
+        local poolConfig = OBJECT_POOL_CONFIG[cls]
         if poolConfig then
             pool.maxCount = poolConfig.maxCount
             pool.minCount = poolConfig.minCount
         end
     end
     return pool
-end
-
-function M:_getNewEntityId()
-    self._entityIds = self._entityIds + 1
-    return self._entityIds 
 end
 
 

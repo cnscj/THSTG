@@ -12,29 +12,29 @@ function M:ctor()
     CSharp.MonoManagerIns:AddUpdateListener(self._updateFunction)
 end
 
-function M:createPool(Cls)
-    if not Cls then return end 
-    if not Cls.new then return end --是个类而不是实例
+function M:createPool(cls)
+    if not cls then return end 
+    if not cls.new then return end --是个类而不是实例
 
-    if not self._poolDict[Cls] then
-        self._poolDict[Cls] = ObjectPool.new(Cls)
+    if not self._poolDict[cls] then
+        self._poolDict[cls] = ObjectPool.new(cls)
     end
-    return self._poolDict[Cls]
+    return self._poolDict[cls]
 end
 
-function M:getPool(Cls)
-    return self._poolDict[Cls]
+function M:getPool(cls)
+    return self._poolDict[cls]
 end
 
 function M:addPool(pool)
     if not pool then return end
-    local Cls = pool._cls
+    local cls = pool._cls
 
-    self._poolDict[Cls] = pool
+    self._poolDict[cls] = pool
 end
 
-function M:getOrCreatePool(Cls)
-   return self:getPool(Cls) or self:createPool(Cls)
+function M:getOrCreatePool(cls)
+   return self:getPool(cls) or self:createPool(cls)
 end
 
 function M:clearAll()

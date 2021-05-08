@@ -24,7 +24,6 @@ function M:ctor(obj)
 
     -- 子默认不开
     self._fairyBatching = false
-    -- ScreenAdaptUtil.init(self)
 end
 
 function M:init(obj)
@@ -41,7 +40,6 @@ function M:init(obj)
         end)
         self:_initUI()
     end
-    -- ScreenAdaptUtil.regist(self)
 end
 
 

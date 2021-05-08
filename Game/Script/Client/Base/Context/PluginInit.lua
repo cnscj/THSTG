@@ -1,2 +1,4 @@
-require("Context.Plugin.RedDot.RedDotNode")
-require("Context.Plugin.RedDot.RedDotManager")
+require("Context.Plugins.RedDot.RedDotNode")
+require("Context.Plugins.RedDot.RedDotManager")
+
+require("Context.Plugins.UI.UIInit")

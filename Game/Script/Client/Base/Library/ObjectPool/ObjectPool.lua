@@ -1,6 +1,6 @@
 local M = class("ObjectPool")
 
-function M:ctor(Cls)
+function M:ctor(cls)
     self.maxCount = 60
     self.minCount = 10
     self.idleCleanTime = 60 --s
@@ -9,7 +9,7 @@ function M:ctor(Cls)
     self.releaseCallback = false
     self.destroyCallback = false
 
-    self._cls = Cls
+    self._cls = cls
     self._queue = Queue.new()
 
     self._lastCleanTimestampMs = 0

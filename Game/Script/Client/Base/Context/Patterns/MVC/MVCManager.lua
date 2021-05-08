@@ -3,6 +3,14 @@ local M = class("MVCManager")
 function M:ctor()
     self._ctrlDict = {}
     self._cacheDict = {}
+
+    --注册一个轮询函数
+    self._updateFunction = function ( ... )
+        self:update(CSharp.Time.deltaTime)
+    end
+
+    --注册更新
+    -- CSharp.MonoManagerIns:AddUpdateListener(self._updateFunction)
 end
 
 function M:addController(key,ctrl)
@@ -76,6 +84,9 @@ function M:getCacheDict()
     return self._cacheDict
 end
 
+function M:update(dt)
+
+end
 
 
 rawset(_G, "MVCManager", M)

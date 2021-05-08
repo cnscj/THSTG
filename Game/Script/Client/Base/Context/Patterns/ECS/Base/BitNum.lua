@@ -1,5 +1,6 @@
 ---@class BitNum
 local MAX_BIT_NUM = 64
+
 local M = class("BitNum")
 
 ---@param n number@位数
@@ -22,7 +23,7 @@ function M:bit( bit )
         printError("[BitNum] n不应该为负数")
         return
     end
-    
+
     if n < MAX_BIT_NUM then
         self.num1 = 1 << n
         return
@@ -32,7 +33,7 @@ function M:bit( bit )
         self.num2 = 1 << (n - MAX_BIT_NUM)
         return
     end
-    
+
     printErrorNoTraceback("[BitNum] 分配给value的位数不够了，加一下num3!!!")
 end
 
@@ -62,6 +63,11 @@ function M:del(b)
     return self
 end
 
+function M:equal(b)
+    return self.num1 == b.num1 
+        and self.num2 == b.num2
+end
+
 ---@param b BitNum
 ---@return boolean@ self & b == b
 function M:containAll(b)
@@ -75,6 +81,7 @@ function M:containAny(b)
     return self.num1 & b.num1 ~= 0
             or self.num2 & b.num2 ~= 0
 end
+
 
 function M:toString()
     if not self._str then
@@ -100,7 +107,6 @@ function M:clear()
 
     self._str = false
 end
---
 
 M.Zero = M.new(0)
 M.Zero.isReadOnly = true

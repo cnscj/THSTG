@@ -43,13 +43,13 @@ function M:_deal(pack, data)
     if type(data) == "table" and type(data.super) == "table" and data.super.cname == "Controller" then
         package.loaded[pack] = nil
         local newCls = require(pack)
-        ControllerManager:reloadController(pack, newCls)
+        CacheControllerManager:reloadController(pack, newCls)
     
     -- 刷新Cache
     elseif type(data) == "table" and type(data.super) == "table" and data.super.cname == "Cache" then
         package.loaded[pack] = nil
         local newCls = require(pack)
-        CacheManager:reloadCache(pack, newCls)
+        CacheControllerManager:reloadCache(pack, newCls)
     else
         package.loaded[pack] = nil 
         require(pack)

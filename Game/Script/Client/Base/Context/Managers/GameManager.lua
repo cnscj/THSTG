@@ -6,8 +6,8 @@ end
 
 function M:start()
     --在Login界面之前,可以先加载一部分模块
-    ControllerManager:initialize()
-    CacheManager:initialize()
+    CacheControllerManager:initialize()
+    ComponentSystemWorld:initialize()
     ViewManager:initialize()
 
 end
@@ -23,8 +23,8 @@ end
 function M:clear()
     self._updateListeners = false
 
-    ControllerManager:clear()
-    CacheManager:clear()
+    CacheControllerManager:clear()
+    ComponentSystemWorld:clear()
     ViewManager:clear()
 end
 
