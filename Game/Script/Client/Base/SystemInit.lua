@@ -24,7 +24,6 @@ require("System.Lang.Collection.Set")
 require("System.Lang.Collection.SimpleArray")
 require("System.Lang.Collection.Stack")
 
-require("System.Lang.Utility.BitNum")
 require("System.Lang.Utility.Color")
 require("System.Lang.Utility.Date")
 require("System.Lang.Utility.Time")

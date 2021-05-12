@@ -1,5 +1,6 @@
-local ExistClassMap = {}
+__RELOADING_LUA__ = false
 
+local ExistClassMap = {}
 --用于禁止类实例在构造函数执行完之后再创建类变量
 local function errorNewIndex(t, k, v)
 	if not __RELOADING_LUA__ then

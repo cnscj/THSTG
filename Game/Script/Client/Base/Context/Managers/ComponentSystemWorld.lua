@@ -31,21 +31,26 @@ function M:initializeComponent()
         for _,v in pairs(componentsPaths) do 
             local cls = require(path)
             if cls then
-                ECSManager:registerComponentClass(cls)
+                -- ECSManager:registerComponentClass(cls)
             end
         end
     end
 end
 
 function M:initializeMainWorld()
-    self._gameWorld = ECSManager:createWorld()
-
+    self._gameWorld = ECS.World.new()
+    ECSManager:addWorld(self._gameWorld)
 end
 --
 
-function M:clear()
-    
+function M:getGameWorld()
+    return self._gameWorld
 end
 
-rawset(_G, "EntitySystemWorld", false)
-EntitySystemWorld = M.new()
+function M:clear()
+    ECSManager:removeWorld(self._gameWorld)
+    self._gameWorld = false
+end
+
+rawset(_G, "ComponentSystemWorld", false)
+ComponentSystemWorld = M.new()

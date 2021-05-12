@@ -6,6 +6,8 @@ ECS = {
     Component = require("Context.Patterns.ECS.Core.Component"),
     System = require("Context.Patterns.ECS.Core.System"),
 }
+require("Context.Patterns.ECS.Base.BitNum")
+require("Context.Patterns.ECS.Base.Archetype")
 require("Context.Patterns.ECS.ECSManager")
 
 

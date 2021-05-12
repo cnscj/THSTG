@@ -6,8 +6,8 @@ end
 
 function M:start()
     --在Login界面之前,可以先加载一部分模块
-    CacheControllerManager:initialize()
     ComponentSystemWorld:initialize()
+    CacheControllerManager:initialize()
     ViewManager:initialize()
 
 end

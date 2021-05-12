@@ -2,16 +2,17 @@ local M = class("World")
 local EMPTY_TABLE = {}
 --持有所有entity和system和负责收集对应的entity
 function M:ctor()
-    self._systemsList = {}
+    self.name = "World"
 
+    self._systemsList = {}
     self._entitiesWithId = {}
     self._entitiesWithArchetype = {}
 end
 
 function M:getEntitiesByArchetype(archetype)
     if not archetype then return end 
-    local archetypeOnly = archetype:toOnly()
-    local curInfo = self._entitiesWithArchetype[archetypeOnly]
+    local archetypeKey = archetype:toString()
+    local curInfo = self._entitiesWithArchetype[archetypeKey]
     if curInfo then
         return curInfo.entitiesDict
     end
@@ -22,26 +23,28 @@ function M:getEntityById(id)
     return self._entitiesWithId[id]
 end
 
---TODO:移除添加操作应该移到帧后进行,否则
---TODO:搜集entity的方式存在疑点
-function M:bindComponent(entity,className)
+--XXX:移除添加操作应该移到帧后进行,否则
+--XXX:搜集entity的方式存在疑点
+function M:bindEntityComponent(entity,className)
     if not entity then return end 
     if not className then return end 
     local archetype = ECSManager:getComponentClassArchetype(className)
     if archetype then 
         local archetypeAll = entity:getComponentsArchetype()
-        local archetypeAllOnly = archetypeAll:toOnly()  
-        local curInfo = self._entitiesWithArchetype[archetypeAllOnly]
+        local archetypeAllKey = archetypeAll:toString()  
+        local curInfo = self._entitiesWithArchetype[archetypeAllKey]
         if not curInfo then
             curInfo = {}
+            curInfo.archetype = archetypeAll
             curInfo.entitiesDict = {}
             curInfo.entitiesList = false
-            self._entitiesWithArchetype[archetypeAllOnly] = curInfo
+            self._entitiesWithArchetype[archetypeAllKey] = curInfo
         end
 
         --
         local entityId = entity:getId()
-        for archetypeInDict,infoInDict in pairs(self._entitiesWithArchetype) do 
+        for _,infoInDict in pairs(self._entitiesWithArchetype) do
+            local archetypeInDict = infoInDict.archetype
             if archetypeAll:containAll(archetypeInDict) or archetypeInDict:containAll(archetypeAll) then
                 infoInDict.entitiesDict[entityId] = entity
                 infoInDict.entitiesList = false
@@ -51,13 +54,14 @@ function M:bindComponent(entity,className)
 end
 
 
-function M:unbindComponent(entity,className)
+function M:unbindEntityComponent(entity,className)
     if not entity then return end 
     if not className then return end 
     local archetype = ECSManager:getComponentClassArchetype(className)
     if archetype then 
         local entityId = entity:getId()
-        for archetypeInDict,infoInDict in pairs(self._entitiesWithArchetype) do 
+        for _,infoInDict in pairs(self._entitiesWithArchetype) do
+            local archetypeInDict = infoInDict.archetype 
             if archetypeInDict:containAll(archetype) then
                 infoInDict.entitiesDict[entityId] = nil
                 infoInDict.entitiesList = false
@@ -66,16 +70,17 @@ function M:unbindComponent(entity,className)
     end
 end
 
-function M:dirtyComponent(entity,className)
+function M:dirtyEntityComponent(entity,className)
 
 end
 
-function M:bindComponents(entity)
+function M:bindEntityComponents(entity)
     if not entity then return end 
 
     local archetypeAll = entity:getComponentsArchetype()
     local entityId = entity:getId()
-    for archetypeInDict,infoInDict in pairs(self._entitiesWithArchetype) do 
+    for _,infoInDict in pairs(self._entitiesWithArchetype) do 
+        local archetypeInDict = infoInDict.archetype 
         if archetypeAll:containAll(archetypeInDict) or archetypeInDict:containAll(archetypeAll) then
             infoInDict.entitiesDict[entityId] = entity
             infoInDict.entitiesList = false
@@ -83,7 +88,7 @@ function M:bindComponents(entity)
     end
 end
 
-function M:unbindComponents(entity)
+function M:unbindEntityComponents(entity)
     if not entity then return end 
 
     local entityId = entity:getId()

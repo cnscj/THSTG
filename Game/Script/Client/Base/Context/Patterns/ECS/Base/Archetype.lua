@@ -67,4 +67,4 @@ function M:_setOnly(val)
    self._value.isReadOnly = val
 end
 
-return M
+rawset(_G, "Archetype", M)

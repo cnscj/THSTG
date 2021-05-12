@@ -3,8 +3,9 @@ local M = class("Entity")
 function M:ctor()
     self._id = 0
     self._owner = false  --所属世界
+
+    --XXX:之后转移到ECSManager的作为Chunk数据
     self._components = {}
-    
     self._componentsArchetype = Archetype.new()
 end
 --
@@ -19,12 +20,12 @@ end
 function M:addComponent(className)
     if not self._components[className] then
         local component = ECSManager:createComponent(className)
-        if component then             
+        if component then
             local archetype = ECSManager:getComponentClassArchetype(className)
             self._componentsArchetype:add(archetype)
             self._components[className] = component            
             
-            if self._owner then self._owner:bindComponent(self,className) end
+            if self._owner then self._owner:bindEntityComponent(self,className) end
         end
     end
 end
@@ -32,7 +33,7 @@ end
 function M:removeComponent(className)
     local component = self._components[className]
     if component then
-        if self._owner then self._owner:unbindComponent(self,className) end
+        if self._owner then self._owner:unbindEntityComponent(self,className) end
 
         local archetype = ECSManager:getComponentClassArchetype(className)
         self._componentsArchetype:del(archetype)
@@ -55,7 +56,7 @@ end
 
 function M:replaceComponent(newComp,className)
     if not newComp then
-        if className then 
+        if className then
             self:removeComponent(className) 
         end
         return
@@ -69,13 +70,13 @@ function M:replaceComponent(newComp,className)
         end
         self._components[className] = newComp
 
-        if self._owner then self._owner:dirtyComponent(self,className) end
+        if self._owner then self._owner:dirtyEntityComponent(self,className) end
     end
 end
 
 function M:removeAllComponents()
     if self._owner then
-        self._owner:unbindComponents(self)
+        self._owner:unbindEntityComponents(self)
     end
 
     self._components = {}

@@ -1,7 +1,9 @@
 ---@class BitNum
-local MAX_BIT_NUM = 64
-
-local M = class("BitNum")
+local M = class("BitNum",nil,{
+    MAX_BIT_NUM = 64,
+    Zero = false,
+    One = false
+})
 
 ---@param n number@位数
 function M:ctor(n)
@@ -14,7 +16,12 @@ function M:ctor(n)
     self:bit(n)
 end
 
-function M:bit( bit )
+function M:set(num1,num2)
+    self.num1 = num1
+    self.num2 = num2
+end
+
+function M:bit(n)
     if not n then
         return
     end
@@ -24,13 +31,13 @@ function M:bit( bit )
         return
     end
 
-    if n < MAX_BIT_NUM then
+    if n < M.MAX_BIT_NUM then
         self.num1 = 1 << n
         return
     end
 
-    if n < 2*MAX_BIT_NUM then
-        self.num2 = 1 << (n - MAX_BIT_NUM)
+    if n < 2*M.MAX_BIT_NUM then
+        self.num2 = 1 << (n - M.MAX_BIT_NUM)
         return
     end
 
@@ -111,4 +118,8 @@ end
 M.Zero = M.new(0)
 M.Zero.isReadOnly = true
 
-return M
+M.One = M.new(0)
+M.One:set(2^M.MAX_BIT_NUM-1,2^M.MAX_BIT_NUM-1)
+M.One.isReadOnly = true
+
+rawset(_G, "BitNum", M)

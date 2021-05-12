@@ -9,7 +9,8 @@ function M:ctor()
 end
 
 function M:initialize()
-
+    self:initializeCache()
+    self:initializeController()
 end
 
 
