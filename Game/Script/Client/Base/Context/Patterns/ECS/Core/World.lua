@@ -23,11 +23,12 @@ function M:getEntityById(id)
     return self._entitiesWithId[id]
 end
 
---XXX:移除添加操作应该移到帧后进行,否则
---XXX:搜集entity的方式存在疑点
-function M:bindEntityComponent(entity,className)
+--TODO:移除添加操作应该移到帧后进行,否则
+--TODO:搜集entity的方式存在疑点
+function M:bindEntityComponent(entity,comp)
     if not entity then return end 
-    if not className then return end 
+    if not comp then return end 
+    local className = comp.__cname
     local archetype = ECSManager:getComponentClassArchetype(className)
     if archetype then 
         local archetypeAll = entity:getComponentsArchetype()
@@ -54,9 +55,10 @@ function M:bindEntityComponent(entity,className)
 end
 
 
-function M:unbindEntityComponent(entity,className)
+function M:unbindEntityComponent(entity,comp)
     if not entity then return end 
-    if not className then return end 
+    if not comp then return end 
+    local className = comp.__cname
     local archetype = ECSManager:getComponentClassArchetype(className)
     if archetype then 
         local entityId = entity:getId()
@@ -70,31 +72,28 @@ function M:unbindEntityComponent(entity,className)
     end
 end
 
-function M:dirtyEntityComponent(entity,className)
-
+function M:dirtyEntityComponent(entity,comp)
+    if not entity then return end 
+    if not comp then return end 
+    local className = comp.__cname
 end
 
+--TODO:应该针对所有组合去添加
 function M:bindEntityComponents(entity)
     if not entity then return end 
 
-    local archetypeAll = entity:getComponentsArchetype()
-    local entityId = entity:getId()
-    for _,infoInDict in pairs(self._entitiesWithArchetype) do 
-        local archetypeInDict = infoInDict.archetype 
-        if archetypeAll:containAll(archetypeInDict) or archetypeInDict:containAll(archetypeAll) then
-            infoInDict.entitiesDict[entityId] = entity
-            infoInDict.entitiesList = false
-        end
+    local components = entity:getComponents()
+    for _,comp in pairs(components) do 
+        self:bindEntityComponent(entity,comp)
     end
 end
 
 function M:unbindEntityComponents(entity)
     if not entity then return end 
 
-    local entityId = entity:getId()
-    for _,infoInDict in pairs(self._entitiesWithArchetype) do 
-        infoInDict.entitiesDict[entityId] = nil
-        infoInDict.entitiesList = false
+    local components = entity:getComponents()
+    for _,comp in pairs(components) do 
+        self:unbindEntityComponent(entity,comp)
     end
 end
 
@@ -106,7 +105,7 @@ function M:addEntity(entity)
     if not self._entitiesWithId[entityId] then
         entity._owner = self
         self._entitiesWithId[entityId] = entity
-        self:bindComponents(self)
+        self:bindEntityComponents(entity)
     end
 end
 
@@ -115,7 +114,7 @@ function M:removeEntity(entity)
 
     local entityId = entity:getId()
     if self._entitiesWithId[entityId] then
-        self:unbindComponents(entity)
+        self:unbindEntityComponents(entity)
         entity._owner = false
         self._entitiesWithId[entityId] = nil
     end

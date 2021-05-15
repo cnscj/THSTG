@@ -1,4 +1,6 @@
-local M = class("Archetype")
+local M = class("Archetype",false,{
+   Empty = false
+})
 local ONLY_DICT = {}
 
 function M:ctor(bit)
@@ -66,5 +68,8 @@ end
 function M:_setOnly(val)
    self._value.isReadOnly = val
 end
+
+M.Empty = M.new()
+M.Empty:_setOnly(true)
 
 rawset(_G, "Archetype", M)

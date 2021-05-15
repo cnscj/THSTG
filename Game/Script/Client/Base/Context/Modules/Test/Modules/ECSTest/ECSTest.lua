@@ -16,8 +16,12 @@ function M:ctor()
     myWorld:addSystem(myTestSystem)
 
     local myEntity = ECSManager:createEntity()
-    myEntity:addComponent(TestComponent.cname)
-    myEntity:addComponent(TestComponent2.cname)
+    myEntity:addComponent(TestComponent)
+    myEntity:addComponent(TestComponent2)
+
+    myEntity:addToWorld(myWorld)
+
+    ECSManager:addWorld(myWorld)
 
     -- print(15,"@@@5,")
     dump(15,myEntity)
