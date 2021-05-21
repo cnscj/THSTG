@@ -1,6 +1,6 @@
 local M = class("AssetLoader")
 local AssetLoaderManagerIns = CSharp.AssetLoaderManagerIns
-
+--[TODO:加载器加载与释放必须成对出现]
 function M:ctor()
 
 end

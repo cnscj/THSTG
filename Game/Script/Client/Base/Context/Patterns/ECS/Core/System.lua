@@ -38,6 +38,10 @@ end
 function M:update(dt)
 
 end
+
+function M:modifyUpdate(entities)
+
+end
 --
 
 return M

@@ -76,6 +76,7 @@ namespace ASGame
             }
         }
 
+        //TODO:释放问题没有解决,应该在Handler中由程序自行释放
         public virtual void UnLoad(string path)
         {
             UnloadWithPath(path);

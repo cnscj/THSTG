@@ -406,4 +406,4 @@ function table.getReadOnlyEmptyTable()
     end
     return ReadOnly_Empty_Table
 end
-table.Empty = table.getReadOnlyEmptyTable()
+table.empty = table.getReadOnlyEmptyTable()

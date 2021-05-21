@@ -7,7 +7,6 @@ local OBJECT_POOL_CONFIG = {        --对象池配置
 }
 local M = class("ECSManager")
 
-
 function M:ctor()
     self._worlds = {}
     self._entities = {}
@@ -76,7 +75,11 @@ function M:getArchetypeByComponentsClass( ... )
     for i = 1, argsNum do
         local arg = select(i, ...)
         local clsName = arg.cname
-        local archetype = self:getComponentClassArchetype(clsName)  --XXX:可能为0
+        local archetype = self:getComponentClassArchetype(clsName)
+        if not archetype then
+            finalArchetype:clear()
+            return finalArchetype
+        end
         finalArchetype:add(archetype)
     end
     return finalArchetype
@@ -146,7 +149,7 @@ function M:addEntityComponent(entity,compCls)
     if not entity then return end 
     if not compCls then return end 
 
-    local chunkData = self:getEntityChunkData(entity) or self:createEntityChunkData(entity)
+    local chunkData = self:getEntityData(entity) or self:createEntityData(entity)
     if chunkData then
         local componentName = compCls.cname
         local componentArchetype = self:getComponentClassArchetype(componentName)
@@ -165,7 +168,7 @@ function M:removeEntityComponent(entity,compCls)
     if not entity then return end 
     if not compCls then return end 
 
-    local chunkData = self:getEntityChunkData(entity)
+    local chunkData = self:getEntityData(entity)
     if chunkData then
         local componentName = compCls.cname
         local componentArchetype = self:getComponentClassArchetype(componentName)
@@ -188,9 +191,9 @@ function M:replaceEntityComponent(entity,newComp)
 
     local entityId = entity:getId()
     local componentName = newComp.__cname 
-    local componentArchetype = self:getComponentClassArchetype(componentName) or self:createEntityChunkData(entity)
+    local componentArchetype = self:getComponentClassArchetype(componentName) or self:createEntityData(entity)
     if componentArchetype then
-        local chunkData = self:getEntityChunkData(entity)
+        local chunkData = self:getEntityData(entity)
         if chunkData then
             if componentArchetype then
                 local oldComp = chunkData.components[componentName]
@@ -201,15 +204,14 @@ function M:replaceEntityComponent(entity,newComp)
                 self:recycleComponent(oldComp)
             end
         end
-    end
-    
+    end 
 end
 
 function M:getEntityComponent(entity,compCls)
     if not entity then return end 
     if not compCls then return end 
 
-    local chunkData = self:getEntityChunkData(entity)
+    local chunkData = self:getEntityData(entity)
     if chunkData then
         local componentName = compCls.cname
         return chunkData.components[componentName]
@@ -218,23 +220,23 @@ end
 
 function M:getEntityComponents(entity)
     if not entity then return end 
-    local chunkData = self:getEntityChunkData(entity)
+    local chunkData = self:getEntityData(entity)
     return chunkData and chunkData.components or EMPTY_TABLE
 end
 
 function M:getEntityComponentsArchetype(entity)
     if not entity then return end 
-    local chunkData = self:getEntityChunkData(entity)
+    local chunkData = self:getEntityData(entity)
     return chunkData and chunkData.componentsArchetype or Archetype.Empty
 end
 
-function M:getEntityChunkData(entity)
+function M:getEntityData(entity)
     if not entity then return end 
     local entityId = entity:getId()
     return self._entityChunkData[entityId]
 end
 
-function M:createEntityChunkData(entity)
+function M:createEntityData(entity)
     if not entity then return end 
     local entityId = entity:getId()
     local chunkData = {

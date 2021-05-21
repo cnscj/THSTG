@@ -166,6 +166,9 @@ namespace ASGame
                     handler.Release();
                 }
             }
+
+            //TODO:这里进行释放操作
+
             AssetLoadHandlerManager.GetInstance().RecycleHandler(this);
         }
 

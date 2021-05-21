@@ -25,20 +25,8 @@ function M:getComponent(compCls)
    return ECSManager:getEntityComponent(self,compCls)
 end
 
-function M:getComponents()
-    return ECSManager:getEntityComponents(self)
-end
-
-function M:getComponentsArchetype()
-    return ECSManager:getEntityComponentsArchetype(self)
-end
-
 function M:replaceComponent(newComp)
     ECSManager:replaceEntityComponent(self,newComp)
-end
-
-function M:removeAllComponents()
-    ECSManager:removeAllEntityComponents(self)
 end
 
 function M:addToWorld(world)
@@ -55,8 +43,8 @@ end
 
 function M:dispose()
     self:removeFromWorld()
-    self:removeAllComponents()
-
+    ECSManager:removeAllEntityComponents(self)
+    
     ECSManager:recycleEntity(self)
 end
 
