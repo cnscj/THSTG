@@ -14,7 +14,7 @@ function M:getWorld()
 end
 
 function M:addComponent(compCls)
-    ECSManager:addEntityComponent(self,compCls)
+    return ECSManager:addEntityComponent(self,compCls)
 end
 
 function M:removeComponent(compCls)
@@ -43,9 +43,8 @@ end
 
 function M:dispose()
     self:removeFromWorld()
-    ECSManager:removeAllEntityComponents(self)
-    
-    ECSManager:recycleEntity(self)
+
+    ECSManager:disposeEntity(self)
 end
 
 function M:clear()

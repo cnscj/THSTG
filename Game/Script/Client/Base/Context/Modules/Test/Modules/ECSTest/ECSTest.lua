@@ -11,20 +11,27 @@ function M:ctor()
     local TestSystem = require("Context.Modules.Test.Modules.ECSTest.TestSystem")
 
     local myWorld = ComponentSystemWorld:getGameWorld()
-    local myTestSystem = TestSystem.new()
-
-    myWorld:addSystem(myTestSystem)
+    myWorld:addSystem(TestSystem.new())
 
     local myEntity = ECSManager:createEntity()
     myEntity:addComponent(TestComponent)
     myEntity:addComponent(TestComponent2)
 
+    local myEntity2 = ECSManager:createEntity()
+    myEntity2:addComponent(TestComponent)
+    myEntity2:addComponent(TestComponent2)
+
+    local myEntity3 = ECSManager:createEntity()
+    myEntity3:addComponent(TestComponent)
+
     myEntity:addToWorld(myWorld)
-
-    ECSManager:addWorld(myWorld)
-
-    -- print(15,"@@@5,")
-    dump(15,myEntity)
+    myEntity2:addToWorld(myWorld)
+    myEntity3:addToWorld(myWorld)
+    Timer:scheduleOnce(3,function ( ... )
+        local testComp = myEntity2:getComponent(TestComponent)
+        testComp.data1 = "!11"
+        myEntity3:replaceComponent(testComp)
+    end)
 end
 
 return M

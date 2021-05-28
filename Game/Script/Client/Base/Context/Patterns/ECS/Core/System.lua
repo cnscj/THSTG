@@ -1,33 +1,27 @@
 local M = class("System")
-local EMPTY_TABLE = {}
 function M:ctor()
     self._owner = false
 
-    self._componentsArchetype = false
+    self._listenedComponents = false
 end
 
-function M:getEntities(arg)
-    --可能有两种情况,一种是Archetype,另一种是className
-    if not self._owner then return end
-    if type(arg) == "table" then
-        if arg.__cname == "Archetype" then
-            return self._owner:getEntitiesByArchetype(arg)
+function M:getEntities(...)
+    --可能有三种情况,一种是Archetype,另一种是classArray,另一种全是形参
+    if not self._owner then return table.empty end
+
+    local componentsArchetype = false
+    local arg = select(1,...)
+    if arg then
+        if arg.__cname then
+            componentsArchetype = arg
         else
-            local componentsArchetype = self._componentsArchetype or Archetype.new()
-            componentsArchetype:clear()
-
-            for _,className in ipairs(arg) do 
-                local archetype = ECSManager:getComponentClassArchetype(className)
-                if not archetype then return EMPTY_TABLE end
-
-                componentsArchetype:add(archetype)
-            end
-            return self._owner:getEntitiesByArchetype(componentsArchetype)
+            componentsArchetype = ECSManager:getArchetypeByComponentClasses(...)
         end
+        return self._owner:getEntitiesByArchetype(componentsArchetype)
     end
-    
-    return EMPTY_TABLE
+    return table.empty
 end
+
 
 function M:removeFromWorld()
     if self._owner then
@@ -36,7 +30,7 @@ function M:removeFromWorld()
 end
 
 function M:update(dt)
-
+ 
 end
 
 function M:modifyUpdate(entities)

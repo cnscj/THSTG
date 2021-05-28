@@ -1,7 +1,7 @@
 --[[
 	更多请看Table.lua
 ]]
----@class TableUtil
+---@class TableTool
 local M = {}
 
 -- 如果a和b的key值都有，a的值会覆盖b的值。

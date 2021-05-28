@@ -4,21 +4,17 @@ local TestComponent = require("Context.Modules.Test.Modules.ECSTest.TestComponen
 local TestComponent2 = require("Context.Modules.Test.Modules.ECSTest.TestComponent2")
 
 function M:ctor()
-    
+    self._listenedComponents = {TestComponent}
 end
 
-local totalDt = 0
-function M:update(dt)
-    totalDt = totalDt + dt
-    if totalDt >= 5 then
-        local archetype = ECSManager:getArchetypeByComponentsClass(TestComponent,TestComponent2)
-        local entities = self:getEntities(archetype)
-        dump(15,entities)
-        -- local entity = self:getEntities()
+function M:modifyUpdate(entities)
+    for _,entity in pairs(entities) do 
+        local testComp = entity:getComponent(TestComponent)
 
-
-        totalDt = 0
+        -- print(15,"!!!!!")
+        print(15,testComp.data1)
     end
+
 end
 
 return M

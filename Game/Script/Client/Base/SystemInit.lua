@@ -29,6 +29,7 @@ require("System.Lang.Utility.Date")
 require("System.Lang.Utility.Time")
 
 --工具函数相关
+require("System.Tool.TableTool")
 require("System.Tool.ConfigOptimizer")
 require("System.Tool.TimerProfiler")
 require("System.Tool.TimeTool")

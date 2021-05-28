@@ -1,5 +1,5 @@
 local M = class("Archetype",false,{
-   Empty = false
+   empty = false
 })
 local ONLY_DICT = {}
 
@@ -24,19 +24,19 @@ end
 function M:equal(archetype)
    if not archetype then return false end 
 
-   return self._value:equal(archetype._value)
+   return self._value:isEqual(archetype._value)
 end
 
 function M:containAll(archetype)
    if not archetype then return false end 
 
-   return self._value:containAll(archetype._value)
+   return self._value:isContainAll(archetype._value)
 end
 
 function M:containAny(archetype)
    if not archetype then return false end 
 
-   return self._value:containAny(archetype._value)
+   return self._value:isContainAny(archetype._value)
 end
 
 
@@ -69,7 +69,7 @@ function M:_setOnly(val)
    self._value.isReadOnly = val
 end
 
-M.Empty = M.new()
-M.Empty:_setOnly(true)
+M.empty = M.new()
+M.empty:_setOnly(true)
 
 rawset(_G, "Archetype", M)

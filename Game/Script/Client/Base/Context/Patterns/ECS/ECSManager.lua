@@ -9,7 +9,6 @@ local M = class("ECSManager")
 
 function M:ctor()
     self._worlds = {}
-    self._entities = {}
 
     self._componentIds = 0
     self._componentClassExInfo = {}
@@ -69,11 +68,38 @@ function M:getComponentClassArchetype(className)
     end
 end
 
-function M:getArchetypeByComponentsClass( ... )
+function M:getArchetypeByComponentClasses( ... )
+    local arg = select(1, ...)
+    if arg then
+        if arg.cname == Archetype.cname then
+            return self:getArchetypeByComponentClassArray(arg)
+        else
+            return self:getArchetypeByComponentClassArgs(...)
+        end
+    end
+    return Archetype.empty
+end
+
+function M:getArchetypeByComponentClassArgs( ... )
     local argsNum = select("#", ...)
     local finalArchetype = Archetype.new()
     for i = 1, argsNum do
         local arg = select(i, ...)
+        local clsName = arg.cname
+        local archetype = self:getComponentClassArchetype(clsName)
+        if not archetype then
+            finalArchetype:clear()
+            return finalArchetype
+        end
+        finalArchetype:add(archetype)
+    end
+    return finalArchetype
+end
+
+function M:getArchetypeByComponentClassArray(array)
+    local finalArchetype = Archetype.new()
+    for i = 1, #array do
+        local arg = array[i]
         local clsName = arg.cname
         local archetype = self:getComponentClassArchetype(clsName)
         if not archetype then
@@ -122,21 +148,24 @@ function M:createEntity()
     entity:clear()
     
     entity._id = self:_getNewEntityId()
-    self._entities[entity._id] = entity
     return entity
 end
 
-function M:getEntityById(entityId)
-    return self._entities[entityId]
-end
 
 function M:recycleEntity(entity)
-    local entityId = entity._id
-    self._entities[entityId] = nil
+    if not entity then return end 
+    
     entity._id = 0
 
     local entityPool = self:_getEntityPool()
     entityPool:release(entity)
+end
+
+function M:disposeEntity(entity)
+    if not entity then return end 
+
+    self:removeAllEntityComponents(self)
+    self:recycleEntity(self)
 end
 
 function M:_getNewEntityId()
@@ -159,7 +188,7 @@ function M:addEntityComponent(entity,compCls)
             chunkData.components[componentName] = component
 
             local world = entity:getWorld()
-            if world then world:bindEntityComponent(self,component) end
+            if world then world:bindEntityComponent(entity,component) end
         end
     end
 end
@@ -175,7 +204,7 @@ function M:removeEntityComponent(entity,compCls)
         if componentArchetype then
             local component = chunkData.components[componentName]
             local world = entity:getWorld()
-            if world then world:unbindEntityComponent(self,component) end
+            if world then world:unbindEntityComponent(entity,component) end
 
             chunkData.componentsArchetype:del(componentArchetype)
             chunkData.components[componentName] = nil
@@ -197,11 +226,14 @@ function M:replaceEntityComponent(entity,newComp)
         if chunkData then
             if componentArchetype then
                 local oldComp = chunkData.components[componentName]
+                local world = entity:getWorld()
 
                 chunkData.componentsArchetype:add(componentArchetype)
                 chunkData.components[componentName] = newComp
     
                 self:recycleComponent(oldComp)
+
+                if world then world:dirtyEntityComponent(entity,newComp) end
             end
         end
     end 
@@ -227,7 +259,7 @@ end
 function M:getEntityComponentsArchetype(entity)
     if not entity then return end 
     local chunkData = self:getEntityData(entity)
-    return chunkData and chunkData.componentsArchetype or Archetype.Empty
+    return chunkData and chunkData.componentsArchetype or Archetype.empty
 end
 
 function M:getEntityData(entity)
@@ -252,8 +284,8 @@ function M:removeAllEntityComponents(entity)
     local entityId = entity:getId()
     local world = entity:getWorld()
 
-    if self._owner then
-        self._owner:unbindEntityComponents(self)
+    if world then
+        world:unbindEntityComponents(entity)
     end
 
     --回收所有Component
@@ -267,13 +299,15 @@ end
 --
 function M:addWorld(world)
     if world then
+        self:removeWorld(world)
         table.insert(self._worlds, world)
     end
 end
 
 function M:removeWorld(world)
     if self._worlds then
-        for i,worldInList in ipairs(self._worlds) do 
+        for i = #self._worlds,1,-1  do 
+            local worldInList = self._worlds[i]
             if world == worldInList then
                 table.remove( list, i )
                 break

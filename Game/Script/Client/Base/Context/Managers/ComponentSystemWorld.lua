@@ -31,7 +31,7 @@ function M:initializeComponent()
         for _,v in pairs(componentsPaths) do 
             local cls = require(path)
             if cls then
-                -- ECSManager:registerComponentClass(cls)
+                ECSManager:registerComponentClass(cls)
             end
         end
     end

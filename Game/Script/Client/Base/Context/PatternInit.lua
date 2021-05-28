@@ -1,4 +1,6 @@
 --ECS模块
+require("Context.Patterns.ECS.Base.BitNum")
+require("Context.Patterns.ECS.Base.Archetype")
 rawset(_G, "ECS", {})
 ECS = {
     World = require("Context.Patterns.ECS.Core.World"),
@@ -6,9 +8,8 @@ ECS = {
     Component = require("Context.Patterns.ECS.Core.Component"),
     System = require("Context.Patterns.ECS.Core.System"),
 }
-require("Context.Patterns.ECS.Base.BitNum")
-require("Context.Patterns.ECS.Base.Archetype")
 require("Context.Patterns.ECS.ECSManager")
+
 
 
 --MVC模块
