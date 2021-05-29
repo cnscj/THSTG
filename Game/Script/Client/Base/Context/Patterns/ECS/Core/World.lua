@@ -17,7 +17,7 @@ function M:getEntitiesByArchetype(archetype)
     local archetypeKey = archetype:toString()
     local curInfo = self._entitiesWithArchetype[archetypeKey]
     if curInfo then
-        return curInfo.entitiesDict
+        return curInfo.updateEntitiesDict
     end
     return EMPTY_TABLE
 end
@@ -53,7 +53,15 @@ function M:unbindEntityComponent(entity,comp)
     self:_removeEntityComponentArchetype(entity,archetype)
 end
 
---TODO:应该针对所有组合去添加
+--TODO:这里把
+function M:_createEntitiesArchetypeData(archetype)
+    local curInfo = {}
+    curInfo.archetype = archetype
+    curInfo.updateEntitiesDict = {}
+    curInfo.modifyEntitiesDict = {first = {},second = {}}
+    return curInfo
+end
+
 function M:_bindEntityComponents(entity)
     if not entity then return end 
 
@@ -78,16 +86,11 @@ function M:_bindSystemComponents(system)
     local listenedComponentsArchetypeKey = listenedComponentsArchetype:toString()
     local curInfo = self._entitiesWithArchetype[listenedComponentsArchetypeKey]
     if not curInfo then
-        curInfo = {}
-        curInfo.archetype = listenedComponentsArchetype
-        curInfo.entitiesDict = {}
-        curInfo.dirtyDict = {first = {},second = {}}
+        curInfo = self:_createEntitiesArchetypeData(listenedComponentsArchetype)
         self._entitiesWithArchetype[listenedComponentsArchetypeKey] = curInfo
     end
 end
 
---TODO:移除添加操作应该移到帧后进行,否则
---TODO:搜集entity的方式存在疑点
 function M:_addEntityComponentArchetype(entity,archetype)
     if not entity then return end 
     if not archetype then return end 
@@ -95,10 +98,7 @@ function M:_addEntityComponentArchetype(entity,archetype)
     local archetypeKey = archetype:toString()
     local curInfo = self._entitiesWithArchetype[archetypeKey]
     if not curInfo then
-        curInfo = {}
-        curInfo.archetype = archetype
-        curInfo.dirtyDict = {first = {},second = {}}
-        curInfo.entitiesDict = {}
+        curInfo = self:_createEntitiesArchetypeData(archetype)
         self._entitiesWithArchetype[archetypeKey] = curInfo
 
         --这里新的archetype集合需要把以前符合条件的entity也添加上去
@@ -106,7 +106,7 @@ function M:_addEntityComponentArchetype(entity,archetype)
             local entityIdInDict = entityInDict:getId()
             local entityComponentsArchetype = ECSManager:getEntityComponentsArchetype(entityInDict)
             if entityComponentsArchetype:containAll(archetype) then
-                curInfo.entitiesDict[entityIdInDict] = entityInDict
+                curInfo.updateEntitiesDict[entityIdInDict] = entityInDict
             end
         end
     end
@@ -116,7 +116,7 @@ function M:_addEntityComponentArchetype(entity,archetype)
     for _,infoInDict in pairs(self._entitiesWithArchetype) do
         local archetypeInDict = infoInDict.archetype
         if archetype:containAll(archetypeInDict) then
-            infoInDict.entitiesDict[entityId] = entity
+            infoInDict.updateEntitiesDict[entityId] = entity
         end
     end
 end
@@ -129,11 +129,13 @@ function M:_removeEntityComponentArchetype(entity,archetype)
     for _,infoInDict in pairs(self._entitiesWithArchetype) do
         local archetypeInDict = infoInDict.archetype 
         if archetype:containAll(archetypeInDict) then
-            infoInDict.entitiesDict[entityId] = nil
+            infoInDict.updateEntitiesDict[entityId] = nil
         end
     end
 end
 
+--TODO:防止重复dirty
+--这里应该先记录一个总的archetype,等update之前在收集
 function M:_modifyEntityComponentArchetype(entity,archetype)
     if not entity then return end 
     if not archetype then return end 
@@ -145,9 +147,8 @@ function M:_modifyEntityComponentArchetype(entity,archetype)
         if archetype:containAll(listenedComponentsArchetype) then
             local entityId = entity:getId()
             local listenedComponentsArchetypeKey = listenedComponentsArchetype:toString()
-            local dirtyEntities = self._entitiesWithArchetype[listenedComponentsArchetypeKey].dirtyDict.first
-            dirtyEntities[entityId] = entity
-
+            local modifyEntities = self._entitiesWithArchetype[listenedComponentsArchetypeKey].modifyEntitiesDict.first
+            modifyEntities[entityId] = entity
         end
     end
 
@@ -177,7 +178,6 @@ function M:removeEntity(entity)
     end
 end
 
---这个system需要先与entity添加,不能动态添加
 function M:addSystem(system)
     if not system then return end
     if system._owner then 
@@ -224,18 +224,18 @@ function M:_updateSystems(dt)
 
         --收集system中所监听所变化的Entity
         local listenedComponentsArchetype = self._systemsExInfo[system].listenedComponentsArchetype
-        local listenedComponentsArchetypeKey = listenedComponentsArchetype:toString()        
+        local listenedComponentsArchetypeKey = listenedComponentsArchetype:toString()
+
         --如果在update中的时候modify了,就不需要清除
-        --:这里应该采用2个Cache交替变换的做法
-    
+        --这里应该采用2个Cache交替变换的做法
         if not self._purgeDirtyQueue[listenedComponentsArchetypeKey] then
-            local dirtyFirstDict = self._entitiesWithArchetype[listenedComponentsArchetypeKey].dirtyDict.first
-            local dirtySecondDict = self._entitiesWithArchetype[listenedComponentsArchetypeKey].dirtyDict.second
-            self._entitiesWithArchetype[listenedComponentsArchetypeKey].dirtyDict.first = dirtySecondDict
-            self._entitiesWithArchetype[listenedComponentsArchetypeKey].dirtyDict.second = dirtyFirstDict  
+            local dirtyFirstDict = self._entitiesWithArchetype[listenedComponentsArchetypeKey].modifyEntitiesDict.first
+            local dirtySecondDict = self._entitiesWithArchetype[listenedComponentsArchetypeKey].modifyEntitiesDict.second
+            self._entitiesWithArchetype[listenedComponentsArchetypeKey].modifyEntitiesDict.first = dirtySecondDict
+            self._entitiesWithArchetype[listenedComponentsArchetypeKey].modifyEntitiesDict.second = dirtyFirstDict  
         end
 
-        local dirtyEntities = self._entitiesWithArchetype[listenedComponentsArchetypeKey].dirtyDict.second
+        local dirtyEntities = self._entitiesWithArchetype[listenedComponentsArchetypeKey].modifyEntitiesDict.second
         if dirtyEntities and next(dirtyEntities) then
             self._purgeDirtyQueue[listenedComponentsArchetypeKey] = listenedComponentsArchetype
             system:modifyUpdate(dirtyEntities)
@@ -245,7 +245,7 @@ end
 
 function M:_purgeSystems(dt)
     for key,_ in pairs(self._purgeDirtyQueue) do 
-        self._entitiesWithArchetype[key].dirtyDict.second = {}
+        self._entitiesWithArchetype[key].modifyEntitiesDict.second = {}
         self._purgeDirtyQueue[key] = nil
     end
 end

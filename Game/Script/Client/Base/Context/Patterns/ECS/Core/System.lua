@@ -23,12 +23,6 @@ function M:getEntities(...)
 end
 
 
-function M:removeFromWorld()
-    if self._owner then
-        self._owner:removeSystem(self)
-    end
-end
-
 function M:update(dt)
  
 end
