@@ -28,8 +28,6 @@ local _getter = {
     Time = function() return UnityEngine.Time end,
     AssetBundle = function() return UnityEngine.AssetBundle end,
 
-    --
-
     --XLibrary
     MonoManagerIns = function() return XLibGame.MonoManager.GetInstance() end,
     TimerIns = function() return XLibGame.Timer.GetInstance() end,
@@ -38,8 +36,11 @@ local _getter = {
     AssetLoaderManagerIns = function() return ASGame.AssetLoaderManager.GetInstance() end,
 
     --自定义
+    LuaBehaviour = function() return SEGame.LuaBehaviour end,
     LuaEngineIns = function() return SEGame.LuaEngine.GetInstance() end,  
     GameEngineIns = function() return STGGame.GameEngine.GetInstance() end, 
+    --
+
 }
 
 

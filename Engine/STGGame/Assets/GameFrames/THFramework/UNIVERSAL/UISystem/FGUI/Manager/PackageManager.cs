@@ -31,7 +31,7 @@ namespace THGame.UI
         {
             m_onAddedCallback = func;
         }
-
+        //TODO:通过URL加载的也需要交由这里管理
         public PackageInfo AddPackage(string packageName)
         {
             if (string.IsNullOrEmpty(packageName))

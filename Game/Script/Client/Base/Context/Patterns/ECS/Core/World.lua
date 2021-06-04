@@ -53,7 +53,6 @@ function M:unbindEntityComponent(entity,comp)
     self:_removeEntityComponentArchetype(entity,archetype)
 end
 
---TODO:这里把
 function M:_createEntitiesArchetypeData(archetype)
     local curInfo = {}
     curInfo.archetype = archetype
@@ -70,7 +69,7 @@ function M:_bindEntityComponents(entity)
     self:_modifyEntityComponentArchetype(entity,archetypeAll)
 end
 
---TODO:移除应该放到帧后
+--XXX:移除应该放到帧后
 function M:_unbindEntityComponents(entity)
     if not entity then return end 
 
@@ -134,7 +133,7 @@ function M:_removeEntityComponentArchetype(entity,archetype)
     end
 end
 
---TODO:防止重复dirty
+--FIXME:防止重复dirty
 --这里应该先记录一个总的archetype,等update之前在收集
 function M:_modifyEntityComponentArchetype(entity,archetype)
     if not entity then return end 

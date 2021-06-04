@@ -22,7 +22,7 @@ namespace SEGame
     }
 
     [LuaCallCSharp]
-    public class LuaBehaviour : MonoBehaviour
+    public class LuaBehaviourx : MonoBehaviour
     {
         public TextAsset luaScript;
         public LuaInjection[] injections;
@@ -81,10 +81,10 @@ namespace SEGame
             {
                 luaUpdate();
             }
-            if (Time.time - LuaBehaviour.lastGCTime > gcInterval)
+            if (Time.time - lastGCTime > gcInterval)
             {
                 GetLuaEnv().Tick();
-                LuaBehaviour.lastGCTime = Time.time;
+                lastGCTime = Time.time;
             }
         }
 
@@ -104,7 +104,7 @@ namespace SEGame
         //all lua behaviour shared one luaenv only!
         LuaEnv GetLuaEnv()
         {
-            return LuaEngine.GetInstance().LuaEnv;
+            return LuaManager.GetInstance().LuaEnv;
         }
     }
 }

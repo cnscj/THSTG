@@ -12,7 +12,7 @@ using static XLua.LuaEnv;
 namespace SEGame
 {
     
-    public class LuaEngine : MonoSingleton<LuaEngine>
+    public class LuaManager : MonoSingleton<LuaManager>
     {
         private static readonly string DEFAULT_DOSTRING = "require 'Main'"; //执行代码
         public string scriptSPath = "../../Game/Script/Client";             //首包脚本路径
@@ -28,19 +28,9 @@ namespace SEGame
         Action<float> m_luaUpdateCallback;
         Action m_luaLateUpdateCallback;
 
-        internal LuaEnv LuaEnv
+        public LuaEnv LuaEnv
         {
             get { return m_luaEnv; }
-        }
-
-        public LuaEngine()
-        {
-
-        }
-
-        ~LuaEngine()
-        {
-
         }
 
         public void Startup()
