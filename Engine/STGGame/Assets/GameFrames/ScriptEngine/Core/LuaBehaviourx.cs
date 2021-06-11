@@ -36,7 +36,8 @@ namespace SEGame
 
         private LuaTable scriptEnv;
 
-        void Awake()
+
+        public void Set(LuaTable clsIns)
         {
             scriptEnv = GetLuaEnv().NewTable();
 
@@ -46,22 +47,50 @@ namespace SEGame
             scriptEnv.SetMetaTable(meta);
             meta.Dispose();
 
-            scriptEnv.Set("self", this);
+            var luaClass = (LuaTable)clsIns;
+            scriptEnv.Set("gameObject", this);
+
+            var luaStart = luaClass.Get<Action<LuaTable>>("start");
+
+            //scriptEnv.Get("start", out luaStart);
+            scriptEnv.Get("update", out luaUpdate);
+            scriptEnv.Get("onDestroy", out luaOnDestroy);
+            if (luaStart != null)
+            {
+                luaStart(luaClass);
+            }
+        }
+
+        void Awake()
+        {
+            if (!luaScript)
+                return;
+
+            scriptEnv = GetLuaEnv().NewTable();
+
+            // 为每个脚本设置一个独立的环境，可一定程度上防止脚本间全局变量、函数冲突
+            LuaTable meta = GetLuaEnv().NewTable();
+            meta.Set("__index", GetLuaEnv().Global);
+            scriptEnv.SetMetaTable(meta);
+            meta.Dispose();
+
+            scriptEnv.Set("gameObject", this);
             foreach (var injection in injections)
             {
                 scriptEnv.Set(injection.name, injection.value);
             }
 
-            GetLuaEnv().DoString(luaScript.text, "chunk", scriptEnv);
+            var rets = GetLuaEnv().DoString(luaScript.text, "chunk", scriptEnv);
+            var luaClass = (LuaTable)rets[0];
 
-            Action luaAwake = scriptEnv.Get<Action>("awake");
+            var luaAwake = luaClass.Get<Action<LuaTable>>("awake");
             scriptEnv.Get("start", out luaStart);
             scriptEnv.Get("update", out luaUpdate);
             scriptEnv.Get("onDestroy", out luaOnDestroy);
 
             if (luaAwake != null)
             {
-                luaAwake();
+                luaAwake(luaClass);
             }
         }
 
@@ -90,10 +119,7 @@ namespace SEGame
 
         void OnDestroy()
         {
-            if (luaOnDestroy != null)
-            {
-                luaOnDestroy();
-            }
+            luaOnDestroy?.Invoke();
             luaOnDestroy = null;
             luaUpdate = null;
             luaStart = null;
@@ -104,7 +130,7 @@ namespace SEGame
         //all lua behaviour shared one luaenv only!
         LuaEnv GetLuaEnv()
         {
-            return LuaManager.GetInstance().LuaEnv;
+            return LuaEngine.GetInstance().LuaEnv;
         }
     }
 }

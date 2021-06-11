@@ -37,7 +37,7 @@ local _getter = {
 
     --自定义
     LuaBehaviour = function() return SEGame.LuaBehaviour end,
-    LuaEngineIns = function() return SEGame.LuaEngine.GetInstance() end,  
+    LuaManagerIns = function() return SEGame.LuaManager.GetInstance() end,  
     GameEngineIns = function() return STGGame.GameEngine.GetInstance() end, 
     --
 

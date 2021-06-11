@@ -1,58 +1,77 @@
 ---@class LuaBehaviour
-local M = class("LuaBehaviour")
-function M.addToGameObject(ugo)
-    if not ugo then return end
-    local newLuaComponent = M.new(ugo)
-    local newUnityComponent = ugo:AddComponent(CSharp.LuaBehaviour)
-    newUnityComponent:set(newLuaComponent)--TODO:
 
-    return newLuaComponent
+local StaticFuncs = {
+    addBehaviour = function (N,ugo)
+        local luaIns = N.new()
+        local unityBehavior = ugo:AddComponent(typeof(CSharp.LuaBehaviour))
+        unityBehavior:SetTable(luaIns)
+        return luaIns
+    end,
+    
+    getBehaviour = function (N,ugo)
+        local unityBehaviors = ugo:GetComponent(typeof(CSharp.LuaBehaviour))
+        for i = 0 ,unityBehaviors.Length - 1 do 
+            local unityBehavior = unityBehaviors[i]
+            if unityBehavior.LuaInstance.__cname == N.cname then
+                return unityBehavior.LuaInstance
+            end
+        end
+    end,
+    
+    getBehaviours = function(N,ugo)
+        local unityBehaviors = ugo:GetComponents(typeof(CSharp.LuaBehaviour))
+        if unityBehaviors and unityBehaviors.Length > 0 then
+            local behaviours = {}
+            for i = 0 ,unityBehaviors.Length - 1 do 
+                local unityBehavior = unityBehaviors[i]
+                if unityBehavior.LuaInstance.__cname == N.cname then
+                    table.insert( behaviours,unityBehavior.LuaInstance )
+                end
+            end
+            return behaviours
+        end
+        return {}
+    end,
+    
+    destroyBehaviours = function(N,ugo)
+        local unityBehaviors = ugo:GetComponents(typeof(CSharp.LuaBehaviour))
+        for i = 0 ,unityBehaviors.Length - 1 do 
+            local unityBehavior = unityBehaviors[i]
+            if unityBehavior.LuaInstance.__cname == N.cname then
+                CSharp.Object.Destroy(unityBehavior)
+            end
+        end
+    end,
+}
+
+local M = class("LuaBehaviour", false, StaticFuncs)
+function M:ctor()
+    self._owner = false
+    self._gameObject = false
 end
 
-function M.destroyBehaviour(behaviour)
-    local owner = behaviour.gameObject
-    local allUnityComponents = behaviour:GetComponents(CSharp.LuaBehaviour)
-    for i = 0,#allUnityComponents do 
-        local comp = allUnityComponents[i]
-        if comp.lua == behaviour then
-            CSharp.Object.Destroy(comp)
-            break
-        end
+function M:newWith( ... )
+
+end
+
+function M:delWith( ... )
+    self._owner = false
+    self._gameObject = false
+end
+
+--下面函数由子类自行添加
+-- function M:awake() end
+-- function M:start()end
+-- function M:update()end
+-- function M:lateUpdate()end
+-- function M:fixedUpdate()end
+-- function M:onEnabled()end
+-- function M:onDestroy()end
+
+function M:destroySelf()
+    if self._owner then
+        CSharp.Object.Destroy(self._owner)
     end
 end
----
-function M:ctor(owner)
-    self.gameObject = owner
-end
 
---
-
-function M:awake()
-
-end
-
-function M:start()
-
-end
-
-function M:update()
-
-end
-
-function M:lateUpdate()
-
-end
-
-function M:fixedUpdate()
-
-end
-
-function M:onEnabled()
-
-end
-
-function M:onDestroy()
-
-end
-
-return M
+rawset(_G, "LuaBehaviour", M)

@@ -49,12 +49,12 @@ namespace SEEditor
         {
             get
             {
-                return AssetDatabase.LoadAssetAtPath(LuaManager.GetInstance().LuaPath + m_LuaScriptPath.stringValue, typeof(DefaultAsset)) as DefaultAsset;
+                return AssetDatabase.LoadAssetAtPath(LuaEngine.GetInstance().LuaPath + m_LuaScriptPath.stringValue, typeof(DefaultAsset)) as DefaultAsset;
             }
             set
             {
                 string path = AssetDatabase.GetAssetPath(value);
-                path = path.Replace(LuaManager.GetInstance().LuaPath, "");
+                path = path.Replace(LuaEngine.GetInstance().LuaPath, "");
                 if ((path.EndsWith(".lua") || value == null) && m_LuaScriptPath.stringValue != path)
                 {
                     m_LuaScriptPath.stringValue = path;
@@ -84,9 +84,9 @@ namespace SEEditor
         //如果Lua文件改变了，则需要重新初始化一遍需要序列化的信息。同时保留已经序列化的数据。
         private void ReloadLua()
         {
-            if (File.Exists(LuaManager.GetInstance().LuaPath + m_LuaScriptPath.stringValue))
+            if (File.Exists(LuaEngine.GetInstance().LuaPath + m_LuaScriptPath.stringValue))
             {
-                long curTime = File.GetLastWriteTime(LuaManager.GetInstance().LuaPath + m_LuaScriptPath.stringValue).Ticks;
+                long curTime = File.GetLastWriteTime(LuaEngine.GetInstance().LuaPath + m_LuaScriptPath.stringValue).Ticks;
                 if (curTime != lastWriteTime)
                 {
                     lastWriteTime = curTime;
@@ -157,14 +157,14 @@ namespace SEEditor
             if (!Application.isPlaying)
             {
                 luaEnv = new LuaEnv();
-                luaEnv.AddLoader(LuaManager.GetInstance().BaseLoader);
+                luaEnv.AddLoader(LuaEngine.GetInstance().BaseLoader);
                 luaEnv.DoString("ExecuteInEditorScript = true");
                 var rets = luaEnv.DoString($"return require \"{m_LuaScriptPath.stringValue}\"");
                 luaClass = (LuaTable)rets[0];
             }
             else
             {
-                var rets = LuaManager.GetInstance().LuaEnv.DoString($"return require \"{m_LuaScriptPath.stringValue}\"");
+                var rets = LuaEngine.GetInstance().LuaEnv.DoString($"return require \"{m_LuaScriptPath.stringValue}\"");
                 luaClass = (LuaTable)rets[0];
             }
             luaClass.Get("_DefineList", out defineTable);

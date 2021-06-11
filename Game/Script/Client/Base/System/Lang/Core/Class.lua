@@ -25,12 +25,6 @@ function class(className, super, staticFuns)
 
 	local cls = {}
 	
-	if staticFuns then
-		for k, v in pairs(staticFuns) do
-			cls[k] = v
-		end
-	end
-	
 	cls.cname = className
 
 	-- 传入的super必须得是该类方法构建的table
@@ -42,6 +36,8 @@ function class(className, super, staticFuns)
 	cls.funcs = {}
 	--储存类实例的重要方法和属性
 	cls.instanceIndexT = {}
+    --储存类静态方法
+    cls.staticFuns = staticFuns
 
 	--该类所生成实例用于索引的元表
 	local instanceIndexT = cls.instanceIndexT
@@ -76,6 +72,17 @@ function class(className, super, staticFuns)
 			end
 		end
 		-- print(1, "~~~~~~~~~~~~~~~~~")
+	end
+
+	-- 把 所有的类静态类方法复制到本类中
+	local c = cls
+	while c do
+		if c.staticFuns then
+			for k, v in pairs(c.staticFuns) do
+				cls[k] = v
+			end
+		end
+		c = c.super
 	end
 
 	--执行构造函数

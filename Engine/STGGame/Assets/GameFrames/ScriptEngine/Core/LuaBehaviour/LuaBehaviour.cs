@@ -111,79 +111,137 @@ namespace SEGame
     
         public LuaTable LuaInstance
         {
-            get
-            {
-                if(mLuaInstance == null)
-                {
-                    InitLua();
-                }
-                return mLuaInstance;
-            }
+            get{ return mLuaInstance; }
         }
 
         private LuaTable mLuaInstance;
+
+        private Action<LuaTable> onAwakeFunc;
+        private Action<LuaTable> onStartFunc;
+        private Action<LuaTable> onUpdateFunc;
+        private Action<LuaTable> onFixUpdateFunc;
+        private Action<LuaTable> onLateUpdateFunc;
         private Action<LuaTable> onEnableFunc;
         private Action<LuaTable> onDisableFunc;
+        private Action<LuaTable> onDestroyFunc;
+
+        public void SetTable(LuaTable luaInstance)
+        {
+            Clear();
+
+            mLuaInstance = luaInstance;
+
+            if (luaInstance != null)
+            {
+                //注入自己
+                luaInstance.Set("_owner", this);
+                luaInstance.Set("_gameObject", gameObject);
+
+                //其它参数注入
+                LuaTable defineTable;
+                luaInstance.Get("_defineList", out defineTable);
+                if (defineTable != null)
+                {
+                    Dictionary<string, Type> infoDict = new Dictionary<string, Type>();
+                    string infoName;
+                    Type infoType;
+                    defineTable.ForEach<int, LuaTable>((index, infoTable) =>
+                    {
+                        infoTable.Get("name", out infoName);
+                        infoTable.Get("type", out infoType);
+                        infoDict.Add(infoName, infoType);
+                    });
+                    //注入object类型对象
+                    foreach (var serializedValue in SerializedObjValues)
+                    {
+                        //看了下set的代码，没有注册任何object类型的pushfunc,所以最后调用的都是pushany，
+                        //不用担心类型错误问题
+                        if (infoDict.ContainsKey(serializedValue.key) && serializedValue.value != null)
+                        {
+                            luaInstance.Set(serializedValue.key, serializedValue.value);
+                        }
+                    }
+                    //注入其他类型
+                    foreach (var serializedValue in SerializedValues)
+                    {
+                        if (infoDict.ContainsKey(serializedValue.key))
+                        {
+                            luaInstance.Set(serializedValue.key, JsonToValue(serializedValue.jsonStr, infoDict[serializedValue.key]));
+                        }
+                    }
+                }
+
+                //回调注册
+                var newWith = luaInstance.Get<Action<LuaTable>>("newWith");
+                newWith?.Invoke(luaInstance);
+
+                onAwakeFunc = luaInstance.Get<Action<LuaTable>>("awake");
+                onStartFunc = luaInstance.Get<Action<LuaTable>>("start");
+                onUpdateFunc = luaInstance.Get<Action<LuaTable>>("update");
+                onFixUpdateFunc = luaInstance.Get<Action<LuaTable>>("fixUPdate");
+                onLateUpdateFunc = luaInstance.Get<Action<LuaTable>>("lateUpdate");
+                onEnableFunc = luaInstance.Get<Action<LuaTable>>("onEnable");
+                onDisableFunc = luaInstance.Get<Action<LuaTable>>("onDisable");
+                onDestroyFunc = luaInstance.Get<Action<LuaTable>>("onDestroy");
+            }
+        }
+
+        public void SetContent(string scriptContent)
+        {
+            if (string.IsNullOrEmpty(scriptContent))
+                return;
+
+            var rets = GetLuaEnv().DoString(scriptContent);
+            var luaClass = (LuaTable)rets[0];
+
+            //从该Table中New一个新的并设置元表
+            mLuaInstance = GetLuaEnv().NewTable();
+
+            LuaTable meta = GetLuaEnv().NewTable();
+            meta.Set("__index", GetLuaEnv().Global);
+            mLuaInstance.SetMetaTable(meta);
+            meta.Dispose();
+
+            SetTable(luaClass);
+        }
+
+        public void SetScript(string luaScriptPath)
+        {
+            if (string.IsNullOrEmpty(luaScriptPath))
+                return;
+
+            SetContent($"return require \"{luaScriptPath}\"");
+        }
 
         //all lua behaviour shared one luaenv only!
         LuaEnv GetLuaEnv()
         {
-            return LuaManager.GetInstance().LuaEnv;
-        }
-
-        void InitLua()
-        {
-            mLuaInstance = GetLuaEnv().NewTable();
-            //注入自己
-            mLuaInstance.Set("gameObject", gameObject);
-            var rets = GetLuaEnv().DoString($"return require \"{LuaScriptPath}\"");
-            var luaClass = (LuaTable)rets[0];
-
-            LuaTable defineTable;
-            luaClass.Get("_DefineList", out defineTable);
-            if (defineTable != null)
-            {
-                Dictionary<string, Type> infoDict = new Dictionary<string, Type>();
-                string infoName;
-                Type infoType;
-                defineTable.ForEach<int, LuaTable>((index, infoTable) =>
-                {
-                    infoTable.Get("name", out infoName);
-                    infoTable.Get("type", out infoType);
-                    infoDict.Add(infoName, infoType);
-                });
-                //注入object类型对象
-                foreach (var serializedValue in SerializedObjValues)
-                {
-                    //看了下set的代码，没有注册任何object类型的pushfunc,所以最后调用的都是pushany，
-                    //不用担心类型错误问题
-                    if (infoDict.ContainsKey(serializedValue.key) && serializedValue.value != null)
-                    {
-                        mLuaInstance.Set(serializedValue.key, serializedValue.value);
-                    }
-                }
-                //注入其他类型
-                foreach (var serializedValue in SerializedValues)
-                {
-                    if (infoDict.ContainsKey(serializedValue.key))
-                    {
-                        mLuaInstance.Set(serializedValue.key, JsonToValue(serializedValue.jsonStr, infoDict[serializedValue.key]));
-                    }
-                }
-            }
-            var newWith = luaClass.Get<Action<LuaTable, LuaTable>>("newWith");
-            newWith(luaClass, mLuaInstance);
-
-            this.onEnableFunc = luaClass.Get<Action<LuaTable>>("onEnable");
-            this.onDisableFunc = luaClass.Get<Action<LuaTable>>("onDisable");
+            return LuaEngine.GetInstance().LuaEnv;
         }
 
         void Awake()
         {
-            if(mLuaInstance == null)
-            {
-                InitLua();
-            }        
+            onAwakeFunc?.Invoke(LuaInstance);
+        }
+
+        void Start()
+        {
+            onStartFunc?.Invoke(LuaInstance);
+        }
+
+        void Update()
+        {
+            onUpdateFunc?.Invoke(LuaInstance);
+        }
+
+        void FixedUpdate()
+        {
+            onFixUpdateFunc?.Invoke(LuaInstance);
+        }
+
+        void LateUpdate()
+        {
+            onLateUpdateFunc?.Invoke(LuaInstance);
         }
 
         void OnEnable()
@@ -198,14 +256,29 @@ namespace SEGame
 
         void OnDestroy()
         {
-            onEnableFunc = null;
-            onDisableFunc = null;
-            var onDestroyFunc = LuaInstance.Get<Action<LuaTable>>("onDestroy");
             onDestroyFunc?.Invoke(LuaInstance);
-            mLuaInstance = null;
+
+            if (LuaInstance != null)
+            {
+                var delWith = LuaInstance.Get<Action<LuaTable>>("delWith");
+                delWith?.Invoke(LuaInstance);
+            }
+
+            Clear();
         }
 
-       
+        void Clear()
+        {
+            onAwakeFunc = null;
+            onStartFunc = null;
+            onUpdateFunc = null;
+            onFixUpdateFunc = null;
+            onLateUpdateFunc = null;
+            onEnableFunc = null;
+            onDisableFunc = null;
+
+            mLuaInstance = null;
+        }
     }
 
 }

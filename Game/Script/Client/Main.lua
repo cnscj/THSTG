@@ -9,10 +9,10 @@ function init()
     require("Version")
 
     --设置主干版本和分支版本
-    CSharp.LuaEngineIns:SetLuaTrunkAndBranch(__TRUNK__,__BRANCH__)
+    CSharp.LuaManagerIns:SetLuaTrunkAndBranch(__TRUNK__,__BRANCH__)
 
     --设置游戏逻辑更新
-    CSharp.LuaEngineIns:RegisterLuaUpdateListeners(update)
+    CSharp.LuaManagerIns:RegisterLuaUpdateListeners(update)
 end
 
 function setup()
