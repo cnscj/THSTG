@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
+using XLibrary;
 using XLibrary.Package;
 using XLua;
 using static XLua.LuaEnv;
@@ -21,8 +23,7 @@ namespace SEGame
             { "lsocket", XLua.LuaDLL.Lua.LoadLsocket },
         };
 
-        private string m_unityFloder = "unityLua";                                                              //Unity所在脚本目录
-        private string m_scriptPath = "Assets/ZCustom_Test/Scr/LuaBehaviourTest/";                              //脚本路径
+        private string m_scriptPath = "Assets/GameFrames/ScriptEngine/Core/LuaBehaviour/Resources/UnityLua/";                              //脚本路径
         private LuaEnv m_luaEnv;
         private IntPtr m_luaCache = IntPtr.Zero;
         private CustomLoader m_customLoader = null;
@@ -37,7 +38,7 @@ namespace SEGame
             get { return m_scriptPath; }
             set { m_scriptPath = value; }
         }
-        
+
         public CustomLoader BaseLoader
         {
             get { return OnLoaderInvoke; }
@@ -61,7 +62,7 @@ namespace SEGame
             }
 
             m_luaEnv.AddLoader(OnLoaderInvoke);
-
+            m_luaEnv.DoString(string.Format("package.path = package.path ..';{0}?.lua';", LuaPath));
         }
 
         public void Restart()
@@ -98,7 +99,19 @@ namespace SEGame
             System.GC.WaitForPendingFinalizers();
         }
 
+
+        public string GetFullLuaPath(string relaFilePath)
+        {
+            return relaFilePath;
+        }
+
+        public string GetRelaLuaPath(string fullFilePath)
+        {
+            return fullFilePath;
+        }
+
         //默认加载委托
+        //TODO:运行时加载路径解析
         private byte[] OnLoaderInvoke(ref string relaFilePath)
         {
             if (m_customLoader != null)
@@ -110,6 +123,7 @@ namespace SEGame
                 try
                 {
                     string fileName = relaFilePath;
+                    
                     if (!fileName.EndsWith(".lua", StringComparison.Ordinal))
                     {
                         fileName = fileName.Replace('.', '/');
@@ -119,9 +133,15 @@ namespace SEGame
                     {
                         fileName = fileName.Replace('.', '/').Replace("/lua", ".lua");
                     }
-                    var fileFullPath = Path.Combine(LuaPath, fileName);
+
+                    string fileFullPath = fileName;
+#if UNITY_EDITOR
+#endif
+                    fileFullPath = fileFullPath.Replace("{LuaPath}", m_scriptPath);
+
                     if (!string.IsNullOrEmpty(fileFullPath))
                     {
+                        //TextAsset不支持以lua结尾文件,因此不适用
                         return File.ReadAllBytes(fileFullPath);
                     }
                 }

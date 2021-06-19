@@ -9,9 +9,11 @@ function M:ctor()
     -- print(15,TestComponent.cname)
 
     local TestSystem = require("Context.Modules.Test.Modules.ECSTest.TestSystem")
+    local TestSystem2 = require("Context.Modules.Test.Modules.ECSTest.TestSystem2")
 
     local myWorld = ComponentSystemWorld:getGameWorld()
     myWorld:addSystem(TestSystem.new())
+    myWorld:addSystem(TestSystem2.new())
 
     local myEntity = ECSManager:createEntity()
     myEntity:addComponent(TestComponent)
@@ -30,7 +32,7 @@ function M:ctor()
     Timer:scheduleOnce(3,function ( ... )
         local testComp = myEntity2:getComponent(TestComponent)
         testComp.data1 = "!11"
-        myEntity3:replaceComponent(testComp)
+        myEntity2:replaceComponent(testComp)
     end)
 end
 

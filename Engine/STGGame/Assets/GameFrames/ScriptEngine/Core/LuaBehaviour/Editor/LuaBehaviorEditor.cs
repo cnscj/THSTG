@@ -49,12 +49,12 @@ namespace SEEditor
         {
             get
             {
-                return AssetDatabase.LoadAssetAtPath(LuaEngine.GetInstance().LuaPath + m_LuaScriptPath.stringValue, typeof(DefaultAsset)) as DefaultAsset;
+                return AssetDatabase.LoadAssetAtPath(LuaEngine.GetInstance().GetFullLuaPath(m_LuaScriptPath.stringValue), typeof(DefaultAsset)) as DefaultAsset;
             }
             set
             {
                 string path = AssetDatabase.GetAssetPath(value);
-                path = path.Replace(LuaEngine.GetInstance().LuaPath, "");
+                path = LuaEngine.GetInstance().GetRelaLuaPath(path);
                 if ((path.EndsWith(".lua") || value == null) && m_LuaScriptPath.stringValue != path)
                 {
                     m_LuaScriptPath.stringValue = path;
@@ -84,9 +84,10 @@ namespace SEEditor
         //如果Lua文件改变了，则需要重新初始化一遍需要序列化的信息。同时保留已经序列化的数据。
         private void ReloadLua()
         {
-            if (File.Exists(LuaEngine.GetInstance().LuaPath + m_LuaScriptPath.stringValue))
+            var fullPath = LuaEngine.GetInstance().GetFullLuaPath(m_LuaScriptPath.stringValue);
+            if (File.Exists(fullPath))
             {
-                long curTime = File.GetLastWriteTime(LuaEngine.GetInstance().LuaPath + m_LuaScriptPath.stringValue).Ticks;
+                long curTime = File.GetLastWriteTime(fullPath).Ticks;
                 if (curTime != lastWriteTime)
                 {
                     lastWriteTime = curTime;
@@ -97,24 +98,32 @@ namespace SEEditor
                     mLuaBehaviour.SerializedValues = new List<LuaBehaviour.SerializedValue>();
                     foreach (var info in infoList)
                     {
-                        if (info.ValueType.IsSubclassOf(typeof(UnityEngine.Object)))
+                        if (info.ValueType != null)
                         {
-                            mLuaBehaviour.SerializedObjValues.Add(
-                                new LuaBehaviour.SerializedObjValue()
-                                {
-                                    key = info.ValueName,
-                                    value = GetObjValueInLuaBehavior(info, preObjValues)
-                                });
+                            if (info.ValueType.IsSubclassOf(typeof(UnityEngine.Object)))
+                            {
+                                mLuaBehaviour.SerializedObjValues.Add(
+                                    new LuaBehaviour.SerializedObjValue()
+                                    {
+                                        key = info.ValueName,
+                                        value = GetObjValueInLuaBehavior(info, preObjValues)
+                                    });
+                            }
+                            else
+                            {
+                                mLuaBehaviour.SerializedValues.Add(
+                                    new LuaBehaviour.SerializedValue()
+                                    {
+                                        key = info.ValueName,
+                                        jsonStr = GetValueInLuaBehavior(info, preValues)
+                                    });
+                            }
                         }
                         else
                         {
-                            mLuaBehaviour.SerializedValues.Add(
-                                new LuaBehaviour.SerializedValue()
-                                {
-                                    key = info.ValueName,
-                                    jsonStr = GetValueInLuaBehavior(info, preValues)
-                                });
+                            Debug.LogErrorFormat("'{0}' is not registered", info.ValueName);
                         }
+                        
                     }
                 }
             }
@@ -192,14 +201,18 @@ namespace SEEditor
             //绘制所有需要注入的对象
             foreach (var info in infoList)
             {
-                if (info.ValueType.IsSubclassOf(typeof(UnityEngine.Object)))
+                if (info.ValueType != null)
                 {
-                    DrawObjValueView(info);
+                    if (info.ValueType.IsSubclassOf(typeof(UnityEngine.Object)))
+                    {
+                        DrawObjValueView(info);
+                    }
+                    else
+                    {
+                        DrawValueView(info);
+                    }
                 }
-                else
-                {
-                    DrawValueView(info);
-                }
+   
             }
             serializedObject.ApplyModifiedProperties();
         }

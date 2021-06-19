@@ -230,9 +230,10 @@ function M:replaceEntityComponent(entity,newComp)
 
                 chunkData.componentsArchetype:add(componentArchetype)
                 chunkData.components[componentName] = newComp
-    
-                self:recycleComponent(oldComp)
-
+                if newComp ~= oldComp then
+                    self:recycleComponent(oldComp)
+                end
+                
                 if world then world:dirtyEntityComponent(entity,newComp) end
             end
         end

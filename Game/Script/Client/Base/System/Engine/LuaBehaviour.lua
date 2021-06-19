@@ -1,6 +1,6 @@
 ---@class LuaBehaviour
 
-local StaticFuncs = {
+local _StaticFuncs_ = {
     addBehaviour = function (N,ugo)
         local luaIns = N.new()
         local unityBehavior = ugo:AddComponent(typeof(CSharp.LuaBehaviour))
@@ -9,7 +9,7 @@ local StaticFuncs = {
     end,
     
     getBehaviour = function (N,ugo)
-        local unityBehaviors = ugo:GetComponent(typeof(CSharp.LuaBehaviour))
+        local unityBehaviors = ugo:GetComponents(typeof(CSharp.LuaBehaviour))
         for i = 0 ,unityBehaviors.Length - 1 do 
             local unityBehavior = unityBehaviors[i]
             if unityBehavior.LuaInstance.__cname == N.cname then
@@ -44,7 +44,7 @@ local StaticFuncs = {
     end,
 }
 
-local M = class("LuaBehaviour", false, StaticFuncs)
+local M = class("LuaBehaviour", false, _StaticFuncs_)
 function M:ctor()
     self._owner = false
     self._gameObject = false

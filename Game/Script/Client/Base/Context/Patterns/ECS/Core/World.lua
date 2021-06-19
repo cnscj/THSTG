@@ -9,7 +9,7 @@ function M:ctor(name)
     self._entitiesWithId = {}
     self._entitiesWithArchetype = {}
 
-    self._purgeDirtyQueue = {}
+    self._entitiesWithModify = {}
 end
 
 function M:getEntitiesByArchetype(archetype)
@@ -57,7 +57,7 @@ function M:_createEntitiesArchetypeData(archetype)
     local curInfo = {}
     curInfo.archetype = archetype
     curInfo.updateEntitiesDict = {}
-    curInfo.modifyEntitiesDict = {first = {},second = {}}
+
     return curInfo
 end
 
@@ -133,24 +133,21 @@ function M:_removeEntityComponentArchetype(entity,archetype)
     end
 end
 
---FIXME:防止重复dirty
+--防止重复dirty
 --这里应该先记录一个总的archetype,等update之前在收集
 function M:_modifyEntityComponentArchetype(entity,archetype)
     if not entity then return end 
     if not archetype then return end 
 
-    for i = #self._systemsList,1,-1 do
-        local system = self._systemsList[i]
-
-        local listenedComponentsArchetype = self._systemsExInfo[system].listenedComponentsArchetype
-        if archetype:containAll(listenedComponentsArchetype) then
-            local entityId = entity:getId()
-            local listenedComponentsArchetypeKey = listenedComponentsArchetype:toString()
-            local modifyEntities = self._entitiesWithArchetype[listenedComponentsArchetypeKey].modifyEntitiesDict.first
-            modifyEntities[entityId] = entity
-        end
+    local entityId = entity:getId()
+    if not self._entitiesWithModify[entityId] then
+        self._entitiesWithModify[entityId] = {
+            modifyArchetype = archetype:clone(),
+        }
+    else
+        self._entitiesWithModify[entityId].modifyArchetype:add(archetype)
     end
-
+    
 end
 
 function M:addEntity(entity)
@@ -213,11 +210,34 @@ function M:update(dt)
     self:_purgeSystems(dt)
 end
 
-function M:clear()
-
-end
-
 function M:_updateSystems(dt)
+    --收集所有的变更entity
+    local modifyArchetypeWithEntities = false
+    local entitiesWithModifyRead = self._entitiesWithModify
+    if next(entitiesWithModifyRead) then
+        modifyArchetypeWithEntities = {}
+        self._entitiesWithModify = {}
+        for entityId,modifyInfo in pairs(entitiesWithModifyRead) do
+            local modifyArchetype = modifyInfo.modifyArchetype
+            for i = #self._systemsList,1,-1 do
+                local system = self._systemsList[i]
+                local listenedComponentsArchetype = self._systemsExInfo[system].listenedComponentsArchetype
+                local listenedComponentsArchetypeKey = listenedComponentsArchetype:toString()
+                local entity = self:getEntityById(entityId)
+                if entity then
+                    local entityComponentsArchetype = ECSManager:getEntityComponentsArchetype(entity)
+                    if entityComponentsArchetype:containAll(listenedComponentsArchetype) then   --必须拥有受监听的组件
+                        if modifyArchetype:containAny(listenedComponentsArchetype) then         --监听的任意一个发生改变,注意用Any容易造成死循环
+                            modifyArchetypeWithEntities[listenedComponentsArchetypeKey] = modifyArchetypeWithEntities[listenedComponentsArchetypeKey] or {}
+                            modifyArchetypeWithEntities[listenedComponentsArchetypeKey][entityId] = entity
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    --更新System
     for _,system in ipairs(self._systemsList) do 
         system:update(dt)
 
@@ -225,28 +245,22 @@ function M:_updateSystems(dt)
         local listenedComponentsArchetype = self._systemsExInfo[system].listenedComponentsArchetype
         local listenedComponentsArchetypeKey = listenedComponentsArchetype:toString()
 
-        --如果在update中的时候modify了,就不需要清除
-        --这里应该采用2个Cache交替变换的做法
-        if not self._purgeDirtyQueue[listenedComponentsArchetypeKey] then
-            local dirtyFirstDict = self._entitiesWithArchetype[listenedComponentsArchetypeKey].modifyEntitiesDict.first
-            local dirtySecondDict = self._entitiesWithArchetype[listenedComponentsArchetypeKey].modifyEntitiesDict.second
-            self._entitiesWithArchetype[listenedComponentsArchetypeKey].modifyEntitiesDict.first = dirtySecondDict
-            self._entitiesWithArchetype[listenedComponentsArchetypeKey].modifyEntitiesDict.second = dirtyFirstDict  
-        end
-
-        local dirtyEntities = self._entitiesWithArchetype[listenedComponentsArchetypeKey].modifyEntitiesDict.second
-        if dirtyEntities and next(dirtyEntities) then
-            self._purgeDirtyQueue[listenedComponentsArchetypeKey] = listenedComponentsArchetype
-            system:modifyUpdate(dirtyEntities)
+        --执行modifyUpdate如果存在已修改的entities
+        if modifyArchetypeWithEntities then
+            local modifyEntitiesWithListenedArchetype = modifyArchetypeWithEntities[listenedComponentsArchetypeKey]
+            if modifyEntitiesWithListenedArchetype then
+                system:modifyUpdate(modifyEntitiesWithListenedArchetype)
+            end
         end
     end
 end
 
 function M:_purgeSystems(dt)
-    for key,_ in pairs(self._purgeDirtyQueue) do 
-        self._entitiesWithArchetype[key].modifyEntitiesDict.second = {}
-        self._purgeDirtyQueue[key] = nil
-    end
+ 
+end
+
+function M:clear()
+
 end
 
 return M

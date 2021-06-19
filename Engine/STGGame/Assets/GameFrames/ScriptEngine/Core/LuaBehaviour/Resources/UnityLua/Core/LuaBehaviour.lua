@@ -1,4 +1,4 @@
-local class = require "Core.MiddleClass"
+local class = require "{LuaPath}Core.MiddleClass"
 local LuaBehaviour = class("LuaBehaviour")
 
 local typeDict = {}
