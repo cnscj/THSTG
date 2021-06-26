@@ -1,4 +1,4 @@
-local class = require "{LuaPath}Core.MiddleClass"
+local class = require "{Resource}Core.MiddleClass"
 local LuaBehaviour = class("LuaBehaviour")
 
 local typeDict = {}
@@ -7,9 +7,9 @@ setmetatable(typeDict, { __index = function(t, k)
     return t[k]
 end})
 function LuaBehaviour:AddDefineList(defineList)
-    self._DefineList = self._DefineList or {}
+    self._defineList = self._defineList or {}
     for key, value in pairs(defineList) do
-        table.insert(self._DefineList, {name = value.name, type = typeDict[value.type]})
+        table.insert(self._defineList, {name = value.name, type = typeDict[value.type]})
     end
 end
 --在编辑器下只加载DefineList,不管其他部分

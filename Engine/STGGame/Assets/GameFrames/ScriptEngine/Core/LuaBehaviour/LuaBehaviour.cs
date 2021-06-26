@@ -134,8 +134,8 @@ namespace SEGame
             if (luaInstance != null)
             {
                 //注入自己
-                luaInstance.Set("_owner", this);
-                luaInstance.Set("_gameObject", gameObject);
+                luaInstance.Set("owner", this);
+                luaInstance.Set("gameObject", gameObject);
 
                 //其它参数注入
                 LuaTable defineTable;
