@@ -21,7 +21,7 @@ local AssistantDict = {
     ["LateUpdate"] = typeof(CS.LuaLateUpdateAssistant),
     ["OnPointerClick"] = typeof(CS.LuaOnPointerClickAssistant)
 }
-function LuaBehaviour:initialize()
+function LuaBehaviour:newWith()
     for funcName, assistant in pairs(AssistantDict) do
         if self[funcName] then
             self.gameObject:AddComponent(assistant)

@@ -1,13 +1,17 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using XLua;
+
 namespace SEGame
 {
-    public class LuaAssistantBase : MonoBehaviour
+    public abstract class LuaAssistantBase : MonoBehaviour
     {
-        protected LuaBehaviour luaBehaviour;
-
-        protected virtual void Awake()
+        public LuaBehaviour luaBehaviour;
+        public Action<LuaTable> assistFunc;
+        void OnDestroy()
         {
-            luaBehaviour = GetComponent<LuaBehaviour>();
+            luaBehaviour = null;
+            assistFunc = null;
         }
     }
 }

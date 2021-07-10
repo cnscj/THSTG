@@ -4,25 +4,12 @@ namespace SEGame
 {
     public class LuaUpdateAssistant : LuaAssistantBase
     {
-        private Action<LuaTable> updateFunc;
-
-        protected override void Awake()
-        {
-            base.Awake();
-            updateFunc = luaBehaviour.LuaInstance.Get<Action<LuaTable>>("Update");
-        }
-
         void Update()
         {
-            if (luaBehaviour.LuaInstance != null)
+            if (luaBehaviour != null && luaBehaviour.LuaInstance != null)
             {
-                updateFunc?.Invoke(luaBehaviour.LuaInstance);
+                assistFunc?.Invoke(luaBehaviour.LuaInstance);
             }
-        }
-
-        void OnDestroy()
-        {
-            updateFunc = null;
         }
     }
 }

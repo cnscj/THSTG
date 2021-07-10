@@ -118,12 +118,14 @@ namespace SEGame
 
         private Action<LuaTable> onAwakeFunc;
         private Action<LuaTable> onStartFunc;
-        private Action<LuaTable> onUpdateFunc;
-        private Action<LuaTable> onFixUpdateFunc;
-        private Action<LuaTable> onLateUpdateFunc;
+
         private Action<LuaTable> onEnableFunc;
         private Action<LuaTable> onDisableFunc;
         private Action<LuaTable> onDestroyFunc;
+
+        private LuaUpdateAssistant onUpdateAssistant;
+        private LuaFixedUpdateAssistant onFixedUpdateAssistant;
+        private LuaLateUpdateAssistant onLateUpdateAssistant;
 
         public void SetTable(LuaTable luaInstance)
         {
@@ -131,15 +133,15 @@ namespace SEGame
 
             mLuaInstance = luaInstance;
 
-            if (luaInstance != null)
+            if (LuaInstance != null)
             {
                 //注入自己
-                luaInstance.Set("owner", this);
-                luaInstance.Set("gameObject", gameObject);
+                LuaInstance.Set("owner", this);
+                LuaInstance.Set("gameObject", gameObject);
 
                 //其它参数注入
                 LuaTable defineTable;
-                luaInstance.Get("_defineList", out defineTable);
+                LuaInstance.Get("_defineList", out defineTable);
                 if (defineTable != null)
                 {
                     Dictionary<string, Type> infoDict = new Dictionary<string, Type>();
@@ -158,7 +160,7 @@ namespace SEGame
                         //不用担心类型错误问题
                         if (infoDict.ContainsKey(serializedValue.key) && serializedValue.value != null)
                         {
-                            luaInstance.Set(serializedValue.key, serializedValue.value);
+                            LuaInstance.Set(serializedValue.key, serializedValue.value);
                         }
                     }
                     //注入其他类型
@@ -166,23 +168,45 @@ namespace SEGame
                     {
                         if (infoDict.ContainsKey(serializedValue.key))
                         {
-                            luaInstance.Set(serializedValue.key, JsonToValue(serializedValue.jsonStr, infoDict[serializedValue.key]));
+                            LuaInstance.Set(serializedValue.key, JsonToValue(serializedValue.jsonStr, infoDict[serializedValue.key]));
                         }
                     }
                 }
 
                 //回调注册
-                var newWith = luaInstance.Get<Action<LuaTable>>("newWith");
-                newWith?.Invoke(luaInstance);
+                var newWith = LuaInstance.Get<Action<LuaTable>>("newWith");
+                newWith?.Invoke(LuaInstance);
 
-                onAwakeFunc = luaInstance.Get<Action<LuaTable>>("awake");
-                onStartFunc = luaInstance.Get<Action<LuaTable>>("start");
-                onUpdateFunc = luaInstance.Get<Action<LuaTable>>("update");
-                onFixUpdateFunc = luaInstance.Get<Action<LuaTable>>("fixUPdate");
-                onLateUpdateFunc = luaInstance.Get<Action<LuaTable>>("lateUpdate");
-                onEnableFunc = luaInstance.Get<Action<LuaTable>>("onEnable");
-                onDisableFunc = luaInstance.Get<Action<LuaTable>>("onDisable");
-                onDestroyFunc = luaInstance.Get<Action<LuaTable>>("onDestroy");
+                onAwakeFunc = LuaInstance.Get<Action<LuaTable>>("awake");
+                onStartFunc = LuaInstance.Get<Action<LuaTable>>("start");
+                onEnableFunc = LuaInstance.Get<Action<LuaTable>>("onEnable");
+                onDisableFunc = LuaInstance.Get<Action<LuaTable>>("onDisable");
+                onDestroyFunc = LuaInstance.Get<Action<LuaTable>>("onDestroy");
+
+                var onUpdateFunc = LuaInstance.Get<Action<LuaTable>>("update");
+                if (onUpdateFunc != null)
+                {
+                    onUpdateAssistant = gameObject.AddComponent<LuaUpdateAssistant>();
+                    onUpdateAssistant.luaBehaviour = this;
+                    onUpdateAssistant.assistFunc = onUpdateFunc;
+                }
+
+                var onFixedUpdateFunc = LuaInstance.Get<Action<LuaTable>>("fixedUpdate");
+                if (onFixedUpdateFunc != null)
+                {
+                    onFixedUpdateAssistant = gameObject.AddComponent<LuaFixedUpdateAssistant>();
+                    onFixedUpdateAssistant.luaBehaviour = this;
+                    onFixedUpdateAssistant.assistFunc = onFixedUpdateFunc;
+                }
+
+                var onLateUpdateFunc = LuaInstance.Get<Action<LuaTable>>("lateUpdate");
+                if (onLateUpdateFunc != null)
+                {
+                    onLateUpdateAssistant = gameObject.AddComponent<LuaLateUpdateAssistant>();
+                    onLateUpdateAssistant.luaBehaviour = this;
+                    onLateUpdateAssistant.assistFunc = onFixedUpdateFunc;
+                }
+
             }
         }
 
@@ -194,15 +218,11 @@ namespace SEGame
             var rets = GetLuaEnv().DoString(scriptContent);
             var luaClass = (LuaTable)rets[0];
 
-            //从该Table中New一个新的并设置元表
-            mLuaInstance = GetLuaEnv().NewTable();
+            //下面步骤是cls的new过程
+            var clsNewFunc = luaClass.Get<Func<LuaTable,LuaTable>>("new");
+            mLuaInstance = clsNewFunc.Invoke(luaClass); //这里会执行init,
 
-            LuaTable meta = GetLuaEnv().NewTable();
-            meta.Set("__index", GetLuaEnv().Global);
-            mLuaInstance.SetMetaTable(meta);
-            meta.Dispose();
-
-            SetTable(luaClass);
+            SetTable(mLuaInstance);
         }
 
         public void SetScript(string luaScriptPath)
@@ -210,10 +230,9 @@ namespace SEGame
             if (string.IsNullOrEmpty(luaScriptPath))
                 return;
 
-            SetContent($"return require \"{luaScriptPath}\"");
+            SetContent($"return require(\"{luaScriptPath}\")");
         }
 
-        //all lua behaviour shared one luaenv only!
         LuaEnv GetLuaEnv()
         {
             return LuaEngine.GetInstance().LuaEnv;
@@ -221,6 +240,7 @@ namespace SEGame
 
         void Awake()
         {
+            SetScript(LuaScriptPath);
             onAwakeFunc?.Invoke(LuaInstance);
         }
 
@@ -229,28 +249,21 @@ namespace SEGame
             onStartFunc?.Invoke(LuaInstance);
         }
 
-        void Update()
-        {
-            onUpdateFunc?.Invoke(LuaInstance);
-        }
-
-        void FixedUpdate()
-        {
-            onFixUpdateFunc?.Invoke(LuaInstance);
-        }
-
-        void LateUpdate()
-        {
-            onLateUpdateFunc?.Invoke(LuaInstance);
-        }
-
         void OnEnable()
         {
+            if (onUpdateAssistant != null) onUpdateAssistant.enabled = true;
+            if (onFixedUpdateAssistant != null) onFixedUpdateAssistant.enabled = true;
+            if (onLateUpdateAssistant != null) onLateUpdateAssistant.enabled = true;
+
             onEnableFunc?.Invoke(LuaInstance);      
         }
 
         void OnDisable()
         {
+            if (onUpdateAssistant != null) onUpdateAssistant.enabled = false;
+            if (onFixedUpdateAssistant != null) onFixedUpdateAssistant.enabled = false;
+            if (onLateUpdateAssistant != null) onLateUpdateAssistant.enabled = false;
+
             onDisableFunc?.Invoke(LuaInstance);
         }
 
@@ -262,6 +275,9 @@ namespace SEGame
             {
                 var delWith = LuaInstance.Get<Action<LuaTable>>("delWith");
                 delWith?.Invoke(LuaInstance);
+
+                LuaInstance.Set("owner", false);
+                LuaInstance.Set("gameObject", false);
             }
 
             Clear();
@@ -269,11 +285,15 @@ namespace SEGame
 
         void Clear()
         {
+            if (onUpdateAssistant != null) GameObject.Destroy(onUpdateAssistant);
+            if (onFixedUpdateAssistant != null) GameObject.Destroy(onFixedUpdateAssistant);
+            if (onLateUpdateAssistant != null) GameObject.Destroy(onLateUpdateAssistant);
+
             onAwakeFunc = null;
             onStartFunc = null;
-            onUpdateFunc = null;
-            onFixUpdateFunc = null;
-            onLateUpdateFunc = null;
+            onUpdateAssistant = null;
+            onFixedUpdateAssistant = null;
+            onLateUpdateAssistant = null;
             onEnableFunc = null;
             onDisableFunc = null;
 
