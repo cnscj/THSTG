@@ -271,15 +271,6 @@ namespace SEGame
         {
             onDestroyFunc?.Invoke(LuaInstance);
 
-            if (LuaInstance != null)
-            {
-                var delWith = LuaInstance.Get<Action<LuaTable>>("delWith");
-                delWith?.Invoke(LuaInstance);
-
-                LuaInstance.Set("owner", false);
-                LuaInstance.Set("gameObject", false);
-            }
-
             Clear();
         }
 
@@ -288,6 +279,15 @@ namespace SEGame
             if (onUpdateAssistant != null) GameObject.Destroy(onUpdateAssistant);
             if (onFixedUpdateAssistant != null) GameObject.Destroy(onFixedUpdateAssistant);
             if (onLateUpdateAssistant != null) GameObject.Destroy(onLateUpdateAssistant);
+
+            if (LuaInstance != null)
+            {
+                var delWith = LuaInstance.Get<Action<LuaTable>>("delWith");
+                delWith?.Invoke(LuaInstance);
+
+                LuaInstance.Set("owner", false);
+                LuaInstance.Set("gameObject", false);
+            }
 
             onAwakeFunc = null;
             onStartFunc = null;

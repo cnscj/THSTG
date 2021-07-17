@@ -1,32 +1,38 @@
 local class = require "{Resource}Core.MiddleClass"
-local LuaBehaviour = class("LuaBehaviour")
+local M = class("LuaBehaviour")
+function M:ctor()
+    self.owner = false
+    self.gameObject = false
+    self._defineList = false
+end
 
 local typeDict = {}
 setmetatable(typeDict, { __index = function(t, k)
     t[k] = typeof(k)
     return t[k]
 end})
-function LuaBehaviour:AddDefineList(defineList)
+
+function M:AddDefineList(defineList)
     self._defineList = self._defineList or {}
     for key, value in pairs(defineList) do
         table.insert(self._defineList, {name = value.name, type = typeDict[value.type]})
     end
 end
 --在编辑器下只加载DefineList,不管其他部分
-if ExecuteInEditorScript then return LuaBehaviour end
+if ExecuteInEditorScript then return M end
 
-local AssistantDict = {
-    ["Update"] = typeof(CS.LuaUpdateAssistant),
-    ["FixedUpdate"] = typeof(CS.LuaFixedUpdateAssistant),
-    ["LateUpdate"] = typeof(CS.LuaLateUpdateAssistant),
-    ["OnPointerClick"] = typeof(CS.LuaOnPointerClickAssistant)
-}
-function LuaBehaviour:newWith()
-    for funcName, assistant in pairs(AssistantDict) do
-        if self[funcName] then
-            self.gameObject:AddComponent(assistant)
-        end
+function M:setEnabled(val)
+    if self.owner then self.owner.enabled = val end
+end
+
+function M:isEnabled()
+    if self.owner then return self.owner.enabled end
+end
+
+function M:destroySelf()
+    if self.owner then
+        CS.UnityEngine.Object.Destroy(self.owner)
     end
 end
 
-return LuaBehaviour
+return M

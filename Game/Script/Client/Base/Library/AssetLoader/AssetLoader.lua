@@ -5,37 +5,43 @@ function M:ctor()
 
 end
 
-
 function M:loadAssetBundleAsync(abPath,onSuccess,onFailed)
-    onSuccess = self:_createSuccessCallback(onSuccess)
-    onFailed = self:_createFailedCallback(onFailed)
 
-    local finalPath = abPath
-    AssetLoaderManagerIns:LoadAssetAsync(finalPath,onSuccess,onFailed)
 end
 
 function M:loadAssetBundleSync(abPath,onSuccess,onFailed)
+    
+end
+
+function M:loadAssetBundleResourceAsync(abPath,resPath,onSuccess,onFailed)
+
+end
+
+function M:loadAssetBundleResourceSync(abPath,resPath,onSuccess,onFailed)
+
+end
+
+function M:loadAssetBundle(isAsync,abPath,onSuccess,onFailed)
     onSuccess = self:_createSuccessCallback(onSuccess)
     onFailed = self:_createFailedCallback(onFailed)
 
     local finalPath = abPath
-    AssetLoaderManagerIns:LoadAssetSync(finalPath,onSuccess,onFailed)
+    if isAsync then
+        AssetLoaderManagerIns:LoadAssetAsync(finalPath,onSuccess,onFailed)
+    else
+        AssetLoaderManagerIns:LoadAssetSync(finalPath,onSuccess,onFailed)
+    end
 end
-
-function M:loadAssetBundleResourceAsync(abPath,resPath,onSuccess,onFailed)
+function M:loadAssetBundleResource(isAsync,abPath,resPath,onSuccess,onFailed)
     onSuccess = self:_createSuccessCallback(onSuccess)
     onFailed = self:_createFailedCallback(onFailed)
 
     local finalPath = string.format("%s|%s",abPath, resPath)
-    AssetLoaderManagerIns:LoadAssetAsync(finalPath,onSuccess,onFailed)
-end
-
-function M:loadAssetBundleResourceSync(abPath,resPath,onSuccess,onFailed)
-    onSuccess = self:_createSuccessCallback(onSuccess)
-    onFailed = self:_createFailedCallback(onFailed)
-
-    local finalPath = string.format("%s|%s",abPath, resPath)
-    AssetLoaderManagerIns:LoadAssetSync(finalPath,onSuccess,onFailed)
+    if isAsync then
+        AssetLoaderManagerIns:LoadAssetAsync(finalPath,onSuccess,onFailed)
+    else
+        AssetLoaderManagerIns:LoadAssetSync(finalPath,onSuccess,onFailed)
+    end
 end
 
 function M:_onSuccess(callback, ...)

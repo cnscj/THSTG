@@ -55,8 +55,7 @@ function M:newWith( ... )
 end
 
 function M:delWith( ... )
-    self._owner = false
-    self._gameObject = false
+
 end
 
 --下面函数由子类自行添加
@@ -67,6 +66,14 @@ end
 -- function M:fixedUpdate()end
 -- function M:onEnabled()end
 -- function M:onDestroy()end
+
+function M:setEnabled(val)
+    if self.owner then self.owner.enabled = val end
+end
+
+function M:isEnabled()
+    if self.owner then return self.owner.enabled end
+end
 
 function M:destroySelf()
     if self._owner then
