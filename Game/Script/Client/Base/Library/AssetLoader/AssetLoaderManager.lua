@@ -10,22 +10,14 @@ function M:ctor()
 end
 
 function M:loadAssetBundleAsync(abPath,onSuccess,onFailed)
-    return self:loadAssetBundle(true,abPath,onSuccess,onFailed)
-end
-
-function M:loadAssetBundleSync(abPath,onSuccess,onFailed)
-    return self:loadAssetBundle(false,abPath,onSuccess,onFailed)
+    return self:_loadAssetBundle(true,abPath,onSuccess,onFailed)
 end
 
 function M:loadAssetBundleResourceAsync(abPath,resPath,onSuccess,onFailed)
-    return self:loadAssetBundleResource(true,abPath,resPath,onSuccess,onFailed)
+    return self:_loadAssetBundleResource(true,abPath,resPath,onSuccess,onFailed)
 end
 
-function M:loadAssetBundleResourceSync(abPath,resPath,onSuccess,onFailed)
-    return self:loadAssetBundleResource(false,abPath,resPath,onSuccess,onFailed)
-end
-
-function M:loadAssetBundle(isAsync,abPath,onSuccess,onFailed)
+function M:_loadAssetBundle(isAsync,abPath,onSuccess,onFailed)
     onSuccess = self:_createSuccessCallback(onSuccess)
     onFailed = self:_createFailedCallback(onFailed)
 
@@ -36,7 +28,7 @@ function M:loadAssetBundle(isAsync,abPath,onSuccess,onFailed)
         AssetLoaderManagerIns:LoadAssetSync(finalPath,onSuccess,onFailed)
     end
 end
-function M:loadAssetBundleResource(isAsync,abPath,resPath,onSuccess,onFailed)
+function M:_loadAssetBundleResource(isAsync,abPath,resPath,onSuccess,onFailed)
     onSuccess = self:_createSuccessCallback(onSuccess)
     onFailed = self:_createFailedCallback(onFailed)
 
@@ -69,5 +61,5 @@ function M:_createFailedCallback(callback)
     return function (...) self:_onFailed(callback, ...) end
 end
 
-rawset(_G, "AssetLoader", false)
-AssetLoader = M.new()
+rawset(_G, "AssetLoaderManager", false)
+AssetLoaderManager = M.new()
