@@ -1,24 +1,28 @@
 local M = class("AssetLoader")
 local AssetLoaderManagerIns = CSharp.AssetLoaderManagerIns
---[TODO:加载器加载与释放必须成对出现]
+--[[]
+    TODO:加载器加载与释放必须成对出现
+    默认使用异步加载
+]]
+
 function M:ctor()
 
 end
 
 function M:loadAssetBundleAsync(abPath,onSuccess,onFailed)
-
+    return self:loadAssetBundle(true,abPath,onSuccess,onFailed)
 end
 
 function M:loadAssetBundleSync(abPath,onSuccess,onFailed)
-    
+    return self:loadAssetBundle(false,abPath,onSuccess,onFailed)
 end
 
 function M:loadAssetBundleResourceAsync(abPath,resPath,onSuccess,onFailed)
-
+    return self:loadAssetBundleResource(true,abPath,resPath,onSuccess,onFailed)
 end
 
 function M:loadAssetBundleResourceSync(abPath,resPath,onSuccess,onFailed)
-
+    return self:loadAssetBundleResource(false,abPath,resPath,onSuccess,onFailed)
 end
 
 function M:loadAssetBundle(isAsync,abPath,onSuccess,onFailed)

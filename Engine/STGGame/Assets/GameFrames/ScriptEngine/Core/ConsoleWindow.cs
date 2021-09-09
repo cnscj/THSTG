@@ -1,44 +1,46 @@
 using UnityEngine;
 using System.Runtime.InteropServices;
-using ASGame;
 
-public class ConsoleWindow : MonoBehaviour
+namespace ASGame
 {
+
+    public class ConsoleWindow : MonoBehaviour
+    {
 #if UNITY_STANDALONE_OSX //|| UNITY_EDITOR_OSX
-    const string ConsoleWindowsDLL = "ConsoleWindow";
-    [DllImport(ConsoleWindowsDLL, CallingConvention = CallingConvention.Cdecl)]
-    public static extern int ShowConsoleWin();
+        const string ConsoleWindowsDLL = "ConsoleWindow";
+        [DllImport(ConsoleWindowsDLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int ShowConsoleWin();
 
-    [DllImport(ConsoleWindowsDLL, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void ShowErrorMsg(string msg);
+        [DllImport(ConsoleWindowsDLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ShowErrorMsg(string msg);
 
-    [DllImport(ConsoleWindowsDLL, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void ShowWarningMsg(string msg);
+        [DllImport(ConsoleWindowsDLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ShowWarningMsg(string msg);
 
-    [DllImport(ConsoleWindowsDLL, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void ShowLogMsg(string msg);
-    
-    void ShowConsole()
-    {
-        ShowConsoleWin();
-    }
+        [DllImport(ConsoleWindowsDLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ShowLogMsg(string msg);
 
-    void HandleLog(string message, string stackTrace, LogType type)
-    {
-        message = message + "\n";
-        if (type == LogType.Log)
+        void ShowConsole()
         {
-            ShowLogMsg(message); 
+            ShowConsoleWin();
         }
-        else if (type == LogType.Warning)
+
+        void HandleLog(string message, string stackTrace, LogType type)
         {
-            ShowWarningMsg(message);
+            message = message + "\n";
+            if (type == LogType.Log)
+            {
+                ShowLogMsg(message);
+            }
+            else if (type == LogType.Warning)
+            {
+                ShowWarningMsg(message);
+            }
+            else
+            {
+                ShowErrorMsg(message + stackTrace);
+            }
         }
-        else
-        {
-            ShowErrorMsg(message + stackTrace);
-        }
-    }
 #elif UNITY_STANDALONE_WIN
 
     void ShowConsole()
@@ -75,4 +77,7 @@ public class ConsoleWindow : MonoBehaviour
         Application.logMessageReceived -= HandleLog;
     }
 #endif
+    }
+
+
 }
