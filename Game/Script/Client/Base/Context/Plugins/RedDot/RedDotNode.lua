@@ -1,7 +1,7 @@
 local M = class("RedDotNode")
 function M:ctor()
     self.name = false
-    self.callback = false   --回调
+    self.callbacks = {}   --回调
     self.children = false
 
     self.data = false

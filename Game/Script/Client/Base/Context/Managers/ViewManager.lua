@@ -1,25 +1,25 @@
 local M = class("ViewManager")
 local P_View = require("Config.Profile.P_View")
-
+local P_Package = require("Config.Profile.P_Package")
 function M:ctor()
     self._packageInfoDict = {}
-    self._viewsInfoDict = P_View.viewsInfo
+    self._viewsInfoDict = P_View
 end
 
 function M:setup()
     --
-    local packageInfoList = P_View.packagesInfo
+    local packageInfoList = P_Package
     for _,v in ipairs(packageInfoList) do 
         self._packageInfoDict[v.name] = v
     end
 
-    --设置加载器
+    -- TODO:设置加载器
     -- UIPackageManager:
 end
 
 -- 加载常驻包
 function M:initPackages()
-    local packageInfoList = P_View.packagesInfo
+    local packageInfoList = P_Package
     for _,v in ipairs(packageInfoList) do
         while true do 
             if v.loadOpportunity ~= 0 then

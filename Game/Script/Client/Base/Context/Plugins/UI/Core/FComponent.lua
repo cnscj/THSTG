@@ -1,14 +1,4 @@
 --[[
-    NOTE: 关于Event被移除问题
-    如果在多个界面有这个组件,当其中一个被close,移除消息之后,其他界面存在这个组件的都无法接收消息
-    解决方法:
-    在ctor里
-    self.__updateLayer = function()
-        self:_updateLayer()
-    end
-    然后注册这么注册
-    self:addEventListener(EventType.ACTIVITY_MSG_UPDATE, self.__updateLayer)
-    参考SkillPanel.lua
 ]]
 ---@class FComponent:GComponent
 local M = class("FComponent", GComponent)
@@ -16,13 +6,11 @@ local M = class("FComponent", GComponent)
 function M:ctor(obj)
     self._obj = obj
     self._root = false          --这是为了习惯统一,这是为了习惯统一,这是为了习惯统一
-    self._children = {}
     self._eventListeners = {}
     self._timerInterval = false
     self._timerId = false
-    self._viewName = self.__cname
 
-    -- 子默认不开
+    -- 子默认不开,如果播放动效发现层级不对需要开启
     self._fairyBatching = false
 end
 
@@ -41,8 +29,6 @@ function M:init(obj)
         self:_initUI()
     end
 end
-
-
 
 
 -- 显示的时候触发

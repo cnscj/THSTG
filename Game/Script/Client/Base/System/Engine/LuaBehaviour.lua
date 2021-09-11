@@ -64,7 +64,7 @@ end
 -- function M:update()end
 -- function M:lateUpdate()end
 -- function M:fixedUpdate()end
--- function M:onEnabled()end
+-- function M:onEnable()end
 -- function M:onDestroy()end
 
 function M:setEnabled(val)

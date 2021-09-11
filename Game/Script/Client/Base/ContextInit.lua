@@ -1,5 +1,7 @@
+require("Context.ConfigInit")
 require("Context.UtilInit")
 require("Context.PatternInit")
 require("Context.ComponentInit")
 require("Context.PluginInit")
 require("Context.ManagerInit")
+require("Context.BehaviourInit")

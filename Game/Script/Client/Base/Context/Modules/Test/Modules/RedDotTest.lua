@@ -8,7 +8,7 @@ function M:ctor( ... )
         print(15,"####")
     end,"tt","aa")
 
-    RedDotManager:unregister("tt","aa","ff")
+    RedDotManager:unregister(false,"tt","aa","ff")
     -- RedDotManager:update("tt","aa","ff")
     dump(0,RedDotManager._root)
 end

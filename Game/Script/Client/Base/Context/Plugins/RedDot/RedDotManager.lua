@@ -7,23 +7,27 @@ function M:ctor()
     self._root = false
 
     self._touchFunc = function ( node )
-        if node.callback then node.callback() end
+        if node.callbacks then 
+            for _,callback in pairs(node.callbacks) do 
+               if callback then callback() end
+            end
+        end
     end
 end
 
 function M:register(callback, ...)
     local node = self:_insert(...)
     if node then
-        node.callback = callback
+        table.insert(node.callbacks, callback)
     end
 end
 
-function M:unregister(...)
+function M:unregister(callback, ...)
     local node = self:_search(...)
     if node then 
-        node.callback = false
+        table.remove(node.callbacks, callback)
         node.data = false
-       self:remove(...)
+        if not next(node.callbacks) then self:remove(...) end
     end
 end
 
@@ -187,6 +191,10 @@ function M:_getRoot()
     self._root._isEnd = false
 
     return self._root
+end
+
+function M:clear()
+    self._root = false
 end
 
 rawset(_G, "RedDotManager", false)

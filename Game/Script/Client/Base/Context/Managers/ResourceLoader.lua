@@ -32,12 +32,21 @@ end
 
 --
 function M:_normalizePath(path,params)
+
+    path = self:_paresKeys(path,params)
+    path = string.lower(path)
+
+    return path
+end
+
+function M:_paresKeys( path ,params)
     for k,v in pairs(params) do
         local formatKey = string.format("{%s}",k)
         path = string.gsub(path,formatKey,v)
     end 
     path = string.gsub(path,KEY_PLATFORM,"pc")
-    path = string.lower(path)
+
+    return path
 end
 rawset(_G, "ResourceLoader", false)
 ResourceLoader = M.new()

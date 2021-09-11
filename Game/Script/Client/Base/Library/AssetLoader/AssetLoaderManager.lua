@@ -23,9 +23,9 @@ function M:_loadAssetBundle(isAsync,abPath,onSuccess,onFailed)
 
     local finalPath = abPath
     if isAsync then
-        AssetLoaderManagerIns:LoadAssetAsync(finalPath,onSuccess,onFailed)
+        return AssetLoaderManagerIns:LoadAssetAsync(finalPath,onSuccess,onFailed)
     else
-        AssetLoaderManagerIns:LoadAssetSync(finalPath,onSuccess,onFailed)
+        return AssetLoaderManagerIns:LoadAssetSync(finalPath,onSuccess,onFailed)
     end
 end
 function M:_loadAssetBundleResource(isAsync,abPath,resPath,onSuccess,onFailed)
@@ -34,9 +34,9 @@ function M:_loadAssetBundleResource(isAsync,abPath,resPath,onSuccess,onFailed)
 
     local finalPath = string.format("%s|%s",abPath, resPath)
     if isAsync then
-        AssetLoaderManagerIns:LoadAssetAsync(finalPath,onSuccess,onFailed)
+        return AssetLoaderManagerIns:LoadAssetAsync(finalPath,onSuccess,onFailed)
     else
-        AssetLoaderManagerIns:LoadAssetSync(finalPath,onSuccess,onFailed)
+        return AssetLoaderManagerIns:LoadAssetSync(finalPath,onSuccess,onFailed)
     end
 end
 
