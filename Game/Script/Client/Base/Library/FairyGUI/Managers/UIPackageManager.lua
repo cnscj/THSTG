@@ -1,3 +1,4 @@
+local UIPackageManagerIns = CSharp.UIPackageManagerIns
 local M = class("UIPackageManager")
 --TODO:
 function M:ctor()

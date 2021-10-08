@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace THGame.UI
 {
-    public class PackageManager : MonoSingleton<PackageManager>
+    public class UIPackageManager : MonoSingleton<UIPackageManager>
     {
         public static string dependKeyName = "name";
         public static float clearCacheDuration = 1f;        //轮询频率
@@ -18,7 +18,7 @@ namespace THGame.UI
         private List<PackageInfo> m_invalidPackages = new List<PackageInfo>();
         private HashSet<string> m_refPackages = new HashSet<string>();
         private Action<PackageInfo> m_onAddedCallback;
-        public PackageManager()
+        public UIPackageManager()
         {
 
         }

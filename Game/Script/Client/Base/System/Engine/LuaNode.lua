@@ -1,5 +1,7 @@
 local M = class("LuaNode")
-
+--[[
+    Unity与Lua通讯之间的基本单位
+]]
 function M:ctor()
     self._gameObject = false
 end

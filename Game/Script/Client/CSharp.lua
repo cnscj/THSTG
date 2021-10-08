@@ -35,6 +35,9 @@ local _getter = {
     --AssetStudio
     AssetLoaderManagerIns = function() return ASGame.AssetLoaderManager.GetInstance() end,
 
+    --THGame
+    UIPackageManagerIns = function() return THGame.UI.UIPackageManager.GetInstance() end,
+
     --自定义
     LuaBehaviour = function() return SEGame.LuaBehaviour end,
     LuaManagerIns = function() return SEGame.LuaManager.GetInstance() end,  

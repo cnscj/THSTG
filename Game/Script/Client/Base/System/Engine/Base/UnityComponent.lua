@@ -1,4 +1,5 @@
 ---@class UnityComponent
+--TODO:生命周期不可控
 local M = class("UnityComponent")
 
 function M:ctor(obj)

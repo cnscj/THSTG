@@ -1,4 +1,4 @@
-local M = class("ViewManager")
+local M = class("UIManager")
 local P_View = require("Config.Profile.P_View")
 local P_Package = require("Config.Profile.P_Package")
 function M:ctor()
@@ -33,21 +33,25 @@ function M:initPackages()
     end
 end
 
+function M:getViewConfig( viewName )
+    return P_View[viewName]
+end
+
 function M:initialize()
     self:setup()
 
     self:initPackages()
 end
 
-function M:open(viewName)
+function M:openView(viewName)
     
 end
 
-function M:close(viewName)
+function M:closeView(viewName)
 
 end
 
-function M:isOpened(viewName)
+function M:isViewOpened(viewName)
 
 end
 
@@ -59,5 +63,5 @@ function M:clear()
 
 end
 
-rawset(_G, "ViewManager", false)
-ViewManager = M.new()
+rawset(_G, "UIManager", false)
+UIManager = M.new()

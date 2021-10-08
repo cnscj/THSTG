@@ -152,7 +152,7 @@ end
 
 function M:addChildView(viewName)
     -- 只能加 公共包 or 常驻包 or 自己的包
-    local viewInfo = ViewManager.getViewConfig(viewName)
+    local viewInfo = UIManager:getViewConfig(viewName)
     local viewClass = require(viewInfo.path)
     local view = viewClass.new({
         parent = self,

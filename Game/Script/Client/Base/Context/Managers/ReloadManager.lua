@@ -31,7 +31,7 @@ function M:reload()
     end
 
     --刷新View
-    ViewManager:reload()
+    UIManager:reload()
     
     --刷新Manager
 

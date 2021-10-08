@@ -1,3 +1,7 @@
+--[[
+    缓存Component各种数据
+]]
+--TODO:生命周期不可控
 local M = class("UnityGameObject",false,{
     initWithGameObject = false,
     initWithNew,
@@ -29,6 +33,9 @@ M.initWithNew = function (name,parent)
         go.name = name
     end
 
+    if parent then
+        go.transform.setParent(parent)
+    end
     ins._obj = go
 end
 

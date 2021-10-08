@@ -32,7 +32,7 @@ function M:toCreate()
         return
     end
 
-    
+    self:__readyPreloadResList()
 end
 
 -- 添加事件监听
@@ -85,4 +85,27 @@ function M:__clearTimer()
     end
 end
 
+
+--
+function M:__loadPackageCallback(...)
+    self._rootGO = UIPackageManager.createObject(self._package ,self._component)
+    self._root = FGUIUtil.createComp(self._rootGO)
+    
+end
+
+function M:__readyPreloadResList()
+    if string.isEmpty(self._package ) then
+        return 
+    end
+
+    if not UIPackageManager.isLoadedPackage(self._package ) then
+        UIPackageManager.loadPackage(self._package ,function ( ... )
+            self:__loadPackageCallback(...)
+        end)
+    else
+        self:__loadPackageCallback(...)
+    end
+
+
+end
 rawset(_G, "FView", M)

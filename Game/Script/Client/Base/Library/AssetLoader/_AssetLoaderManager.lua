@@ -1,7 +1,7 @@
-local M = class("AssetLoader")
+local M = class("AssetLoaderManager")
 local AssetLoaderManagerIns = CSharp.AssetLoaderManagerIns
 --[[]
-    TODO:加载器加载与释放必须成对出现
+    加载器加载与释放必须成对出现
     默认使用异步加载
 ]]
 
@@ -9,30 +9,17 @@ function M:ctor()
 
 end
 
-function M:loadAssetBundleAsync(abPath,onSuccess,onFailed)
+function M:loadAsset(path,onSuccess,onFailed)
     return self:_loadAssetBundle(true,abPath,onSuccess,onFailed)
 end
 
-function M:loadAssetBundleResourceAsync(abPath,resPath,onSuccess,onFailed)
-    return self:_loadAssetBundleResource(true,abPath,resPath,onSuccess,onFailed)
-end
+----
 
-function M:_loadAssetBundle(isAsync,abPath,onSuccess,onFailed)
+function M:_loadAssetBundle(isAsync,path,onSuccess,onFailed)
     onSuccess = self:_createSuccessCallback(onSuccess)
     onFailed = self:_createFailedCallback(onFailed)
 
-    local finalPath = abPath
-    if isAsync then
-        return AssetLoaderManagerIns:LoadAssetAsync(finalPath,onSuccess,onFailed)
-    else
-        return AssetLoaderManagerIns:LoadAssetSync(finalPath,onSuccess,onFailed)
-    end
-end
-function M:_loadAssetBundleResource(isAsync,abPath,resPath,onSuccess,onFailed)
-    onSuccess = self:_createSuccessCallback(onSuccess)
-    onFailed = self:_createFailedCallback(onFailed)
-
-    local finalPath = string.format("%s|%s",abPath, resPath)
+    local finalPath = path
     if isAsync then
         return AssetLoaderManagerIns:LoadAssetAsync(finalPath,onSuccess,onFailed)
     else

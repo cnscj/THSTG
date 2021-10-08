@@ -406,7 +406,7 @@ function M:onClick(func)
         -- self._traceStr = getTraceback("", 1)
     end
 
-    local path = ViewManager.getObjPath(self)
+    local path = FGUIUtil.getObjPath(self)
 
     if not DEBUG_UI then
         self._clickFunc = func
@@ -829,7 +829,7 @@ end
 
 function M:getPath()
     if not self._path then
-        self._path = ViewManager.getObjPath(self)
+        self._path = FGUIUtil.getObjPath(self)
     end
     return self._path
 end

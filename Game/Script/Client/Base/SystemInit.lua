@@ -35,9 +35,11 @@ require("System.Tool.TimerProfiler")
 require("System.Tool.TimeTool")
 
 --Unity相关
+-- require("System.Engine.Base.UnityComponent")
+-- require("System.Engine.Base.UnityGameObject")
 require("System.Engine.LuaBehaviour")
-require("System.Engine.UnityComponent")
-require("System.Engine.UnityGameObject")
+require("System.Engine.LuaNode")
+
 
 --XLua相关
 require("System.XLua.Debug")
