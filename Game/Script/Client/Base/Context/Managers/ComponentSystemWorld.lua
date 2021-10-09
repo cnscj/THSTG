@@ -1,5 +1,7 @@
 local M = class("EntitySystemWorld")
-local DICT = require("Config.Profile.P_ECS")
+local P_ECS = require("Config.Profile.P_ECS")
+local SYSTEM_LIST = P_ECS.systems
+local COMPONENT_LIST = P_ECS.components
 function M:ctor()
     self._gameWorld = false
 end
@@ -14,7 +16,7 @@ end
 --
 function M:initializeSystem()
     --注册System
-    local systemPaths = DICT.systems
+    local systemPaths = SYSTEM_LIST
     if systemPaths then
         for _,path in pairs(systemPaths) do 
             local cls = require(path)
@@ -26,7 +28,7 @@ function M:initializeSystem()
 end
 function M:initializeComponent()
     --注册Component
-    local componentsPaths = DICT.components
+    local componentsPaths = COMPONENT_LIST
     if componentsPaths then
         for _,v in pairs(componentsPaths) do 
             local cls = require(path)

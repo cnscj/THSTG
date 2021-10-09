@@ -3,7 +3,6 @@ local P_View = require("Config.Profile.P_View")
 local P_Package = require("Config.Profile.P_Package")
 function M:ctor()
     self._packageInfoDict = {}
-    self._viewsInfoDict = P_View
 end
 
 function M:setup()

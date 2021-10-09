@@ -1,4 +1,3 @@
-local AssetLoaderManagerIns = CSharp.AssetLoaderManagerIns
 local M = class("AssetLoaderTask",false,{
     LoadMode = {
         Sync = 1,

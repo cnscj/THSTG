@@ -1,8 +1,9 @@
 local GLOBAL_CACHE_PACKAGE = "Cache"
 
 local M = class("ControllerManager")
-local CACHE_LIST = require("Config.Profile.P_Cache")
-local CONTROLLER_LIST = require("Config.Profile.P_Controller")
+local P_MVC = require("Config.Profile.P_MVC")
+local CACHE_LIST = P_MVC.caches
+local CONTROLLER_LIST = P_MVC.controllers
 
 function M:ctor()
     self._cacheKeyDict = {}

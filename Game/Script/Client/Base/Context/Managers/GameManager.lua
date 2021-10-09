@@ -4,11 +4,17 @@ function M:ctor()
     self._updateListeners = false
 end
 
-function M:start()
-    --在Login界面之前,可以先加载一部分模块
+--在Login界面之前,可以先加载一部分模块
+function M:launch()
+    ResourceLoader:initialize()
     ComponentSystemWorld:initialize()
     CacheControllerManager:initialize()
     UIManager:initialize()
+
+end
+
+--游戏开始
+function M:start()
 
 end
 

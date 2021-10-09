@@ -1,6 +1,3 @@
-
-
-
 require("CSharp")
 require("Agent")
 require("Test")
@@ -31,7 +28,7 @@ function start()
     print(string.format("Engine Name:%s Engine Version:%s\nProject Name:%s Project Version:%s",__ENGINE_NAME__,__ENGINE_VERSION__,__PROJECT_NAME__,__SCRIPT_VERSION__))
     print(string.format("Launch Finish!"))
 
-    GameManager:start()
+    GameManager:launch()
 end
 
 function main()

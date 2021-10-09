@@ -7,7 +7,7 @@ namespace XLibGame
         private MonoCallback _awakeCallback;
         private MonoCallback _startCallback;
         private MonoCallback _updateCallback;
-        private MonoCallback _fixUpdateCallback;
+        private MonoCallback _fixedUpdateCallback;
         private MonoCallback _lateUpdateCallback;
 
 
@@ -28,7 +28,7 @@ namespace XLibGame
 
         private void FixedUpdate()
         {
-            _fixUpdateCallback?.Invoke();
+            _fixedUpdateCallback?.Invoke();
         }
 
         private void LateUpdate()
@@ -64,13 +64,13 @@ namespace XLibGame
             _updateCallback -= callback;
         }
 
-        public void AddFixUpdateListener(MonoCallback callback)
+        public void AddFixedUpdateListener(MonoCallback callback)
         {
-            _fixUpdateCallback += callback;
+            _fixedUpdateCallback += callback;
         }
-        public void RemoveFixUpdateListener(MonoCallback callback)
+        public void RemoveFixedUpdateListener(MonoCallback callback)
         {
-            _fixUpdateCallback -= callback;
+            _fixedUpdateCallback -= callback;
         }
 
         public void AddLateUpdateListener(MonoCallback callback)

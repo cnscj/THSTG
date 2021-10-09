@@ -1,0 +1,493 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		10A919E423A0F36600FA1AEE /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 10A919E323A0F36600FA1AEE /* Utils.m */; };
+		10A919E523A0F36600FA1AEE /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 10A919E323A0F36600FA1AEE /* Utils.m */; };
+		194BF926231587DE00F9C934 /* NSTextView+HandleKeyEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 194BF925231587DE00F9C934 /* NSTextView+HandleKeyEvent.m */; };
+		194BF92F2315899C00F9C934 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 194BF92E2315899C00F9C934 /* AppDelegate.m */; };
+		194BF9322315899C00F9C934 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 194BF9312315899C00F9C934 /* ViewController.m */; };
+		194BF9342315899D00F9C934 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 194BF9332315899D00F9C934 /* Assets.xcassets */; };
+		194BF9372315899D00F9C934 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 194BF9352315899D00F9C934 /* Main.storyboard */; };
+		194BF93A2315899D00F9C934 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 194BF9392315899D00F9C934 /* main.m */; };
+		194BF94923158CC200F9C934 /* NSTextView+HandleKeyEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 194BF925231587DE00F9C934 /* NSTextView+HandleKeyEvent.m */; };
+		194BF94A23158CC500F9C934 /* ConsoleWindow.mm in Sources */ = {isa = PBXBuildFile; fileRef = E367FAB92181B69A00251FB7 /* ConsoleWindow.mm */; };
+		194BF94B23158CC700F9C934 /* ConsoleWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = E34FD8AE2182B1CE007DFAF9 /* ConsoleWindowController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		194BF94C23158CCC00F9C934 /* ConsoleWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = E34FD8AD2182B1CE007DFAF9 /* ConsoleWindow.xib */; };
+		E34FD8BE2182B57B007DFAF9 /* ConsoleWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = E34FD8AE2182B1CE007DFAF9 /* ConsoleWindowController.m */; };
+		E34FD8BF2182B580007DFAF9 /* ConsoleWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = E34FD8AD2182B1CE007DFAF9 /* ConsoleWindow.xib */; };
+		E34FD90921869AF2007DFAF9 /* ConsoleWindow.h in Resources */ = {isa = PBXBuildFile; fileRef = E367FABB2181B6CC00251FB7 /* ConsoleWindow.h */; };
+		E367FAC62181BEF100251FB7 /* ConsoleWindow.mm in Sources */ = {isa = PBXBuildFile; fileRef = E367FAB92181B69A00251FB7 /* ConsoleWindow.mm */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		10A919E223A0F36600FA1AEE /* Utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
+		10A919E323A0F36600FA1AEE /* Utils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Utils.m; sourceTree = "<group>"; };
+		194BF924231587DE00F9C934 /* NSTextView+HandleKeyEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSTextView+HandleKeyEvent.h"; sourceTree = "<group>"; };
+		194BF925231587DE00F9C934 /* NSTextView+HandleKeyEvent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSTextView+HandleKeyEvent.m"; sourceTree = "<group>"; };
+		194BF92B2315899C00F9C934 /* TestConsoleWindow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestConsoleWindow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		194BF92D2315899C00F9C934 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		194BF92E2315899C00F9C934 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		194BF9302315899C00F9C934 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		194BF9312315899C00F9C934 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		194BF9332315899D00F9C934 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		194BF9362315899D00F9C934 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		194BF9382315899D00F9C934 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		194BF9392315899D00F9C934 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		194BF93B2315899D00F9C934 /* TestConsoleWindow.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TestConsoleWindow.entitlements; sourceTree = "<group>"; };
+		E34FD8AD2182B1CE007DFAF9 /* ConsoleWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ConsoleWindow.xib; sourceTree = "<group>"; };
+		E34FD8AE2182B1CE007DFAF9 /* ConsoleWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConsoleWindowController.m; sourceTree = "<group>"; };
+		E34FD8AF2182B1CE007DFAF9 /* ConsoleWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConsoleWindowController.h; sourceTree = "<group>"; };
+		E34FD8D52182BE12007DFAF9 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E367FAB92181B69A00251FB7 /* ConsoleWindow.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ConsoleWindow.mm; sourceTree = "<group>"; };
+		E367FABB2181B6CC00251FB7 /* ConsoleWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConsoleWindow.h; sourceTree = "<group>"; };
+		E367FAC02181BEC800251FB7 /* ConsoleWindow.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ConsoleWindow.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		194BF9282315899C00F9C934 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E367FABD2181BEC800251FB7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		194BF92C2315899C00F9C934 /* TestConsoleWindow */ = {
+			isa = PBXGroup;
+			children = (
+				194BF92D2315899C00F9C934 /* AppDelegate.h */,
+				194BF92E2315899C00F9C934 /* AppDelegate.m */,
+				194BF9302315899C00F9C934 /* ViewController.h */,
+				194BF9312315899C00F9C934 /* ViewController.m */,
+				194BF9332315899D00F9C934 /* Assets.xcassets */,
+				194BF9352315899D00F9C934 /* Main.storyboard */,
+				194BF9382315899D00F9C934 /* Info.plist */,
+				194BF9392315899D00F9C934 /* main.m */,
+				194BF93B2315899D00F9C934 /* TestConsoleWindow.entitlements */,
+			);
+			path = TestConsoleWindow;
+			sourceTree = "<group>";
+		};
+		E34FD8C12182BCF7007DFAF9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E367FAA82181B60000251FB7 = {
+			isa = PBXGroup;
+			children = (
+				E367FAB82181B61600251FB7 /* plugin */,
+				194BF92C2315899C00F9C934 /* TestConsoleWindow */,
+				E367FAB22181B60000251FB7 /* Products */,
+				E34FD8C12182BCF7007DFAF9 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		E367FAB22181B60000251FB7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E367FAC02181BEC800251FB7 /* ConsoleWindow.bundle */,
+				194BF92B2315899C00F9C934 /* TestConsoleWindow.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E367FAB82181B61600251FB7 /* plugin */ = {
+			isa = PBXGroup;
+			children = (
+				E34FD8D52182BE12007DFAF9 /* Info.plist */,
+				E34FD8AD2182B1CE007DFAF9 /* ConsoleWindow.xib */,
+				E34FD8AF2182B1CE007DFAF9 /* ConsoleWindowController.h */,
+				E34FD8AE2182B1CE007DFAF9 /* ConsoleWindowController.m */,
+				E367FAB92181B69A00251FB7 /* ConsoleWindow.mm */,
+				E367FABB2181B6CC00251FB7 /* ConsoleWindow.h */,
+				194BF924231587DE00F9C934 /* NSTextView+HandleKeyEvent.h */,
+				194BF925231587DE00F9C934 /* NSTextView+HandleKeyEvent.m */,
+				10A919E223A0F36600FA1AEE /* Utils.h */,
+				10A919E323A0F36600FA1AEE /* Utils.m */,
+			);
+			path = plugin;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		194BF92A2315899C00F9C934 /* TestConsoleWindow */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 194BF93C2315899D00F9C934 /* Build configuration list for PBXNativeTarget "TestConsoleWindow" */;
+			buildPhases = (
+				194BF9272315899C00F9C934 /* Sources */,
+				194BF9282315899C00F9C934 /* Frameworks */,
+				194BF9292315899C00F9C934 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TestConsoleWindow;
+			productName = TestConsoleWindow;
+			productReference = 194BF92B2315899C00F9C934 /* TestConsoleWindow.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E367FABF2181BEC800251FB7 /* ConsoleWindow */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E367FAC32181BEC800251FB7 /* Build configuration list for PBXNativeTarget "ConsoleWindow" */;
+			buildPhases = (
+				E367FABC2181BEC800251FB7 /* Sources */,
+				E367FABD2181BEC800251FB7 /* Frameworks */,
+				E367FABE2181BEC800251FB7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ConsoleWindow;
+			productName = DebugWinPlug1;
+			productReference = E367FAC02181BEC800251FB7 /* ConsoleWindow.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E367FAA92181B60000251FB7 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0940;
+				ORGANIZATIONNAME = yk;
+				TargetAttributes = {
+					194BF92A2315899C00F9C934 = {
+						CreatedOnToolsVersion = 10.3;
+					};
+					E367FABF2181BEC800251FB7 = {
+						CreatedOnToolsVersion = 9.4.1;
+					};
+				};
+			};
+			buildConfigurationList = E367FAAC2181B60000251FB7 /* Build configuration list for PBXProject "ConsoleWindow" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E367FAA82181B60000251FB7;
+			productRefGroup = E367FAB22181B60000251FB7 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E367FABF2181BEC800251FB7 /* ConsoleWindow */,
+				194BF92A2315899C00F9C934 /* TestConsoleWindow */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		194BF9292315899C00F9C934 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				194BF9342315899D00F9C934 /* Assets.xcassets in Resources */,
+				194BF94C23158CCC00F9C934 /* ConsoleWindow.xib in Resources */,
+				194BF9372315899D00F9C934 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E367FABE2181BEC800251FB7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E34FD90921869AF2007DFAF9 /* ConsoleWindow.h in Resources */,
+				E34FD8BF2182B580007DFAF9 /* ConsoleWindow.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		194BF9272315899C00F9C934 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				194BF9322315899C00F9C934 /* ViewController.m in Sources */,
+				194BF94923158CC200F9C934 /* NSTextView+HandleKeyEvent.m in Sources */,
+				194BF93A2315899D00F9C934 /* main.m in Sources */,
+				194BF94B23158CC700F9C934 /* ConsoleWindowController.m in Sources */,
+				194BF94A23158CC500F9C934 /* ConsoleWindow.mm in Sources */,
+				10A919E523A0F36600FA1AEE /* Utils.m in Sources */,
+				194BF92F2315899C00F9C934 /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E367FABC2181BEC800251FB7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E367FAC62181BEF100251FB7 /* ConsoleWindow.mm in Sources */,
+				E34FD8BE2182B57B007DFAF9 /* ConsoleWindowController.m in Sources */,
+				194BF926231587DE00F9C934 /* NSTextView+HandleKeyEvent.m in Sources */,
+				10A919E423A0F36600FA1AEE /* Utils.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		194BF9352315899D00F9C934 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				194BF9362315899D00F9C934 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		194BF93D2315899D00F9C934 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = TestConsoleWindow/TestConsoleWindow.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = CMUB8792GB;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/plugin\"";
+				INFOPLIST_FILE = TestConsoleWindow/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				OTHER_CFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = com.guangyv.TestConsoleWindow;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		194BF93E2315899D00F9C934 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = TestConsoleWindow/TestConsoleWindow.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = CMUB8792GB;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/plugin\"";
+				INFOPLIST_FILE = TestConsoleWindow/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_FAST_MATH = YES;
+				OTHER_CFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = com.guangyv.TestConsoleWindow;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		E367FAB32181B60000251FB7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		E367FAB42181B60000251FB7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		E367FAC42181BEC800251FB7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/product";
+				DEVELOPMENT_TEAM = CMUB8792GB;
+				INFOPLIST_FILE = plugin/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				MACH_O_TYPE = mh_bundle;
+				PRODUCT_BUNDLE_IDENTIFIER = com.guangyv.ConsoleWindow;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Debug;
+		};
+		E367FAC52181BEC800251FB7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/product";
+				DEVELOPMENT_TEAM = CMUB8792GB;
+				INFOPLIST_FILE = plugin/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				MACH_O_TYPE = mh_bundle;
+				PRODUCT_BUNDLE_IDENTIFIER = com.guangyv.ConsoleWindow;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		194BF93C2315899D00F9C934 /* Build configuration list for PBXNativeTarget "TestConsoleWindow" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				194BF93D2315899D00F9C934 /* Debug */,
+				194BF93E2315899D00F9C934 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E367FAAC2181B60000251FB7 /* Build configuration list for PBXProject "ConsoleWindow" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E367FAB32181B60000251FB7 /* Debug */,
+				E367FAB42181B60000251FB7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E367FAC32181BEC800251FB7 /* Build configuration list for PBXNativeTarget "ConsoleWindow" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E367FAC42181BEC800251FB7 /* Debug */,
+				E367FAC52181BEC800251FB7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E367FAA92181B60000251FB7 /* Project object */;
+}

@@ -15,6 +15,7 @@ local XLua = CS.XLua
 local XLibGame = CS.XLibGame
 local SEGame = CS.SEGame
 local ASGame = CS.ASGame
+local THGame = CS.THGame
 local STGGame = CS.STGGame
 
 local Tweening = CS.DG.Tweening
@@ -38,12 +39,14 @@ local _getter = {
     --THGame
     UIPackageManagerIns = function() return THGame.UI.UIPackageManager.GetInstance() end,
 
-    --自定义
+    --SEGame
     LuaBehaviour = function() return SEGame.LuaBehaviour end,
     LuaManagerIns = function() return SEGame.LuaManager.GetInstance() end,  
-    GameEngineIns = function() return STGGame.GameEngine.GetInstance() end, 
-    --
 
+    --自定义
+    GameEngineIns = function() return STGGame.GameEngine.GetInstance() end, 
+
+    --
 }
 
 

@@ -1,5 +1,5 @@
 
---http://robertpenner.com/easing/easing_demo.html
+--http://www.xuanfengge.com/easeing/easeing/
 Ease = {
     Unset = "Unset",
     Linear = "Linear",
@@ -41,12 +41,4 @@ Ease = {
     INTERNAL_Custom = "INTERNAL_Custom",
 }
 
-ThrowTextType = {
-    EnemyCriticalHit = "HurtText1",
-    Img = "HurtText2",
-    HeroCriticalHit = "HurtText3",
-    Pet = "HurtText4",
-    HeroDeadlyHit = "HurtText5",
-    NormalHit = "HurtText6",
-}
 
