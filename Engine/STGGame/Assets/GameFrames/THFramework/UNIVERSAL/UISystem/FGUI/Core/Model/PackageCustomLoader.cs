@@ -15,7 +15,7 @@ namespace THGame
             Bundles,
         }
         private Func<string, string> m_loaderWithPath;
-        private Func<string, AssetBundle[]> m_loaderWithBundle;
+        private Func<string, Tuple<AssetBundle, AssetBundle>> m_loaderWithBundle;
         private LoadMode m_mode;
 
         public PackageCustomLoader()
@@ -27,7 +27,7 @@ namespace THGame
             m_loaderWithPath = loader;
             m_mode = LoadMode.Path;
         }
-        public PackageCustomLoader(Func<string, AssetBundle[]> loader)
+        public PackageCustomLoader(Func<string, Tuple<AssetBundle, AssetBundle>> loader)
         {
             m_loaderWithBundle = loader;
             m_mode = LoadMode.Bundles;
@@ -49,10 +49,9 @@ namespace THGame
             }
             else if (GetLoadMode() == PackageCustomLoader.LoadMode.Bundles)
             {
-                object result = m_loaderWithBundle?.Invoke(packageName);
-                AssetBundle[] abs = (AssetBundle[])result;
-                AssetBundle binaryAb = abs.Length > 0 ? abs[0] : null;
-                AssetBundle altasAb = abs.Length > 1 ? abs[1] : null;
+                var resultTuple = m_loaderWithBundle?.Invoke(packageName);
+                AssetBundle binaryAb = resultTuple.Item1;
+                AssetBundle altasAb = resultTuple.Item2;
                 return UIPackage.AddPackage(binaryAb, altasAb);
             }
             return null;

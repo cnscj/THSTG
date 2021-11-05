@@ -28,9 +28,9 @@ namespace THGame.UI
                 return default;
 
             //加载包
-            if (PackageManager.GetInstance().GetPackageInfo(packageName) == null)
+            if (UIPackageManager.GetInstance().GetPackageInfo(packageName) == null)
             {
-                var packageInfo = PackageManager.GetInstance().AddPackage(packageName);
+                var packageInfo = UIPackageManager.GetInstance().AddPackage(packageName);
 
                 if (packageInfo == null)
                 {

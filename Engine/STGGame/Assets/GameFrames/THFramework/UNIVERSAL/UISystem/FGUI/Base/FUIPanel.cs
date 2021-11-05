@@ -15,7 +15,7 @@ namespace THGame.UI
             if (string.IsNullOrEmpty(packageName))
                 return;
 
-            PackageManager.GetInstance().AddPackage(packageName);
+            UIPackageManager.GetInstance().AddPackage(packageName);
             _obj.packageName = packageName;
             _obj.componentName = componentName;
 

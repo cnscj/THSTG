@@ -79,7 +79,7 @@ namespace THGame.UI
         {
             if (widget != null )
             {
-                PackageManager.GetInstance().RetainPackage(widget.package);
+                UIPackageManager.GetInstance().RetainPackage(widget.package);
             }
         }
 
@@ -87,7 +87,7 @@ namespace THGame.UI
         {
             if (widget != null)
             {
-                PackageManager.GetInstance().ReleasePackage(widget.package);
+                UIPackageManager.GetInstance().ReleasePackage(widget.package);
             }
         }
 

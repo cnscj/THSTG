@@ -12,7 +12,6 @@ using XLibrary.Package;
 
 namespace THGame.UI
 {
-    //TODO:同时包含动态合并图集功能
     //异步加载图片资源或者预加载资源,一般一张图片一个AB包
     //离散释放,如果一次加载太多又同时释放会卡
     public static class UITextureLoadStatus
@@ -1432,6 +1431,7 @@ namespace THGame.UI
         }
     }
 
+
     public class UITextureManager : MonoSingleton<UITextureManager>
     {
         public static readonly string DEFAULT_TEXTURE_KEY = "_DefaultTexture_";
@@ -1442,7 +1442,7 @@ namespace THGame.UI
         private NTexturePool m_ntexturePool;
         private DataPersistencer m_dataPersistencer;
 
-        //TODO:小图图集打包
+        //Note:小图图集打包,不过应该用处不打就不写了
         private Func<string, Texture> m_customLoaderSync;              //自定义同步加载器
         private Action<string, Action<Texture>> m_customLoaderAsync;   //自定义异步加载器
         private Dictionary<string, string> m_pathDict;

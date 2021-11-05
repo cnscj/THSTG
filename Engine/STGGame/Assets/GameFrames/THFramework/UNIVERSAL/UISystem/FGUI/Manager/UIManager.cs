@@ -12,8 +12,9 @@ namespace THGame.UI
         public FRoot Root => FRoot.GetInstance();
 
 
-        private void Awake()
+        private new void Awake()
         {
+            base.Awake();
             SetLoaderExtension(typeof(XLoader));
         }
 

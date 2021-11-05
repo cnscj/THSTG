@@ -64,8 +64,8 @@ namespace STGRuntime
         public static void InitAwake()
         {
             //设置Package的加载器
-            PackageManager.GetInstance().residentTimeS = residentTimeS;
-            PackageManager.GetInstance().SetLoader(new PackageCustomLoader((packageName) =>
+            UIPackageManager.GetInstance().residentTimeS = residentTimeS;
+            UIPackageManager.GetInstance().SetLoader(new PackageCustomLoader((packageName) =>
             {
 #if UNITY_EDITOR
                 return Path.Combine(AssetFileBook.FGUI_ROOT_SRC, string.Format("{0}", packageName));
@@ -74,7 +74,7 @@ namespace STGRuntime
 #endif
             }));
 
-            PackageManager.GetInstance().OnAdded((packageInfo) =>
+            UIPackageManager.GetInstance().OnAdded((packageInfo) =>
             {
                 PackageSettingInfo settingInfo = null;
                 if (m_packageSettingMap.TryGetValue(packageInfo.package.name, out settingInfo))
@@ -102,7 +102,7 @@ namespace STGRuntime
                         m_packageSettingMap.Add(settingInfo.packageName, settingInfo);
                         if (settingInfo.isPlayLoad)
                         {
-                            PackageManager.GetInstance().AddPackage(settingInfo.packageName);
+                            UIPackageManager.GetInstance().AddPackage(settingInfo.packageName);
                         }
                     }
                 }
