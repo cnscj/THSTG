@@ -88,7 +88,7 @@ end
 
 --
 function M:__loadPackageCallback(...)
-    self._rootGO = UIPackageManager.createObject(self._package ,self._component)
+    self._rootGO = UIPackageManager:createObject(self._package ,self._component)
     self._root = FGUIUtil.createComp(self._rootGO)
     
 end
@@ -98,8 +98,8 @@ function M:__readyPreloadResList()
         return 
     end
 
-    if not UIPackageManager.isLoadedPackage(self._package ) then
-        UIPackageManager.loadPackage(self._package ,function ( ... )
+    if not UIPackageManager:isLoadedPackage(self._package ) then
+        UIPackageManager:loadPackage(self._package ,function ( ... )
             self:__loadPackageCallback(...)
         end)
     else

@@ -6,16 +6,19 @@ local AssetLoaderManagerIns = CSharp.AssetLoaderManagerIns
 ]]
 
 function M:ctor()
-
+    self._defaultLoadMode = false   --默认加载模式
 end
 
-function M:loadAsset(path,onSuccess,onFailed)
-    return self:_loadAssetBundle(true,abPath,onSuccess,onFailed)
+function M:loadAssetSync(path,type,onSuccess,onFailed)
+    return self:_loadAssetBundle(false, abPath, type, onSuccess, onFailed)
 end
 
+function M:loadAssetAsync(path,type,onSuccess,onFailed)
+    return self:_loadAssetBundle(true, abPath, type, onSuccess, onFailed)
+end
 ----
 
-function M:_loadAssetBundle(isAsync,path,onSuccess,onFailed)
+function M:_loadAssetBundle(isAsync,path,type,onSuccess,onFailed)
     onSuccess = self:_createSuccessCallback(onSuccess)
     onFailed = self:_createFailedCallback(onFailed)
 
