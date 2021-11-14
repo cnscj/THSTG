@@ -12,10 +12,10 @@ namespace THGame
         public override void OnStart(SkillTimelineContext context)
         {
             var go = context.owner as GameObject;
-            string resPath = string.Format("Assets/ZCustom_Test/Res/Effects/Prefabs/{0}.prefab", effectId);
-            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(resPath);
+           // string resPath = string.Format("Assets/ZCustom_Test/Res/Effects/Prefabs/{0}.prefab", effectId);
+           // var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(resPath);
 
-            Object.Instantiate(prefab, go.transform);
+           // Object.Instantiate(prefab, go.transform);
         }
     }
 }

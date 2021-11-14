@@ -1,4 +1,4 @@
-local M = class("TestCache",MVC.Cache)
+local M = class("LoginCache",MVC.Cache)
 
 
 function M:ctor()

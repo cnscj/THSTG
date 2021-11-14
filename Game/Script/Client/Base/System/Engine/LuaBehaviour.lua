@@ -46,8 +46,8 @@ local _StaticFuncs_ = {
 
 local M = class("LuaBehaviour", false, _StaticFuncs_)
 function M:ctor()
-    self._owner = false
-    self._gameObject = false
+    self.owner = false
+    self.gameObject = false
 end
 
 function M:newWith( ... )

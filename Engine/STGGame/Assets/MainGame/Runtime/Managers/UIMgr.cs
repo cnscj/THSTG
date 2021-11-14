@@ -70,7 +70,8 @@ namespace STGRuntime
 #if UNITY_EDITOR
                 return Path.Combine(AssetFileBook.FGUI_ROOT_SRC, string.Format("{0}", packageName));
 #else
-                return AssetManager.GetInstance().LoadUISync(packageName);//这里要改为异步
+                return Path.Combine(AssetFileBook.FGUI_ROOT_SRC, string.Format("{0}", packageName));
+     //           return AssetManager.GetInstance().LoadUISync(packageName);//这里要改为异步
 #endif
             }));
 

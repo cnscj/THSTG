@@ -7,8 +7,8 @@ return {
 
     controllers = {
         {path = "Context.Modules.Test.TestController"},
-        {path = "Context.Modules.Login.LoginController"},
-        {path = "Context.Modules.MainUI.MainUIController"},
+        -- {path = "Context.Modules.Login.LoginController"},
+        -- {path = "Context.Modules.MainUI.MainUIController"},
     },
 
 }

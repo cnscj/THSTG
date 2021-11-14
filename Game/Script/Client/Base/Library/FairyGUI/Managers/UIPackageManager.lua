@@ -41,6 +41,15 @@ function M:unloadPackage(path)
     --依赖释放
 
 end
+
+function M:addPackage(packageName)
+
+end
+
+function M:removePackage(packageName)
+    
+end
+
 ---
 function M:createObject(packageName, componentName)
     local obj = FairyGUI.UIPackage.CreateObject(packageName, componentName)

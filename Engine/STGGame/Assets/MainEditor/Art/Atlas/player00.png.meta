@@ -2,80 +2,43 @@ fileFormatVersion: 2
 guid: e3ae4077db6030c49ae7eafe29c0dfe7
 TextureImporter:
   fileIDToRecycleName:
-    21300000: reimu_idle_01
-    21300002: reimu_idle_02
-    21300004: reimu_idle_03
-    21300006: reimu_idle_04
-    21300008: yukari_idle_01
-    21300010: yukari_idle_02
-    21300012: yukari_idle_03
-    21300014: yukari_idle_04
-    21300016: reimu_moveleft_01
-    21300018: reimu_moveleft_02
-    21300020: reimu_moveleft_03
-    21300022: reimu_moveleft_04
-    21300024: reimu_moveleft_05
-    21300026: reimu_moveleft_06
-    21300028: reimu_moveleft_07
-    21300030: yukari_moveleft_01
-    21300032: yukari_moveleft_02
-    21300034: yukari_moveleft_03
-    21300036: yukari_moveleft_04
-    21300038: yukari_moveleft_05
-    21300040: yukari_moveleft_06
-    21300042: yukari_moveleft_07
-    21300044: player00_22
-    21300046: player00_25
-    21300048: player00_27
-    21300050: player00_28
-    21300052: player00_29
-    21300054: player00_30
-    21300056: player00_34
-    21300058: player00_35
-    21300060: player00_36
-    21300062: player00_37
-    21300064: player00_23
-    21300066: player00_24
-    21300068: player00_26
-    21300070: player00_31
-    21300072: player00_32
-    21300074: Role@400001_reimu#idle#01
-    21300076: Role@400001_reimu#idle#02
-    21300078: Role@400001_reimu#idle#03
-    21300080: Role@400001_reimu#idle#04
-    21300082: Role@400001_reimu#moveleft#01
-    21300084: Role@400001_reimu#moveleft#02
-    21300086: Role@400001_reimu#moveleft#03
-    21300088: Role@400001_reimu#moveleft#04
-    21300090: Role@400001_reimu#moveleft#05
-    21300092: Role@400001_reimu#moveleft#06
-    21300094: Role@400001_reimu#moveleft#07
-    21300096: Role@400002_yukari#idle#01
-    21300098: Role@400002_yukari#idle#02
-    21300100: Role@400002_yukari#idle#03
-    21300102: Role@400002_yukari#idle#04
-    21300104: Role@400002_yukari#moveleft#01
-    21300106: Role@400002_yukari#moveleft#02
-    21300108: Role@400002_yukari#moveleft#03
-    21300110: Role@400002_yukari#moveleft#04
-    21300112: Role@400002_yukari#moveleft#05
-    21300114: Role@400002_yukari#moveleft#06
-    21300116: Role@400002_yukari#moveleft#07
-    21300118: Role@400001_reimu#movest#01
-    21300120: Role@400001_reimu#movest#02
-    21300122: Role@400001_reimu#movesu#01
-    21300124: Role@400001_reimu#movesu#02
-    21300126: Role@400001_reimu#movesu#03
-    21300128: Role@400001_reimu#movesu#04
-    21300130: Role@400001_reimu#movesu#05
-    21300132: Role@400002_yukari#movest#01
-    21300134: Role@400002_yukari#movest#02
-    21300136: Role@400002_yukari#movesu#01
-    21300138: Role@400002_yukari#movesu#02
-    21300140: Role@400002_yukari#movesu#03
-    21300142: Role@400002_yukari#movesu#04
-    21300144: Role@400002_yukari#movesu#05
-    21300146: player00_0
+    21300000: player00_23
+    21300002: player00_24
+    21300004: player00_25
+    21300006: player00_26
+    21300008: player00_27
+    21300010: player00_28
+    21300012: player00_29
+    21300014: player00_30
+    21300016: player00_31
+    21300018: player00_32
+    21300020: player00_34
+    21300022: player00_35
+    21300024: player00_36
+    21300026: player00_37
+    21300028: Role@400001_reimu#idle#01
+    21300030: Role@400001_reimu#idle#02
+    21300032: Role@400001_reimu#idle#03
+    21300034: Role@400001_reimu#idle#04
+    21300036: Role@400001_reimu#movest#01
+    21300038: Role@400001_reimu#movest#02
+    21300040: Role@400001_reimu#movesu#01
+    21300042: Role@400001_reimu#movesu#02
+    21300044: Role@400001_reimu#movesu#03
+    21300046: Role@400001_reimu#movesu#04
+    21300048: Role@400001_reimu#movesu#05
+    21300050: Role@400002_yukari#idle#01
+    21300052: Role@400002_yukari#idle#02
+    21300054: Role@400002_yukari#idle#03
+    21300056: Role@400002_yukari#idle#04
+    21300058: Role@400002_yukari#movest#01
+    21300060: Role@400002_yukari#movest#02
+    21300062: Role@400002_yukari#movesu#01
+    21300064: Role@400002_yukari#movesu#02
+    21300066: Role@400002_yukari#movesu#03
+    21300068: Role@400002_yukari#movesu#04
+    21300070: Role@400002_yukari#movesu#05
+    21300072: player00_0
   externalObjects: {}
   serializedVersion: 9
   mipmaps:
@@ -106,11 +69,11 @@ TextureImporter:
   textureSettings:
     serializedVersion: 2
     filterMode: 0
-    aniso: -1
-    mipBias: -100
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
-    wrapW: -1
+    wrapW: 0
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50

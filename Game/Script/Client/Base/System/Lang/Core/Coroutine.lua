@@ -22,6 +22,27 @@ function Coroutine.create(f)
 	return co
 end
 
+function Coroutine.start(co)
+	return function(...)
+        assert(coroutine.resume(co, ...))
+    end
+end
+
+function Coroutine.stop(co)
+	
+end
+
+function Coroutine.yield(...)
+	return coroutine.yield(...)
+end
+function Coroutine.yieldNull()
+	return Coroutine.yield()
+end
+function Coroutine.yieldWaitForSeconds(seconds)
+	return Coroutine.yield(CS.UnityEngine.WaitForSeconds(1))
+end
+
+
 -- 改自xlua中，resume阻断
 function Coroutine.asyncToSync(f, callbackPos)
 	return function(...)
@@ -51,8 +72,3 @@ function Coroutine.asyncToSync(f, callbackPos)
 		return unpack(rets)
 	end
 end
-
--- 暂停一会
-Coroutine.delayTime = Coroutine.asyncToSync(function(time, cb)
-	CSharp.TimerIns:ScheduleOnce(cb,time)
-end)

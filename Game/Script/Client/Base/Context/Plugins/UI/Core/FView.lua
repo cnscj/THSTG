@@ -103,7 +103,7 @@ function M:__readyPreloadResList()
             self:__loadPackageCallback(...)
         end)
     else
-        self:__loadPackageCallback(...)
+        self:__loadPackageCallback()
     end
 
 

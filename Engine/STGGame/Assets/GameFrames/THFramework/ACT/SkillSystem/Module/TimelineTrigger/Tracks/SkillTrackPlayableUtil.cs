@@ -110,13 +110,6 @@ namespace THGame
 
         }
 
-
-
-
-    }
 #endif
-
-
-
-
+    }
 }
