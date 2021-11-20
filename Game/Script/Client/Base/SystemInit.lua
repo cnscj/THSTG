@@ -43,7 +43,5 @@ require("System.Engine.LuaNode")
 
 --XLua相关
 require("System.XLua.Debug")
-Profiler = require("System.XLua.Profiler")
-Util = require("System.XLua.Util")
 -- require("System.XLua.Tdr")
 require("System.XLua.Strict")   --这里开始不能在设置全局变量了

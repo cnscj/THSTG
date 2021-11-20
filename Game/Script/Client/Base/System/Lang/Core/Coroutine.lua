@@ -1,50 +1,40 @@
 -- 协程中使用的一些方法
-Coroutine = {}
+local CoroutineRunner = CS.SEGame.CoroutineRunner.GetInstance()
+local Util = require("System.XLua.Util")
 
-local coroutinePool = {}
 
--- 复用协程create方法
-function Coroutine.create(f)
-	local co = table.remove(coroutinePool)
-	if co == nil then
-		co = coroutine.create(function(...)
-			f(...)
-			while true do
-				f = nil
-				coroutinePool[#coroutinePool+1] = co
-				f = coroutine.yield("EXIT")
-				f(coroutine.yield())
-			end
-		end)
-	else
-		coroutine.resume(co, f)
+function coroutine.wait(seconds)
+	return coroutine.yield(CS.UnityEngine.WaitForSeconds(seconds))
+end
+
+function coroutine.inter()
+	return
+end
+
+function coroutine.generator(...)
+	local iEnu = Util.cs_generator(...)
+	return iEnu
+end
+
+function coroutine.start(iEnu)
+	if (iEnu) then
+		return CoroutineRunner:StartCoroutine(iEnu)	
 	end
-	return co
 end
 
-function Coroutine.start(co)
-	return function(...)
-        assert(coroutine.resume(co, ...))
-    end
+function coroutine.stop(cor)
+	if (cor) then
+		CoroutineRunner:StopCoroutine(cor)
+	end
 end
 
-function Coroutine.stop(co)
-	
+function coroutine.call(...)
+	local iEnu = coroutine.generator(...)
+	return coroutine.start(iEnu)
 end
-
-function Coroutine.yield(...)
-	return coroutine.yield(...)
-end
-function Coroutine.yieldNull()
-	return Coroutine.yield()
-end
-function Coroutine.yieldWaitForSeconds(seconds)
-	return Coroutine.yield(CS.UnityEngine.WaitForSeconds(1))
-end
-
 
 -- 改自xlua中，resume阻断
-function Coroutine.asyncToSync(f, callbackPos)
+function coroutine.asyncToSync(f, callbackPos)
 	return function(...)
 		local _co = coroutine.running() or error ('this function must be run in coroutine')
 		local rets
