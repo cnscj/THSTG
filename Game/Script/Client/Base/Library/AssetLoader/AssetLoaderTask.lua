@@ -1,30 +1,14 @@
-local M = class("AssetLoaderTask",false,{
-    LoadMode = {
-        Sync = 1,
-        Async = 2,
-    },
-
-    UseLoader = {
-        Auto = 1,
-        AssetBundle = 2,
-        Resource = 3 
-    }
-
-})
+local M = class("AssetLoaderTask")
 
 function M:ctor()
-    self._baseLoader = false
-
-    self.loadMode = M.LoadMode.Async
-    self.useLoader = M.UseLoader.Auto
+    self.baseHandler = false
 
     self.onSuccess = false
     self.onFailed = false
+    
 end
 
 function M:start()
-    self:clear()
-    local loader = self:_getOrCrateLoader()
 
 
 end
@@ -42,13 +26,13 @@ function M:_unload()
 
 end
 
-function M:_getOrCrateLoader()
-    
-end
-
-function M:_onCompleted()
-
+function M:_onCompleted(result)
+    if result.data then
+        if self.onSuccess then self.onSuccess(result) end
+    else
+        if self.onFailed then self.onFailed(result) end
+    end
 end
 --
 
-rawset(_G, "AssetLoaderTask", false)
+rawset(_G, "AssetLoaderTask", M)

@@ -33,6 +33,7 @@ require("System.Tool.TableTool")
 require("System.Tool.ConfigOptimizer")
 require("System.Tool.TimerProfiler")
 require("System.Tool.TimeTool")
+require("System.Tool.PathTool")
 
 --Unity相关
 -- require("System.Engine.Base.UnityComponent")

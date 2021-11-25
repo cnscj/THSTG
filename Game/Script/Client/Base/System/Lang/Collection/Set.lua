@@ -43,6 +43,13 @@ function Set:size()
     return self._size
 end
 
+function Set:iter()
+    return function (t,k)
+        local rk, rv = next(t,k)
+        return rk,rv
+    end,self._tab
+end
+
 function Set:clear()
     for ele,v in pairs(self._tab) do
         self._tab[ele] = nil

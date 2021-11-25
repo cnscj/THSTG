@@ -60,8 +60,15 @@ function M:ctor()
         print(15,data,"的D是多少")
 
     end) 
-    local id = coroutine.start(loadABFileAsync)
+    -- local id = coroutine.start(loadABFileAsync)
     -- coroutine.stop(id)
+
+    local task = AssetLoaderManager:loadAssetAsync("/Users/cnscj/UnityWorkspace/THSTG/Game/Resource/pc/effect/60100002.ab|assets/gameassets/effect/60100002.prefab")
+    task.onSuccess = function (result)
+        local data = result.data
+        -- CS.UnityEngine.Object.Instantiate(data)
+        dump(15,result)
+    end
 end
 
 return M

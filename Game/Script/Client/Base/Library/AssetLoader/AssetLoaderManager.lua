@@ -7,48 +7,27 @@ local AssetLoaderManagerIns = CSharp.AssetLoaderManagerIns
 
 function M:ctor()
     self._defaultLoadMode = false   --默认加载模式
+
+    self._bundlerLoader = false
 end
 
-function M:loadAssetSync(path,type,onSuccess,onFailed)
-    return self:_loadAssetBundle(false, abPath, type, onSuccess, onFailed)
+function M:loadAssetSync(path,type)
+    local loader = self:getOrCreateBundlerLoader()
+    local obj = loader:loadAssetSync(path)
+    return obj
 end
 
 function M:loadAssetAsync(path,type,onSuccess,onFailed)
-    return self:_loadAssetBundle(true, abPath, type, onSuccess, onFailed)
-end
-----
-
-function M:_loadAssetBundle(isAsync,path,type,onSuccess,onFailed)
-    onSuccess = self:_createSuccessCallback(onSuccess)
-    onFailed = self:_createFailedCallback(onFailed)
-
-    local finalPath = path
-    if isAsync then
-        return AssetLoaderManagerIns:LoadAssetAsync(finalPath,onSuccess,onFailed)
-    else
-        return AssetLoaderManagerIns:LoadAssetSync(finalPath,onSuccess,onFailed)
-    end
-end
-
-function M:_onSuccess(callback, ...)
-
-
-    if callback then callback(...) end 
-end
-
-function M:_onFailed(callback, ...)
-
-
-    if callback then callback(...) end 
+    local loader = self:getOrCreateBundlerLoader()
+    return loader:loadAssetAsync(path,onSuccess,onFailed)
 end
 
 --
-function M:_createSuccessCallback(callback)
-    return function (...) self:_onSuccess(callback, ...) end
-end
-
-function M:_createFailedCallback(callback)
-    return function (...) self:_onFailed(callback, ...) end
+function M:getOrCreateBundlerLoader( ... )
+    if not self._bundlerLoader then
+        self._bundlerLoader = AssetBundleLoader.new()
+    end
+    return self._bundlerLoader
 end
 
 rawset(_G, "AssetLoaderManager", false)
