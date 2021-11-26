@@ -17,7 +17,8 @@ function M:ctor()
 end
 
 function M:loadAssetSync(path)
-    self:_onLoadSync()
+    local handler = self:__createHandler(path)
+    return self:_onLoadSync(handler)
 end
 
 function M:loadAssetAsync(path,onSuccess,onFailed)
@@ -31,6 +32,11 @@ function M:loadAssetAsync(path,onSuccess,onFailed)
 
     return task
 end
+
+function M:unloadAsset(path)
+    --TODO:
+end
+
 
 function M:update()
     self:dealReady()
@@ -72,12 +78,18 @@ function M:dealFinished()
 end
 
 ---
+
+function M:__createHandler(path)
+    local handler = AssetLoaderHandler.new()
+    handler.baseLoader = self
+    handler.path = path 
+    return handler
+end
+
 function M:_getOrCreateHandler(path)
     local handler = self._allHandlerDict[path]
     if not handler then
-        handler = AssetLoaderHandler.new()
-        handler.baseLoader = self
-        handler.path = path 
+        handler = self:__createHandler(path)
 
         self._allHandlerDict[path] = handler
         self._readyHandlers:enqueue(handler)

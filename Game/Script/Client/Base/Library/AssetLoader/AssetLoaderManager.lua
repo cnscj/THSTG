@@ -6,10 +6,9 @@ local AssetLoaderManagerIns = CSharp.AssetLoaderManagerIns
 ]]
 
 function M:ctor()
-    self._defaultLoadMode = false   --默认加载模式
-
     self._bundlerLoader = false
 end
+
 
 function M:loadAssetSync(path,type)
     local loader = self:getOrCreateBundlerLoader()

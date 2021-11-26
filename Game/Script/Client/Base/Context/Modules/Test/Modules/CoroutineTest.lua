@@ -69,6 +69,9 @@ function M:ctor()
         -- CS.UnityEngine.Object.Instantiate(data)
         dump(15,result)
     end
+
+    local obj = AssetLoaderManager:loadAssetSync("/Users/cnscj/UnityWorkspace/THSTG/Game/Resource/pc/effect/60100002.ab|assets/gameassets/effect/60100002.prefab")
+    dump(15,obj)
 end
 
 return M

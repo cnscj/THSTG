@@ -2,13 +2,17 @@ local M = {}
 
 --
 function M.normalize(path)
-    return string.gsub(path, "\\", "/") 
+    if not string.isEmpty(path) then
+        return string.gsub(path, "\\", "/") 
+    end
+    return path
 end
 
 function M.combine(path1,path2)
     --如果最后一个字符是/,就直接拼,不然就加上
     local newPath1 = M.normalize(path1)
     local newPath2 = M.normalize(path2)
+    
     local endChar = string.sub(newPath1,string.len(newPath1),1)
     if endChar == "/" then
         return newPath1 .. newPath2

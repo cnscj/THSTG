@@ -13,21 +13,34 @@ local function sqlitePaths(path)
     return bundlePath,assetPath
 end
 
-local function __loadBundleAsync(loaderHandler)
+function M:onLoadBundleAsync(loaderHandler)
     local path = loaderHandler.path
     local bundlePath,assetPath = sqlitePaths(path)
-
     local isDone = false
     local resultData = false
-    local bundleRequest = CS.UnityEngine.AssetBundle.LoadFromFileAsync(bundlePath)
-    while (not bundleRequest.isDone) do
-        coroutine.yield() 
+
+    local bundleWarp = self:getBundleWarp(bundlePath)
+    local ab = false
+    if not bundleWarp then
+        local bundleRequest = CS.UnityEngine.AssetBundle.LoadFromFileAsync(bundlePath)
+        while (not bundleRequest.isDone) do
+            coroutine.yield() 
+        end
+
+        coroutine.yield(bundleRequest)
+
+        ab = bundleRequest.assetBundle
+        isDone = bundleRequest.isDone
+        resultData = ab
+
+        self:addBundleWrap(bundlePath,ab)
+    else
+        ab = bundleWarp.assetBundle
+        isDone = true
+        resultData = ab
     end
 
-    coroutine.yield(bundleRequest)
-
     if assetPath then
-        local ab = bundleRequest.assetBundle
         if ab then
             local assetRequest = ab:LoadAssetAsync(assetPath)
 
@@ -36,9 +49,6 @@ local function __loadBundleAsync(loaderHandler)
             isDone = assetRequest.isDone
             resultData = assetRequest.asset
         end
-    else
-        isDone = bundleRequest.isDone
-        resultData = bundleRequest.assetBundle    
     end
 
     loaderHandler.result = {
@@ -48,9 +58,61 @@ local function __loadBundleAsync(loaderHandler)
     loaderHandler:finish()
 end
 
+function M:onLoadBundleSync(loaderHandler)
+    local path = loaderHandler.path
+    local bundlePath,assetPath = sqlitePaths(path)
+
+    local resultData = false
+    local bundleWarp = self:getBundleWarp(bundlePath)
+    local ab = false
+    if not bundleWarp then
+        ab = CS.UnityEngine.AssetBundle.LoadFromFile(bundlePath)
+        resultData = ab
+
+        self:addBundleWrap(bundlePath,ab)
+    else
+        ab = bundleWarp.assetBundle
+        resultData = ab
+    end
+
+    if assetPath then
+        if ab then
+            resultData = ab:LoadAsset(assetPath)
+        end
+    end
+
+    return resultData
+end
+
+
 function M:ctor()
     self._dependenciesPath = false
     self._assetBundleRootPath = false
+    
+    self._bundleWrapDict = false
+end
+
+function M:addBundleWrap(bundlePath,assetBundle)
+    self._bundleWrapDict = self._bundleWrapDict or {}
+    if not self._bundleWrapDict[bundlePath] then
+        self._bundleWrapDict[bundlePath] = {
+            assetBundle = assetBundle,
+            refCount = 1,
+        }
+    end
+    return self._bundleWrapDict[bundlePath]
+end
+
+function M:removeBundleWrap(bundlePath)
+    if self._bundleWrapDict then
+        self._bundleWrapDict[bundlePath] = nil
+    end
+end
+
+function M:getBundleWarp(bundlePath)
+    if self._bundleWrapDict then
+        return self._bundleWrapDict[bundlePath]
+    end
 end
 
 function M:loadManifestPath(mainfestPath)
@@ -103,14 +165,22 @@ function M:_onLoadAsync(loaderHandler)
     local bundlePath,assetPath = sqlitePaths(path)
     local dependencies = self:queryDependencies(bundlePath)
     if dependencies then
+
         for _,dependPath in ipairs(dependencies) do 
             local childHandler = self:_getOrCreateHandler(dependPath)
             loaderHandler:addChild(childHandler)
         end
     end
 
-    local iEnu = coroutine.generator(__loadBundleAsync,loaderHandler)
+    local iEnu = coroutine.generator(self.onLoadBundleAsync,self,loaderHandler)
     coroutine.start(iEnu)
 end
+
+
+function M:_onLoadSync(loaderHandler)
+    return self:onLoadBundleSync(loaderHandler)
+end
+
+
 rawset(_G, "AssetBundleLoader", M)
 return M
