@@ -3,6 +3,7 @@ local AssetLoaderManagerIns = CSharp.AssetLoaderManagerIns
 --[[]
     加载器加载与释放必须成对出现
     默认使用异步加载
+    LUA方式的加载存在很大的性能问题,研究下可以了,不可大范围使用
 ]]
 
 function M:ctor()

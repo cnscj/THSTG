@@ -33,11 +33,6 @@ function M:loadAssetAsync(path,onSuccess,onFailed)
     return task
 end
 
-function M:unloadAsset(path)
-    --TODO:
-end
-
-
 function M:update()
     self:dealReady()
     self:dealLoading()
@@ -51,6 +46,7 @@ function M:dealReady()
     local i = 1
     while i <= canLoadHandlersNum and self._readyHandlers:size() > 0 do
         local handler = self._readyHandlers:dequeue()
+        handler:tick()
         self:_onLoadAsync(handler)
 
         self._loadingHandlers:insert(handler)
@@ -61,6 +57,8 @@ end
 function M:dealLoading()
     for handler in self._loadingHandlers:iter() do 
         if handler:isTimeout() then
+            handler:finish()    --标记下,但是是超时失败的返回
+            self._loadingHandlers:remove(handler)
             self._finishedHandlers:enqueue(handler)
         elseif handler:isCompleted() then
             self._loadingHandlers:remove(handler)
@@ -107,7 +105,6 @@ end
 function M:_onLoadSync(loaderHandler)
 
 end
-
 
 
 rawset(_G, "AssetBaseLoader", M)

@@ -5,7 +5,7 @@ function M.normalize(path)
     if not string.isEmpty(path) then
         return string.gsub(path, "\\", "/") 
     end
-    return path
+    return path or ""
 end
 
 function M.combine(path1,path2)
@@ -13,19 +13,19 @@ function M.combine(path1,path2)
     local newPath1 = M.normalize(path1)
     local newPath2 = M.normalize(path2)
     
-    local endChar = string.sub(newPath1,string.len(newPath1),1)
+    local endChar = string.sub(newPath1,string.len(newPath1))
     if endChar == "/" then
         return newPath1 .. newPath2
     end
     return newPath1 .."/".. newPath2
 end
 
---获取路径
+--获取根目录路径
 function M.getDirectoryName(filename)
     if string.isEmpty(filename) then
         return filename
     end
-    return string.match(filename, "(.+)/[^/]*%.%w+$") or "" --*nix system
+    return string.match(filename, "(.+)/[^/]*%.?%w+$") or "" --*nix system
 end
 
 --获取文件名
