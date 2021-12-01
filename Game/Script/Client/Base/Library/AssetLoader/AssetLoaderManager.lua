@@ -10,17 +10,17 @@ function M:ctor()
     self._bundlerLoader = false
 end
 
-
-function M:loadAssetSync(path,type)
+function M:loadBundleAssetSync(path,type,onSuccess,onFailed)
     local loader = self:getOrCreateBundlerLoader()
-    local obj = loader:loadAssetSync(path)
+    local obj = loader:loadAssetSync(path,onSuccess,onFailed)
     return obj
 end
 
-function M:loadAssetAsync(path,type,onSuccess,onFailed)
+function M:loadBundleAssetAsync(path,type,onSuccess,onFailed)
     local loader = self:getOrCreateBundlerLoader()
     return loader:loadAssetAsync(path,onSuccess,onFailed)
 end
+--
 
 --
 function M:getOrCreateBundlerLoader( ... )

@@ -4,12 +4,7 @@ function M:ctor()
     self._poolDict = {}
 
     --注册一个轮询函数
-    self._updateFunction = function ( ... )
-        self:update(CSharp.Time.deltaTime)
-    end
-
-    --注册更新
-    CSharp.MonoManagerIns:AddUpdateListener(self._updateFunction)
+    MonoManager:addUpdateListener(self.update,self)
 end
 
 function M:createPool(cls)

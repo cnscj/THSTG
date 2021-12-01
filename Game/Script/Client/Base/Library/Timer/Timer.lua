@@ -59,7 +59,7 @@ function M:_registerUpdateHandler()
         self._updateFunc = function()
             self:update(CSharp.Time.deltaTime)
         end
-        CSharp.MonoManagerIns:AddUpdateListener(self._updateFunc)
+        MonoManager:addUpdateListener(self._updateFunc)
     end
 end
 

@@ -52,12 +52,12 @@ function M:onLoadBundleAsync(loaderHandler)
         end
     end
 
-    local result = AssetLoaderResult.new()
-    result._warp = bundleWarp
-    result.isDone = isDone
-    result.data = resultData
+    local loaderResult = AssetLoaderResult.new()
+    loaderResult._warp = bundleWarp
+    loaderResult.isDone = isDone
+    loaderResult.data = resultData
 
-    loaderHandler.result = result
+    loaderHandler.result = loaderResult
     loaderHandler:finish()
 end
 
@@ -66,17 +66,20 @@ function M:onLoadBundleSync(loaderHandler)
     local bundlePath,assetPath = sqlitePaths(path)
 
     local resultData = false
+    local isDone = false
     local bundleWarp = self:getBundleWarp(bundlePath)
     local ab = false
     if not bundleWarp then
         local fullBundlePath = PathTool.combine(self._assetBundleRootPath,bundlePath)
         ab = CS.UnityEngine.AssetBundle.LoadFromFile(fullBundlePath)
         resultData = ab
+        isDone = true
 
         bundleWarp = self:addBundleWrap(bundlePath,ab)
     else
         ab = bundleWarp.assetBundle
         resultData = ab
+        isDone = true
     end
 
     if assetPath then
@@ -85,13 +88,21 @@ function M:onLoadBundleSync(loaderHandler)
         end
     end
 
-    return resultData
+    local loaderResult = AssetLoaderResult.new()
+    loaderResult._warp = bundleWarp
+    loaderResult.isDone = isDone
+    loaderResult.data = resultData
+
+    loaderHandler.result = loaderResult
+    loaderHandler:finish()
+
+    return loaderResult
 end
 
 
 function M:ctor()
     self._assetBundleRootPath = false
-    self._dependenciesPath = false
+    self._dependenciesPaths = false
 
     self._bundleWrapCache = false
 end
@@ -122,7 +133,8 @@ function M:getBundleWarp(bundlePath)
 end
 
 function M:loadManifest(manifestPath)
-    local manifestAssetBundle = self:loadAssetSync(manifestPath)
+    local loaderTask = self:loadAssetSync(manifestPath)
+    local manifestAssetBundle = loaderTask:getData()
     if (manifestAssetBundle) then
 
         --取manifest所在目录为根目录
@@ -130,7 +142,7 @@ function M:loadManifest(manifestPath)
         
         local manifest = manifestAssetBundle:LoadAsset("AssetBundleManifest")
         
-        self._dependenciesPath = {}
+        self._dependenciesPaths = {}
         if (manifest) then
             local allPathsList = manifest:GetAllAssetBundles()
             for i = 0,allPathsList.Length - 1 do
@@ -144,19 +156,19 @@ function M:loadManifest(manifestPath)
                 end
                 
                 if (#dewDps > 0) then
-                    self._dependenciesPath[path] = dewDps
+                    self._dependenciesPaths[path] = dewDps
                 end
             end
         end
 
-        manifestAssetBundle:Unload(true)
+        loaderTask:release()
     end
 end
 
 
 function M:queryDependencies(bundlePath)
-    if self._dependenciesPath then
-       return self._dependenciesPath[bundlePath]
+    if self._dependenciesPaths then
+       return self._dependenciesPaths[bundlePath]
     end
 end
 
@@ -167,8 +179,9 @@ function M:_onLoadAsync(loaderHandler)
     local dependencies = self:queryDependencies(bundlePath)
     if dependencies then
         for _,dependPath in ipairs(dependencies) do 
-            local childHandler = self:_getOrCreateHandler(dependPath)
+            local childHandler = self:_getOrCreateAsyncHandler(dependPath)
             loaderHandler:addChild(childHandler)
+            self:_loadHandlerAsync(childHandler)
         end
     end
 
@@ -178,6 +191,17 @@ end
 
 
 function M:_onLoadSync(loaderHandler)
+    local path = loaderHandler.path
+    local bundlePath,assetPath = sqlitePaths(path)
+    local dependencies = self:queryDependencies(bundlePath)
+    if dependencies then
+        for _,dependPath in ipairs(dependencies) do 
+            local childHandler = self:_createHandler(dependPath)    --不能与异步的Handler混用,否则就不能同步
+            loaderHandler:addChild(childHandler)
+            self:_loadHandlerSync(childHandler)
+        end
+    end
+
     return self:onLoadBundleSync(loaderHandler)
 end
 

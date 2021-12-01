@@ -8,6 +8,15 @@ function M:ctor()
     
 end
 
+function M:getResult()
+    return self.baseHandler.result
+end
+
+function M:getData()
+    local loaderResult = self:getResult()
+    return loaderResult and loaderResult.data
+end
+
 function M:stop()
     if not self.baseHandler then return end 
     if self.baseHandler.result then return end 
@@ -39,12 +48,17 @@ function M:clear()
 
 end
 
-function M:_onCompleted(result)
+function M:_onCompleted(handler)
+    local result = handler.result
     if result.data then
         self:retain()
-        if self.onSuccess then self.onSuccess(result) end
+        if self.onSuccess then 
+            self.onSuccess(result) 
+        end
     else
-        if self.onFailed then self.onFailed(result) end
+        if self.onFailed then 
+            self.onFailed(result) 
+        end
     end
 end
 --

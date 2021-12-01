@@ -1,148 +1,154 @@
 local M = class("MonoManager")
 local MonoManagerIns = CSharp.MonoManagerIns
 function M:ctor()
-    self.awakeFunc = false
-    self.startFunc = false
-    self.updateFunc = false
-    self.fixedUpdateFunc = false
-    self.lateUpdateFunc = false
+    self.awakeListeners = false
+    self.startListeners = false
+    self.updateListeners = false
+    self.fixedUpdateListeners = false
+    self.lateUpdateListeners = false
+
+    self._awakeFunc = function ( ... ) self:_awake() end
+    self._startFunc = function ( ... ) self:_start() end
+    self._updateFunc = function ( ... ) self:_update() end
+    self._fixedUpdateFunc = function ( ... ) self:_fixedUpdate() end
+    self._lateUpdateFunc = function ( ... ) self:_lateUpdate() end
 end
 
 function M:addAwakeListener(listener,caller)
-    if not self.awakeFunc then
-        self.awakeFunc = {}
-        MonoManagerIns:AddUpdateListener(self._awake)
+    if not self.awakeListeners then
+        self.awakeListeners = {}
+        MonoManagerIns:AddUpdateListener(self._awakeFunc)
     end
-    table.insert(self.awakeFunc, {listener = listener,caller = caller})
+    table.insert(self.awakeListeners, {listener = listener,caller = caller})
 end
 
 function M:removeAwakeListener(listener,caller)
-    for i = #self.awakeFunc,1,-1 do 
-        local v = self.awakeFunc[i]
+    for i = #self.awakeListeners,1,-1 do 
+        local v = self.awakeListeners[i]
         if v.listener == listener and v.caller == caller then
-            table.remove(self.awakeFunc,i)
+            table.remove(self.awakeListeners,i)
             break
         end
     end
 end
 
 function M:addStartListener(listener,caller)
-    if not self.startFunc then
-        self.startFunc = {}
-        MonoManagerIns:AddUpdateListener(self._start)
+    if not self.startListeners then
+        self.startListeners = {}
+        MonoManagerIns:AddUpdateListener(self._startFunc)
     end
-    table.insert(self.startFunc, {listener = listener,caller = caller})
+    table.insert(self.startListeners, {listener = listener,caller = caller})
 end
 
 function M:removeStartListener(listener,caller)
-    for i = #self.startFunc,1,-1 do 
-        local v = self.startFunc[i]
+    for i = #self.startListeners,1,-1 do 
+        local v = self.startListeners[i]
         if v.listener == listener and v.caller == caller then
-            table.remove(self.startFunc,i)
+            table.remove(self.startListeners,i)
             break
         end
     end
 end
 
 function M:addUpdateListener(listener,caller)
-    if not self.updateFunc then
-        self.updateFunc = {}
-        MonoManagerIns:AddUpdateListener(self._update)
+    if not self.updateListeners then
+        self.updateListeners = {}
+        MonoManagerIns:AddUpdateListener(self._updateFunc)
     end
-    table.insert(self.updateFunc, {listener = listener,caller = caller})
+    table.insert(self.updateListeners, {listener = listener,caller = caller})
 end
 
 function M:removeUpdateListener(listener,caller)
-    for i = #self.updateFunc,1,-1 do 
-        local v = self.updateFunc[i]
+    for i = #self.updateListeners,1,-1 do 
+        local v = self.updateListeners[i]
         if v.listener == listener and v.caller == caller then
-            table.remove(self.updateFunc,i)
+            table.remove(self.updateListeners,i)
             break
         end
     end
 end
 
 function M:addFixedUpdateListener(listener,caller)
-    if not self.fixedUpdateFunc then
-        self.fixedUpdateFunc = {}
-        MonoManagerIns:AddFixUpdateListener(self._fixedUpdate)
+    if not self.fixedUpdateListeners then
+        self.fixedUpdateListeners = {}
+        MonoManagerIns:AddFixUpdateListener(self._fixedUpdateFunc)
     end
-    table.insert(self.fixedUpdateFunc, {listener = listener,caller = caller})
+    table.insert(self.fixedUpdateListeners, {listener = listener,caller = caller})
 end
 
 function M:removeFixedUpdateListener(listener,caller)
-    for i = #self.fixedUpdateFunc,1,-1 do 
-        local v = self.fixedUpdateFunc[i]
+    for i = #self.fixedUpdateListeners,1,-1 do 
+        local v = self.fixedUpdateListeners[i]
         if v.listener == listener and v.caller == caller then
-            table.remove(self.fixedUpdateFunc,i)
+            table.remove(self.fixedUpdateListeners,i)
             break
         end
     end
 end
 
 function M:addLateUpdateListener(listener,caller)
-    if not self.lateUpdateFunc then
-        self.lateUpdateFunc = {}
-        MonoManagerIns:AddFixUpdateListener(self._lateUpdate)
+    if not self.lateUpdateListeners then
+        self.lateUpdateListeners = {}
+        MonoManagerIns:AddFixUpdateListener(self._lateUpdateFunc)
     end
-    table.insert(self.lateUpdateFunc, {listener = listener,caller = caller})
+    table.insert(self.lateUpdateListeners, {listener = listener,caller = caller})
 end
 
 function M:removeLateUpdateListener(listener,caller)
-    for i = #self.lateUpdateFunc,1,-1 do 
-        local v = self.lateUpdateFunc[i]
+    for i = #self.lateUpdateListeners,1,-1 do 
+        local v = self.lateUpdateListeners[i]
         if v.listener == listener and v.caller == caller then
-            table.remove(self.lateUpdateFunc,i)
+            table.remove(self.lateUpdateListeners,i)
             break
         end
     end
 end
 
 function M:removeAllListeners()
-    self.updateFunc = {}
-    self.fixedUpdateFunc = {}
-    self.lateUpdateFunc = {}
+    self.updateListeners = {}
+    self.fixedUpdateListeners = {}
+    self.lateUpdateListeners = {}
 end
 --
 function M:_awake()
-    if self.awakeFunc then
-        for _,funcArgs in ipairs(self.awakeFunc) do 
-            funcArgs.listener()
+    if self.awakeListeners then
+        for _,funcArgs in ipairs(self.awakeListeners) do 
+            funcArgs.listener(funcArgs.caller)
         end
     end
 end
 
 function M:_start()
-    if self.startFunc then
-        for _,funcArgs in ipairs(self.startFunc) do 
-            funcArgs.listener()
+    if self.startListeners then
+        for _,funcArgs in ipairs(self.startListeners) do 
+            funcArgs.listener(funcArgs.caller)
         end
     end
 end
 
 function M:_update()
-    if self.updateFunc then
+    if self.updateListeners then
         local deltaTime = CSharp.Time.deltaTime
-        for _,funcArgs in ipairs(self.updateFunc) do 
-            funcArgs.listener(deltaTime)
+        for _,funcArgs in ipairs(self.updateListeners) do 
+            funcArgs.listener(funcArgs.caller,deltaTime)
         end
     end
 end
 
 function M:_fixedUpdate()
-    if self.fixedUpdateFunc then
+    if self.fixedUpdateListeners then
         local deltaTime = CSharp.Time.deltaTime
-        for _,funcArgs in ipairs(self.fixedUpdateFunc) do 
-            funcArgs.listener(deltaTime)
+        for _,funcArgs in ipairs(self.fixedUpdateListeners) do 
+            funcArgs.listener(funcArgs.caller,deltaTime)
         end
     end
 end
 
 function M:_lateUpdate()
-    if self.lateUpdateFunc then
+    if self.lateUpdateListeners then
         local deltaTime = CSharp.Time.deltaTime
-        for _,funcArgs in ipairs(self.lateUpdateFunc) do 
-            funcArgs.listener(deltaTime)
+        for _,funcArgs in ipairs(self.lateUpdateListeners) do 
+            funcArgs.listener(funcArgs.call,deltaTime)
         end
     end
 end

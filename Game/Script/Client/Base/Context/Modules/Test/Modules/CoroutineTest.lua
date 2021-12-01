@@ -64,16 +64,22 @@ function M:ctor()
     -- coroutine.stop(id)
     local abRootPath = "/Users/cnscj/UnityWorkspace/THSTG/Game/Resource/pc/"
     AssetLoaderManager:getOrCreateBundlerLoader():loadManifest(PathTool.combine(abRootPath,"pc"))
-    local task = AssetLoaderManager:loadAssetAsync("effect/60100002.ab|assets/gameassets/effect/60100002.prefab")
-    task.onSuccess = function (result)
+    -- local task = AssetLoaderManager:loadBundleAssetAsync("effect/60100002.ab|assets/gameassets/effect/60100002.prefab")
+    -- task.onSuccess = function (result)
+    --     local data = result.data
+    --     CS.UnityEngine.Object.Instantiate(data)
+    -- end
+
+    -- task:release()
+
+    local task = AssetLoaderManager:loadBundleAssetSync("effect/60100002.ab|assets/gameassets/effect/60100002.prefab",false,function ( result )
         local data = result.data
         CS.UnityEngine.Object.Instantiate(data)
         dump(15,result)
-    end
-    -- task:release()
+    end)
 
-    -- local obj = AssetLoaderManager:loadAssetSync("effect/60100002.ab|assets/gameassets/effect/60100002.prefab")
-    -- dump(15,obj)
+    -- dump(15,task)
+    -- dump(15,task:getData())
 end
 
 return M

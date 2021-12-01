@@ -5,31 +5,37 @@ local M = class("AssetBaseLoader")
 function M:ctor()
     self.maxLoadingCount = 30   --最大同时加载个数
 
-    self._allHandlerDict = {}
+    self._asyncHandlerDict = {}
     self._readyHandlers = Queue.new()
     self._loadingHandlers = Set.new()
     self._finishedHandlers = Queue.new()
 
     --注册更新
-    CSharp.MonoManagerIns:AddUpdateListener(function ()
-        self:update()
-    end)
+    MonoManager:addUpdateListener(self.update,self)
 end
 
-function M:loadAssetSync(path)
-    local handler = self:__createHandler(path)
-    return self:_onLoadSync(handler)
-end
-
-function M:loadAssetAsync(path,onSuccess,onFailed)
-    --异步加载把实现延迟到下一帧
-    local handler = self:_getOrCreateHandler(path)
+function M:loadAssetSync(path,onSuccess,onFailed)
+    local handler = self:_createHandler(path)
     local task = AssetLoaderTask.new()
     task.baseHandler = handler
     task.onSuccess = onSuccess or false
     task.onFailed = onFailed or false
     handler:addCallback(task._onCompleted,task)
 
+    self:_loadHandlerSync(handler)
+    return task
+end
+
+function M:loadAssetAsync(path,onSuccess,onFailed)
+    --异步加载把实现延迟到下一帧
+    local handler = self:_getOrCreateAsyncHandler(path)
+    local task = AssetLoaderTask.new()
+    task.baseHandler = handler
+    task.onSuccess = onSuccess or false
+    task.onFailed = onFailed or false
+    handler:addCallback(task._onCompleted,task)
+
+    self:_loadHandlerAsync(handler)
     return task
 end
 
@@ -46,11 +52,13 @@ function M:dealReady()
     local i = 1
     while i <= canLoadHandlersNum and self._readyHandlers:size() > 0 do
         local handler = self._readyHandlers:dequeue()
-        handler:tick()
-        self:_onLoadAsync(handler)
+        if not self._loadingHandlers:contains(handler) then
+            handler:tick()
+            self:_onLoadAsync(handler)
 
-        self._loadingHandlers:insert(handler)
-        i = i + 1
+            self._loadingHandlers:insert(handler)
+            i = i + 1
+        end
     end
 end
 
@@ -71,29 +79,36 @@ function M:dealFinished()
     while self._finishedHandlers:size() > 0 do
         local handler = self._finishedHandlers:dequeue()
         local path = handler.path
-        self._allHandlerDict[path] = nil
+        self._asyncHandlerDict[path] = nil
     end
 end
 
 ---
-
-function M:__createHandler(path)
+function M:_createHandler(path)
     local handler = AssetLoaderHandler.new()
     handler.baseLoader = self
     handler.path = path 
+
     return handler
 end
 
-function M:_getOrCreateHandler(path)
-    local handler = self._allHandlerDict[path]
+function M:_getOrCreateAsyncHandler(path)
+    local handler = self._asyncHandlerDict[path]
     if not handler then
-        handler = self:__createHandler(path)
+        handler = self:_createHandler(path)
 
-        self._allHandlerDict[path] = handler
-        self._readyHandlers:enqueue(handler)
-
+        self._asyncHandlerDict[path] = handler
     end
     return handler
+end
+
+function M:_loadHandlerAsync(loaderHandler)
+    self._readyHandlers:enqueue(loaderHandler)
+end
+
+function M:_loadHandlerSync(loaderHandler)
+    loaderHandler:tick()
+    local loaderResult = self:_onLoadSync(loaderHandler)
 end
 
 ---
