@@ -16,6 +16,7 @@ function init()
     CSharp.LuaManagerIns:SetLuaTrunkAndBranch(__TRUNK__,__BRANCH__)
 
     --设置游戏逻辑更新
+    -- FIXME:注册操作应该放到CSharp,至少lua奔溃了引擎还能跑
     CSharp.LuaManagerIns:RegisterLuaUpdateListeners(update)
 end
 
