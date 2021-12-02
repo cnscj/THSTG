@@ -3,23 +3,19 @@ local P_Resource = require("Config.Profile.P_Resource")
 local KEY_PLATFORM = "{platform}"
 
 function M:initialize()
-    --TODO:
-    --加载并设置manifest
+    --TODO:应该获取相对路径
+    local abRootPath = "/Users/cnscj/UnityWorkspace/THSTG/Game/Resource/pc/"
+    AssetLoaderManager:getOrCreateBundlerLoader():loadManifest(PathTool.combine(abRootPath,"pc"))
 end
 
-function M:loadManifest(platform,onSuccess,onFailed)
-    local pathPattern = P_Resource.manifestPattern
-    local abPath = self:_normalizePath(pathPattern,{platform = platform})
-
-    AssetLoader:loadAssetBundleAsync(abPath,onSuccess,onFailed)
-end
 
 function M:loadModel(id,onSuccess,onFailed)
     local pathPattern = P_Resource.resDict.modelFolder
 
     local abPath = self:_normalizePath(pathPattern.abPattern,{id = id})
     local resPath = self:_normalizePath(pathPattern.resPattern,{id = id})
-    AssetLoader:loadAssetBundleResourceAsync(abPath,resPath,onSuccess,onFailed)
+    local fullPath = string.format("%s|%s",abPath,resPath)
+    AssetLoaderManager:loadBundleAssetAsync(fullPath,false,onSuccess,onFailed)
 end
 
 function M:loadEffect(id,onSuccess,onFailed)
@@ -27,12 +23,12 @@ function M:loadEffect(id,onSuccess,onFailed)
 
     local abPath = self:_normalizePath(pathPattern.abPattern,{id = id})
     local resPath = self:_normalizePath(pathPattern.resPattern,{id = id})
-    AssetLoader:loadAssetBundleResourceAsync(abPath,resPath,onSuccess,onFailed)
+    local fullPath = string.format("%s|%s",abPath,resPath)
+    AssetLoaderManager:loadBundleAssetAsync(fullPath,false,onSuccess,onFailed)
 end
 
 --
 function M:_normalizePath(path,params)
-
     path = self:_paresKeys(path,params)
     path = string.lower(path)
 

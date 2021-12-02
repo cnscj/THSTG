@@ -44,7 +44,6 @@ end
 
 function M:_onChildCall(childHandler)
     local childResult = childHandler.result
-    if childResult then childResult:retain() end 
 
     self:_onSelfCall(childHandler)
 end

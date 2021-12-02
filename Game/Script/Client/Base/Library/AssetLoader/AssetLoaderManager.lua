@@ -11,12 +11,14 @@ function M:ctor()
 end
 
 function M:loadBundleAssetSync(path,type,onSuccess,onFailed)
+    type = type or CSharp.Object
     local loader = self:getOrCreateBundlerLoader()
-    local obj = loader:loadAssetSync(path,onSuccess,onFailed)
-    return obj
+    local task = loader:loadAssetSync(path,onSuccess,onFailed)
+    return task
 end
 
 function M:loadBundleAssetAsync(path,type,onSuccess,onFailed)
+    type = type or CSharp.Object
     local loader = self:getOrCreateBundlerLoader()
     return loader:loadAssetAsync(path,onSuccess,onFailed)
 end

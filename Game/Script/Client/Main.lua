@@ -1,6 +1,13 @@
 require("CSharp")
 require("Agent")
 require("Test")
+local updateFunc = function (dt)
+    GameManager:update(dt)
+end
+
+local errorFunc = function (...)
+    print(debug.traceback())
+end
 
 function init()
     require("Version")
@@ -39,7 +46,7 @@ function main()
 end
 
 function update(dt)
-    GameManager:update(dt)
+    xpcall(updateFunc,errorFunc,dt)
 end
 
 main()

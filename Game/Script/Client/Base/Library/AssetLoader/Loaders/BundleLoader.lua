@@ -22,8 +22,14 @@ function M:onLoadBundleAsync(loaderHandler)
     local bundleWarp = self:getBundleWarp(bundlePath)
     local ab = false
     if not bundleWarp then
-        local fullBundlePath = PathTool.combine(self._assetBundleRootPath,bundlePath)
-        local bundleRequest = CS.UnityEngine.AssetBundle.LoadFromFileAsync(fullBundlePath)
+        local fullBundlePath = self:_getBundleFullPath(bundlePath)
+        local bundleRequestInfo = self:_getOrCreateBundleRequest(fullBundlePath)
+        local bundleRequest = bundleRequestInfo.bundleRequest
+        local requestRefCount = bundleRequestInfo.refCount
+        --NOTE:添加下子AB的依赖,写这里感觉不太对
+        if requestRefCount == 1 then
+            loaderHandler:addCallback(self._onBundleDependencies,self)
+        end
         while (not bundleRequest.isDone) do
             coroutine.yield() 
         end
@@ -35,17 +41,22 @@ function M:onLoadBundleAsync(loaderHandler)
         resultData = ab
 
         bundleWarp = self:addBundleWrap(bundlePath,ab)
+        self:_releaseCreateBundleRequest(fullBundlePath)
     else
         ab = bundleWarp.assetBundle
         isDone = true
         resultData = ab
     end
 
+    --在同一帧下,如果A加载包AB,B加载包AB里的C,如果在它们的回调里释放AB,有可能会使得B没跑完加载AB就被释放了导致报错
+    --因此杜绝在回调里释放AB
     if assetPath then
         if ab then
+            bundleWarp:retain() --先持有下,免得被释放掉了
             local assetRequest = ab:LoadAssetAsync(assetPath)
 
             coroutine.yield(assetRequest)
+            bundleWarp:release(false)    --如果这里超时了可能会造成释放不掉
 
             isDone = assetRequest.isDone
             resultData = assetRequest.asset
@@ -70,12 +81,16 @@ function M:onLoadBundleSync(loaderHandler)
     local bundleWarp = self:getBundleWarp(bundlePath)
     local ab = false
     if not bundleWarp then
-        local fullBundlePath = PathTool.combine(self._assetBundleRootPath,bundlePath)
-        ab = CS.UnityEngine.AssetBundle.LoadFromFile(fullBundlePath)
+        local fullBundlePath = self:_getBundleFullPath(bundlePath)
+        ab = self:_getOrLoadBundle(fullBundlePath)
+
         resultData = ab
         isDone = true
 
         bundleWarp = self:addBundleWrap(bundlePath,ab)
+
+        --添加下子类引用的AB
+        self:_onBundleDependencies(loaderHandler)
     else
         ab = bundleWarp.assetBundle
         resultData = ab
@@ -99,15 +114,17 @@ function M:onLoadBundleSync(loaderHandler)
     return loaderResult
 end
 
-
 function M:ctor()
     self._assetBundleRootPath = false
     self._dependenciesPaths = false
-
+    self._bundleRequestCache = false
     self._bundleWrapCache = false
 end
 
 function M:addBundleWrap(bundlePath,assetBundle)
+    if string.isEmpty(bundlePath) then return end
+    if not assetBundle then return end
+
     self._bundleWrapCache = self._bundleWrapCache or {}
     if not self._bundleWrapCache[bundlePath] then
         local bundleWrap = AssetLoaderWrap.new()
@@ -115,6 +132,7 @@ function M:addBundleWrap(bundlePath,assetBundle)
         bundleWrap.onUnwrap = function ( ... )
            self:_onUnWrap(bundlePath)
         end
+        bundleWrap:release(false) --弱引用释放
         self._bundleWrapCache[bundlePath] = bundleWrap
     end
     return self._bundleWrapCache[bundlePath]
@@ -172,11 +190,50 @@ function M:queryDependencies(bundlePath)
     end
 end
 
+function M:_getBundleFullPath(bundlePath)
+    if not string.isEmpty(self._assetBundleRootPath) then
+        if string.find(bundlePath,self._assetBundleRootPath) then
+            return bundlePath
+        end
+    end
+    return PathTool.combine(self._assetBundleRootPath,bundlePath)
+end
+
+function M:_getOrLoadBundle(bundlePath)
+    --Note:异常处理
+    local bundle = CS.UnityEngine.AssetBundle.LoadFromFile(bundlePath)
+    return bundle
+end
+
+function M:_getOrCreateBundleRequest(bundlePath)
+    self._bundleRequestCache = self._bundleRequestCache or {}
+    local bundleRequestInfo = self._bundleRequestCache[bundlePath]
+    if not bundleRequestInfo then
+        --Note:异常处理
+        local bundleRequest = CS.UnityEngine.AssetBundle.LoadFromFileAsync(bundlePath)
+        self._bundleRequestCache[bundlePath] = {bundleRequest = bundleRequest,refCount = 1}
+    else
+        bundleRequestInfo.refCount = bundleRequestInfo.refCount + 1
+    end
+    return self._bundleRequestCache[bundlePath]
+end
+
+function M:_releaseCreateBundleRequest(bundlePath)
+    if self._bundleRequestCache then
+        local bundleRequestInfo = self._bundleRequestCache[bundlePath]
+        if bundleRequestInfo then
+            bundleRequestInfo.refCount = bundleRequestInfo.refCount - 1
+            if bundleRequestInfo.refCount <= 0 then
+                self._bundleRequestCache[bundlePath] = nil
+            end
+        end
+    end
+end
+
 function M:_onLoadAsync(loaderHandler)
-    --依赖加载
     local path = loaderHandler.path
     local bundlePath,assetPath = sqlitePaths(path)
-    local dependencies = self:queryDependencies(bundlePath)
+    local dependencies = self:queryDependencies(bundlePath)    --依赖加载
     if dependencies then
         for _,dependPath in ipairs(dependencies) do 
             local childHandler = self:_getOrCreateAsyncHandler(dependPath)
@@ -222,5 +279,17 @@ function M:_onUnWrap(bundlePath)
     self:removeBundleWrap(bundlePath)
 end
 
+--增持依赖引用
+function M:_onBundleDependencies(loaderHandler)
+    local path = loaderHandler.path
+    local bundlePath,assetPath = sqlitePaths(path)
+    local dependencies = self:queryDependencies(bundlePath)
+    if dependencies then
+        for _,dependPath in ipairs(dependencies) do 
+            local childBundleWarp = self:getBundleWarp(dependPath)
+            if childBundleWarp then childBundleWarp:retain() end
+        end
+    end
+end
 rawset(_G, "AssetBundleLoader", M)
 return M

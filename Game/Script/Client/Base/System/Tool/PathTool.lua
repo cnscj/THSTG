@@ -14,7 +14,7 @@ function M.combine(path1,path2)
     local newPath2 = M.normalize(path2)
     
     local endChar = string.sub(newPath1,string.len(newPath1))
-    if endChar == "/" then
+    if endChar == "/" or string.isEmpty(endChar) then
         return newPath1 .. newPath2
     end
     return newPath1 .."/".. newPath2
@@ -33,7 +33,7 @@ function M.getFileName(filename)
     if string.isEmpty(filename) then
         return filename
     end
-    local name = string.match(filename, ".+/([^/]*%.%w+)$")
+    local name = string.match(filename, ".+/([^/]*%.?%w+)$")
     return name or filename
 end
 

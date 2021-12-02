@@ -25,7 +25,7 @@ function M:initPackages()
                 break
             end
 
-            UIPackageManager:addPackage(v.name)
+            UIPackageManager:loadPackage(v.name)
 
             break
         end
