@@ -24,24 +24,26 @@ function M:onLoadBundleAsync(loaderHandler)
     if not bundleWarp then
         local fullBundlePath = self:_getBundleFullPath(bundlePath)
         local bundleRequestInfo = self:_getOrCreateBundleRequest(fullBundlePath)
-        local bundleRequest = bundleRequestInfo.bundleRequest
-        local requestRefCount = bundleRequestInfo.refCount
-        --NOTE:添加下子AB的依赖,写这里感觉不太对
-        if requestRefCount == 1 then
-            loaderHandler:addCallback(self._onBundleDependencies,self)
+        if bundleRequestInfo then
+            local bundleRequest = bundleRequestInfo.bundleRequest
+            local requestRefCount = bundleRequestInfo.refCount
+            --NOTE:添加下子AB的依赖,写这里感觉不太对
+            if requestRefCount == 1 then
+                loaderHandler:addCallback(self._onBundleDependencies,self)
+            end
+            while (not bundleRequest.isDone) do
+                coroutine.yield() 
+            end
+
+            coroutine.yield(bundleRequest)
+
+            ab = bundleRequest.assetBundle
+            isDone = bundleRequest.isDone
+            resultData = ab
+
+            bundleWarp = self:addBundleWrap(bundlePath,ab)
+            self:_releaseCreateBundleRequest(fullBundlePath)
         end
-        while (not bundleRequest.isDone) do
-            coroutine.yield() 
-        end
-
-        coroutine.yield(bundleRequest)
-
-        ab = bundleRequest.assetBundle
-        isDone = bundleRequest.isDone
-        resultData = ab
-
-        bundleWarp = self:addBundleWrap(bundlePath,ab)
-        self:_releaseCreateBundleRequest(fullBundlePath)
     else
         ab = bundleWarp.assetBundle
         isDone = true
@@ -84,13 +86,15 @@ function M:onLoadBundleSync(loaderHandler)
         local fullBundlePath = self:_getBundleFullPath(bundlePath)
         ab = self:_getOrLoadBundle(fullBundlePath)
 
-        resultData = ab
-        isDone = true
+        if ab then
+            resultData = ab
+            isDone = true
 
-        bundleWarp = self:addBundleWrap(bundlePath,ab)
+            bundleWarp = self:addBundleWrap(bundlePath,ab)
 
-        --添加下子类引用的AB
-        self:_onBundleDependencies(loaderHandler)
+            --添加下子类引用的AB
+            self:_onBundleDependencies(loaderHandler)
+        end
     else
         ab = bundleWarp.assetBundle
         resultData = ab
@@ -183,7 +187,6 @@ function M:loadManifest(manifestPath)
     end
 end
 
-
 function M:queryDependencies(bundlePath)
     if self._dependenciesPaths then
        return self._dependenciesPaths[bundlePath]
@@ -211,6 +214,7 @@ function M:_getOrCreateBundleRequest(bundlePath)
     if not bundleRequestInfo then
         --Note:异常处理
         local bundleRequest = CS.UnityEngine.AssetBundle.LoadFromFileAsync(bundlePath)
+        if not bundleRequest then return end 
         self._bundleRequestCache[bundlePath] = {bundleRequest = bundleRequest,refCount = 1}
     else
         bundleRequestInfo.refCount = bundleRequestInfo.refCount + 1
@@ -275,7 +279,7 @@ function M:_onUnWrap(bundlePath)
     end
     local bundleWrap = self:getBundleWarp(bundlePath)
     local assetBundle = bundleWrap.asset
-    if assetBundle then assetBundle:Unload(true) end
+    if assetBundle then assetBundle:Unload(false) end   --如果不严格使用引用计数错误释放会很麻烦,这里就不进行完全释放了
     self:removeBundleWrap(bundlePath)
 end
 

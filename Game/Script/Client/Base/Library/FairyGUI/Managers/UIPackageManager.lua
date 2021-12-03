@@ -10,7 +10,7 @@ local M = class("UIPackageManager",false,{
     }
 })
 function M:ctor()    
-    self.loadMode = M.LoadMode.AssetBundle  --加载模式,AB或者编辑器模式
+    self.loadMode = M.LoadMode.Editor  --加载模式,AB或者编辑器模式
     self.abFolderName = ""
     self.descSuffix = "_fui.ab"
     self.resSuffix = "_res.ab"
@@ -131,8 +131,18 @@ function M:_removePackageInfo(packageName)
     end
 end
 
-function M:_queryDependencies(packageName)
+function M:_queryDependencies(package)
+    if not package then return end
 
+    local depList = {}
+    local depArray = package.dependencies
+    if depArray and depArray.Length > 0 then 
+        for i = 0,depArray.Length - 1 do 
+            local depPath = depArray[i]
+            table.insert( depList, depPath )
+        end
+    end
+    return depList
 end
 
 --
@@ -143,6 +153,7 @@ function M:_onLoadEditorAsync(path,onSuccess,onFailed)
 end
 
 function M:_onLoadEditorSync(path,onSuccess,onFailed)
+    --使用AddPackage函数加载desc的bytes文件,需要自定义加载函数
     local package = FairyGUI.UIPackage.AddPackage(path)
     self:_addPackageInfo(package)
 end

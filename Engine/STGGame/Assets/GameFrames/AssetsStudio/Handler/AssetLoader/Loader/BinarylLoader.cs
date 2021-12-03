@@ -68,6 +68,23 @@ namespace ASGame
 
         }
 
+        //protected void Test()
+        //{
+        //    var path = @"D:\1.txt";
+        //    using (FileStream fsRead = new FileStream(path, FileMode.Open))
+        //    {
+        //        int fsLen = (int)fsRead.Length;
+        //        int stLen = 1024 * 1024;
+        //        byte[] heByte = new byte[fsLen];
+
+        //        int hadReadedLen = 0;
+        //        int needReadLen = hadReadedLen + stLen < fsLen ? stLen : fsLen - hadReadedLen;
+        //        int r = fsRead.Read(heByte, hadReadedLen, needReadLen);
+        //        hadReadedLen = hadReadedLen + r;
+
+        //    }
+        //}
+
     }
 }
 

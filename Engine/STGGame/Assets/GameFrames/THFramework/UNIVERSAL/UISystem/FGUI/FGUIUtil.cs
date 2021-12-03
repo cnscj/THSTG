@@ -212,11 +212,27 @@ namespace THGame.UI
         }
 
         ///////////////////////////
+        ///
+        public static GComponent CreateLayerObject(int sortingOrder, string layerName = null)
+        {
+            var obj = new GComponent();
+            obj.sortingOrder = sortingOrder;
+            obj.SetSize(GRoot.inst.width, GRoot.inst.height);
+            obj.AddRelation(GRoot.inst, RelationType.Size);
+            GRoot.inst.AddChild(obj);
+
+            if (!string.IsNullOrEmpty(layerName))
+            {
+                obj.rootContainer.gameObject.name = layerName;
+            }
+
+            return obj;
+        }
+
         public static string GetUIUrl(string package, string component)
         {
             return UIPackage.GetItemURL(package, component);
         }
-
 
         ///////////////////////////
 

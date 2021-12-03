@@ -7,7 +7,20 @@ local AssetLoaderManagerIns = CSharp.AssetLoaderManagerIns
 ]]
 
 function M:ctor()
+    self._binaryLoader = false
     self._bundlerLoader = false
+end
+
+function M:loadBytesAssetSync(path,onSuccess,onFailed)
+    local loader = self:getOrCreateBinaryLoader()
+    local task = loader:loadAssetSync(path,onSuccess,onFailed)
+    return task
+end
+
+function M:loadBytesAssetAsync(path,onSuccess,onFailed)
+    type = type or CSharp.Object
+    local loader = self:getOrCreateBinaryLoader()
+    return loader:loadAssetAsync(path,onSuccess,onFailed)
 end
 
 function M:loadBundleAssetSync(path,type,onSuccess,onFailed)
@@ -25,6 +38,13 @@ end
 --
 
 --
+function M:getOrCreateBinaryLoader( ... )
+    if not self._binaryLoader then
+        self._binaryLoader = AssetBinaryLoader.new()
+    end
+    return self._binaryLoader
+end
+
 function M:getOrCreateBundlerLoader( ... )
     if not self._bundlerLoader then
         self._bundlerLoader = AssetBundleLoader.new()

@@ -1,10 +1,11 @@
 local M = class("TestController",MVC.Controller)
 -- local RedDotTest = require("Context.Modules.Test.Modules.RedDotTest")
 -- local CoroutineTest = require("Context.Modules.Test.Modules.CoroutineTest")
-local FGUITest = require("Context.Modules.Test.Modules.FGUITest")
+-- local FGUITest = require("Context.Modules.Test.Modules.FGUITest")
 -- local ResLoadTest = require("Context.Modules.Test.Modules.ResLoadTest")
 -- local ECSTest = require("Context.Modules.Test.Modules.ECSTest.ECSTest")
 -- local LuaBehaviourTest = require("Context.Modules.Test.Modules.LuaBehaviourTest")
+local BinaryTest = require("Context.Modules.Test.Modules.BinaryTest")
 function M:ctor()
     Timer:scheduleOnce(10,function ( ... )
         self:dispatchEvent(EventType.TEST_1)
@@ -17,7 +18,8 @@ function M:ctor()
     -- LuaBehaviourTest.new()
 
     -- self.coroutineTest = CoroutineTest.new()
-    self.fguiTest = FGUITest.new()
+    -- self.fguiTest = FGUITest.new()
+    self.binaryTest = BinaryTest.new()
     
     print(15,"@@@@@@@@@@@@")
 end

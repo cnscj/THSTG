@@ -3,6 +3,7 @@ local P_View = require("Config.Profile.P_View")
 local P_Package = require("Config.Profile.P_Package")
 function M:ctor()
     self._packageInfoDict = {}
+    self._parentLayer = {}
 end
 
 function M:setup()
@@ -12,8 +13,6 @@ function M:setup()
         self._packageInfoDict[v.name] = v
     end
 
-    -- TODO:设置加载器
-    -- UIPackageManager:
 end
 
 -- 加载常驻包
@@ -32,6 +31,14 @@ function M:initPackages()
     end
 end
 
+--创建窗口层
+function M:initViewLayers()
+    for k, v in pairs(ViewLayer) do
+        local obj = CSharp.FGUIUtil.CreateLayerObject(v, k .. "Layer")
+        self._parentLayer[v] = GComponent.new(obj)
+    end
+end
+
 function M:getViewConfig( viewName )
     return P_View[viewName]
 end
@@ -40,6 +47,12 @@ function M:initialize()
     self:setup()
 
     self:initPackages()
+    self:initViewLayers()
+end
+-----------------------------------
+
+function M.geParentLayer(viewDepth)
+    return self._parentLayer[viewDepth]
 end
 
 function M:openView(viewName)

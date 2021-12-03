@@ -37,6 +37,7 @@ local _getter = {
     AssetLoaderManagerIns = function() return ASGame.AssetLoaderManager.GetInstance() end,
 
     --THGame
+    FGUIUtil = function() return THGame.UI.FGUIUtil end,
     UIPackageManagerIns = function() return THGame.UI.UIPackageManager.GetInstance() end,
 
     --SEGame
