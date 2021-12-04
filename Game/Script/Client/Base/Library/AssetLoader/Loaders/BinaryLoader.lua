@@ -12,12 +12,11 @@ function M:_loadFileBytesAsync(loaderHandler)
     local fsRead = IO.FileStream(path,IO.FileMode.Open)
     local fsLen = fsRead.Length
     local stLen = 1024 * 1024
-    local heBytes = CS.XLua.BytesRef(fsLen) --TODO:不知为何一直为nil
-
+    local heBytes = CS.XLua.BytesRef(fsLen) 
     local hadReadLen = 0
     while true do 
-        local needReadLen = (hadReadLen + stLen) < fsLen and fsLen or (fsLen - hadReadLen)
-        local r = fsRead:Read(heByte, hadReadLen, needReadLen)
+        local needReadLen = (hadReadLen + stLen) < fsLen and stLen or (fsLen - hadReadLen)
+        local r = fsRead:Read(heBytes, hadReadLen, needReadLen)
         hadReadLen = hadReadLen + r
 
         if hadReadLen >= fsLen then 
@@ -49,7 +48,7 @@ function M:_loadFileBytesSync(loaderHandler)
     return bytes
 end
 
-function M:_onLoadAsync(loaderHandler)
+function M:_onLoadAsync(loaderHandler)    
     local iEnu = coroutine.generator(self._loadFileBytesAsync,self,loaderHandler)
     coroutine.start(iEnu)
 end

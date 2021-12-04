@@ -4,6 +4,8 @@ using FairyGUI.Utils;
 using XLua;
 using UnityEngine;
 using FairyGUI;
+using System.IO;
+using System.Collections;
 
 namespace THGame.UI
 {
@@ -288,5 +290,4 @@ namespace THGame.UI
         }
     }
     #endregion
-
 }

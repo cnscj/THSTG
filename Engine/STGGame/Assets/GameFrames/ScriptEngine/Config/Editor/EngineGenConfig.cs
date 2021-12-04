@@ -56,6 +56,7 @@ public static class EngineGenConfig
     public static List<Type> CSharpCallLua = new List<Type>() {
                 typeof(Func<GameObject, bool>),
                 typeof(Func<double, double, double>),
+                typeof(Func<string, string, Type>),
 
                 typeof(Action),
                 typeof(Action<int>),

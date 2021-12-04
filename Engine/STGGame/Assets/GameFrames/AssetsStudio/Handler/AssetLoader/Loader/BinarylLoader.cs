@@ -9,35 +9,31 @@ namespace ASGame
     {
         protected override IEnumerator OnLoadAssetAsync(AssetLoadHandler handler)
         {
-            string filePath = handler.path;
-
-            FileInfo fi = new FileInfo(filePath);
-            if (fi.Exists)
+            var filePath = handler.path;
+            using (FileStream fsRead = new FileStream(filePath, FileMode.Open))
             {
-                byte[] buff = new byte[fi.Length];
+                int fsLen = (int)fsRead.Length;
+                int stLen = 1024 * 1024;
+                byte[] heByte = new byte[fsLen];
 
-                FileStream fs = fi.OpenRead();
-                bool isCompleted = false;
-                AsyncCallback callBack = new AsyncCallback((ar) =>
+                int hadReadedLen = 0;
+                int needReadLen = hadReadedLen + stLen < fsLen ? stLen : fsLen - hadReadedLen;
+                while (true)
                 {
-                    isCompleted = true;
-
-                    handler.result = new AssetLoadResult(buff, true);
-                    handler.status = AssetLoadStatus.LOAD_FINISHED;
-                    handler.Callback();
-                });
-
-                fs.BeginRead(buff, 0, buff.Length, callBack, null);
-                fs.Close();
-
-                while (!isCompleted) yield return null;
-            }
-            else
-            {
-                handler.result = AssetLoadResult.EMPTY_RESULT;
-                handler.status = AssetLoadStatus.LOAD_ERROR;
-                handler.Callback();
-                yield break;
+                    int r = fsRead.Read(heByte, hadReadedLen, needReadLen);
+                    hadReadedLen = hadReadedLen + r;
+                    if (hadReadedLen >= fsLen)
+                    {
+                        handler.result = new AssetLoadResult(heByte, true);
+                        handler.status = AssetLoadStatus.LOAD_FINISHED;
+                        handler.Callback();
+                        yield break;
+                    }
+                    else
+                    {
+                        yield return null;
+                    }
+                }
             }
         }
 
@@ -67,24 +63,6 @@ namespace ASGame
             }
 
         }
-
-        //protected void Test()
-        //{
-        //    var path = @"D:\1.txt";
-        //    using (FileStream fsRead = new FileStream(path, FileMode.Open))
-        //    {
-        //        int fsLen = (int)fsRead.Length;
-        //        int stLen = 1024 * 1024;
-        //        byte[] heByte = new byte[fsLen];
-
-        //        int hadReadedLen = 0;
-        //        int needReadLen = hadReadedLen + stLen < fsLen ? stLen : fsLen - hadReadedLen;
-        //        int r = fsRead.Read(heByte, hadReadedLen, needReadLen);
-        //        hadReadedLen = hadReadedLen + r;
-
-        //    }
-        //}
-
     }
 }
 

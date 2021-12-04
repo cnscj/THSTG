@@ -1,7 +1,7 @@
 local M = class("TestController",MVC.Controller)
 -- local RedDotTest = require("Context.Modules.Test.Modules.RedDotTest")
 -- local CoroutineTest = require("Context.Modules.Test.Modules.CoroutineTest")
--- local FGUITest = require("Context.Modules.Test.Modules.FGUITest")
+local FGUITest = require("Context.Modules.Test.Modules.FGUITest")
 -- local ResLoadTest = require("Context.Modules.Test.Modules.ResLoadTest")
 -- local ECSTest = require("Context.Modules.Test.Modules.ECSTest.ECSTest")
 -- local LuaBehaviourTest = require("Context.Modules.Test.Modules.LuaBehaviourTest")

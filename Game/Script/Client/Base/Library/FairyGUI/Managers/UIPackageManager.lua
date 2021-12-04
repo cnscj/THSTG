@@ -12,8 +12,10 @@ local M = class("UIPackageManager",false,{
 function M:ctor()    
     self.loadMode = M.LoadMode.Editor  --加载模式,AB或者编辑器模式
     self.abFolderName = ""
-    self.descSuffix = "_fui.ab"
-    self.resSuffix = "_res.ab"
+    self.abSuffix = ".ab"
+    self.byteSuffix = ".bytes"
+    self.descSuffix = "_fui"
+    self.resSuffix = "_res"
 
 
     self._packageInfosDict = false
@@ -99,6 +101,16 @@ function M:getDescPathAndResPathByFullPath(fullPath)
     return descAbFilePath,resAbFilePath
 end
 
+function M:getDescBundlePathAndRedBundlePathByFullPath(fullPath)
+    local descPath,resPath = self:getDescPathAndResPathByFullPath(fullPath)
+    return descPath .. self.abSuffix, resPath .. self.abSuffix
+end
+
+function M:getDescBinaryPathByFullPath(fullPath)
+    local descPath,resPath = self:getDescPathAndResPathByFullPath(fullPath)
+    return descPath .. self.byteSuffix
+end
+
 function M:_getPackageInfo(packageName)
     if not self._packageInfosDict then 
         return false
@@ -154,7 +166,15 @@ end
 
 function M:_onLoadEditorSync(path,onSuccess,onFailed)
     --使用AddPackage函数加载desc的bytes文件,需要自定义加载函数
-    local package = FairyGUI.UIPackage.AddPackage(path)
+    local descBinaryPath = self:getDescBinaryPathByFullPath(path)
+    local task = AssetLoaderManager:loadBytesAssetSync(descBinaryPath)
+    local bytes = task:getData()
+    local package = CS.THGame.UI.LuaMethodHelper.LoadPackageInPcCustom(bytes,"",function (name, extension, type)
+        --TODO:
+        return 
+    end)
+
+    print(15,package,"@@@")
     self:_addPackageInfo(package)
 end
 
@@ -168,8 +188,8 @@ function M:_onLoadAssetBundleAsync(path,onSuccess,onFailed)
             self:_addPackageInfo(package)
         end
     end
-    local descPath,resPath = self:getDescPathAndResPathByFullPath(path)
-    AssetLoaderManager:loadBundleAssetAsync(descPath,false,function ( result )
+    local descBundlePath,resBundlePath = self:getDescBundlePathAndRedBundlePathByFullPath(path)
+    AssetLoaderManager:loadBundleAssetAsync(descBundlePath,false,function ( result )
         callCount = callCount + 1
         descAb = result.data
         try2AddPack()
@@ -177,7 +197,7 @@ function M:_onLoadAssetBundleAsync(path,onSuccess,onFailed)
         callCount = callCount + 1
         try2AddPack()
     end)
-    AssetLoaderManager:loadBundleAssetAsync(resPath,false,function ( ... )
+    AssetLoaderManager:loadBundleAssetAsync(resBundlePath,false,function ( ... )
         callCount = callCount + 1
         resAb = result.data
         try2AddPack()
