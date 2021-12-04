@@ -18,8 +18,8 @@ function M:ctor()
     -- LuaBehaviourTest.new()
 
     -- self.coroutineTest = CoroutineTest.new()
-    -- self.fguiTest = FGUITest.new()
-    self.binaryTest = BinaryTest.new()
+    self.fguiTest = FGUITest.new()
+    -- self.binaryTest = BinaryTest.new()
     
     print(15,"@@@@@@@@@@@@")
 end

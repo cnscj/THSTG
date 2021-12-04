@@ -4,6 +4,7 @@
 local M = class("FWidget", GComponent)
 
 function M:ctor(obj,args)
+    args = args or {}
     -- FGUI中的资源包名
     self._package = args.package or ""
     -- 资源包中的组件
@@ -26,17 +27,23 @@ function M:ctor(obj,args)
     self._fairyBatching = false
 end
 
-function M:init(obj)
+function M:init(obj,args)
     self._root = self
     self._rootGO = obj
 
     self:__initObj()
 end
 
+-- 准备addChild到场景
+function M:toAdd()
+    -- if not self._parent:isDisposed() and self._root and not self._root:isDisposed() then
+    --     self._parent:addChild(self._root)
+    -- end
+end
 
 function M:toCreate()
     -- 创建时，先判断一下父节点
-    if self._parent:isDisposed() then
+    if self._parent and self._parent:isDisposed() then
         return
     end
 
@@ -85,10 +92,15 @@ function M:__initObj()
         end)
         self:_initUI()
     end
+
+    self:toAdd()
 end
 
 function M:__loadPackageCallback(...)
     self._obj = UIPackageManager:createObject(self._package ,self._component)
+    if not self._obj then return end 
+
+    print(15,self._root,"self._root")
     self._root = FGUIUtil.createComp(self._obj)
     self._rootGO = obj
     
@@ -101,6 +113,7 @@ function M:__readyPreloadResList()
     end
 
     if not UIPackageManager:isLoadedPackage(self._package) then
+        --TODO:需要设置下路径
         UIPackageManager:loadPackage(self._package ,self._loadMethod, function ( ... )
             self:__loadPackageCallback(...)
         end)
