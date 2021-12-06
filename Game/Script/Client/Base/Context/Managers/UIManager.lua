@@ -3,9 +3,13 @@ local P_View = require("Config.Profile.P_View")
 local P_Package = require("Config.Profile.P_Package")
 function M:ctor()
     self._packageInfoDict = {}
+
+    self._parentLayerName = {}
     self._parentLayer = {}
 
-    self.__openedViews = {}    --正在打开的窗口
+    self._openedViews = {}    --正在打开的窗口
+
+    self:setup()
 end
 
 function M:setup()
@@ -14,6 +18,11 @@ function M:setup()
         self._packageInfoDict[v.name] = v
     end
 
+    for k, v in pairs(ViewLayer) do
+        self._parentLayerName[v] = k
+    end
+
+    UIPackageManager.abFolderName = PathConfig.getFGuiEditorPath()
 end
 
 -- 加载常驻包
@@ -35,15 +44,16 @@ end
 --创建窗口层
 function M:initViewLayers()
     for k, v in pairs(ViewLayer) do
-        local obj = CSharp.FGUIUtil.CreateLayerObject(v, k .. "Layer")
-        self._parentLayer[v] = GComponent.new(obj)
+        if not self._parentLayer[v] then
+            local obj = CSharp.FGUIUtil.CreateLayerObject(v, k .. "Layer")
+            self._parentLayer[v] = GComponent.new(obj)
+        end
     end
+
 end
 
 
 function M:initialize()
-    self:setup()
-
     self:initPackages()
     self:initViewLayers()
 end
@@ -53,10 +63,18 @@ function M:getViewConfig(viewName)
 end
 
 function M:getParentLayer(viewDepth)
+    if not self._parentLayer[viewDepth]  then
+        local layerName = self._parentLayerName[viewDepth]
+        if layerName then
+            local obj = CSharp.FGUIUtil.CreateLayerObject(viewDepth, layerName .. "Layer")
+            self._parentLayer[viewDepth] = GComponent.new(obj)
+        end
+    end
     return self._parentLayer[viewDepth]
 end
 
 --
+
 function M:_newView(viewName,args)
     local viewConfig = self:getViewConfig(viewName)
     if viewConfig then
@@ -75,12 +93,12 @@ function M:createView(viewName,args)
     local view = self:_newView(viewName,args)
     if not view then return end 
 
-    self.__openedViews[viewName] = self.__openedViews[viewName] or {}
-    self.__openedViews[viewName][view] = view
+    self._openedViews[viewName] = self._openedViews[viewName] or {}
+    self._openedViews[viewName][view] = view
 end
 
 function M:getViews(viewName)
-    return self.__openedViews[viewName]
+    return self._openedViews[viewName]
 end
 
 function M:getView(viewName)
@@ -107,20 +125,23 @@ function M:openView(viewName,args)
         return 
     end
 
-    self.__openedViews[viewName] = self.__openedViews[viewName] or {}
-    self.__openedViews[viewName][view] = view
+    self._openedViews[viewName] = self._openedViews[viewName] or {}
+    self._openedViews[viewName][view] = view
 end
 
 function M:closeViewByView(view)
     if not view then return end
-    --TODO:常驻窗口不用清理
+
 
     local viewName = view:getViewName()
     local viewDict = self:getViews(viewName)
-    if not next(viewDict) then self.__openedViews[viewName] = nil end 
+    if not next(viewDict) then self._openedViews[viewName] = nil end 
+
+    --TODO:常驻窗口不用清理
+    --包引用及依赖减持,常驻包不清理
 
     --从父节点移除
-
+    view:removeFromParent()
 end
 
 function M:closeView(viewName)
@@ -137,7 +158,7 @@ function M:closeAllViews(viewName)
             self:closeViewByView(view)
         end
     else    --所有
-        for _,dict in pairs(self.__openedViews) do
+        for _,dict in pairs(self._openedViews) do
             for _,view in pairs(dict) do
                 self:closeViewByView(view)
             end

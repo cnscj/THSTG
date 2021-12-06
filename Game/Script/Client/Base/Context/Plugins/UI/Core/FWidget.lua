@@ -29,16 +29,18 @@ end
 
 function M:init(obj,args)
     self._root = self
-    self._rootGO = obj
+    self._rootGO = obj or false
 
     self:__initObj()
 end
 
 -- 准备addChild到场景
 function M:toAdd()
-    -- if not self._parent:isDisposed() and self._root and not self._root:isDisposed() then
-    --     self._parent:addChild(self._root)
-    -- end
+    if self._parent then
+        if not self._parent:isDisposed() and self._root and not self._root:isDisposed() then
+            self._parent:addChild(self._root)
+        end
+    end
 end
 
 function M:toCreate()
@@ -98,11 +100,13 @@ end
 
 function M:__loadPackageCallback(...)
     self._obj = UIPackageManager:createObject(self._package ,self._component)
-    if not self._obj then return end 
+    if not self._obj then
+        printError(string.format( "Check that component %s is set to export",self._component))
+        return 
+    end 
 
-    print(15,self._root,"self._root")
     self._root = FGUIUtil.createComp(self._obj)
-    self._rootGO = obj
+    self._rootGO = self._obj or false
     
     self:__initObj()
 end
@@ -113,7 +117,6 @@ function M:__readyPreloadResList()
     end
 
     if not UIPackageManager:isLoadedPackage(self._package) then
-        --TODO:需要设置下路径
         UIPackageManager:loadPackage(self._package ,self._loadMethod, function ( ... )
             self:__loadPackageCallback(...)
         end)
