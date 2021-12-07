@@ -4,18 +4,15 @@
 local M = class("FWidget", GComponent)
 
 function M:ctor(obj,args)
-    args = args or {}
     -- FGUI中的资源包名
-    self._package = args.package or ""
+    self._package = args and args.package or ""
     -- 资源包中的组件
-    self._component = args.component or ""
+    self._component = args and args.component or ""
 
     ---ui根节点(Lua层的GComponet)
     self._root = false
     --显示对象根节点(Unity层的GameObject)
     self._rootGO = false
-    ---ui父节点，如在窗口中可能对应窗口内的contentNode节点对象
-    self._parent = false
     --加载方式,如果为true为异步,false,为同步
     self._loadMethod = false
 
@@ -29,7 +26,7 @@ end
 
 function M:init(obj,args)
     self._root = self
-    self._rootGO = obj or false
+    self._rootGO = obj and obj.displayObject.gameObject or false
 
     self:__initObj()
 end
@@ -82,10 +79,10 @@ function M:__clearEventListeners()
 end
 
 function M:__initObj()
-    if self._fairyBatching then
-        self._obj.fairyBatching = self._fairyBatching
-    end
     if self._obj then
+        if self._fairyBatching then
+            self._obj.fairyBatching = self._fairyBatching
+        end
         self._obj.onAddedToStage:Add(function ()
             self:__onAddedToStage()
         end)
@@ -93,21 +90,27 @@ function M:__initObj()
             self:_onRemovedFromStage()
         end)
         self:_initUI()
+        self:toAdd()
     end
-
-    self:toAdd()
 end
 
-function M:__loadPackageCallback(...)
+function M:__loadPackageCallback(packageWrap)
     self._obj = UIPackageManager:createObject(self._package ,self._component)
     if not self._obj then
-        printError(string.format( "Check that component %s is set to export",self._component))
+        printError(string.format("Check that component %s is set to export", self._component))
         return 
     end 
 
-    self._root = FGUIUtil.createComp(self._obj)
-    self._rootGO = self._obj or false
-    
+    self._root = self
+    self._rootGO = self._obj and self._obj.displayObject.gameObject or false
+
+    self._obj.onAddedToStage:Add(function ()
+        UIPackageManager:retainPackage(self._package)
+    end)
+    self._obj.onRemovedFromStage:Add(function ()
+        UIPackageManager:releasePackage(self._package)
+    end)
+
     self:__initObj()
 end
 
@@ -116,13 +119,9 @@ function M:__readyPreloadResList()
         return 
     end
 
-    if not UIPackageManager:isLoadedPackage(self._package) then
-        UIPackageManager:loadPackage(self._package ,self._loadMethod, function ( ... )
-            self:__loadPackageCallback(...)
-        end)
-    else
-        self:__loadPackageCallback()
-    end
+    UIPackageManager:loadPackage(self._package ,self._loadMethod, function ( packageWrap )
+        self:__loadPackageCallback(packageWrap)
+    end)
 end
 
 -- 运行定时器

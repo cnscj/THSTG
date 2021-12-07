@@ -17,7 +17,7 @@ function M:ctor()
     self.descSuffix = "_fui"
     self.resSuffix = "_res"
 
-    self._packageInfosDict = false
+    self._packageWrapCache = false
     self._dependenciesDict = false
     self._itemExistDict = false
 
@@ -25,13 +25,15 @@ function M:ctor()
 end
 
 function M:isLoadedPackage(packageName)
-    local packageInfo = self:_getPackageInfo(packageName)
-    return packageInfo and true or false
+    local packageWrap = self:_getPackageWrap(packageName)
+    return packageWrap and true or false
 end
 
 function M:loadPackage(path,loadMethod,onSuccess,onFailed)
-    local packageName = self:getPackageNameByFullPath(path)
-    if self:isLoadedPackage(packageName) then
+    local packageName = self:_getPackageNameByFullPath(path)
+    local packageWrap = self:_getPackageWrap(packageName)
+    if packageWrap then
+        if onSuccess then onSuccess(packageWrap) end
         return
     end
 
@@ -42,93 +44,111 @@ function M:loadPackage(path,loadMethod,onSuccess,onFailed)
         loadMethod = M.LoadMethod.Sync
     end
 
-    local newSuccess = function(package)
-        local dependencies = self:_queryDependencies(package)
-        local directorName = self:getDirectorNameByFullPath(path)
-
-        for _,depPackageName in ipairs(dependencies) do 
-            local depPackagePath = PathTool.combine(directorName, depPackageName)
-            self:loadPackage(depPackagePath,loadMethod,false,onFailed)
+    local successOrLoadChild = function(packageWrap)
+        local dependencies = self:_queryDependencies(packageWrap.package)
+        local directorName = self:_getDirectorNameByFullPath(path)
+        if dependencies then
+            for _,depPackageName in ipairs(dependencies) do 
+                local depPackagePath = PathTool.combine(directorName, depPackageName)
+                self:loadPackage(depPackagePath,loadMethod,function (childPackageWrap)
+                    childPackageWrap:retain() --这里加载完成需要添加下依赖,只加一次即可
+                end,onFailed)  
+            end
         end
-
-        if onSuccess then onSuccess(package) end
+        if onSuccess then onSuccess(packageWrap) end
     end
     
     if loadMethod == M.LoadMethod.Async then
         if self.loadMode == M.LoadMode.Editor then
-            self:_onLoadEditorAsync(path,newSuccess,onFailed)
+            self:_onLoadEditorAsync(path,successOrLoadChild,onFailed)
         elseif self.loadMode == M.LoadMode.AssetBundle then
-            self:_onLoadAssetBundleAsync(path,newSuccess,onFailed)
+            self:_onLoadAssetBundleAsync(path,successOrLoadChild,onFailed)
         end
     elseif loadMethod == M.LoadMethod.Sync then
         if self.loadMode == M.LoadMode.Editor then
-            self:_onLoadEditorSync(path,newSuccess,onFailed)
+            self:_onLoadEditorSync(path,successOrLoadChild,onFailed)
         elseif self.loadMode == M.LoadMode.AssetBundle then
-            self:_onLoadAssetBundleSync(path,newSuccess,onFailed)
+            self:_onLoadAssetBundleSync(path,successOrLoadChild,onFailed)
         end
     end
 end
 
 function M:unloadPackage(path)
-    local packageName = self:getPackageNameByFullPath(path)
+    local packageName = self:_getPackageNameByFullPath(path)
     if not self:isLoadedPackage(packageName) then
         return
     end
 
     --卸载
-    local packageInfo = self:_getPackageInfo(packageName)
-    if packageInfo then 
-        packageInfo:_onRelease()
+    local packageWrap = self:_getPackageWrap(packageName)
+    if packageWrap then 
+        packageWrap:destroy()
     end
 end
 
 function M:retainPackage(packageName)
-    local packageInfo = self:_getPackageInfo(packageName)
-    if packageInfo then 
-        packageInfo:retain()
+    local packageWrap = self:_getPackageWrap(packageName)
+    if packageWrap then 
+        packageWrap:retain()
     end
 end
 
 function M:releasePackage(packageName)
-    local packageInfo = self:_getPackageInfo(packageName)
-    if packageInfo then 
-        packageInfo:release()
+    local packageWrap = self:_getPackageWrap(packageName)
+    if packageWrap then 
+        packageWrap:release()
     end
 end
 
 ---
-function M:createObject(packageName, componentName)
-    local obj = FairyGUI.UIPackage.CreateObject(packageName, componentName)
-    return obj
-end
-
-function M:isItemExist(path)
+function M:isUIExist(url)
     self._itemExistDict = self._itemExistDict or {}
-    if not self._itemExistDict[path] then
-        self._itemExistDict[path] = FairyGUI.UIPackage.GetItemByURL(path)
+    if not self._itemExistDict[url] then
+        self._itemExistDict[url] = FairyGUI.UIPackage.GetItemByURL(url)
     end
-    return self._itemExistDict[path]
+    return self._itemExistDict[url]
+end
+
+function M:createObject(packageName, componentName)
+    if self:isLoadedPackage(packageName) then
+        local obj = FairyGUI.UIPackage.CreateObject(packageName, componentName)
+        if obj then
+            return obj
+        else
+            error(string.format("The component [%s] is not exported or does not exist.",componentName))
+        end
+    else
+        error(string.format("Package [%s] is not loaded.",packageName))
+    end
+end
+
+function M:createComponent(packageName, componentName, userCls, args)
+    local obj = self:createObject(packageName, componentName)
+    if obj then
+        userCls = userCls or GComponent
+        return userCls.new(obj, args)
+    end
 end
 ---
-function M:getDirectorNameByFullPath(fullPath)
+function M:_getDirectorNameByFullPath(fullPath)
     local directorName = PathTool.getDirectoryName(fullPath)
     if string.isEmpty(directorName) then directorName = self.abFolderName end 
     return directorName
 end
 
-function M:getPackageNameByFullPath(fullPath)
+function M:_getPackageNameByFullPath(fullPath)
     return PathTool.getFileNameWithoutExtension(fullPath)
 end
 
-function M:getFullPathByPackageName(packageName)
-    local directorName = self:getDirectorNameByFullPath(packageName)
-    local realPackageName = self:getPackageNameByFullPath(packageName)
+function M:_getFullPathByPackageName(packageName)
+    local directorName = self:_getDirectorNameByFullPath(packageName)
+    local realPackageName = self:_getPackageNameByFullPath(packageName)
     return PathTool.combine(directorName,realPackageName)
 end
 
-function M:getDescPathAndResPathByFullPath(fullPath)
-    local packageName = self:getPackageNameByFullPath(fullPath)
-    local directorName = self:getDirectorNameByFullPath(fullPath)
+function M:_getDescPathAndResPathByFullPath(fullPath)
+    local packageName = self:_getPackageNameByFullPath(fullPath)
+    local directorName = self:_getDirectorNameByFullPath(fullPath)
 
     local descFileName = string.format("%s%s", packageName, self.descSuffix)
     local resFileName = string.format("%s%s", packageName, self.resSuffix)
@@ -138,19 +158,19 @@ function M:getDescPathAndResPathByFullPath(fullPath)
     return descAbFilePath,resAbFilePath
 end
 
-function M:getDescBundlePathAndRedBundlePathByFullPath(fullPath)
-    local descPath,resPath = self:getDescPathAndResPathByFullPath(fullPath)
+function M:_getDescBundlePathAndRedBundlePathByFullPath(fullPath)
+    local descPath,resPath = self:_getDescPathAndResPathByFullPath(fullPath)
     return descPath .. self.abSuffix, resPath .. self.abSuffix
 end
 
-function M:getDescBinaryPathByFullPath(fullPath)
-    local descPath,resPath = self:getDescPathAndResPathByFullPath(fullPath)
+function M:_getDescBinaryPathByFullPath(fullPath)
+    local descPath,resPath = self:_getDescPathAndResPathByFullPath(fullPath)
     return descPath .. self.byteSuffix
 end
 
 
-function M:_getPackageInfo(packageName)
-    if not self._packageInfosDict then 
+function M:_getPackageWrap(packageName)
+    if not self._packageWrapCache then 
         return false
     end
 
@@ -158,31 +178,33 @@ function M:_getPackageInfo(packageName)
         return false
     end
     
-    return self._packageInfosDict[packageName]
+    return self._packageWrapCache[packageName]
 end
 
-function M:_addPackageInfo(package)
+function M:_addPackageWrap(package)
     if not package then return end 
 
     local packageName = package.name 
-    self._packageInfosDict = self._packageInfosDict or {}
-    if not self:_getPackageInfo(packageName) then
-        local packageInfo = FairyGUIPackageWrap.new()
-        packageInfo.package = package
-        packageInfo.onUnwrap = function ( ... )
-            self:_removePackageInfo()
+    self._packageWrapCache = self._packageWrapCache or {}
+    if not self:_getPackageWrap(packageName) then
+        local packageWrap = FairyGUIPackageWrap.new()
+        packageWrap.package = package
+        packageWrap.onUnwrap = function ( ... )
+            self:_removePackageWrap(packageName)
         end
-        self._packageInfosDict[packageName] = packageInfo
+        self._packageWrapCache[packageName] = packageWrap
+        packageWrap:release(false)
     end
-    return self._packageInfosDict[packageName]
+    return self._packageWrapCache[packageName]
 end
 
-function M:_removePackageInfo(packageName)
+function M:_removePackageWrap(packageName)
     if string.isEmpty(packageName) then 
         return false
     end
-end
 
+    self._packageWrapCache[packageName] = nil
+end
 
 function M:update()
 
@@ -192,25 +214,26 @@ end
 function M:_queryDependencies(package)
     if not package then return end
 
-    local depList = {}
     local depArray = CS.THGame.UI.LuaMethodHelper.GetPackageDependencies(package)
     if depArray and depArray.Length > 0 then 
+        local depList = {}
         for i = 0,depArray.Length - 1 do 
             local packageName = depArray[i]
             table.insert( depList, packageName )
         end
+        return depList
     end
-    return depList
+    return
 end
 
 --
 function M:_onLoadCallback(package,path,onSuccess,onFailed)
     if package then
-        self:_addPackageInfo(package)
-        if onSuccess then onSuccess(package) end
+        local packageWrap = self:_addPackageWrap(package)
+        if onSuccess then onSuccess(packageWrap) end
     else
-        local packageName = self:getPackageNameByFullPath(path)
-        printError(string.format("Package %s could not be found",packageName))
+        local packageName = self:_getPackageNameByFullPath(path)
+        printError(string.format("Package [%s] could not be found",packageName))
         if onFailed then onFailed(path) end
     end
 end
@@ -223,39 +246,39 @@ end
 
 function M:_onLoadEditorSync(path,onSuccess,onFailed)
     --使用AddPackage函数加载desc的bytes文件,需要自定义加载函数
-    local descBinaryPath = self:getDescBinaryPathByFullPath(path)
+    local fullPackageNamePath = self:_getFullPathByPackageName(path)
+    local descBinaryPath = self:_getDescBinaryPathByFullPath(path)
     local descTask = AssetLoaderManager:loadBytesAssetSync(descBinaryPath)
     local descBytes = descTask:getData()
-    local package = CS.THGame.UI.LuaMethodHelper.LoadPackageInPcCustom(descBytes,function (name, extension, type)
-        --Resource type. e.g. 'Texture' 'AudioClip'
-        local directorName = self:getDirectorNameByFullPath(path)
-        local packageName = self:getPackageNameByFullPath(path)
-        local resBinaryPath = PathTool.combine(directorName,string.format("%s_%s%s",packageName,name, extension))
-
-        if type == typeof(CS.UnityEngine.AudioClip) then
-            if (extension == ".ogg") then
-
-            elseif (extension == ".wav") then
+    if descBytes then
+        local package = CS.THGame.UI.LuaMethodHelper.LoadPackageInPcCustom(descBytes,fullPackageNamePath,function (name, extension, type)
+            --Resource type. e.g. 'Texture' 'AudioClip'
+            local resBinaryPath = string.format("%s%s", name, extension)
+            if type == typeof(CS.UnityEngine.AudioClip) then
+                if (extension == ".ogg") then
+                    local task = AssetLoaderManager:loadBytesAssetSync(resBinaryPath)
+                    local bytes = task:getData()
+                    local audioClip = CS.THGame.UI.AudioUtil.ByteToOggAudioClip(bytes)
+                    return audioClip
+                elseif (extension == ".wav") then
+                    local task = AssetLoaderManager:loadBytesAssetSync(resBinaryPath)
+                    local bytes = task:getData()
+                    local audioClip = CS.THGame.UI.AudioUtil.ByteToWavAudioClip(bytes)
+                    return audioClip
+                end
+            elseif type == typeof(CS.UnityEngine.Texture) then
                 local task = AssetLoaderManager:loadBytesAssetSync(resBinaryPath)
                 local bytes = task:getData()
-                local audioClip = CS.THGame.UI.WavUtil.ToAudioClip(bytes)
-                audioClip.name = PathTool.getFileNameWithoutExtension(name)
-                return audioClip
-            end
-        else
-            local task = AssetLoaderManager:loadBytesAssetSync(resBinaryPath)
-            local bytes = task:getData()
-            if type == typeof(CS.UnityEngine.Texture) then
                 local texture = CS.THGame.UI.TextureUtil.Bytes2Texture2d(bytes)
-                texture.name = PathTool.getFileNameWithoutExtension(name)
                 return texture
             end
-        end
-        
-        return
-    end)
+            return
+        end)
 
-    self:_onLoadCallback(package,path,onSuccess,onFailed)
+        self:_onLoadCallback(package,path,onSuccess,onFailed)
+    else
+        if onFailed then onFailed(path) end
+    end
 end
 
 function M:_onLoadAssetBundleAsync(path,onSuccess,onFailed)
@@ -273,7 +296,7 @@ function M:_onLoadAssetBundleAsync(path,onSuccess,onFailed)
         try2AddPack()
     end
 
-    local descBundlePath,resBundlePath = self:getDescBundlePathAndRedBundlePathByFullPath(path)
+    local descBundlePath,resBundlePath = self:_getDescBundlePathAndRedBundlePathByFullPath(path)
     AssetLoaderManager:loadBundleAssetAsync(descBundlePath,false,function ( result )
         descAb = result.data
         addCallCount()
@@ -285,7 +308,7 @@ function M:_onLoadAssetBundleAsync(path,onSuccess,onFailed)
 end
 
 function M:_onLoadAssetBundleSync(path,onSuccess,onFailed)
-    local descPath,resPath = self:getDescPathAndResPathByFullPath(path)
+    local descPath,resPath = self:_getDescPathAndResPathByFullPath(path)
     local descTask = AssetLoaderManager:loadBundleAssetSync(descPath)
     local resTask = AssetLoaderManager:loadBundleAssetSync(resPath)
 
@@ -294,7 +317,7 @@ function M:_onLoadAssetBundleSync(path,onSuccess,onFailed)
 end
 
 function M:_onUnload(path)
-    local packageName = self:getPackageNameByFullPath(path)
+    local packageName = self:_getPackageNameByFullPath(path)
     FairyGUI.UIPackage.RemovePackage(packageName)
 end
 ---

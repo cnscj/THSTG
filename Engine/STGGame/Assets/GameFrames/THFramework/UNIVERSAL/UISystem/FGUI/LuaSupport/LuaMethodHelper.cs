@@ -9,72 +9,28 @@ namespace THGame.UI
 {
     public static class LuaMethodHelper
     {
-
-        public static UIPackage LoadPackageInPcCustom(byte[] descBytes, string assetNamePrefix, Func<string, string, object> call)
-        {
-
-            return UIPackage.AddPackage(descBytes, assetNamePrefix, (string name, string extension, System.Type type, out DestroyMethod destroyMethod) =>
-            {
-                destroyMethod = DestroyMethod.Unload;
-                byte[] bytes = (byte[])call?.Invoke(name, extension);
-                if (bytes != null)
-                {
-                    if (type == typeof(Texture))
-                    {
-                        // texture
-                        Texture2D texture = new Texture2D(16, 16, TextureFormat.ARGB32, false);
-                        texture.LoadImage(bytes);
-                        texture.name = System.IO.Path.GetFileNameWithoutExtension(name);
-                        return texture;
-                    }
-                    else if (type == typeof(AudioClip))
-                    {
-                        if (extension == ".ogg")
-                        {
-                            string fullPath = "";
-                            string url = "file://" + fullPath;
-                            UnityWebRequest req = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.UNKNOWN);
-                            var obj = req.SendWebRequest();
-                            AudioClip audipClip = null;
-                            obj.completed += (_) =>
-                            {
-                                if (string.IsNullOrEmpty(req.error))
-                                {
-                                    audipClip = audipClip = DownloadHandlerAudioClip.GetContent(req);
-                                }
-                            };
-                            audipClip.name = System.IO.Path.GetFileNameWithoutExtension(name);
-                            return audipClip;
-
-                            //FIXME:OGG解码支持
-                            //audioClip.name = System.IO.Path.GetFileNameWithoutExtension(name);
-                            //return audioClip;
-                        }
-                        else if (extension == ".wav")
-                        {
-                            AudioClip audioClip = WavUtil.ToAudioClip(bytes);
-                            audioClip.name = System.IO.Path.GetFileNameWithoutExtension(name);
-                            return audioClip;
-                        }
-                    }
-
-                }
-
-
-                return Resources.Load(name,type);
-            });
-        }
-
         //传assetPath需要修改UIPackage.AddPackage里的TextAsset为byte[]
-        public static UIPackage LoadPackageInPcCustom(byte[] descData, Func<string, string, System.Type, object> call)
+        public static UIPackage LoadPackageInPcCustom(byte[] descData, string assetNamePrefix, Func<string, string, System.Type, object> call)
         {
-            return UIPackage.AddPackage(descData, string.Empty, (string name, string extension, System.Type type, out DestroyMethod destroyMethod) =>
+            return UIPackage.AddPackage(descData, assetNamePrefix ,(string name, string extension, System.Type type, out DestroyMethod destroyMethod) =>
             {
-                destroyMethod = DestroyMethod.Unload;
-                return call?.Invoke(name, extension, type);
+                destroyMethod = DestroyMethod.None;
+                var retObj = call?.Invoke(name, extension, type);
+                if (retObj == null)
+                {
+#if UNITY_EDITOR
+                    retObj = UnityEditor.AssetDatabase.LoadAssetAtPath(name + extension, type);
+#else
+                    retObj = Resources.Load(name, type);
+#endif
+                    if (retObj != null) destroyMethod = DestroyMethod.Unload;
+                    else destroyMethod = DestroyMethod.None;
+                }
+                return retObj;
             });
         }
 
+        //获取包的依赖
         public static string[] GetPackageDependencies(UIPackage package)
         {
             if (package == null)

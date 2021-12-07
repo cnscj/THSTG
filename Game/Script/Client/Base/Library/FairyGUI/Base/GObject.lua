@@ -3,7 +3,7 @@ local DEBUG_UI = __DEBUG__ and __PRINT_TRACE_BACK__
 ---@class GObject
 local M = class("GObject")
 
-function M:ctor(obj, args, isGetChild)
+function M:ctor(obj, args)
     self._obj = obj or false
 
     --用来标记是否被destroy()过，理论上来说true的时候该类就不能再使用了，
@@ -11,11 +11,12 @@ function M:ctor(obj, args, isGetChild)
     --但实际上，这些被引用的GObject应该独立destroy()，比如被放进了对象池，或者单例。此时，这个变量可以用来判断该类是否被destroy()过，而决定要不要再缓存它。
     self._isDestroyed = false
 
+    --父节点
+    self._parent = args and args.parent or false
+
     self._graph = false
     self._tweenerHelper = false
     self._xy = false
-
-    self._isGetChild = isGetChild or 1
 
     self._uniqueOnClick = false
     self._clickFunc = false
@@ -23,8 +24,6 @@ function M:ctor(obj, args, isGetChild)
     if DEBUG_UI then
         self._traceStr = string.empty
     end
-
-    self._path = false
 end
 
 function M:init(obj)
@@ -72,16 +71,20 @@ function M:getObj()
     return self._obj
 end
 
+
+function M:getId()
+    return self._obj.id
+end
+
 function M:isDestroyed()
     return self._isDestroyed
 end
 
 function M:getParent(compType)
-    -- if not self._parent then
-    --     self._parent = FGUIUtil.createComp(self._obj.parent, compType)
-    -- end
-    -- return self._parent
-    return FGUIUtil.createComp(self._obj.parent, compType)
+    if not self._parent then
+        self._parent = UIManager:convertComponent(self._obj.parent,compType)
+    end
+    return self._parent
 end
 
 function M:getParentGO()
@@ -816,30 +819,6 @@ function M:parabolaToComp(comp, vec2, height, duration, callback)
             callback()
         end
     end)
-end
-
----@return FView
-function M:getView()
-    return self._view
-end
-
-function M:getId()
-    return self._obj.id
-end
-
-function M:getPath()
-    if not self._path then
-        self._path = FGUIUtil.getObjPath(self)
-    end
-    return self._path
-end
-
-function M:setPath(path)
-    self._path = path or false
-end
-
-function M:clearPath()
-    self._path = false
 end
 
 rawset(_G, "GObject", M)

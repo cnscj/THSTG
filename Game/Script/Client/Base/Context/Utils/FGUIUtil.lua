@@ -13,7 +13,7 @@ function M.createComp(obj,compType,args)
         error(string.format("getCompType error type:%s not exist.", compType))
     end
 
-    return cls.new(obj, args)
+    return self:convertComponent(obj,cls,args)
 end
 
 function M.getObjPath( obj)

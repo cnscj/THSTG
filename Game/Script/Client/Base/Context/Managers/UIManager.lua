@@ -13,6 +13,8 @@ function M:ctor()
 end
 
 function M:setup()
+    UIPackageManager.abFolderName = PathConfig.getFGuiEditorPath()
+
     local packageInfoList = P_Package
     for _,v in ipairs(packageInfoList) do 
         self._packageInfoDict[v.name] = v
@@ -21,8 +23,6 @@ function M:setup()
     for k, v in pairs(ViewLayer) do
         self._parentLayerName[v] = k
     end
-
-    UIPackageManager.abFolderName = PathConfig.getFGuiEditorPath()
 end
 
 -- 加载常驻包
@@ -88,6 +88,16 @@ function M:_newView(viewName,args)
     end
 end
 
+---
+
+function M:convertComponent(obj, userCls, args)
+    if not obj then
+        return 
+    end
+    userCls = userCls or GComponent
+    return userCls.new(obj, args)
+end
+
 --打开非模态窗口
 function M:createView(viewName,args)
     local view = self:_newView(viewName,args)
@@ -115,7 +125,6 @@ function M:openView(viewName,args)
 
     local canOpen = view:isCanOpen(args)
     if canOpen ~= true then
-
         return 
     end
 
@@ -129,38 +138,34 @@ function M:openView(viewName,args)
     self._openedViews[viewName][view] = view
 end
 
-function M:closeViewByView(view)
+function M:closeViewByView(view,isImmediate)
     if not view then return end
-
 
     local viewName = view:getViewName()
     local viewDict = self:getViews(viewName)
     if not next(viewDict) then self._openedViews[viewName] = nil end 
 
-    --TODO:常驻窗口不用清理
-    --包引用及依赖减持,常驻包不清理
-
-    --从父节点移除
-    view:removeFromParent()
+    --从移除
+    view:doClose(isImmediate, true)
 end
 
-function M:closeView(viewName)
+function M:closeView(viewName,isImmediate)
     if not self:isViewOpened(viewName) then return end 
 
     local view = self:getView(viewName)
-    self:closeViewByView(view)
+    self:closeViewByView(view,isImmediate)
 end
 
-function M:closeAllViews(viewName)
+function M:closeAllViews(viewName,isImmediate)
     if viewName then
         local viewDict = self:getViews(viewName)
         for view in pairs(viewDict) do
-            self:closeViewByView(view)
+            self:closeViewByView(view,isImmediate)
         end
     else    --所有
         for _,dict in pairs(self._openedViews) do
             for _,view in pairs(dict) do
-                self:closeViewByView(view)
+                self:closeViewByView(view,isImmediate)
             end
         end
     end

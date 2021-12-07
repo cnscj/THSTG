@@ -21,14 +21,14 @@ end
 --
 
 --
-function M.normalizePath(path,params)
+function M.normalizePath(path, params)
     path = M._paresKeys(path,params)
     path = string.lower(path)
 
     return path
 end
 
-function M._paresKeys( path ,params)
+function M._paresKeys(path,params)
     for k,v in pairs(params) do
         local formatKey = string.format("{%s}",k)
         path = string.gsub(path,formatKey,v)
