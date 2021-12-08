@@ -9,6 +9,12 @@ function M:ctor(obj,args)
 
     -- view名字
     self._viewName = self.__cname
+
+    --窗口动画
+    self.__isPlayingAnimation = false
+
+    --窗口关闭flag
+    self.__isCloseFlag = false
 end
 
 function M:init(obj,args)
@@ -37,11 +43,21 @@ end
 -- @param   isImmediate     #boolean       是否不播放任何动画直接关闭
 -- @param   needDispose     #boolean       关闭后是否销毁
 function M:doClose(isImmediate,needDispose)
-    view:removeFromParent()
-    if needDispose then
-        self:dispose()
+    if view:getObj() then 
+        view:removeFromParent()
+        if needDispose then
+            self:dispose()
+        end
+        self.__isCloseFlag = true
+    else
+        self.__isCloseFlag = true
     end
 end
+
+function M:isClosed( ... )
+    return self.__isCloseFlag
+end
+
 ----------------
 --[[下面函数由子类覆写]]
 --是否能够打开

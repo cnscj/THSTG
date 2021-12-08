@@ -6,6 +6,7 @@ using XLibrary;
 
 namespace ASGame
 {
+    //NOTE:一般不去使用他,
     public class ModelEffectLoader : MonoBehaviour
     {
         public string key;
@@ -200,7 +201,6 @@ namespace ASGame
         {
             Unsetup();
         }
-
     }
 
 }

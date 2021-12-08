@@ -21,6 +21,8 @@ function M:ctor()
     self._dependenciesDict = false
     self._itemExistDict = false
 
+    self._delayRemoveDict = {}
+
     MonoManager:addUpdateListener(self.update,self)
 end
 
@@ -190,7 +192,15 @@ function M:_addPackageWrap(package)
         local packageWrap = FairyGUIPackageWrap.new()
         packageWrap.package = package
         packageWrap.onUnwrap = function ( ... )
-            self:_removePackageWrap(packageName)
+            local stayTime = packageWrap.stayTime
+            if stayTime < 0 then
+                return
+            elseif stayTime == 0 then
+                self:_removePackageWrap(packageName)
+            else
+                --送入延迟队列
+                self._delayRemoveDict[packageName] = packageWrap
+            end
         end
         self._packageWrapCache[packageName] = packageWrap
         packageWrap:release(false)
@@ -206,8 +216,27 @@ function M:_removePackageWrap(packageName)
     self._packageWrapCache[packageName] = nil
 end
 
-function M:update()
+function M:_pollDelayRemoveList()
+    if self._delayRemoveDict then
+        for packageName,packageWrap in pairs(self._delayRemoveDict) do 
+            while true do
+                local refCount = packageWrap:refCount()
+                if refCount > 0 then 
+                    self._delayRemoveDict[packageName] = nil 
+                    break 
+                else
+                    if packageWrap:isStayTimeOut() then
+                        self:_removePackageWrap(packageName)
+                    end
+                end
+                break
+            end
+        end
+    end
+end
 
+function M:update()
+    self:_pollDelayRemoveList()
 end
 
 --包依赖查询
@@ -320,6 +349,7 @@ function M:_onUnload(path)
     local packageName = self:_getPackageNameByFullPath(path)
     FairyGUI.UIPackage.RemovePackage(packageName)
 end
+
 ---
 
 

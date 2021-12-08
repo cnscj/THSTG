@@ -214,10 +214,6 @@ namespace ASGame
             return exposeNames;
         }
 
-        public void Destroy()
-        {
-            Object.Destroy(this);
-        }
         ////
         private void OnDestroy()
         {

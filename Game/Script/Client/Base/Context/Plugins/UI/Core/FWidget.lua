@@ -8,8 +8,10 @@ function M:ctor(obj,args)
     self._package = args and args.package or ""
     -- 资源包中的组件
     self._component = args and args.component or ""
+    -- 子默认不开,如果播放动效发现层级不对需要开启
+    self._fairyBatching = false
 
-    ---ui根节点(Lua层的GComponet)
+    ---ui根节点(Lua层的GComponent)
     self._root = false
     --显示对象根节点(Unity层的GameObject)
     self._rootGO = false
@@ -20,33 +22,46 @@ function M:ctor(obj,args)
     self._timerInterval = false
     self._timerId = false
 
-    -- 子默认不开,如果播放动效发现层级不对需要开启
-    self._fairyBatching = false
+    self.__isLoading = false
 end
 
 function M:init(obj,args)
     self._root = self
     self._rootGO = obj and obj.displayObject.gameObject or false
 
-    self:__initObj()
+    self:__setupObj()
 end
 
 -- 准备addChild到场景
-function M:toAdd()
-    if self._parent then
-        if not self._parent:isDisposed() and self._root and not self._root:isDisposed() then
-            self._parent:addChild(self._root)
+function M:toAdd(parent)
+    parent = parent or self._parent
+    if parent then
+        if not parent:isDisposed() and self._root and not self._root:isDisposed() then
+            parent:addChild(self._root)
+            return true
         end
     end
+    return false
 end
 
-function M:toCreate()
+function M:toCreate(onSuccess,onFailed)
     -- 创建时，先判断一下父节点
     if self._parent and self._parent:isDisposed() then
+        printWarning(string.format( "parent node has been disposed"))
         return
     end
 
-    self:__readyPreloadResList()
+    if string.isEmpty(self._package) or string.isEmpty(self._component) then
+        printWarning(string.format( "self._package or self._component can't be empty"))
+        return 
+    end
+
+    self.__isLoading = true
+    UIPackageManager:loadPackage(self._package ,self._loadMethod, function ( packageWrap )
+        self.__isLoading = false
+        self:__loadPackageCallback(packageWrap)
+        if onSuccess then onSuccess() end
+    end,onFailed)
 end
 
 function M:__onAddedToStage( ... )
@@ -78,7 +93,8 @@ function M:__clearEventListeners()
     end
 end
 
-function M:__initObj()
+function M:__setupObj()
+    self:_initObj()
     if self._obj then
         if self._fairyBatching then
             self._obj.fairyBatching = self._fairyBatching
@@ -90,7 +106,6 @@ function M:__initObj()
             self:_onRemovedFromStage()
         end)
         self:_initUI()
-        self:toAdd()
     end
 end
 
@@ -111,17 +126,7 @@ function M:__loadPackageCallback(packageWrap)
         UIPackageManager:releasePackage(self._package)
     end)
 
-    self:__initObj()
-end
-
-function M:__readyPreloadResList()
-    if string.isEmpty(self._package) then
-        return 
-    end
-
-    UIPackageManager:loadPackage(self._package ,self._loadMethod, function ( packageWrap )
-        self:__loadPackageCallback(packageWrap)
-    end)
+    self:__setupObj()
 end
 
 -- 运行定时器
@@ -148,6 +153,10 @@ end
 --------------------------------------------------
 
 -- 重写方法
+function M:_initObj()
+
+end
+
 function M:_initUI()
 
 end

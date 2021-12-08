@@ -88,6 +88,7 @@ function M:_newView(viewName,args)
     end
 end
 
+
 ---
 
 function M:convertComponent(obj, userCls, args)
@@ -102,6 +103,18 @@ end
 function M:createView(viewName,args)
     local view = self:_newView(viewName,args)
     if not view then return end 
+
+    view:toCreate(function ( ... )
+        if not view:getObj() then
+            self:closeViewByView(view,true)
+            return 
+        end
+        if view:isClosed() then
+            self:closeViewByView(view,true)
+            return 
+        end
+        view:toAdd()
+    end)
 
     self._openedViews[viewName] = self._openedViews[viewName] or {}
     self._openedViews[viewName][view] = view
@@ -128,11 +141,19 @@ function M:openView(viewName,args)
         return 
     end
 
-    view:toCreate()
-    --判断是否加载成功
-    if not view:getObj() then 
-        return 
-    end
+    view:toCreate(function ( ... )
+        --如果加载的时候,组件已经接收到关闭命令,则不会在打开
+        if not view:getObj() then
+            self:closeViewByView(view,true)
+            return 
+        end
+        if view:isClosed() then
+            self:closeViewByView(view,true)
+            return 
+        end
+        view:toAdd()
+    
+    end)
 
     self._openedViews[viewName] = self._openedViews[viewName] or {}
     self._openedViews[viewName][view] = view
@@ -143,10 +164,14 @@ function M:closeViewByView(view,isImmediate)
 
     local viewName = view:getViewName()
     local viewDict = self:getViews(viewName)
-    if not next(viewDict) then self._openedViews[viewName] = nil end 
 
-    --从移除
     view:doClose(isImmediate, true)
+
+    if viewDict and next(viewDict) then 
+        viewDict[view] = nil 
+        if not next(viewDict) then self._openedViews[viewName] = nil end 
+    end
+
 end
 
 function M:closeView(viewName,isImmediate)

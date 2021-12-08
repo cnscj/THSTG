@@ -1,6 +1,6 @@
 local M = {}
 
---TODO:应该用一个table装载
+--NOTE:应该用一个table装载
 function M.createComp(obj,compType,args)
     local cls = GComponent
     if type(compType) == "string" then
