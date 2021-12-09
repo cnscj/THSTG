@@ -23,6 +23,8 @@ function M:setup()
     for k, v in pairs(ViewLayer) do
         self._parentLayerName[v] = k
     end
+
+
 end
 
 -- 加载常驻包
@@ -52,10 +54,17 @@ function M:initViewLayers()
 
 end
 
+function M:initUICamera( ... )
+    --摄像机参数设置
+    -- CSharp.StageCamera.main.clearFlags = CS.UnityEngine.CameraClearFlags.SolidColor
+    -- CSharp.StageCamera.main.backgroundColor.a = 0
+end
+
 
 function M:initialize()
     self:initPackages()
     self:initViewLayers()
+    self:initUICamera()
 end
 -----------------------------------
 function M:getViewConfig(viewName)
@@ -75,7 +84,7 @@ end
 
 --
 
-function M:_newView(viewName,args)
+function M:_newView(viewName, args)
     local viewConfig = self:getViewConfig(viewName)
     if viewConfig then
         local viewCls = require(viewConfig.path)
@@ -90,16 +99,26 @@ end
 
 
 ---
-
-function M:convertComponent(obj, userCls, args)
+function M:convertComponent(obj, compType, args)
     if not obj then
         return 
     end
-    userCls = userCls or GComponent
-    return userCls.new(obj, args)
+    
+    local cls = false
+    if type(compType) == "string" then
+        cls = CompType[compType]
+    elseif type(compType) == "table" then
+        cls = compType
+    end
+
+    if not cls then
+        error(string.format("CompType error type:%s not exist.", compType))
+    end
+    cls = cls or GComponent
+    return cls.new(obj, args)
 end
 
---打开非模态窗口
+--打开新建窗口
 function M:createView(viewName,args)
     local view = self:_newView(viewName,args)
     if not view then return end 
@@ -129,7 +148,7 @@ function M:getView(viewName)
     return dict and next(dict)
 end
 
---打开模态窗口
+--打开窗口,只允许一个
 function M:openView(viewName,args)
     if self:isViewOpened(viewName) then return end 
 

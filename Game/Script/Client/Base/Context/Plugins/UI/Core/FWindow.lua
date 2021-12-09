@@ -33,4 +33,51 @@ function M:init(obj,args)
     self._parentLayer = args and args.parentLayer or ViewLayer.Window or 0
 end
 
+function M:_initObj( ... )
+    if self._obj then
+        self._frame = self.root:getChild("frame")
+        self._frame = self._frame or self
+
+        --关闭按钮
+        self._closeBtn = self._frame:getChild("closeBtn")
+        if self._closeBtn then
+            self._closeBtn:onClick(function ( ... )
+                self:closeView()
+            end)
+        end
+
+        self._titleImageLoader = self._frame:getChild("icon")
+
+        self._titleLabel = self._frame:getChild("title")
+        self:setTitle(self._title)
+
+        -- 显示等待区域
+        self._modalArea = self._frame:getChild("modalArea")
+
+        -- 内容节点
+        self._contentNode = self._frame:getChild("contentNode")
+
+        -- 拖动区域
+        if self._dragArea == false then
+            self._dragArea = self._frame:getChild("dragArea")
+            if self._dragArea then
+                self._dragArea:setDraggable(true)
+                self._dragArea:onDragStart(function (context)
+                    context:PreventDefault()
+                    self._root:startDrag(context.data)
+                end)
+            end
+        end
+    end
+    self:super("FView", "_initObj", ...)
+end
+
+function M:setTitle( title )
+    if self._titleLabel then
+        if not string.isEmpty(title) then
+            self._titleLabel:setText(title)
+        end
+    end
+end
+
 return M

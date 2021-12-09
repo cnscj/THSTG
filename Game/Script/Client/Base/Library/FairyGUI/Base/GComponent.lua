@@ -1,14 +1,10 @@
 ---@class GComponent:GObject @FGUIComponent
 local M = class("GComponent", GObject)
 
-function M:ctor(obj, args, isGetChild, view)
-    self._view = view or false
-
+function M:ctor(obj, args)
     self._children = {}
     self._controllers = {}
     self._scrollPane = false
-    self._viewName = ""
-    
 end
 
 function M:init(obj)
@@ -27,12 +23,7 @@ function M:destroy()
         for k,v in pairs(self._children) do
             if v and v ~= self then
                 if type(v) == "table" and type(v.destroy) == "function" then
-                    if type(v.isTypeOf) == "function" and v:isTypeOf("FView") then
-                        --do nothing
-                        print(9, "FView can't destroy: ", k, v.__cname)
-                    else
-                        v:destroy()
-                    end
+                    v:destroy()
                 else
                     printWarning("GComponent has no destroy function?")
                 end
@@ -51,10 +42,6 @@ function M:destroy()
         end
         self._controllers = false
     end
-
-    --FView直接去掉引用
-    self._view = false
-    self._viewName = ""
 
     self:super("GObject", "destroy")
 end
@@ -83,7 +70,6 @@ end
 ---@return GComponent
 function M:getChild(name, type, args)
     if self._children and self._children[name] then
-        -- print(5, "拿了缓存", name, type)
         return self._children[name]
     end
     if not self._obj then
@@ -92,14 +78,10 @@ function M:getChild(name, type, args)
 
     local obj = self._obj:GetChild(name)
     if obj == nil then
-        if __DEBUG__ and name ~= "redDot" and name ~= "chatName" then
-        -- printWarning("getChild obj is nil, name =", name, "名字错误？没加载到对应包？无用代码？")
-        -- printTraceback()
-        end
         return false
     end
 
-    local child = FGUIUtil.createComp(obj, type, args, self._isGetChild, self._view)
+    local child = UIManager:convertComponent(obj, type, args)
     self._children = self._children or {}
     self._children[name] = child
 
@@ -119,7 +101,7 @@ function M:getChildren(type, args)
     local CObjArray = self:getChildrenObj()
     for i = 0, CObjArray.Length - 1 do
         local obj = CObjArray[i]
-        local child = FGUIUtil.createComp(obj, type, args)
+        local child = UIManager:convertComponent(obj, type, args)
         table.insert(result, child)
     end
     return result
@@ -240,7 +222,6 @@ end
 
 function M:setChildBefore(child)
     local childIndex = self._obj.parent:GetChildIndex(child:getObj())
-    print(5, "childIndex", childIndex)
     self._obj.parent:SetChildIndexBefore(self._obj, childIndex)
 end
 

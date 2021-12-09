@@ -17,19 +17,19 @@ function M:ctor(obj,args)
     self._rootGO = false
     --加载方式,如果为true为异步,false,为同步
     self._loadMethod = false
-
-    self._eventListeners = {}
+    --开启一个定时器
     self._timerInterval = false
-    self._timerId = false
 
+    self.__eventListeners = false
+    self.__timerId = false
     self.__isLoading = false
 end
-
+--------------------------------------------------
 function M:init(obj,args)
     self._root = self
     self._rootGO = obj and obj.displayObject.gameObject or false
 
-    self:__setupObj()
+    self:_initObj()
 end
 
 -- 准备addChild到场景
@@ -48,11 +48,13 @@ function M:toCreate(onSuccess,onFailed)
     -- 创建时，先判断一下父节点
     if self._parent and self._parent:isDisposed() then
         printWarning(string.format( "parent node has been disposed"))
+        if onFailed then onFailed() end
         return
     end
 
     if string.isEmpty(self._package) or string.isEmpty(self._component) then
-        printWarning(string.format( "self._package or self._component can't be empty"))
+        printWarning(string.format( "package or component can't be empty"))
+        if onFailed then onFailed() end
         return 
     end
 
@@ -64,11 +66,30 @@ function M:toCreate(onSuccess,onFailed)
     end,onFailed)
 end
 
+-- 添加监听
+function M:addEventListener(name, listener, listenerCaller, priority)
+    self.__eventListeners = self.__eventListeners or {}
+    Dispatcher.addEventListener(name, listener, listenerCaller, priority)
+    table.insert(self.__eventListeners, {name=name, listener=listener})
+end
+
+function M:removeEventListener(name, listener, listenerCaller)
+    if self.__eventListeners then
+        for _, event in ipairs(self.__eventListeners) do
+            if event.name == name and event.listener == listener and event.listenerCaller == listenerCaller then
+                Dispatcher.removeEventListener(name, listener, listenerCaller)
+            end
+        end
+    end
+end
+
+
+--------------------
 function M:__onAddedToStage( ... )
     self:__onEnter()
 end
 
-function M:_onRemovedFromStage()
+function M:__onRemovedFromStage()
     self:__onExit()
 end
 
@@ -88,24 +109,10 @@ end
 
 -- 删除所有侦听的事件
 function M:__clearEventListeners()
-    for _, event in ipairs(self._eventListeners) do
-        Dispatcher.removeEventListener(event.name, event.listener, self)
-    end
-end
-
-function M:__setupObj()
-    self:_initObj()
-    if self._obj then
-        if self._fairyBatching then
-            self._obj.fairyBatching = self._fairyBatching
+    if self.__eventListeners then
+        for _, event in ipairs(self.__eventListeners) do
+            Dispatcher.removeEventListener(event.name, event.listener, self)
         end
-        self._obj.onAddedToStage:Add(function ()
-            self:__onAddedToStage()
-        end)
-        self._obj.onRemovedFromStage:Add(function ()
-            self:_onRemovedFromStage()
-        end)
-        self:_initUI()
     end
 end
 
@@ -126,16 +133,16 @@ function M:__loadPackageCallback(packageWrap)
         UIPackageManager:releasePackage(self._package)
     end)
 
-    self:__setupObj()
+    self:_initObj()
 end
 
 -- 运行定时器
 function M:__runTimer()
     if type(self._timerInterval) == "number" 
         and self._timerInterval >= 0 
-        and self._timerId == false
+        and self.__timerId == false
     then
-        self._timerId = Timer:schedule(function ()
+        self.__timerId = Timer:schedule(function ()
             self:_onTick()
         end, self._timerInterval, 0)
         self:_onTick()
@@ -144,19 +151,29 @@ end
 
 -- 清除定时器
 function M:__clearTimer()
-    if self._timerId then
-        Timer:unschedule(self._timerId)
-        self._timerId = false
+    if self.__timerId then
+        Timer:unschedule(self.__timerId)
+        self.__timerId = false
     end
 end
 
 --------------------------------------------------
-
--- 重写方法
 function M:_initObj()
-
+    if self._obj then
+        if self._fairyBatching then
+            self._obj.fairyBatching = self._fairyBatching
+        end
+        self._obj.onAddedToStage:Add(function ()
+            self:__onAddedToStage()
+        end)
+        self._obj.onRemovedFromStage:Add(function ()
+            self:__onRemovedFromStage()
+        end)
+        self:_initUI()
+    end
 end
 
+-- 重写方法
 function M:_initUI()
 
 end
@@ -177,17 +194,6 @@ function M:_onTick()
 
 end
 
---------------------------------------------------
 
--- 公有方法
-function M:addEventListener(name, listener, listenerCaller, priority)
-    Dispatcher.addEventListener(name, listener, listenerCaller, priority)
-    table.insert(self._eventListeners, {name=name, listener=listener})
-end
-
-function M:addListener(name, listener, priority)
-    Dispatcher.addEventListener(name, listener, self, priority)
-    table.insert(self._eventListeners, { name = name, listener = listener })
-end
 
 rawset(_G, "FWidget", M)

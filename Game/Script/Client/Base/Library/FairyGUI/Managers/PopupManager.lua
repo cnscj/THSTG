@@ -1,12 +1,20 @@
 local M = class("PopupManager")
---TODO:
+function M:ctor( ... )
 
-function M:showPopup(obj)
-    
 end
 
-function M:hidePopup()
-   
+--[[
+    sender,
+    data,
+    pos = Vector2(100, 100), 
+    pivot = Vector2(0, 0), 
+]]
+function M:show(params)
+
+end
+
+function M:hide()
+
 end
 
 function M:isShow(toolTipId)
@@ -20,6 +28,15 @@ end
 function M:clear()
 
 end
+-------
+function M:_showPopup(obj)
+    FairyGUI.GRoot.inst:AddChild(obj)
+end
+
+function M:_hidePopup()
+   
+end
+
 
 rawset(_G, "PopupManager", false)
 PopupManager = M.new()

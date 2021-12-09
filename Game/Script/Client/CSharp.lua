@@ -37,6 +37,11 @@ local _getter = {
     AssetLoaderManagerIns = function() return ASGame.AssetLoaderManager.GetInstance() end,
 
     --THGame
+    GRoot = function() return FairyGUI.GRoot end,
+    Stage = function() return FairyGUI.Stage end,
+    StageCamera = function() return FairyGUI.StageCamera end,
+    BlurFilter = function() return FairyGUI.BlurFilter end,
+    TypingEffect = function() return FairyGUI.TypingEffect end,
     FGUIUtil = function() return THGame.UI.FGUIUtil end,
     UIPackageManagerIns = function() return THGame.UI.UIPackageManager.GetInstance() end,
 
