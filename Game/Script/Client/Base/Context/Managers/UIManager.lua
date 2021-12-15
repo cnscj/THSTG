@@ -13,7 +13,7 @@ function M:ctor()
 end
 
 function M:setup()
-    UIPackageManager.abFolderName = PathConfig.getFGuiEditorPath()
+    UIPackageManager.loadMode = UIPackageManager.LoadMode.Editor
 
     local packageInfoList = P_Package
     for _,v in ipairs(packageInfoList) do 
@@ -23,8 +23,6 @@ function M:setup()
     for k, v in pairs(ViewLayer) do
         self._parentLayerName[v] = k
     end
-
-
 end
 
 -- 加载常驻包
@@ -36,7 +34,7 @@ function M:initPackages()
                 break
             end
 
-            UIPackageManager:loadPackage(v.name)
+            self:loadPackage(v.name)
 
             break
         end
@@ -99,6 +97,14 @@ end
 
 
 ---
+function M:loadPackage(path,loadMethod,onSuccess,onFailed)
+    return ResourceLoader:loadUIPackage(path,loadMethod,onSuccess,onFailed)
+end
+
+function M:createObject(packageName, componentName)
+    return UIPackageManager:createObject(packageName, componentName)
+end
+
 function M:convertComponent(obj, compType, args)
     if not obj then
         return 
@@ -116,6 +122,13 @@ function M:convertComponent(obj, compType, args)
     end
     cls = cls or GComponent
     return cls.new(obj, args)
+end
+
+function M:createComponent(packageName, componentName, userCls, args)
+    local obj = self:createObject(packageName, componentName)
+    if obj then
+        return self:convertComponent(obj,userCls,args)
+    end
 end
 
 --打开新建窗口

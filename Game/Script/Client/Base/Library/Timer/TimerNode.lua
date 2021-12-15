@@ -1,7 +1,7 @@
 --定时器实体
 ---@class TimerNode
 local M = class("TimerNode")
-
+local logWarn = printWarning
 function M:ctor()
     --所有字段reset()都包含
     self:reset()
@@ -118,28 +118,28 @@ function M:trigger()
 
     self._callback()
 
-    if __ENABLE_PROFILER__ then
-        time1 = millisecondNow()  --ms
+    -- if __ENABLE_PROFILER__ then
+    --     time1 = millisecondNow()  --ms
 
-        local info = debug.getinfo(self._callback, "Sln")
-        local msg = string.format("%s L%d %s", info.source, info.linedefined, info.name and "in " .. info.name or "")
-        local time = time1 - time0
-        TimerProfiler.record(msg, time)
+    --     local info = debug.getinfo(self._callback, "Sln")
+    --     local msg = string.format("%s L%d %s", info.source, info.linedefined, info.name and "in " .. info.name or "")
+    --     local time = time1 - time0
+    --     TimerProfiler.record(msg, time)
 
-        if time > 400 then
-            logWarn(string.format("这个定时器回调耗时很长(%s ms)，不算错误，但是值得关注:\n%s", tostring(time), msg))
-        end
-    elseif __DEBUG__ then
-        time1 = millisecondNow()  --ms
-        local time = time1 - time0
+    --     if time > 400 then
+    --         logWarn(string.format("这个定时器回调耗时很长(%s ms)，不算错误，但是值得关注:\n%s", tostring(time), msg))
+    --     end
+    -- elseif __DEBUG__ then
+    --     time1 = millisecondNow()  --ms
+    --     local time = time1 - time0
 
-        if time > 400 then
-            local info = debug.getinfo(self._callback, "Sln")
-            local msg = string.format("%s L%d %s", info.source, info.linedefined, info.name and "in " .. info.name or "")
+    --     if time > 400 then
+    --         local info = debug.getinfo(self._callback, "Sln")
+    --         local msg = string.format("%s L%d %s", info.source, info.linedefined, info.name and "in " .. info.name or "")
 
-            logWarn(string.format("这个定时器回调耗时很长(%s ms)，不算错误，但是值得关注:\n%s", tostring(time), msg))
-        end
-    end
+    --         logWarn(string.format("这个定时器回调耗时很长(%s ms)，不算错误，但是值得关注:\n%s", tostring(time), msg))
+    --     end
+    -- end
 end
 
 rawset(_G, "TimerNode", M)

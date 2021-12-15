@@ -19,4 +19,11 @@ function M:release()
     end
 end
 
+function M:getData()
+    if not self.data then
+        return nil
+    end
+    return self.data
+end
+
 rawset(_G, "AssetLoaderResult", M)

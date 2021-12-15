@@ -1,16 +1,17 @@
 local FairyGUI = CS.FairyGUI
-local M = class("UIPackageManager",false,{
-    LoadMode = {
+local M = class("UIPackageManager")
+
+function M:ctor()
+    self.LoadMode = {
         Editor = 1,
         AssetBundle = 2,
-    },
-    LoadMethod = {
+    }
+    self.LoadMethod = {
         Async = 1,
         Sync = 2,
     }
-})
-function M:ctor()    
-    self.loadMode = M.LoadMode.Editor  --加载模式,AB或者编辑器模式
+
+    self.loadMode = self.LoadMode.Editor  --加载模式,AB或者编辑器模式
     self.abFolderName = ""
     self.abSuffix = ".ab"
     self.byteSuffix = ".bytes"
@@ -41,9 +42,9 @@ function M:loadPackage(path,loadMethod,onSuccess,onFailed)
 
     loadMethod = loadMethod or false
     if loadMethod == true then 
-        loadMethod = M.LoadMethod.Async
+        loadMethod = self.LoadMethod.Async
     elseif loadMethod == false then 
-        loadMethod = M.LoadMethod.Sync
+        loadMethod = self.LoadMethod.Sync
     end
 
     local successOrLoadChild = function(packageWrap)
@@ -59,17 +60,17 @@ function M:loadPackage(path,loadMethod,onSuccess,onFailed)
         end
         if onSuccess then onSuccess(packageWrap) end
     end
-    
-    if loadMethod == M.LoadMethod.Async then
-        if self.loadMode == M.LoadMode.Editor then
+
+    if loadMethod == self.LoadMethod.Async then
+        if self.loadMode == self.LoadMode.Editor then
             self:_onLoadEditorAsync(path,successOrLoadChild,onFailed)
-        elseif self.loadMode == M.LoadMode.AssetBundle then
+        elseif self.loadMode == self.LoadMode.AssetBundle then
             self:_onLoadAssetBundleAsync(path,successOrLoadChild,onFailed)
         end
-    elseif loadMethod == M.LoadMethod.Sync then
-        if self.loadMode == M.LoadMode.Editor then
+    elseif loadMethod == self.LoadMethod.Sync then
+        if self.loadMode == self.LoadMode.Editor then
             self:_onLoadEditorSync(path,successOrLoadChild,onFailed)
-        elseif self.loadMode == M.LoadMode.AssetBundle then
+        elseif self.loadMode == self.LoadMode.AssetBundle then
             self:_onLoadAssetBundleSync(path,successOrLoadChild,onFailed)
         end
     end
@@ -124,13 +125,6 @@ function M:createObject(packageName, componentName)
     end
 end
 
-function M:createComponent(packageName, componentName, userCls, args)
-    local obj = self:createObject(packageName, componentName)
-    if obj then
-        userCls = userCls or GComponent
-        return userCls.new(obj, args)
-    end
-end
 ---
 function M:_getDirectorNameByFullPath(fullPath)
     local directorName = PathTool.getDirectoryName(fullPath)
@@ -160,7 +154,7 @@ function M:_getDescPathAndResPathByFullPath(fullPath)
     return descAbFilePath,resAbFilePath
 end
 
-function M:_getDescBundlePathAndRedBundlePathByFullPath(fullPath)
+function M:_getDescBundlePathAndResBundlePathByFullPath(fullPath)
     local descPath,resPath = self:_getDescPathAndResPathByFullPath(fullPath)
     return descPath .. self.abSuffix, resPath .. self.abSuffix
 end
@@ -267,12 +261,6 @@ function M:_onLoadCallback(package,path,onSuccess,onFailed)
     end
 end
 
-function M:_onLoadEditorAsync(path,onSuccess,onFailed)
-    Timer:scheduleNextFrame(function ( ... )
-        self:_onLoadEditorSync(path,onSuccess,onFailed)
-    end)
-end
-
 function M:_onLoadEditorSync(path,onSuccess,onFailed)
     --使用AddPackage函数加载desc的bytes文件,需要自定义加载函数
     local fullPackageNamePath = self:_getFullPathByPackageName(path)
@@ -280,7 +268,7 @@ function M:_onLoadEditorSync(path,onSuccess,onFailed)
     local descTask = AssetLoaderManager:loadBytesAssetSync(descBinaryPath)
     local descBytes = descTask:getData()
     if descBytes then
-        local package = CS.THGame.UI.LuaMethodHelper.LoadPackageInPcCustom(descBytes,fullPackageNamePath,function (name, extension, type)
+        local package = CS.THGame.UI.LuaMethodHelper.LoadPackageSyncInPcCustom(descBytes,fullPackageNamePath,function (name, extension, type)
             --Resource type. e.g. 'Texture' 'AudioClip'
             local resBinaryPath = string.format("%s%s", name, extension)
             if type == typeof(CS.UnityEngine.AudioClip) then
@@ -310,10 +298,56 @@ function M:_onLoadEditorSync(path,onSuccess,onFailed)
     end
 end
 
+function M:_onLoadEditorAsync(path,onSuccess,onFailed)
+    --使用AddPackage函数加载desc的bytes文件,需要自定义加载函数
+    local fullPackageNamePath = self:_getFullPathByPackageName(path)
+    local descBinaryPath = self:_getDescBinaryPathByFullPath(path)
+    AssetLoaderManager:loadBytesAssetAsync(descBinaryPath,function ( descResult )
+        local descBytes = descResult:getData()
+        if descBytes then
+           
+            local package = CS.THGame.UI.LuaMethodHelper.LoadPackageAsyncInPcCustom(descBytes,fullPackageNamePath,function (name, extension, type, call2)
+                --FIXME:无法执行到这里
+                local function call2CSharp(retObj)
+                    if call2 then call2(retObj) end
+                end
+                --Resource type. e.g. 'Texture' 'AudioClip'
+                local resBinaryPath = string.format("%s%s", name, extension)
+                if type == typeof(CS.UnityEngine.AudioClip) then
+                    if (extension == ".ogg") then
+                        AssetLoaderManager:loadBytesAssetAsync(resBinaryPath,function (result)
+                            local bytes = result:getData()
+                            local audioClip = CS.THGame.UI.AudioUtil.ByteToOggAudioClip(bytes)
+                            call2CSharp(audioClip)
+                        end,onFailed)
+                        
+                    elseif (extension == ".wav") then
+                        local task = AssetLoaderManager:loadBytesAssetAsync(resBinaryPath,function (result)
+                            local bytes = result:getData()
+                            local audioClip = CS.THGame.UI.AudioUtil.ByteToWavAudioClip(bytes)
+                            call2CSharp(audioClip)
+                        end,onFailed)
+                    end
+                elseif type == typeof(CS.UnityEngine.Texture) then
+                    local task = AssetLoaderManager:loadBytesAssetAsync(resBinaryPath,function (result)
+                        local bytes = result:getData()
+                        local texture = CS.THGame.UI.TextureUtil.Bytes2Texture2d(bytes)
+                        call2CSharp(texture)
+                    end,onFailed)
+                end
+            end)
+
+            self:_onLoadCallback(package,path,onSuccess,onFailed)
+        else
+            if onFailed then onFailed(path) end
+        end
+    end,onFailed)
+end
+
 function M:_onLoadAssetBundleAsync(path,onSuccess,onFailed)
     local callCount = 0
-    local descAb = false
-    local resAb = false
+    local descAb = nil
+    local resAb = nil
     local function try2AddPack()
         if callCount >= 2 then
             local package = FairyGUI.UIPackage.AddPackage(descAb,resAb)
@@ -325,19 +359,20 @@ function M:_onLoadAssetBundleAsync(path,onSuccess,onFailed)
         try2AddPack()
     end
 
-    local descBundlePath,resBundlePath = self:_getDescBundlePathAndRedBundlePathByFullPath(path)
+    local descBundlePath,resBundlePath = self:_getDescBundlePathAndResBundlePathByFullPath(path)
     AssetLoaderManager:loadBundleAssetAsync(descBundlePath,false,function ( result )
-        descAb = result.data
+        descAb = result:getData()
         addCallCount()
     end,addCallCount)
     AssetLoaderManager:loadBundleAssetAsync(resBundlePath,false,function ( result )
-        resAb = result.data
+        resAb = result:getData()
         addCallCount()
     end,addCallCount)
 end
 
 function M:_onLoadAssetBundleSync(path,onSuccess,onFailed)
-    local descPath,resPath = self:_getDescPathAndResPathByFullPath(path)
+    local descPath,resPath = self:_getDescBundlePathAndResBundlePathByFullPath(path)
+
     local descTask = AssetLoaderManager:loadBundleAssetSync(descPath)
     local resTask = AssetLoaderManager:loadBundleAssetSync(resPath)
 

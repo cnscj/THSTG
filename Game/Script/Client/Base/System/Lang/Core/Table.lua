@@ -406,4 +406,8 @@ function table.getReadOnlyEmptyTable()
     end
     return ReadOnly_Empty_Table
 end
+
+-- function table.setReadOnlyTable(tab)
+--     setmetatable(tab, ReadOnly_Empty_Metatable)
+-- end
 table.empty = table.getReadOnlyEmptyTable()

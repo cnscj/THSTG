@@ -14,7 +14,7 @@ end
 
 function M:getData()
     local loaderResult = self:getResult()
-    return loaderResult and loaderResult.data
+    return loaderResult:getData()
 end
 
 function M:stop()

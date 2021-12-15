@@ -59,7 +59,7 @@ function M:toCreate(onSuccess,onFailed)
     end
 
     self.__isLoading = true
-    UIPackageManager:loadPackage(self._package ,self._loadMethod, function ( packageWrap )
+    UIManager:loadPackage(self._package ,self._loadMethod, function ( packageWrap )
         self.__isLoading = false
         self:__loadPackageCallback(packageWrap)
         if onSuccess then onSuccess() end
@@ -117,7 +117,7 @@ function M:__clearEventListeners()
 end
 
 function M:__loadPackageCallback(packageWrap)
-    self._obj = UIPackageManager:createObject(self._package ,self._component)
+    self._obj = UIManager:createObject(self._package ,self._component)
     if not self._obj then
         printError(string.format("Check that component %s is set to export", self._component))
         return 
@@ -126,11 +126,12 @@ function M:__loadPackageCallback(packageWrap)
     self._root = self
     self._rootGO = self._obj and self._obj.displayObject.gameObject or false
 
+    --FIXME:如果只是生成,没有AddChild,可能会运作不正常
     self._obj.onAddedToStage:Add(function ()
-        UIPackageManager:retainPackage(self._package)
+        packageWrap:retain()
     end)
     self._obj.onRemovedFromStage:Add(function ()
-        UIPackageManager:releasePackage(self._package)
+        packageWrap:release()
     end)
 
     self:_initObj()

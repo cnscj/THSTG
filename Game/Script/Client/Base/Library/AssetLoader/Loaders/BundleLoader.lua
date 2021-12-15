@@ -203,8 +203,13 @@ function M:_getBundleFullPath(bundlePath)
 end
 
 function M:_getOrLoadBundle(bundlePath)
-    --Note:异常处理
-    local bundle = CS.UnityEngine.AssetBundle.LoadFromFile(bundlePath)
+    --异常处理
+    local bundle = nil
+    if not pcall(function() 
+        bundle = CS.UnityEngine.AssetBundle.LoadFromFile(bundlePath)
+    end) then
+        printError(string.format("Unable to open file %s",bundlePath))
+    end
     return bundle
 end
 
@@ -212,8 +217,14 @@ function M:_getOrCreateBundleRequest(bundlePath)
     self._bundleRequestCache = self._bundleRequestCache or {}
     local bundleRequestInfo = self._bundleRequestCache[bundlePath]
     if not bundleRequestInfo then
-        --Note:异常处理
-        local bundleRequest = CS.UnityEngine.AssetBundle.LoadFromFileAsync(bundlePath)
+        --异常处理
+        local bundleRequest = nil 
+        if not pcall(function() 
+            bundleRequest = CS.UnityEngine.AssetBundle.LoadFromFileAsync(bundlePath)
+        end) then
+            printError(string.format("Unable to open file %s",bundlePath))
+        end
+
         if not bundleRequest then return end 
         self._bundleRequestCache[bundlePath] = {bundleRequest = bundleRequest,refCount = 1}
     else

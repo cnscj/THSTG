@@ -58,6 +58,7 @@ public static class EngineGenConfig
                 typeof(Func<double, double, double>),
                 typeof(Func<string, string, object>),
                 typeof(Func<string, string, Type, object>),
+                typeof(Action<string, string, Type, Action<object>>),
 
                 typeof(Action),
                 typeof(Action<int>),

@@ -1,13 +1,14 @@
 local M = class("ResourceLoader")
 
 function M:initialize()
-    --TODO:应该获取相对路径
-    local abRootPath = PathTool.combine(PathConfig.getResourcePath(),"pc")
-    AssetLoaderManager:getOrCreateBundlerLoader():loadManifest(PathTool.combine(abRootPath,"pc"))
+    --应该获取相对路径
+    local platform = "pc"
+    local abRootPath = PathTool.combine(PathConfig.getResourcePath(),platform)
+    AssetLoaderManager:getOrCreateBundlerLoader():loadManifest(PathTool.combine(abRootPath,platform))
 end
 
 
-function M:loadModel(id,onSuccess,onFailed)
+function M:loadModel(id,loadMethod,onSuccess,onFailed)
     local pathPattern = PathConfig.getModelPatternPath()
 
     local abPath = PathConfig.normalizePath(pathPattern.abPattern,{id = id})
@@ -16,13 +17,27 @@ function M:loadModel(id,onSuccess,onFailed)
     AssetLoaderManager:loadBundleAssetAsync(fullPath,false,onSuccess,onFailed)
 end
 
-function M:loadEffect(id,onSuccess,onFailed)
+function M:loadEffect(id,loadMethod,onSuccess,onFailed)
     local pathPattern = PathConfig.getEffectPatternPath()
 
     local abPath = PathConfig.normalizePath(pathPattern.abPattern,{id = id})
     local resPath = PathConfig.normalizePath(pathPattern.resPattern,{id = id})
     local fullPath = string.format("%s|%s",abPath,resPath)
     AssetLoaderManager:loadBundleAssetAsync(fullPath,false,onSuccess,onFailed)
+end
+
+function M:loadUIPackage(path,loadMethod,onSuccess,onFailed)
+    --这里区分加路径
+    local newPath = path
+    if UIPackageManager.loadMode == UIPackageManager.LoadMode.AssetBundle then
+        local pathPattern = PathConfig.getUIPatternPath()
+        newPath = PathConfig.normalizePath(pathPattern.abPattern,{id = path})
+    elseif UIPackageManager.loadMode == UIPackageManager.LoadMode.Editor then
+        local editorPath = PathConfig.getFGuiEditorPath()
+        newPath = PathTool.combine(editorPath,path)
+    end
+    
+    return UIPackageManager:loadPackage(newPath,loadMethod,onSuccess,onFailed)
 end
 
 rawset(_G, "ResourceLoader", false)
