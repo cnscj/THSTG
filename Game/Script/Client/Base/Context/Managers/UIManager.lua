@@ -3,6 +3,7 @@ local P_View = require("Config.Profile.P_View")
 local P_Package = require("Config.Profile.P_Package")
 function M:ctor()
     self._packageInfoDict = {}
+    self._packageLoadOpportunityDict = {}
 
     self._parentLayerName = {}
     self._parentLayer = {}
@@ -13,11 +14,17 @@ function M:ctor()
 end
 
 function M:setup()
-    UIPackageManager.loadMode = UIPackageManager.LoadMode.Editor
+    UIPackageManager.loadMode = __DEBUG__ and UIPackageManager.LoadMode.Editor or UIPackageManager.LoadMode.AssetBundle
 
     local packageInfoList = P_Package
     for _,v in ipairs(packageInfoList) do 
         self._packageInfoDict[v.name] = v
+
+        if v.loadOpportunity then
+            self._packageLoadOpportunityDict[v.loadOpportunity] = self._packageLoadOpportunityDict[v.loadOpportunity] or {}
+            table.insert(self._packageLoadOpportunityDict[v.loadOpportunity],v)
+        end
+
     end
 
     for k, v in pairs(ViewLayer) do
@@ -27,18 +34,7 @@ end
 
 -- 加载常驻包
 function M:initPackages()
-    local packageInfoList = P_Package
-    for _,v in ipairs(packageInfoList) do
-        while true do 
-            if v.loadOpportunity ~= 0 then
-                break
-            end
-
-            self:loadPackage(v.name)
-
-            break
-        end
-    end
+   self:loadPackagesByLoadOpportunity(0)    --进入游戏加载
 end
 
 --创建窗口层
@@ -65,6 +61,10 @@ function M:initialize()
     self:initUICamera()
 end
 -----------------------------------
+function M:getPackageConfig(packageName)
+    return self._packageInfoDict[packageName]
+end
+
 function M:getViewConfig(viewName)
     return P_View[viewName]
 end
@@ -97,8 +97,51 @@ end
 
 
 ---
+function M:loadPackagesByLoadOpportunity(loadOpportunity)
+    local packageList = self._packageLoadOpportunityDict[loadOpportunity]
+    if packageList then
+        for _,v in ipairs(packageList) do 
+            self:loadPackage(v.name)
+        end
+    end
+end
+
 function M:loadPackage(path,loadMethod,onSuccess,onFailed)
-    return ResourceLoader:loadUIPackage(path,loadMethod,onSuccess,onFailed)
+    local needCallCount = 1
+    local callCount = 0
+    local successOrLoadChild = function(packageWrap)    --依赖加载
+        local dependencies = UIPackageManager:queryDependencies(packageWrap.package)
+        local directorName = UIPackageManager:getDirectorNameByFullPath(path)
+        local tryCallback = function ( ... )
+            callCount = callCount + 1
+            if callCount >= needCallCount then 
+                if onSuccess then onSuccess(packageWrap) end
+            end
+        end
+
+        if dependencies then
+            needCallCount = needCallCount + #dependencies
+            for _,depPackageName in ipairs(dependencies) do 
+                local depPackagePath = PathTool.combine(directorName, depPackageName)
+                ResourceLoader:loadUIPackage(depPackagePath,loadMethod,function (childPackageWrap)
+                    childPackageWrap:retain() --这里加载完成需要添加下依赖,只加一次即可
+                    tryCallback()
+                end,function ( ... )
+                    tryCallback()
+                end)
+
+                --非常驻依赖加载判断
+                local packageConfig = self:getPackageConfig(depPackageName)
+                if not packageConfig or (packageConfig and not packageConfig.isResident) then
+                    printWarning(string.format("A non-resident package is loaded:%s",depPackageName))
+                end
+
+            end
+        end
+        tryCallback()
+    end
+
+    return ResourceLoader:loadUIPackage(path,loadMethod,successOrLoadChild,onFailed)
 end
 
 function M:createObject(packageName, componentName)
@@ -240,6 +283,5 @@ end
 function M:clear()
 
 end
-
 rawset(_G, "UIManager", false)
 UIManager = M.new()

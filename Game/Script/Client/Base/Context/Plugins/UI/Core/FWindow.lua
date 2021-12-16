@@ -69,6 +69,18 @@ function M:_initObj( ... )
             end
         end
     end
+
+    --背景遮罩
+    if self._maskType ~= ViewMaskType.None then
+        if self._maskType == ViewMaskType.Translucent then
+
+        elseif self._maskType == ViewMaskType.Black then
+
+        elseif self._maskType == ViewMaskType.SceneBlur then
+
+        end
+    end
+
     self:super("FView", "_initObj", ...)
 end
 

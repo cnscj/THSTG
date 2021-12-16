@@ -1,17 +1,18 @@
 local FairyGUI = CS.FairyGUI
-local M = class("UIPackageManager")
+local M = simpleClass("UIPackageManager")
+--加载模式:编辑器模式Bundle模式
+M.LoadMode = {
+    Editor = 1,
+    AssetBundle = 2,
+}
+--加载方式:同步异步
+M.LoadMethod = {
+    Async = 1,
+    Sync = 2,
+}
 
 function M:ctor()
-    self.LoadMode = {
-        Editor = 1,
-        AssetBundle = 2,
-    }
-    self.LoadMethod = {
-        Async = 1,
-        Sync = 2,
-    }
-
-    self.loadMode = self.LoadMode.Editor  --加载模式,AB或者编辑器模式
+    self.loadMode = M.LoadMode.Editor  --加载模式,AB或者编辑器模式
     self.abFolderName = ""
     self.abSuffix = ".ab"
     self.byteSuffix = ".bytes"
@@ -42,36 +43,22 @@ function M:loadPackage(path,loadMethod,onSuccess,onFailed)
 
     loadMethod = loadMethod or false
     if loadMethod == true then 
-        loadMethod = self.LoadMethod.Async
+        loadMethod = M.LoadMethod.Async
     elseif loadMethod == false then 
-        loadMethod = self.LoadMethod.Sync
+        loadMethod = M.LoadMethod.Sync
     end
 
-    local successOrLoadChild = function(packageWrap)
-        local dependencies = self:_queryDependencies(packageWrap.package)
-        local directorName = self:_getDirectorNameByFullPath(path)
-        if dependencies then
-            for _,depPackageName in ipairs(dependencies) do 
-                local depPackagePath = PathTool.combine(directorName, depPackageName)
-                self:loadPackage(depPackagePath,loadMethod,function (childPackageWrap)
-                    childPackageWrap:retain() --这里加载完成需要添加下依赖,只加一次即可
-                end,onFailed)  
-            end
+    if loadMethod == M.LoadMethod.Async then
+        if self.loadMode == M.LoadMode.Editor then
+            self:_onLoadEditorAsync(path,onSuccess,onFailed)
+        elseif self.loadMode == M.LoadMode.AssetBundle then
+            self:_onLoadAssetBundleAsync(path,onSuccess,onFailed)
         end
-        if onSuccess then onSuccess(packageWrap) end
-    end
-
-    if loadMethod == self.LoadMethod.Async then
-        if self.loadMode == self.LoadMode.Editor then
-            self:_onLoadEditorAsync(path,successOrLoadChild,onFailed)
-        elseif self.loadMode == self.LoadMode.AssetBundle then
-            self:_onLoadAssetBundleAsync(path,successOrLoadChild,onFailed)
-        end
-    elseif loadMethod == self.LoadMethod.Sync then
-        if self.loadMode == self.LoadMode.Editor then
-            self:_onLoadEditorSync(path,successOrLoadChild,onFailed)
-        elseif self.loadMode == self.LoadMode.AssetBundle then
-            self:_onLoadAssetBundleSync(path,successOrLoadChild,onFailed)
+    elseif loadMethod == M.LoadMethod.Sync then
+        if self.loadMode == M.LoadMode.Editor then
+            self:_onLoadEditorSync(path,onSuccess,onFailed)
+        elseif self.loadMode == M.LoadMode.AssetBundle then
+            self:_onLoadAssetBundleSync(path,onSuccess,onFailed)
         end
     end
 end
@@ -126,7 +113,7 @@ function M:createObject(packageName, componentName)
 end
 
 ---
-function M:_getDirectorNameByFullPath(fullPath)
+function M:getDirectorNameByFullPath(fullPath)
     local directorName = PathTool.getDirectoryName(fullPath)
     if string.isEmpty(directorName) then directorName = self.abFolderName end 
     return directorName
@@ -137,14 +124,14 @@ function M:_getPackageNameByFullPath(fullPath)
 end
 
 function M:_getFullPathByPackageName(packageName)
-    local directorName = self:_getDirectorNameByFullPath(packageName)
+    local directorName = self:getDirectorNameByFullPath(packageName)
     local realPackageName = self:_getPackageNameByFullPath(packageName)
     return PathTool.combine(directorName,realPackageName)
 end
 
 function M:_getDescPathAndResPathByFullPath(fullPath)
     local packageName = self:_getPackageNameByFullPath(fullPath)
-    local directorName = self:_getDirectorNameByFullPath(fullPath)
+    local directorName = self:getDirectorNameByFullPath(fullPath)
 
     local descFileName = string.format("%s%s", packageName, self.descSuffix)
     local resFileName = string.format("%s%s", packageName, self.resSuffix)
@@ -234,19 +221,26 @@ function M:update()
 end
 
 --包依赖查询
-function M:_queryDependencies(package)
+function M:queryDependencies(package)
     if not package then return end
 
-    local depArray = CS.THGame.UI.LuaMethodHelper.GetPackageDependencies(package)
-    if depArray and depArray.Length > 0 then 
-        local depList = {}
-        for i = 0,depArray.Length - 1 do 
-            local packageName = depArray[i]
-            table.insert( depList, packageName )
+    local packageName = package.name
+    local depList = self._dependenciesDict and self._dependenciesDict[packageName]
+    if not depList then
+        depList = {}
+        local depArray = CS.THGame.UI.LuaMethodHelper.GetPackageDependencies(package)
+        if depArray and depArray.Length > 0 then 
+            for i = 0,depArray.Length - 1 do 
+                local packageName = depArray[i]
+                table.insert( depList, packageName )
+            end
         end
-        return depList
+
+        self._dependenciesDict = self._dependenciesDict or {}
+        self._dependenciesDict[packageName] = depList
     end
-    return
+
+    return depList
 end
 
 --
@@ -305,9 +299,8 @@ function M:_onLoadEditorAsync(path,onSuccess,onFailed)
     AssetLoaderManager:loadBytesAssetAsync(descBinaryPath,function ( descResult )
         local descBytes = descResult:getData()
         if descBytes then
-           
+            --NOTE:这里需要保证先加载完依赖包才能成功运行
             local package = CS.THGame.UI.LuaMethodHelper.LoadPackageAsyncInPcCustom(descBytes,fullPackageNamePath,function (name, extension, type, call2)
-                --FIXME:无法执行到这里
                 local function call2CSharp(retObj)
                     if call2 then call2(retObj) end
                 end

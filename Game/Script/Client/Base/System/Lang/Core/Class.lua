@@ -9,6 +9,10 @@ local function errorNewIndex(t, k, v)
 	end
 end
 
+--[[
+	A.Mode = {Normal = 1,Special = 2}
+	function A:ctor() self.mode = self.Mode end	--这里只能通过self.访问类变量
+]]
 --定义一个类对象
 --@param	#string		className	类名
 --@param	#table		super		父类
@@ -190,11 +194,17 @@ end
 --     end
 --     --do other things...
 -- end
+
+--[[
+	还可以这样
+	A.Mode = {Normal = 1,Special = 2}
+	function A:ctor() self.mode = A.Mode end
+]]
 --
 --如果有继承再继承就建议用class()，因为调用父类函数会更复杂。
 
 local ExistSimpleClassMap = {}
-
+--单次继承,建议用这个
 function simpleClass(className, super)
 	if ExistSimpleClassMap[className] then
 		if not __RELOADING_LUA__ then
