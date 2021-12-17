@@ -77,7 +77,7 @@ function M:_initObj( ... )
         elseif self._maskType == ViewMaskType.Black then
 
         elseif self._maskType == ViewMaskType.SceneBlur then
-
+            
         end
     end
 

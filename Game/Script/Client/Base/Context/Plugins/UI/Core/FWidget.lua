@@ -23,6 +23,9 @@ function M:ctor(obj,args)
     self.__eventListeners = false
     self.__timerId = false
     self.__isLoading = false
+
+    --flag
+    self.__disposeFlag = false
 end
 --------------------------------------------------
 function M:init(obj,args)
@@ -47,13 +50,13 @@ end
 function M:toCreate(onSuccess,onFailed)
     -- 创建时，先判断一下父节点
     if self._parent and self._parent:isDisposed() then
-        printWarning(string.format( "parent node has been disposed"))
+        printWarning(string.format("parent node has been disposed"))
         if onFailed then onFailed() end
         return
     end
 
     if string.isEmpty(self._package) or string.isEmpty(self._component) then
-        printWarning(string.format( "package or component can't be empty"))
+        printWarning(string.format("package or component can't be empty"))
         if onFailed then onFailed() end
         return 
     end
@@ -61,6 +64,10 @@ function M:toCreate(onSuccess,onFailed)
     self.__isLoading = true
     UIManager:loadPackage(self._package ,self._loadMethod, function ( packageWrap )
         self.__isLoading = false
+        if self.__disposeFlag then
+            self:dispose()
+            return 
+        end
         self:__loadPackageCallback(packageWrap)
         if onSuccess then onSuccess() end
     end,onFailed)
@@ -126,7 +133,7 @@ function M:__loadPackageCallback(packageWrap)
     self._root = self
     self._rootGO = self._obj and self._obj.displayObject.gameObject or false
 
-    --FIXME:如果只是生成,没有AddChild,可能会运作不正常
+    --如果只是生成,没有AddChild,可能会运作不正常
     self._obj.onAddedToStage:Add(function ()
         packageWrap:retain()
     end)
@@ -157,7 +164,16 @@ function M:__clearTimer()
         self.__timerId = false
     end
 end
+--------------------------------------------------
 
+function M:dispose()
+    if self.__isLoading then    --加载中dispose
+        self.__disposeFlag = true
+    else
+        self.__disposeFlag = false
+        self:super("GObject","dispose")
+    end
+end
 --------------------------------------------------
 function M:_initObj()
     if self._obj then

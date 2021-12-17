@@ -283,5 +283,6 @@ end
 function M:clear()
 
 end
+
 rawset(_G, "UIManager", false)
 UIManager = M.new()

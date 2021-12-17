@@ -6,6 +6,9 @@ local FGUITest = require("Context.Modules.Test.Modules.FGUITest")
 -- local ECSTest = require("Context.Modules.Test.Modules.ECSTest.ECSTest")
 -- local LuaBehaviourTest = require("Context.Modules.Test.Modules.LuaBehaviourTest")
 local BinaryTest = require("Context.Modules.Test.Modules.BinaryTest")
+
+local HTTPTest = require("Context.Modules.Test.Modules.HTTPTest")
+
 function M:ctor()
     Timer:scheduleOnce(10,function ( ... )
         self:dispatchEvent(EventType.TEST_1)
@@ -18,7 +21,8 @@ function M:ctor()
     -- LuaBehaviourTest.new()
 
     -- self.coroutineTest = CoroutineTest.new()
-    self.fguiTest = FGUITest.new()
+    -- self.fguiTest = FGUITest.new()
+    self.httpTest = HTTPTest.new()
     -- self.binaryTest = BinaryTest.new()
     
     print(15,"@@@@@@@@@@@@")
