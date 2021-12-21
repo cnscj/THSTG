@@ -1,4 +1,4 @@
-local M = class("GameManager")
+local M = simpleClass("GameManager")
 
 function M:ctor()
     self._updateListeners = false

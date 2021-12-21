@@ -1,4 +1,4 @@
-local M = class("ItemData")
+local M = simpleClass("ItemData")
 
 --itemInfo:{type,code,amount}
 function M.createFromInfo(itemInfo)

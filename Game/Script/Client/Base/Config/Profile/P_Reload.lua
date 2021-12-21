@@ -9,6 +9,8 @@ return {
     
     --排除的文件或文件夹路径
     excludePattern = {
+        --多数Manager不可reload
+        "CacheControllerManager",
 
     },
 }

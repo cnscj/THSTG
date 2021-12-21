@@ -2,8 +2,8 @@
 local M = class("GComponent", GObject)
 
 function M:ctor(obj, args)
-    self._children = {}
-    self._controllers = {}
+    self._children = false
+    self._controllers = false
     self._scrollPane = false
 end
 

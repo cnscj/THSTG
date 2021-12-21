@@ -43,12 +43,12 @@ end
 -- @param   isImmediate     #boolean       是否不播放任何动画直接关闭
 -- @param   needDispose     #boolean       关闭后是否销毁
 function M:doClose(isImmediate,needDispose)
-    if view:getObj() then 
-        view:removeFromParent()
+    if self:getObj() then 
         if needDispose then
             self:dispose()
+        else
+            self:removeFromParent()
         end
-        self.__isCloseFlag = true
     else
         self.__isCloseFlag = true
     end

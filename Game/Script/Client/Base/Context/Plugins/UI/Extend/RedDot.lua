@@ -1,4 +1,4 @@
-local M = class("RedDot",FComponent)
+local M = class("RedDot",FWidget)
 
 
 function M:ctor()

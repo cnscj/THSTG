@@ -1,4 +1,4 @@
-local M = class("EntitySystemWorld")
+local M = simpleClass("EntitySystemWorld")
 local P_ECS = require("Config.Profile.P_ECS")
 local SYSTEM_LIST = P_ECS.systems
 local COMPONENT_LIST = P_ECS.components

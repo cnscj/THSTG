@@ -1,4 +1,4 @@
-local M = class("UIManager")
+local M = simpleClass("UIManager")
 local P_View = require("Config.Profile.P_View")
 local P_Package = require("Config.Profile.P_Package")
 function M:ctor()
@@ -8,14 +8,12 @@ function M:ctor()
     self._parentLayerName = {}
     self._parentLayer = {}
 
-    self._openedViews = {}    --正在打开的窗口
+    self._openedViews = {}    --正在打开或已经打开的窗口
 
     self:setup()
 end
 
 function M:setup()
-    UIPackageManager.loadMode = __DEBUG__ and UIPackageManager.LoadMode.Editor or UIPackageManager.LoadMode.AssetBundle
-
     local packageInfoList = P_Package
     for _,v in ipairs(packageInfoList) do 
         self._packageInfoDict[v.name] = v
@@ -24,7 +22,6 @@ function M:setup()
             self._packageLoadOpportunityDict[v.loadOpportunity] = self._packageLoadOpportunityDict[v.loadOpportunity] or {}
             table.insert(self._packageLoadOpportunityDict[v.loadOpportunity],v)
         end
-
     end
 
     for k, v in pairs(ViewLayer) do
@@ -239,14 +236,18 @@ function M:closeViewByView(view,isImmediate)
 
     local viewName = view:getViewName()
     local viewDict = self:getViews(viewName)
+    local viewConfig = self:getViewConfig(viewName)
+    if viewConfig then
+        local isResident = viewConfig.isResident
+        if not isResident then  --常驻view不允许关闭
+            view:doClose(isImmediate, true)
 
-    view:doClose(isImmediate, true)
-
-    if viewDict and next(viewDict) then 
-        viewDict[view] = nil 
-        if not next(viewDict) then self._openedViews[viewName] = nil end 
+            if viewDict and next(viewDict) then 
+                viewDict[view] = nil 
+                if not next(viewDict) then self._openedViews[viewName] = nil end 
+            end
+        end
     end
-
 end
 
 function M:closeView(viewName,isImmediate)
@@ -278,6 +279,7 @@ end
 
 function M:reload()
     --刷新classInstance
+    self:closeAllViews(false,true)
 end
 
 function M:clear()

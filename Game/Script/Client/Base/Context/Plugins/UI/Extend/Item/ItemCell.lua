@@ -1,4 +1,4 @@
-local M = class("ItemCell",FComponent)
+local M = class("ItemCell",FWidget)
 
 
 function M:ctor()

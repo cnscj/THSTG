@@ -1,12 +1,13 @@
-local M = class("ResourceLoader")
+local M = simpleClass("ResourceLoader")
 
 function M:initialize()
     --应该获取相对路径
     local platform = "pc"
     local abRootPath = PathTool.combine(PathConfig.getResourcePath(),platform)
     AssetLoaderManager:getOrCreateBundlerLoader():loadManifest(PathTool.combine(abRootPath,platform))
-end
 
+    UIPackageManager.loadMode = __DEBUG__ and UIPackageManager.LoadMode.Editor or UIPackageManager.LoadMode.AssetBundle
+end
 
 function M:loadModel(id,loadMethod,onSuccess,onFailed)
     local pathPattern = PathConfig.getModelPatternPath()

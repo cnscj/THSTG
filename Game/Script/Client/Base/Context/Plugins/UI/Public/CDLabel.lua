@@ -1,4 +1,4 @@
-local M = class("CDLabel",FComponent)
+local M = class("CDLabel",FWidget)
 
 function M:ctor()
 

@@ -1,4 +1,4 @@
-local M = class("Language")
+local M = simpleClass("Language")
 
 function M:ctor( ... )
     self._desc = false

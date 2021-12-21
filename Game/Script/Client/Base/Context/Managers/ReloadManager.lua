@@ -1,10 +1,12 @@
-local M = class("ReloadManager")
+local M = simpleClass("ReloadManager")
 
 local P_Reload = require("Config.Profile.P_Reload")
 local function isInExcludePattern(value)
-    for _, pattern in ipairs(P_Reload.excludePattern) do
-        if string.find(value, pattern) then
-            return true
+    if P_Reload.excludePattern and next(P_Reload.excludePattern) then
+        for _, pattern in ipairs(P_Reload.excludePattern) do
+            if string.find(value, pattern) then
+                return true
+            end
         end
     end
     return false
@@ -17,6 +19,18 @@ end
 function M:reload()
     if not __DEBUG__ then return end
 
+    --重载脚本文件
+    self:reloadScript()
+
+    --刷新View
+    UIManager:reload()
+    
+    --刷新Manager
+    EntityManager:reload()
+end
+
+--
+function M:reloadScript()
     --刷新Main_Script
     for pack, data in pairs(package.loaded) do
         while true do
@@ -29,15 +43,8 @@ function M:reload()
             break
         end
     end
-
-    --刷新View
-    UIManager:reload()
-    
-    --刷新Manager
-
 end
 
---
 function M:_deal(pack, data)
     -- 刷新controller
     if type(data) == "table" and type(data.super) == "table" and data.super.cname == "Controller" then

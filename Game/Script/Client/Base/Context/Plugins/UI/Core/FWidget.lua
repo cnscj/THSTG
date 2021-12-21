@@ -24,7 +24,7 @@ function M:ctor(obj,args)
     self.__timerId = false
     self.__isLoading = false
 
-    --flag
+    --dispose的flag
     self.__disposeFlag = false
 end
 --------------------------------------------------
@@ -48,6 +48,16 @@ function M:toAdd(parent)
 end
 
 function M:toCreate(onSuccess,onFailed)
+    --正在加载
+    if self.__isLoading then  
+        return
+    end 
+
+    --已加载
+    if self._obj then  
+        return
+    end 
+
     -- 创建时，先判断一下父节点
     if self._parent and self._parent:isDisposed() then
         printWarning(string.format("parent node has been disposed"))
@@ -89,7 +99,6 @@ function M:removeEventListener(name, listener, listenerCaller)
         end
     end
 end
-
 
 --------------------
 function M:__onAddedToStage( ... )
@@ -133,12 +142,9 @@ function M:__loadPackageCallback(packageWrap)
     self._root = self
     self._rootGO = self._obj and self._obj.displayObject.gameObject or false
 
-    --如果只是生成,没有AddChild,可能会运作不正常
-    self._obj.onAddedToStage:Add(function ()
-        packageWrap:retain()
-    end)
+    packageWrap:retain()
     self._obj.onRemovedFromStage:Add(function ()
-        packageWrap:release()
+        if self:isDisposed() then  packageWrap:release() end
     end)
 
     self:_initObj()
@@ -171,9 +177,10 @@ function M:dispose()
         self.__disposeFlag = true
     else
         self.__disposeFlag = false
-        self:super("GObject","dispose")
+        self:super("GObject","dispose")   
     end
 end
+
 --------------------------------------------------
 function M:_initObj()
     if self._obj then

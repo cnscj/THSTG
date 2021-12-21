@@ -193,8 +193,11 @@ function M:_removePackageWrap(packageName)
     if string.isEmpty(packageName) then 
         return false
     end
-
-    self._packageWrapCache[packageName] = nil
+    local packageWrap = self:_getPackageWrap(packageName)
+    if packageWrap then
+        
+        self._packageWrapCache[packageName] = nil
+    end
 end
 
 function M:_pollDelayRemoveList()
@@ -343,6 +346,7 @@ function M:_onLoadAssetBundleAsync(path,onSuccess,onFailed)
     local resAb = nil
     local function try2AddPack()
         if callCount >= 2 then
+            --TODO:这里需要对AB进行维护
             local package = FairyGUI.UIPackage.AddPackage(descAb,resAb)
             self:_onLoadCallback(package,path,onSuccess,onFailed)
         end

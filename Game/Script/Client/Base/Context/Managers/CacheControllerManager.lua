@@ -1,6 +1,6 @@
 local GLOBAL_CACHE_PACKAGE = "Cache"
 
-local M = class("ControllerManager")
+local M = simpleClass("ControllerManager")
 local P_MVC = require("Config.Profile.P_MVC")
 local CACHE_LIST = P_MVC.caches
 local CONTROLLER_LIST = P_MVC.controllers
