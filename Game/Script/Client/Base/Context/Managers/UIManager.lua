@@ -253,8 +253,7 @@ end
 function M:closeView(viewName,isImmediate)
     if not self:isViewOpened(viewName) then return end 
 
-    local view = self:getView(viewName)
-    self:closeViewByView(view,isImmediate)
+    self:closeAllViews(viewName,isImmediate)
 end
 
 function M:closeAllViews(viewName,isImmediate)
