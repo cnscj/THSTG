@@ -35,7 +35,7 @@ end
 
 function M:_initObj( ... )
     if self._obj then
-        self._frame = self.root:getChild("frame")
+        self._frame = self._root:getChild("frame")
         self._frame = self._frame or self
 
         --关闭按钮
@@ -81,7 +81,7 @@ function M:_initObj( ... )
         end
     end
 
-    self:super("FView", "_initObj", ...)
+    self:super("FWidget", "_initObj", ...)
 end
 
 function M:setTitle( title )
@@ -92,4 +92,30 @@ function M:setTitle( title )
     end
 end
 
-return M
+----
+function M:doShowAnimation(callback)
+    local rootObj = self:getObj()
+    local y = rootObj.y
+    rootObj.y = y + 20
+    rootObj.alpha = 0
+    self.__isPlayingAnimation = true
+    rootObj:TweenFade(1, 0.25):SetEase(FairyGUI.EaseType.QuadOut)
+    rootObj:TweenMoveY(y, 0.25):SetEase(FairyGUI.EaseType.BackOut):OnComplete(function()
+        self.__isPlayingAnimation = false
+        if callback then callback() end
+    end)
+end
+
+function M:doHideAnimation(callback)
+    local rootObj = self:getObj()
+    local y = rootObj.y
+    rootObj.y = y
+    rootObj.alpha = 1
+    self.__isPlayingAnimation = true
+    rootObj:TweenFade(0, 0.25):SetEase(FairyGUI.EaseType.QuadOut)
+    rootObj:TweenMoveY(y+20, 0.25):SetEase(FairyGUI.EaseType.BackOut):OnComplete(function()
+        self.__isPlayingAnimation = false
+        if callback then callback() end
+    end)
+end
+rawset(_G, "FWindow", M)

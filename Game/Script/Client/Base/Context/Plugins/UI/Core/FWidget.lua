@@ -102,22 +102,22 @@ end
 
 --------------------
 function M:__onAddedToStage( ... )
-    self:__onEnter()
+    self:_onEnter()
 end
 
 function M:__onRemovedFromStage()
-    self:__onExit()
+    self:_onExit()
 end
 
 -- 显示的时候触发
-function M:__onEnter()
+function M:_onEnter()
     self:_initEvent()
     self:_enter()
     self:__runTimer()
 end
 
 -- 隐藏的时候触发
-function M:__onExit()
+function M:_onExit()
     self:_exit()
     self:__clearEventListeners()
     self:__clearTimer()
