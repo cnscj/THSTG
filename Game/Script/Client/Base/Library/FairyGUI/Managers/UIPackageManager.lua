@@ -164,14 +164,16 @@ function M:_getPackageWrap(packageName)
     return self._packageWrapCache[packageName]
 end
 
-function M:_addPackageWrap(package)
-    if not package then return end 
+function M:_addPackageWrap(result)
+    if not result then return end 
+    if not result.package then return end
 
-    local packageName = package.name 
+    local packageName = result.package.name 
     self._packageWrapCache = self._packageWrapCache or {}
     if not self:_getPackageWrap(packageName) then
         local packageWrap = FairyGUIPackageWrap.new()
-        packageWrap.package = package
+        packageWrap.package = result.package
+        packageWrap.refHandlers = {result.descLoadHandler, result.resLoadHandler}
         packageWrap.onUnwrap = function ( ... )
             local stayTime = packageWrap.stayTime
             if stayTime < 0 then
@@ -195,7 +197,7 @@ function M:_removePackageWrap(packageName)
     end
     local packageWrap = self:_getPackageWrap(packageName)
     if packageWrap then
-        
+        packageWrap:destroy()
         self._packageWrapCache[packageName] = nil
     end
 end
@@ -247,9 +249,10 @@ function M:queryDependencies(package)
 end
 
 --
-function M:_onLoadCallback(package,path,onSuccess,onFailed)
+function M:_onLoadCallback(result,path,onSuccess,onFailed)
+    local package = result.package
     if package then
-        local packageWrap = self:_addPackageWrap(package)
+        local packageWrap = self:_addPackageWrap(result)
         if onSuccess then onSuccess(packageWrap) end
     else
         local packageName = self:_getPackageNameByFullPath(path)
@@ -289,7 +292,7 @@ function M:_onLoadEditorSync(path,onSuccess,onFailed)
             return
         end)
 
-        self:_onLoadCallback(package,path,onSuccess,onFailed)
+        self:_onLoadCallback({package = package,descLoadHandler = descTask},path,onSuccess,onFailed)
     else
         if onFailed then onFailed(path) end
     end
@@ -299,7 +302,7 @@ function M:_onLoadEditorAsync(path,onSuccess,onFailed)
     --使用AddPackage函数加载desc的bytes文件,需要自定义加载函数
     local fullPackageNamePath = self:_getFullPathByPackageName(path)
     local descBinaryPath = self:_getDescBinaryPathByFullPath(path)
-    AssetLoaderManager:loadBytesAssetAsync(descBinaryPath,function ( descResult )
+    local descLoadHandler = AssetLoaderManager:loadBytesAssetAsync(descBinaryPath,function ( descResult )
         local descBytes = descResult:getData()
         if descBytes then
             --NOTE:这里需要保证先加载完依赖包才能成功运行
@@ -333,7 +336,7 @@ function M:_onLoadEditorAsync(path,onSuccess,onFailed)
                 end
             end)
 
-            self:_onLoadCallback(package,path,onSuccess,onFailed)
+            self:_onLoadCallback({package = package,descLoadHandler = descLoadHandler},path,onSuccess,onFailed)
         else
             if onFailed then onFailed(path) end
         end
@@ -344,11 +347,16 @@ function M:_onLoadAssetBundleAsync(path,onSuccess,onFailed)
     local callCount = 0
     local descAb = nil
     local resAb = nil
+    local descLoadHandler = false
+    local resLoadHandler = false
     local function try2AddPack()
         if callCount >= 2 then
-            --TODO:这里需要对AB进行维护
             local package = FairyGUI.UIPackage.AddPackage(descAb,resAb)
-            self:_onLoadCallback(package,path,onSuccess,onFailed)
+            self:_onLoadCallback({
+                package = package,
+                descLoadHandler = descLoadHandler,
+                resLoadHandler = resLoadHandler
+            },path,onSuccess,onFailed)
         end
     end
     local function addCallCount( ... )
@@ -357,11 +365,11 @@ function M:_onLoadAssetBundleAsync(path,onSuccess,onFailed)
     end
 
     local descBundlePath,resBundlePath = self:_getDescBundlePathAndResBundlePathByFullPath(path)
-    AssetLoaderManager:loadBundleAssetAsync(descBundlePath,false,function ( result )
+    descLoadHandler = AssetLoaderManager:loadBundleAssetAsync(descBundlePath,false,function ( result )
         descAb = result:getData()
         addCallCount()
     end,addCallCount)
-    AssetLoaderManager:loadBundleAssetAsync(resBundlePath,false,function ( result )
+    resLoadHandler = AssetLoaderManager:loadBundleAssetAsync(resBundlePath,false,function ( result )
         resAb = result:getData()
         addCallCount()
     end,addCallCount)
@@ -374,7 +382,11 @@ function M:_onLoadAssetBundleSync(path,onSuccess,onFailed)
     local resTask = AssetLoaderManager:loadBundleAssetSync(resPath)
 
     local package = FairyGUI.UIPackage.AddPackage(descTask:getData(),resTask:getData())
-    self:_onLoadCallback(package,path,onSuccess,onFailed)
+    self:_onLoadCallback({
+        package = package,
+        descLoadHandler = descTask,
+        resLoadHandler = resTask
+    },path,onSuccess,onFailed)
 end
 
 function M:_onUnload(path)

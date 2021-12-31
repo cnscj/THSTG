@@ -13,8 +13,7 @@ end
 
 function M:loadBytesAssetSync(path,onSuccess,onFailed)
     local loader = self:getOrCreateBinaryLoader()
-    local task = loader:loadAssetSync(path,onSuccess,onFailed)
-    return task
+    return loader:loadAssetSync(path,onSuccess,onFailed)
 end
 
 function M:loadBytesAssetAsync(path,onSuccess,onFailed)
@@ -26,8 +25,7 @@ end
 function M:loadBundleAssetSync(path,type,onSuccess,onFailed)
     type = type or CSharp.Object
     local loader = self:getOrCreateBundlerLoader()
-    local task = loader:loadAssetSync(path,onSuccess,onFailed)
-    return task
+    return loader:loadAssetSync(path,onSuccess,onFailed)
 end
 
 function M:loadBundleAssetAsync(path,type,onSuccess,onFailed)

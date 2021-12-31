@@ -1,6 +1,7 @@
 local M = class("FairyGUIPackageWrap",RefObj)
 
 function M:ctor()
+    self.refHandlers = false
     self.package = false 
     self.stayTime = 0           --立马移除
     self.isResident = false     --是否为常驻包
@@ -33,8 +34,12 @@ function M:_onRelease()
 end
 
 function M:destroy()
-    while self:refCount() > 0 do 
-        self:release()
+    if self.refHandlers then
+        for _,handler in ipairs(self.refHandlers) do 
+            if handler then
+                handler:release()
+            end
+        end
     end
 end
 
