@@ -3,11 +3,11 @@ using System;
 using UnityEditor;
 using System.Collections.Generic;
 
-#if CINEMACHINE_HDRP || CINEMACHINE_LWRP_7_0_0
-    #if CINEMACHINE_HDRP_7_0_0
+#if CINEMACHINE_HDRP || CINEMACHINE_LWRP_7_3_1
+    #if CINEMACHINE_HDRP_7_3_1
     using UnityEngine.Rendering.HighDefinition;
     #else
-        #if CINEMACHINE_LWRP_7_0_0
+        #if CINEMACHINE_LWRP_7_3_1
         using UnityEngine.Rendering.Universal;
         #else
         using UnityEngine.Experimental.Rendering.HDPipeline;
@@ -79,6 +79,9 @@ namespace Cinemachine.Editor
         [Serializable]
         public struct Preset
         {
+            /// <summary>
+            /// Name of the preset
+            /// </summary>
             [Tooltip("Lens Name")]
             public string m_Name;
 
@@ -87,7 +90,8 @@ namespace Cinemachine.Editor
             /// on a super-35mm sensor would equal a 19.6 degree FOV
             /// </summary>
             [Range(1f, 179f)]
-            [Tooltip("This is the camera view in vertical degrees. For cinematic people, a 50mm lens on a super-35mm sensor would equal a 19.6 degree FOV")]
+            [Tooltip("This is the camera view in vertical degrees. For cinematic people, "
+                + " a 50mm lens on a super-35mm sensor would equal a 19.6 degree FOV")]
             public float m_FieldOfView;
         }
         /// <summary>The array containing Preset definitions for nonphysical cameras</summary>
@@ -99,6 +103,9 @@ namespace Cinemachine.Editor
         [Serializable]
         public struct PhysicalPreset
         {
+            /// <summary>
+            /// Name of the preset
+            /// </summary>
             [Tooltip("Lens Name")]
             public string m_Name;
 
@@ -131,16 +138,18 @@ namespace Cinemachine.Editor
         public PhysicalPreset[] m_PhysicalPresets = new PhysicalPreset[0];
 
         /// <summary>Get the index of the preset that matches the lens settings</summary>
+        /// <param name="verticalFOV">Vertical field of view</param>
         /// <returns>the preset index, or -1 if no matching preset</returns>
-        public int GetMatchingPreset(float fov)
+        public int GetMatchingPreset(float verticalFOV)
         {
             for (int i = 0; i < m_Presets.Length; ++i)
-                if (Mathf.Approximately(m_Presets[i].m_FieldOfView, fov))
+                if (Mathf.Approximately(m_Presets[i].m_FieldOfView, verticalFOV))
                     return i;
             return -1;
         }
 
         /// <summary>Get the index of the physical preset that matches the lens settings</summary>
+        /// <param name="focalLength">Focal length to match</param>
         /// <returns>the preset index, or -1 if no matching preset</returns>
         public int GetMatchingPhysicalPreset(float focalLength)
         {

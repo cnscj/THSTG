@@ -12,11 +12,8 @@ namespace Cinemachine
     [DocumentationSorting(DocumentationSortingAttribute.Level.UserRef)]
     [RequireComponent(typeof(Camera)), DisallowMultipleComponent]
     [AddComponentMenu("Cinemachine/CinemachineExternalCamera")]
-#if UNITY_2018_3_OR_NEWER
     [ExecuteAlways]
-#else
-    [ExecuteInEditMode]
-#endif
+    [HelpURL(Documentation.BaseURL + "manual/CinemachineExternalCamera.html")]
     public class CinemachineExternalCamera : CinemachineVirtualCameraBase
     {
         /// <summary>The object that the camera is looking at.</summary>
@@ -48,6 +45,8 @@ namespace Cinemachine
         public BlendHint m_BlendHint = BlendHint.None;
 
         /// <summary>Internal use only.  Do not call this method</summary>
+        /// <param name="worldUp">Effective world up</param>
+        /// <param name="deltaTime">Effective deltaTime</param>
         public override void InternalUpdateCameraState(Vector3 worldUp, float deltaTime)
         {
             // Get the state from the camera

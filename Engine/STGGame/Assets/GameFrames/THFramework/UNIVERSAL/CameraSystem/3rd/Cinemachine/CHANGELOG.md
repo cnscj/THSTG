@@ -4,9 +4,191 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [2.6.1] - 2020-00-00
-### New Bugfixes
+## UNRELEASED
+- Bugfix: Confiner2D confines to midpoint when camera window is bigger than the axis aligned bounding box of the input confiner.
+- Bugfix: 3rdPersonFollow shows a warning message when no follow target is assigned like the rest of the body components.
+- Bugfix: FadeOut sample scene shader was culling some objects incorrectly.
+- Bugfix: Freelook had wrong heading at first frame, which could cause a slight jitter. 
+
+
+## [2.9.0-pre.7] - 2022-03-29
+- Bugfix: memory leak with PostProcessing if no PP layer is present on the camera
+- Bugfix: Standalone profiler no longer crashed with CM.
+- Bugfix: Cinemachine does not produce compiler error in unity editor versions older than 2020, when Input System package is installed.
+- Bugfix: EmbeddedAssetProperties were not displayed correctly in the editor.
+- Timeline guards added to scripts that rely on it.
+- Bugfix: SaveDuringPlay works with ILists now.
+- Bugfix: CinemachineInputProvider now correctly tracks enabled state of input action
+- Bugfix: POV orientation was incorrect with World Up override
+- Added AutoEnable option to CinemachineInputHandler
+
+
+## [2.9.0-pre.6] - 2022-01-12
+- Bugfix: Negative Near Clip Plane value is kept when camera is orthographic.
+- Regression fix: could not change the projection of the main camera if a CM virtual camera is active.
+- Regression fix: Axis input was ignoring CM's IgnoreTimeScale setting.
+- Removed legacy .unitypackages
+- New feature: CinemachineBrain may control other GameObject instead of the one it is attached to.
+- Bugfix: Cinemachine assigns a default input controller delegate that returns 0 when the legacy input system is disabled.
+- Cinemachine example scenes show informative text when used with Input System instead of throwing error messages.
+- Regression fix: compilation errors when physics module is not present.
+- GameObjects created with Gameobject menu items now follow Unity naming conventions.
+- Regression fix: virtual cameras no longer forget that they are targeting groups on domain reload.
+- Moved Cinemachine tools into the main Tools overlay (2022.1+), moved Freelook rig selection to a separate overlay, updated icons to support light and dark themes.
+- Bugfix: 3rdPersonFollow logged console messages when looking straight up or down.
+- BugFix: InputProvider no longer causes a tiny gc alloc every frame.
+- Regression fix: CinemachineCollider smoothing time did not reset correctly, so it was working once only.
+- Bugfix: Overlay tooltip names were incorrect.
+- Bugfix: Confiner2D now displays the calculated confining area when its vcam is selected.
+- Samples no longer throw errors with HDRP and URP. 3rdPersonWithAimMode and Timeline samples no longer have invalid references.
+
+
+## [2.9.0-pre.1] - 2021-10-26
+- Added ability to directly set the active blend in CinemachineBrain.
+- Bugfix: OnTargetObjectWarped() did not work properly for 3rdPersonFollow.
+- Bugfix: POV did not properly handle overridden up.
+- Regression fix: removed GC allocs in UpdateTargetCache.
+- Bugfix: async scene load/unload could cause jitter.
+- Bugfix: Input system should be read only once per render frame.
+- Bugfix: Blends were sometimes incorrect when src or dst camera is looking along world up axis.
+- Bugfix: Improve accuracy of Group Framing.
+- New feature: Added scene view overlay tools for Cinemachine components.
+- Regression fix: Lookahead works again.
+- Cinemachine3rdPersonAim exposes AimTarget, which is the position of where the player would hit.
+
+
+## [2.8.0] - 2021-07-13
+- Bugfix: Freelook prefabs won't get corrupted after editing the Prefab via its instances.
+- Bugfix: 3rdPersonFollow works with Aim components now. 
+- Bugfix: Blends between vcams, that are rotated so that their up vector is different from World up, are correct now.
+- Bugfix: POV recentering did not always recenter correctly, when an axis range was limited.
+- Bugfix: Collider sometimes bounced a little when the camera radius was large.
+- Bugfix: CinemachineVolumeSettings inspector was making the game view flicker.
+- Bugfix: CinemachineVolumeSettings inspector displayed a misleading warning message with URP when focus tracking was enabled.
+- Bugfix: Rapidly toggling active cameras before the blends were finished did not use the correct blend time.
+- AimingRig sample scene updated with a better reactive crosshair design.
+- Added API accessor for Active Blend in Clearshot and StateDrivenCamera. 
+- Bugfix: Virtual Cameras were not updating in Edit mode when Brain's BlendUpdateMode was FixedUpdate.
+- Bugfix: Lens mode override was not working correctly in all cases.
+- Collider2D inspector: added warning when collider is of the wrong type.
+
+
+## [2.8.0-pre.1] - 2021-04-21
+- Switching targets (Follow, LookAt) is smooth by default. For the old behaviour, set PreviousStateIsValid to false after changing the targets.
+- Bugfix: Reversing a blend in progress respects asymmetric blend times.
+- Regression fix: CmPostProcessing and CmVolumeSettings components setting Depth of Field now works correctly with Framing Transposer. 
+- Regression fix: 3rdPersonFollow kept player in view when Z damping was high.
+- Regression fix: Physical camera properties were overwritten by vcams when "override mode: physical" was not selected.
+- New sample scene: Boss cam demonstrates how to setup a camera that follows the player and looks at the player and the boss. Boss cam also shows examples of custom extensions.
+- Added simplified modes to Impulse Source.
+- Added secondary reaction settings to Impulse Listener.
+- Added Storyboard support for ScreenSpaceOverlay and ScreenSpaceCamera camera render modes.
+- Added DampingIntoCollision and DampingFromCollision properties to Cinemachine3rdPersonFollow to control how gradually the camera moves to correct for occlusions.
+- Added CinemachineCore.OnTargetObjectWarped() to warp all vcams targeting an object.
+- Added ability for vcam to have a negative near clip plane.
+- Added Draggable Game Window Guides toggle in Cinemachine preferences. When disabled, Game Window guides are only for visualization.
+- Added button to virtual camera inspectors to auto-generate the CinemachineInputProvider component if it is missing.
+- Default PostProcessing profile priority is now configurable and defaults to 1000.
+- Cinemachine3rdPersonFollow now operates without the physics module and without collision resolution.
+- Bugfix: 3rdPersonFollow collision resolution failed when the camera radius was large.
+- Bugfix: 3rdPersonFollow damping occured in world space instead of camera space.
+- Bugfix: 3rdPersonFollow stuttered when Z damping was high.
+- Regression fix: CinemachineInputProvider stopped providing input.
+- Bugfix: Lens aspect and sensorSize were updated when lens OverrideMode != None.
+- Bugfix: Changing targets on a live vcam misbehaved.
+- Bugfix: Framing transposer did not handle empty groups.
+- Bugfix: Interrupting a transition with InheritPosition enabled did not work.
+- Bugfix: Cinemachine3rdPersonFollow handled collisions by default, now it is disabled by default.
+- Bugfix: SaveDuringPlay saved some components that did not have the SaveDuringPlay attribute.
+- Regression fix: Entries in the custom blends editor in CM Brain inspector were not selectable.
+- GameView guides are drawn only if appropriate inspector subsection is expanded.
+- FreeLook rigs are now organized in tabs in the inspector.
+- New sample scene: **Boss cam** sample scene demonstrates a camera setup to follow the player and to look at the player and the boss. The scene provides  examples of custom extensions.
+- New Sample scene: **2D zoom**, showing how to zoom an orthographic camera with mouse scroll.
+- New Sample scene: **2D fighters**, showing how to add/remove targets gradually to/from a TargetGroup based on some conditions (here, it is the y coord of the players).
+- Bugfix: CinemachineCollider's displacement damping was being calculated in world space instead of camera space.
+- Bugfix: TrackedDolly sometimes introduced spurious rotations if Default Up and no Aim behaviour.
+- Bugfix: 3rdPersonFollow's shoulder now changes smoothly with respect to world-up vector changes.
+
+
+## [2.7.2] - 2021-02-15
+- CinemachineConfiner2D now handles cases where camera window is oversized
+- New sample scene (FadeOutNearbyObjects) demonstrating fade out effect for objects between camera and target using shaders. The example includes a cinemachine extension giving convenient control over the shader parameters
+- Bugfix (1293429) - Brain could choose vcam with not the highest priority in some cases
+- Bugfix: SaveDuringPlay also works on prefab instances
+- Bugfix (1272146) - Adding vcam to a prefab asset no longer causes errors in console
+- Bugfix (1290171) - Impulse manager was not cleared at playmode start
+- Nested Scrub Bubble sample removed (filenames too long), available now as embedded package
+- Compilation guards for physics, animation, and imgui. Cinemachine does not hard depend on anything now
+- Bugfix: CM StoryBoard had a 1 pixel border
+- Bugfix: CM StoryBoard lost viewport reference after hot reload
+- Bugfix: FramingTransposer's TargetMovementOnly damping caused a flick.
+- Bugfix: FreeLook small drift when no user input if SimpleFollowWithWorldUp
+- Bugfix: InheritPosition did not work with SimpleFollow binding mode
+- Bugfix: cleanup straggling post processing profiles when no active vcams
+- Bugfix: Checking whether the Input Action passed to CinemachineInputHandler is enabled before using it.
+- Bugfix: 3rdPersonFollow FOV was blended incorrectly when ReferenceLookAt was set to a faraway target
+- Bugfix: Position predictor not properly reset
+- Bugfix: Create via menu doesn't create as child of selected object
+- Bugfix: Post-processing profiles not cleaned up when no active vcams
+- Bugfix: Install CinemachineExamples Asset Package menu item was failing on 2018.4 / macOS
+- New sample scene (2DConfinerComplex) demonstrating new CinemachineConfiner2D extension.
+- Updated CharacterMovement2D script in 2D sample scenes (2DConfinedTargetGroup, 2DConfiner, 2DConfinerUndersized, 2DTargetGroup) to make jumping responsive. 
+- Updated 2DConfinedTargetGroup and 2DConfiner scenes to use new CinemachineConfiner2D extension. 
+
+
+## [2.7.1] - 2020-11-14
+- New feature: CinemachineConfiner2D - Improved 2D confiner.
+- Added ApplyAfter option to ImpulseListener, to add control over the ordering of extensions
+- UI update - Moved Cinemachine menu to GameObject Create menu and Right Click context menu for Hierarchy.
+- Virtual Camera Lens inspector supports display of Horizontal FOV
+- Virtual Camera Lens can override orthographic and physical camera settings
+- Bugfix (1060230) - lens inspector sometimes displayed ortho vs perspective incorrectly for a brief time
+- Bugfix (1283984) - Error message when loading new scene with DontDestroyOnLoad
+- bugfix (1284701) - Edge-case exception when vcam is deleted
+- Storyboard Global Mute moved from Cinemachine menu to Cinemachine preferences.
+- Bugfix - long-idle vcams when reawakened sometimes had a single frame with a huge deltaTime
+- Bugfix - PostProcessing temporarily stopped being applied after exiting play mode
+
+
+## [2.6.3] - 2020-09-16
+- Regression fix (1274989) - OnTargetObjectWarped broken for OrbitalTransposer
+- Bugfix (1276391) - CM Brain Reset did not reset Custom Blends asset in inspector
+- Bugfix (1276343) - CM Brain inspector custom blends misaligned dropdown arrow
+- Bugfix (1256530) - disallow multiple components where appropriate
+- Bugfix: BlendList camera was incorrectly holding 0-length camera cuts
+- Bugfix (1174993) - CM Brain logo was not added to Hierarchy next to Main Camera after adding vcam for the first time after importing CM.
+- Bugfix (1100131) - Confiner is aware of 2D collider's offset attribute.
+
+
+
+## [2.6.2] - 2020-09-02
+### Bugfixes
+- Regression fix: OnCameraCut Memory leak when using Cinemachine with PostProcessing package
+- Bugfix (1272146): Checking for null pipeline, before drawing gizmos.
+- Add support for disabling Physics module
+
+
+## [2.6.1] - 2020-08-13
+### Bugfixes
+- Regression Fix: PostProcessing/VolumeSettings FocusTracksTarget was not accounting for lookAt target offset
+- Regression fix: Confiner no longer confines noise and impulse
+- Bugfix: StateDrivenCamera was choosing parent state if only 1 clip in blendstate, even though there was a vcam assigned to that clip
 - Bugfix: vertical group composition was not composing properly
+- Bugfix: CinemachineNewVirtualCamera.AddComponent() now works properly
+- Bugfix: removed compile errors when Physics2D module is disabled
+- Bugfix: brain updates on scene loaded or unloaded
+- Bugfix (1252431): Fixed unnecessary GC Memory allocation every frame when using timeline  
+- Bugfix (1260385): check for prefab instances correctly
+- Bugfix (1266191) Clicking on foldout labels in preferences panel toggles their expanded state
+- Bugfix (1266196) Composer target Size label in preferences panel was too big
+- Bugfix: Scrubbing Cache was locking virtual camera transforms beyond the cache range
+- Improved performance of path gizmo drawing
+- Timeline Scrubbing Cache supports nested timelines, with some known limitations to be addressed with a future Timeline package release
+- Added support for deterministic noise in the context of controlled rendering (via CinemachineCore.CurrentTimeOverride)
+- Added Target Offset field to Framing Transposer
+- Added Multi-object edit capabilities to virtual cameras and extensions 
+- Added inspector button to clear the Scrubbing Cache
 
 
 ## [2.6.0] - 2020-06-04

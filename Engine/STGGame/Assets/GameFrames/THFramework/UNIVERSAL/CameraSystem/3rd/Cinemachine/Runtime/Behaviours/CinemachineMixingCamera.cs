@@ -14,13 +14,10 @@ namespace Cinemachine
     /// </summary>
     [DocumentationSorting(DocumentationSortingAttribute.Level.UserRef)]
     [DisallowMultipleComponent]
-#if UNITY_2018_3_OR_NEWER
     [ExecuteAlways]
-#else
-    [ExecuteInEditMode]
-#endif
     [ExcludeFromPreset]
     [AddComponentMenu("Cinemachine/CinemachineMixingCamera")]
+    [HelpURL(Documentation.BaseURL + "manual/CinemachineMixingCamera.html")]
     public class CinemachineMixingCamera : CinemachineVirtualCameraBase
     {
         /// <summary>The maximum number of tracked cameras.  If you want to add
@@ -129,7 +126,7 @@ namespace Cinemachine
 
         /// <summary>Get the current "best" child virtual camera, which is nominally
         /// the one with the greatest weight.</summary>
-        private ICinemachineCamera LiveChild { set; get; }
+        private ICinemachineCamera LiveChild { get; set; }
 
         /// <summary>The blended CameraState</summary>
         public override CameraState State { get { return m_State; } }

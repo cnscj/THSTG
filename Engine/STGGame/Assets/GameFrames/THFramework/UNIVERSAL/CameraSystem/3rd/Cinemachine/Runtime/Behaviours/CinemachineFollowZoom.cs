@@ -11,11 +11,9 @@ namespace Cinemachine
     [DocumentationSorting(DocumentationSortingAttribute.Level.UserRef)]
     [AddComponentMenu("")] // Hide in menu
     [SaveDuringPlay]
-#if UNITY_2018_3_OR_NEWER
     [ExecuteAlways]
-#else
-    [ExecuteInEditMode]
-#endif
+    [DisallowMultipleComponent]
+    [HelpURL(Documentation.BaseURL + "manual/CinemachineFollowZoom.html")]
     public class CinemachineFollowZoom : CinemachineExtension
     {
         /// <summary>The shot width to maintain, in world units, at target distance.
@@ -62,6 +60,10 @@ namespace Cinemachine
         }
         
         /// <summary>Callback to preform the zoom adjustment</summary>
+        /// <param name="vcam">The virtual camera being processed</param>
+        /// <param name="stage">The current pipeline stage</param>
+        /// <param name="state">The current virtual camera state</param>
+        /// <param name="deltaTime">The current applicable deltaTime</param>
         protected override void PostPipelineStageCallback(
             CinemachineVirtualCameraBase vcam,
             CinemachineCore.Stage stage, ref CameraState state, float deltaTime)

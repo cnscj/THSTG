@@ -12,8 +12,11 @@ namespace Cinemachine.Editor
 {
 #if CINEMACHINE_PHYSICS || CINEMACHINE_PHYSICS_2D
     [CustomEditor(typeof(CinemachineConfiner))]
+    [CanEditMultipleObjects]
     internal sealed class CinemachineConfinerEditor : BaseEditor<CinemachineConfiner>
     {
+        /// <summary>Get the property names to exclude in the inspector.</summary>
+        /// <param name="excluded">Add the names to this list</param>
         protected override void GetExcludedPropertiesInInspector(List<string> excluded)
         {
             base.GetExcludedPropertiesInInspector(excluded);
@@ -148,7 +151,7 @@ namespace Cinemachine.Editor
                     {
                         PolygonCollider2D poly = confiner.m_BoundingShape2D as PolygonCollider2D;
                         for (int i = 0; i < poly.pathCount; ++i)
-                            DrawPath(poly.GetPath(i), -1);
+                            DrawPath(poly.GetPath(i), -1, poly.offset);
                     }
                     else if (colliderType == typeof(CompositeCollider2D))
                     {
@@ -162,7 +165,7 @@ namespace Cinemachine.Editor
                             {
                                 path[j] *= revertCompositeColliderScale;
                             }
-                            DrawPath(path, numPoints);
+                            DrawPath(path, numPoints, poly.offset);
                         }
                     }
 #endif
@@ -174,7 +177,7 @@ namespace Cinemachine.Editor
             }
         }
 
-        static void DrawPath(Vector2[] path, int numPoints)
+        static void DrawPath(Vector2[] path, int numPoints, Vector2 offset)
         {
             if (numPoints < 0)
                 numPoints = path.Length;
@@ -184,7 +187,7 @@ namespace Cinemachine.Editor
                 for (int j = 0; j < numPoints; ++j)
                 {
                     Vector2 v = path[j];
-                    Gizmos.DrawLine(v0, v);
+                    Gizmos.DrawLine(v0 + offset, v + offset);
                     v0 = v;
                 }
             }

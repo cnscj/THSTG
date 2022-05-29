@@ -20,11 +20,7 @@ namespace Cinemachine
     /// </summary>
     [DocumentationSorting(DocumentationSortingAttribute.Level.UserRef)]
     [DisallowMultipleComponent]
-#if UNITY_2018_3_OR_NEWER
     [ExecuteAlways]
-#else
-    [ExecuteInEditMode]
-#endif
     [AddComponentMenu("Cinemachine/CinemachineNewFreeLook")]
     [SaveDuringPlay]
     public class CinemachineNewFreeLook : CinemachineNewVirtualCamera
@@ -306,7 +302,8 @@ namespace Cinemachine
             InvokeOnTransitionInExtensions(fromCam, worldUp, deltaTime);
             m_VerticalAxis.m_Recentering.DoRecentering(ref m_VerticalAxis, -1, 0.5f);
             m_VerticalAxis.m_Recentering.CancelRecentering();
-            if (fromCam != null && m_Transitions.m_InheritPosition)
+            if (fromCam != null && m_Transitions.m_InheritPosition
+                 && !CinemachineCore.Instance.IsLiveInBlend(this))
             {
                 // Note: horizontal axis already taken care of by base class
                 var cameraPos = fromCam.State.RawPosition;
@@ -318,7 +315,7 @@ namespace Cinemachine
                     if (orbital != null)
                         cameraPos = orbital.GetTargetCameraPosition(worldUp);
                 }
-                m_VerticalAxis.Value = GetYAxisClosestValue(cameraPos, worldUp);
+                ForceCameraPosition(cameraPos, fromCam.State.FinalOrientation);
             }
         }
 
@@ -379,6 +376,8 @@ namespace Cinemachine
         /// <param name="deltaTime">Delta time for time-based effects (ignore if less than 0)</param>
         override public void InternalUpdateCameraState(Vector3 worldUp, float deltaTime)
         {
+            UpdateTargetCache();
+
             FollowTargetAttachment = 1;
             LookAtTargetAttachment = 1;
 
@@ -419,13 +418,11 @@ namespace Cinemachine
 
             // Push the raw position back to the game object's transform, so it
             // moves along with the camera.
-            if (!UserIsDragging)
-            {
-                if (Follow != null)
-                    transform.position = State.RawPosition;
-                if (LookAt != null)
-                    transform.rotation = State.RawOrientation;
-            }
+            if (Follow != null)
+                transform.position = State.RawPosition;
+            if (LookAt != null)
+                transform.rotation = State.RawOrientation;
+            
             // Signal that it's all done
             InvokePostPipelineStageCallback(this, CinemachineCore.Stage.Finalize, ref m_State, deltaTime);
             PreviousStateIsValid = true;
@@ -512,8 +509,8 @@ namespace Cinemachine
             Rig.ComposerSettings composerSaved = new Rig.ComposerSettings();
             Rig.PerlinNoiseSettings noiseSaved = new Rig.PerlinNoiseSettings();
 
-            public int OtherRig { get; set; }
-            public float BlendAmount { get; set; }
+            public int OtherRig;
+            public float BlendAmount;
             CinemachineNewFreeLook mFreeLook;
 
             public ComponentBlender(CinemachineNewFreeLook freeLook) { mFreeLook = freeLook; }

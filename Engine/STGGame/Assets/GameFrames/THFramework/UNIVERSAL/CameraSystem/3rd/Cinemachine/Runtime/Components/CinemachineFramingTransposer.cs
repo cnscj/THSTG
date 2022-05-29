@@ -32,6 +32,17 @@ namespace Cinemachine
     [SaveDuringPlay]
     public class CinemachineFramingTransposer : CinemachineComponentBase
     {
+        /// <summary>
+        /// Offset from the Follow Target object (in target-local co-ordinates).  The camera will attempt to
+        /// frame the point which is the target's position plus this offset.  Use it to correct for
+        /// cases when the target's origin is not the point of interest for the camera.
+        /// </summary>
+        [Tooltip("Offset from the Follow Target object (in target-local co-ordinates).  "
+            + "The camera will attempt to frame the point which is the target's position plus "
+            + "this offset.  Use it to correct for cases when the target's origin is not the "
+            + "point of interest for the camera.")]
+        public Vector3 m_TrackedObjectOffset;
+
         /// <summary>This setting will instruct the composer to adjust its target offset based
         /// on the motion of the target.  The composer will look at a point where it estimates
         /// the target will be this many seconds into the future.  Note that this setting is sensitive
@@ -45,6 +56,7 @@ namespace Cinemachine
             + "If the camera jitters unacceptably when the target is in motion, turn down this "
             + "setting, or animate the target more smoothly.")]
         [Range(0f, 1f)]
+        [Space]
         public float m_LookaheadTime = 0;
 
         /// <summary>Controls the smoothness of the lookahead algorithm.  Larger values smooth out
@@ -65,7 +77,7 @@ namespace Cinemachine
         [Space]
         [Range(0f, 20f)]
         [Tooltip("How aggressively the camera tries to maintain the offset in the X-axis.  "
-            + " Small numbers are more responsive, rapidly translating the camera to keep the target's "
+            + "Small numbers are more responsive, rapidly translating the camera to keep the target's "
             + "x-axis offset.  Larger numbers give a more heavy slowly responding camera.  "
             + "Using different settings per axis can yield a wide range of camera behaviors.")]
         public float m_XDamping = 1f;
@@ -97,7 +109,7 @@ namespace Cinemachine
         /// the rotation changes</summary>
         [Tooltip("If set, damping will apply  only to target motion, but not to camera "
             + "rotation changes.  Turn this on to get an instant response when the rotation changes.  ")]
-        public bool m_TargetMovementOnly;
+        public bool m_TargetMovementOnly = true;
 
         /// <summary>Horizontal screen position for target. The camera will move to position the tracked object here</summary>
         [Space]
@@ -291,7 +303,7 @@ namespace Cinemachine
             }
         }
 
-        private void OnValidate()
+        void OnValidate()
         {
             m_CameraDistance = Mathf.Max(m_CameraDistance, kMinimumCameraDistance);
             m_DeadZoneDepth = Mathf.Max(m_DeadZoneDepth, 0);
@@ -313,6 +325,9 @@ namespace Cinemachine
         /// <summary>Get the Cinemachine Pipeline stage that this component implements.
         /// Always returns the Body stage</summary>
         public override CinemachineCore.Stage Stage { get { return CinemachineCore.Stage.Body; } }
+
+        /// <summary>FramingTransposer's algorithm tahes camera orientation as input, 
+        /// so even though it is a Body component, it must apply after Aim</summary>
         public override bool BodyAppliesAfterAim { get { return true; } }
 
         const float kMinimumCameraDistance = 0.01f;
@@ -320,7 +335,7 @@ namespace Cinemachine
 
         /// <summary>State information for damping</summary>
         Vector3 m_PreviousCameraPosition = Vector3.zero;
-        PositionPredictor m_Predictor = new PositionPredictor();
+        internal PositionPredictor m_Predictor = new PositionPredictor();
 
         /// <summary>Internal API for inspector</summary>
         public Vector3 TrackedPoint { get; private set; }
@@ -349,6 +364,7 @@ namespace Cinemachine
         {
             base.ForceCameraPosition(pos, rot);
             m_PreviousCameraPosition = pos;
+            m_prevRotation = rot;
         }
         
         /// <summary>
@@ -365,21 +381,24 @@ namespace Cinemachine
         /// <param name="fromCam">The camera being deactivated.  May be null.</param>
         /// <param name="worldUp">Default world Up, set by the CinemachineBrain</param>
         /// <param name="deltaTime">Delta time for time-based effects (ignore if less than or equal to 0)</param>
+        /// <param name="transitionParams">Transition settings for this vcam</param>
         /// <returns>True if the vcam should do an internal update as a result of this call</returns>
         public override bool OnTransitionFromCamera(
             ICinemachineCamera fromCam, Vector3 worldUp, float deltaTime,
             ref CinemachineVirtualCameraBase.TransitionParams transitionParams)
         {
-            if (fromCam != null && transitionParams.m_InheritPosition)
+            if (fromCam != null && transitionParams.m_InheritPosition
+                 && !CinemachineCore.Instance.IsLiveInBlend(VirtualCamera))
             {
-                transform.rotation = fromCam.State.RawOrientation;
-                InheritingPosition = true;
+                m_PreviousCameraPosition = fromCam.State.RawPosition;
+                m_prevRotation = fromCam.State.RawOrientation;
+                m_InheritingPosition = true;
                 return true;
             }
             return false;
         }
 
-        bool InheritingPosition { get; set; }
+        bool m_InheritingPosition;
 
         // Convert from screen coords to normalized orthographic distance coords
         private Rect ScreenToOrtho(Rect rScreen, float orthoSize, float aspect)
@@ -422,15 +441,16 @@ namespace Cinemachine
         public override void MutateCameraState(ref CameraState curState, float deltaTime)
         {
             LensSettings lens = curState.Lens;
-            Vector3 followTargetPosition = FollowTargetPosition;
+            Vector3 followTargetPosition = FollowTargetPosition + (FollowTargetRotation * m_TrackedObjectOffset);
             bool previousStateIsValid = deltaTime >= 0 && VirtualCamera.PreviousStateIsValid;
+            if (!previousStateIsValid || VirtualCamera.FollowTargetChanged)
+                m_Predictor.Reset();
             if (!previousStateIsValid)
             {
-                m_Predictor.Reset();
                 m_PreviousCameraPosition = curState.RawPosition;
                 m_prevFOV = lens.Orthographic ? lens.OrthographicSize : lens.FieldOfView;
                 m_prevRotation = curState.RawOrientation;
-                if (!InheritingPosition && m_CenterOnActivate)
+                if (!m_InheritingPosition && m_CenterOnActivate)
                 {
                     m_PreviousCameraPosition = FollowTargetPosition
                         + (curState.RawOrientation * Vector3.back) * m_CameraDistance;
@@ -438,13 +458,15 @@ namespace Cinemachine
             }
             if (!IsValid)
             {
-                InheritingPosition = false;
+                m_InheritingPosition = false;
                 return;
             }
 
+            var verticalFOV = lens.FieldOfView;
+
             // Compute group bounds and adjust follow target for group framing
             ICinemachineTargetGroup group = AbstractFollowTargetGroup;
-            bool isGroupFraming = group != null && m_GroupFramingMode != FramingMode.None;
+            bool isGroupFraming = group != null && m_GroupFramingMode != FramingMode.None && !group.IsEmpty;
             if (isGroupFraming)
                 followTargetPosition = ComputeGroupBounds(group, ref curState);
 
@@ -486,7 +508,7 @@ namespace Cinemachine
                 {
                     // What distance from near edge would be needed to get the adjusted
                     // target height, at the current FOV
-                    targetDistance = targetHeight / (2f * Mathf.Tan(lens.FieldOfView * Mathf.Deg2Rad / 2f));
+                    targetDistance = targetHeight / (2f * Mathf.Tan(verticalFOV * Mathf.Deg2Rad / 2f));
 
                     // Clamp to respect min/max distance settings to the near surface of the bounds
                     targetDistance = Mathf.Clamp(targetDistance, m_MinimumDistance, m_MaximumDistance);
@@ -500,7 +522,7 @@ namespace Cinemachine
 
             // Optionally allow undamped camera orientation change
             Quaternion localToWorld = curState.RawOrientation;
-            if (previousStateIsValid && m_TargetMovementOnly && m_prevRotation != localToWorld)
+            if (previousStateIsValid && m_TargetMovementOnly)
             {
                 var q = localToWorld * Quaternion.Inverse(m_prevRotation);
                 m_PreviousCameraPosition = TrackedPoint + q * (m_PreviousCameraPosition - TrackedPoint);
@@ -527,13 +549,13 @@ namespace Cinemachine
             // Move along the XY plane
             float screenSize = lens.Orthographic 
                 ? lens.OrthographicSize 
-                : Mathf.Tan(0.5f * lens.FieldOfView * Mathf.Deg2Rad) * (targetZ - cameraOffset.z);
+                : Mathf.Tan(0.5f * verticalFOV * Mathf.Deg2Rad) * (targetZ - cameraOffset.z);
             Rect softGuideOrtho = ScreenToOrtho(SoftGuideRect, screenSize, lens.Aspect);
             if (!previousStateIsValid)
             {
                 // No damping or hard bounds, just snap to central bounds, skipping the soft zone
                 Rect rect = softGuideOrtho;
-                if (m_CenterOnActivate && !InheritingPosition)
+                if (m_CenterOnActivate && !m_InheritingPosition)
                     rect = new Rect(rect.center, Vector2.zero); // Force to center
                 cameraOffset += OrthoOffsetToScreenBounds(targetPos, rect);
             }
@@ -593,7 +615,7 @@ namespace Cinemachine
                     curState.Lens = lens;
                 }
             }
-            InheritingPosition = false;
+            m_InheritingPosition = false;
         }
 
         float GetTargetHeight(Vector2 boundsSize)
@@ -638,19 +660,21 @@ namespace Cinemachine
         static Bounds GetScreenSpaceGroupBoundingBox(
             ICinemachineTargetGroup group, ref Vector3 pos, Quaternion orientation)
         {
-            Matrix4x4 observer = Matrix4x4.TRS(pos, orientation, Vector3.one);
-            Vector2 minAngles, maxAngles, zRange;
-            group.GetViewSpaceAngularBounds(observer, out minAngles, out maxAngles, out zRange);
+            var observer = Matrix4x4.TRS(pos, orientation, Vector3.one);
+            group.GetViewSpaceAngularBounds(observer, out var minAngles, out var maxAngles, out var zRange);
+            var shift = (minAngles + maxAngles) / 2;
 
-            Quaternion q = Quaternion.identity.ApplyCameraRotation((minAngles + maxAngles) / 2, Vector3.up);
-            Vector3 localPosAdustment = q * new Vector3(0, 0, (zRange.y + zRange.x)/2);
-            localPosAdustment.z = 0;
-            pos = observer.MultiplyPoint3x4(localPosAdustment);
+            var q = Quaternion.identity.ApplyCameraRotation(new Vector2(-shift.x, shift.y), Vector3.up);
+            pos = q * new Vector3(0, 0, (zRange.y + zRange.x)/2);
+            pos.z = 0;
+            pos = observer.MultiplyPoint3x4(pos);
             observer = Matrix4x4.TRS(pos, orientation, Vector3.one);
             group.GetViewSpaceAngularBounds(observer, out minAngles, out maxAngles, out zRange);
 
-            float zSize = zRange.y - zRange.x;
-            float z = zRange.x + (zSize / 2);
+            // For width and height (in camera space) of the bounding box, we use the values at the center of the box.
+            // This is an arbitrary choice.  The gizmo drawer will take this into account when displaying
+            // the frustum bounds of the group
+            var d = zRange.y + zRange.x;
             Vector2 angles = new Vector2(89.5f, 89.5f);
             if (zRange.x > 0)
             {
@@ -658,8 +682,9 @@ namespace Cinemachine
                 angles = Vector2.Min(angles, new Vector2(89.5f, 89.5f));
             }
             angles *= Mathf.Deg2Rad;
-            return new Bounds(new Vector3(0, 0, z),
-                new Vector3(Mathf.Tan(angles.y) * z * 2, Mathf.Tan(angles.x) * z * 2, zSize));
+            return new Bounds(
+                new Vector3(0, 0, d/2),
+                new Vector3(Mathf.Tan(angles.y) * d, Mathf.Tan(angles.x) * d, zRange.y - zRange.x));
         }
     }
 }

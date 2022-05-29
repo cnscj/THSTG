@@ -148,10 +148,14 @@ namespace Cinemachine.Editor
             Type type = property.serializedObject.targetObject.GetType();
             var a = property.propertyPath.Split('.');
             for (int i = 0; i < a.Length; ++i)
-                type = type.GetField(a[i],
+            {
+                var field = type.GetField(a[i],
                     System.Reflection.BindingFlags.Public
                     | System.Reflection.BindingFlags.NonPublic
-                    | System.Reflection.BindingFlags.Instance).FieldType;
+                    | System.Reflection.BindingFlags.Instance);
+                if (field == null) continue;
+                type = field.FieldType;
+            }
             return type;
         }
 
@@ -165,14 +169,12 @@ namespace Cinemachine.Editor
                 return;
 
             mAssetPresets = new List<ScriptableObject>();
-#if UNITY_2018_1_OR_NEWER
             if (mAssetTypes != null)
             {
                 for (int i = 0; i < mAssetTypes.Length; ++i)
                     InspectorUtility.AddAssetsFromPackageSubDirectory(
                         mAssetTypes[i], mAssetPresets, "Presets/Noise");
             }
-#endif
             List<GUIContent> presetNameList = new List<GUIContent>();
             foreach (var n in mAssetPresets)
                 presetNameList.Add(new GUIContent("Presets/" + n.name));

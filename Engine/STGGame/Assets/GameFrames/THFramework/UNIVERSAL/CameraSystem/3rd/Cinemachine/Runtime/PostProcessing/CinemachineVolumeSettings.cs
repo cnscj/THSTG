@@ -3,12 +3,12 @@
 #if CINEMACHINE_HDRP
     using System.Collections.Generic;
     using UnityEngine.Rendering;
-    #if CINEMACHINE_HDRP_7_0_0
+    #if CINEMACHINE_HDRP_7_3_1
         using UnityEngine.Rendering.HighDefinition;
     #else
         using UnityEngine.Experimental.Rendering.HDPipeline;
     #endif
-#elif CINEMACHINE_LWRP_7_0_0
+#elif CINEMACHINE_LWRP_7_3_1
     using System.Collections.Generic;
     using UnityEngine.Rendering;
     using UnityEngine.Rendering.Universal;
@@ -16,8 +16,18 @@
 
 namespace Cinemachine.PostFX
 {
-#if !(CINEMACHINE_HDRP || CINEMACHINE_LWRP_7_0_0)
+#if !(CINEMACHINE_HDRP || CINEMACHINE_LWRP_7_3_1)
     // Workaround for Unity scripting bug
+    /// <summary>
+    /// This behaviour is a liaison between Cinemachine with the Post-Processing v3 module.
+    ///
+    /// As a component on the Virtual Camera, it holds
+    /// a Post-Processing Profile asset that will be applied to the Unity camera whenever
+    /// the Virtual camera is live.  It also has the optional functionality of animating
+    /// the Focus Distance and DepthOfField properties of the Camera State, and
+    /// applying them to the current Post-Processing profile, provided that profile has a
+    /// DepthOfField effect that is enabled.
+    /// </summary>
     [AddComponentMenu("")] // Hide in menu
     public class CinemachineVolumeSettings : MonoBehaviour {}
 #else
@@ -32,15 +42,20 @@ namespace Cinemachine.PostFX
     /// DepthOfField effect that is enabled.
     /// </summary>
     [DocumentationSorting(DocumentationSortingAttribute.Level.UserRef)]
-#if UNITY_2018_3_OR_NEWER
     [ExecuteAlways]
-#else
-    [ExecuteInEditMode]
-#endif
     [AddComponentMenu("")] // Hide in menu
     [SaveDuringPlay]
+    [DisallowMultipleComponent]
+    [HelpURL(Documentation.BaseURL + "manual/CinemachineVolumeSettings.html")]
     public class CinemachineVolumeSettings : CinemachineExtension
     {
+        /// <summary>
+        /// This is the priority for the vcam's PostProcessing volumes.  It's set to a high
+        /// number in order to ensure that it overrides other volumes for the active vcam.
+        /// You can change this value if necessary to work with other systems.
+        /// </summary>
+        static public float s_VolumePriority = 1000f;
+
         /// <summary>This is obsolete, please use m_FocusTracking</summary>
         [HideInInspector]
         public bool m_FocusTracksTarget;
@@ -78,8 +93,10 @@ namespace Cinemachine.PostFX
             + "Offsets the sharpest point away from the focus target.")]
         public float m_FocusOffset;
 
-        [Tooltip("This Post-Processing profile will be applied whenever this "
-            + "virtual camera is live")]
+        /// <summary>
+        /// This profile will be applied whenever this virtual camera is live
+        /// </summary>
+        [Tooltip("This profile will be applied whenever this virtual camera is live")]
         public VolumeProfile m_Profile;
 
         class VcamExtraState
@@ -121,9 +138,9 @@ namespace Cinemachine.PostFX
                 list[i].DestroyProfileCopy();
         }
 
-        protected override void Awake()
+        protected override void OnEnable()
         {
-            base.Awake();
+            base.OnEnable();
 
             // Map legacy m_FocusTracksTarget to focus mode
             if (m_FocusTracksTarget)
@@ -140,13 +157,17 @@ namespace Cinemachine.PostFX
             base.OnDestroy();
         }
 
+        /// <summary>Apply PostProcessing effects</summary>
+        /// <param name="vcam">The virtual camera being processed</param>
+        /// <param name="stage">The current pipeline stage</param>
+        /// <param name="state">The current virtual camera state</param>
+        /// <param name="deltaTime">The current applicable deltaTime</param>
         protected override void PostPipelineStageCallback(
             CinemachineVirtualCameraBase vcam,
             CinemachineCore.Stage stage, ref CameraState state, float deltaTime)
         {
             // Set the focus after the camera has been fully positioned.
-            // GML todo: what about collider?
-            if (stage == CinemachineCore.Stage.Aim)
+            if (stage == CinemachineCore.Stage.Finalize)
             {
                 var extra = GetExtraState<VcamExtraState>(vcam);
                 if (!IsValid)
@@ -166,16 +187,20 @@ namespace Cinemachine.PostFX
                         if (profile.TryGet(out DepthOfField dof))
                         {
                             float focusDistance = m_FocusOffset;
-                            Transform focusTarget = null;
-                            switch (m_FocusTracking)
+                            if (m_FocusTracking == FocusTrackingMode.LookAtTarget)
+                                focusDistance += (state.FinalPosition - state.ReferenceLookAt).magnitude;
+                            else
                             {
-                                default: break;
-                                case FocusTrackingMode.LookAtTarget: focusTarget = VirtualCamera.LookAt; break;
-                                case FocusTrackingMode.FollowTarget: focusTarget = VirtualCamera.Follow; break;
-                                case FocusTrackingMode.CustomTarget: focusTarget = m_FocusTarget; break;
+                                Transform focusTarget = null;
+                                switch (m_FocusTracking)
+                                {
+                                    default: break;
+                                    case FocusTrackingMode.FollowTarget: focusTarget = VirtualCamera.Follow; break;
+                                    case FocusTrackingMode.CustomTarget: focusTarget = m_FocusTarget; break;
+                                }
+                                if (focusTarget != null)
+                                    focusDistance += (state.FinalPosition - focusTarget.position).magnitude;
                             }
-                            if (focusTarget != null)
-                                focusDistance += (state.FinalPosition - focusTarget.position).magnitude;
                             dof.focusDistance.value = Mathf.Max(0, focusDistance);
                             
                             profile.isDirty = true;
@@ -191,16 +216,22 @@ namespace Cinemachine.PostFX
         {
             //Debug.Log($"Camera cut to {brain.ActiveVirtualCamera.Name}");
 
-#if CINEMACHINE_HDRP_7_0_0
+#if CINEMACHINE_HDRP_7_3_1
             // Reset temporal effects
             var cam = brain.OutputCamera;
             if (cam != null)
             {
-    #if CINEMACHINE_HDRP_7_1_0
                 HDCamera hdCam = HDCamera.GetOrCreate(cam);
-    #else
-                HDCamera hdCam = HDCamera.GetOrCreate(cam, new XRPass());
-    #endif
+                hdCam.volumetricHistoryIsValid = false;
+                hdCam.colorPyramidHistoryIsValid = false;
+                hdCam.Reset();
+            }
+#elif CINEMACHINE_LDRP_7_3_1
+            // Reset temporal effects
+            var cam = brain.OutputCamera;
+            if (cam != null)
+            {
+                HDCamera hdCam = HDCamera.GetOrCreate(cam);
                 hdCam.volumetricHistoryIsValid = false;
                 hdCam.colorPyramidHistoryIsValid = false;
                 hdCam.Reset();
@@ -232,7 +263,7 @@ namespace Cinemachine.PostFX
                         firstVolume = v;
                     v.sharedProfile = profile;
                     v.isGlobal = true;
-                    v.priority = float.MaxValue - (numBlendables - i - 1) * 1.0e35f;
+                    v.priority = s_VolumePriority - (numBlendables - i) - 1;
                     v.weight = b.m_Weight;
                     ++numPPblendables;
                 }
@@ -277,10 +308,10 @@ namespace Cinemachine.PostFX
                 }
 
                 // Update the volume's layer so it will be seen
-#if CINEMACHINE_LWRP_7_0_0 && !CINEMACHINE_HDRP
-                var data = brain.gameObject.GetComponent<UniversalAdditionalCameraData>();
-#else
+#if CINEMACHINE_HDRP
                 var data = brain.gameObject.GetComponent<HDAdditionalCameraData>();
+#elif CINEMACHINE_LWRP_7_3_1
+                var data = brain.gameObject.GetComponent<UniversalAdditionalCameraData>();
 #endif
                 if (data != null)
                 {

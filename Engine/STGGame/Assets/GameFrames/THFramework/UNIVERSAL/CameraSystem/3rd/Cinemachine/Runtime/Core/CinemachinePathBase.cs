@@ -18,10 +18,13 @@ namespace Cinemachine
         [DocumentationSorting(DocumentationSortingAttribute.Level.UserRef)]
         [Serializable] public class Appearance
         {
+            /// <summary>The color of the path itself when it is active in the editor</summary>
             [Tooltip("The color of the path itself when it is active in the editor")]
             public Color pathColor = Color.green;
+            /// <summary>The color of the path itself when it is inactive in the editor</summary>
             [Tooltip("The color of the path itself when it is inactive in the editor")]
             public Color inactivePathColor = Color.gray;
+            /// <summary>The width of the railroad-tracks that are drawn to represent the path</summary>
             [Tooltip("The width of the railroad-tracks that are drawn to represent the path")]
             [Range(0f, 10f)]
             public float width = 0.2f;
@@ -45,14 +48,12 @@ namespace Cinemachine
         /// <returns>Standardized position, between MinPos and MaxPos</returns>
         public virtual float StandardizePos(float pos)
         {
-            if (MaxPos == 0)
-                return 0;
-            if (Looped)
+            if (Looped && MaxPos > 0)
             {
                 pos = pos % MaxPos;
                 if (pos < 0)
                     pos += MaxPos;
-                return pos > MaxPos - UnityVectorExtensions.Epsilon ? 0 : pos;
+                return pos;
             }
             return Mathf.Clamp(pos, 0, MaxPos);
         }
@@ -99,7 +100,7 @@ namespace Cinemachine
                 if (!Looped)
                 {
                     start = Mathf.Max(start, MinPos);
-                    end = Mathf.Max(end, MaxPos);
+                    end = Mathf.Min(end, MaxPos);
                 }
             }
             stepsPerSegment = Mathf.RoundToInt(Mathf.Clamp(stepsPerSegment, 1f, 100f));
@@ -268,13 +269,12 @@ namespace Cinemachine
             return Mathf.Clamp(distance, 0, length);
         }
 
-        /// <summary>Get the path position (in native path units) corresponding to the psovided
-        /// value, in the units indicated.
+        /// <summary>Get the path position to native path units.
         /// If the distance cache is not valid, then calling this will
         /// trigger a potentially costly regeneration of the path distance cache</summary>
         /// <param name="pos">The value to convert from</param>
         /// <param name="units">The units in which pos is expressed</param>
-        /// <returns>The length of the path in native units, when sampled at this rate</returns>
+        /// <returns>The path position, in native units</returns>
         public float ToNativePathUnits(float pos, PositionUnits units)
         {
             if (units == PositionUnits.PathUnits)
@@ -292,12 +292,12 @@ namespace Cinemachine
             return MinPos + Mathf.Lerp(m_DistanceToPos[i], m_DistanceToPos[i+1], t);
         }
 
-        /// <summary>Get the path position (in path units) corresponding to this distance along the path.
+        /// <summary>Convert a path position from native path units to the desired units.
         /// If the distance cache is not valid, then calling this will
         /// trigger a potentially costly regeneration of the path distance cache</summary>
         /// <param name="pos">The value to convert from, in native units</param>
-        /// <param name="units">The units to convert toexpressed</param>
-        /// <returns>The length of the path in distance units, when sampled at this rate</returns>
+        /// <param name="units">The units to convert to</param>
+        /// <returns>Tha path position, in the requested units</returns>
         public float FromPathNativeUnits(float pos, PositionUnits units)
         {
             if (units == PositionUnits.PathUnits)

@@ -8,6 +8,29 @@ using UnityEngine.UIElements;
 
 namespace Cinemachine.Editor
 {
+    [InitializeOnLoad]
+    static class CinemachineScreenComposerGuidesGlobalDraggable
+    {
+        static CinemachineScreenComposerGuidesGlobalDraggable()
+        {
+            CinemachineScreenComposerGuides.sDraggableGameWindowGuides = Enabled;
+        }
+
+        public static string kEnabledKey = "DraggableScreenComposerGuides_Enabled";
+        public static bool Enabled
+        {
+            get => EditorPrefs.GetBool(kEnabledKey, true);
+            set
+            {
+                if (value != CinemachineScreenComposerGuides.sDraggableGameWindowGuides)
+                {
+                    EditorPrefs.SetBool(kEnabledKey, value);
+                    CinemachineScreenComposerGuides.sDraggableGameWindowGuides = value;
+                }
+            }
+        }
+    }
+    
 #if !UNITY_2019_2_OR_NEWER
     internal class GameViewEventCatcher
     {
@@ -88,21 +111,48 @@ namespace Cinemachine.Editor
     }
 #endif
 
+    /// <summary>
+    /// Use an instance of this class to draw screen composer guides in the game view.
+    /// This is an internal class, and is not meant to be called outside of Cinemachine.
+    /// </summary>
     public class CinemachineScreenComposerGuides
     {
+        /// <summary>Delegate for getting the hard/soft guide rects</summary>
+        /// <returns>The Hard/Soft guide rect</returns>
         public delegate Rect RectGetter();
+
+        /// <summary>Delegate for setting the hard/soft guide rects</summary>
+        /// <param name="rcam">The value to set</param>
         public delegate void RectSetter(Rect r);
+
+        /// <summary>Delegate to get the current object whose guides are being drawn</summary>
+        /// <returns>The target object whose guides are being drawn</returns>
         public delegate SerializedObject ObjectGetter();
 
-        // Clients MUST implement all of these
+        /// <summary>Get the Hard Guide.  Client must implement this</summary>
         public RectGetter GetHardGuide;
+        /// <summary>Get the Soft Guide.  Client must implement this</summary>
         public RectGetter GetSoftGuide;
+        /// <summary>Set the Hard Guide.  Client must implement this</summary>
         public RectSetter SetHardGuide;
+        /// <summary>Get the Soft Guide.  Client must implement this</summary>
         public RectSetter SetSoftGuide;
+        /// <summary>Get the target object whose guides are being drawn.  Client must implement this</summary>
         public ObjectGetter Target;
 
+        /// <summary>Width of the draggable guide bar in the game view</summary>
         public const float kGuideBarWidthPx = 3f;
 
+        /// <summary>If true, then allows game window guides to be edited in play mode.</summary>
+        public static bool sDraggableGameWindowGuides = true;
+
+        /// <summary>
+        /// Helper to set the appropriate new rects in the target object, is something changed.
+        /// </summary>
+        /// <param name="oldHard">Current hard guide</param>
+        /// <param name="oldSoft">Current soft guide</param>
+        /// <param name="newHard">New hard guide</param>
+        /// <param name="newSoft">New soft guide</param>
         public void SetNewBounds(Rect oldHard, Rect oldSoft, Rect newHard, Rect newSoft)
         {
             if ((oldSoft != newSoft) || (oldHard != newHard))
@@ -122,7 +172,6 @@ namespace Cinemachine.Editor
             float screenHeight = cameraRect.height;
             float screenWidth = cameraRect.width;
 
-#if UNITY_2018_2_OR_NEWER
             float screenAspect = screenWidth / screenHeight;
             switch (outputCamera.gateFit)
             {
@@ -161,7 +210,7 @@ namespace Cinemachine.Editor
                 case Camera.GateFitMode.None:
                     break;
             }
-#endif
+
             cameraRect = new Rect(cameraRect.position, new Vector2(screenWidth, screenHeight));
 
             // Invert Y
@@ -176,6 +225,13 @@ namespace Cinemachine.Editor
             return cameraRect;
         }
 
+        /// <summary>
+        /// Call this from the inspector's OnGUI.  Draws the guides and manages dragging.
+        /// </summary>
+        /// <param name="isLive">Is the target live</param>
+        /// <param name="outputCamera">Destination camera</param>
+        /// <param name="lens">Current lens settings</param>
+        /// <param name="showHardGuides">True if hard guides should be shown</param>
         public void OnGUI_DrawGuides(bool isLive, Camera outputCamera, LensSettings lens, bool showHardGuides)
         {
             Rect cameraRect = GetCameraRect(outputCamera, lens);
@@ -223,7 +279,7 @@ namespace Cinemachine.Editor
             mDragBars[(int)DragBar.Center] = new Rect(softEdgeLeft, softEdgeTop, softEdgeRight - softEdgeLeft, softEdgeBottom - softEdgeTop);
 
             // Handle dragging bars
-            if (isLive)
+            if (sDraggableGameWindowGuides && isLive)
                 OnGuiHandleBarDragging(screenWidth, screenHeight);
 
             // Draw the masks

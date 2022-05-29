@@ -312,7 +312,7 @@ namespace THEditor.Tween
                 {
                     var nodePos = mtx * ToVec4(tnPath.LocalNodes[i]);
                     Handles.color = tnPath.DebugColor;
-                    Handles.CubeCap(0, nodePos, handleRotation, HandleUtility.GetHandleSize(nodePos) * .1f);
+                    Handles.CubeHandleCap(0, nodePos, handleRotation, HandleUtility.GetHandleSize(nodePos) * .1f ,EventType.Repaint);
                 }
             }
         }

@@ -2,27 +2,46 @@ using UnityEngine;
 
 namespace Cinemachine.Utility
 {
+    /// <summary>
+    /// This is a utility class to implement position predicting.
+    /// </summary>
     public class PositionPredictor
     {
         Vector3 m_Velocity;
         Vector3 m_SmoothDampVelocity;
         Vector3 m_Pos;
-        float m_SqrSpeed;
         bool m_HavePos;
 
-        public float Smoothing { get; set; }
+        /// <summary>
+        /// How much to smooth the predicted result.  Must be >= 0, roughly coresponds to smoothing time.
+        /// </summary>
+        public float Smoothing;
 
+        /// <summary>
+        /// Have any positions been logged for smoothing?
+        /// </summary>
+        /// <returns>True if no positions have yet been logged, in which case smoothing is impossible</returns>
         public bool IsEmpty() { return !m_HavePos; }
 
+        /// <summary>
+        /// Apply a delta to the target's position, which will be ignored for 
+        /// smoothing purposes.  Use this whent he target's position gets warped.
+        /// </summary>
+        /// <param name="positionDelta">The position change of the target object</param>
         public void ApplyTransformDelta(Vector3 positionDelta) { m_Pos += positionDelta; }
 
+        /// <summary>Reset the lookahead data, clear all the buffers.</summary>
         public void Reset() 
         { 
             m_HavePos = false; 
             m_SmoothDampVelocity = Vector3.zero; 
-            m_SqrSpeed = 0;
+            m_Velocity = Vector3.zero;
         }
 
+        /// <summary>Add a new target position to the history buffer</summary>
+        /// <param name="pos">The new target position</param>
+        /// <param name="deltaTime">deltaTime since the last target position was added</param>
+        /// <param name="lookaheadTime">Current lookahead time setting (unused)</param>
         public void AddPosition(Vector3 pos, float deltaTime, float lookaheadTime)
         {
             if (deltaTime < 0)
@@ -30,22 +49,26 @@ namespace Cinemachine.Utility
             if (m_HavePos && deltaTime > UnityVectorExtensions.Epsilon)
             {
                 var vel = (pos - m_Pos) / deltaTime;
-                var sqrSpeed = vel.sqrMagnitude;
-                bool slowing = sqrSpeed < m_SqrSpeed;
+                bool slowing = vel.sqrMagnitude < m_Velocity.sqrMagnitude;
                 m_Velocity = Vector3.SmoothDamp(
                     m_Velocity, vel, ref m_SmoothDampVelocity, Smoothing / (slowing ? 30 : 10), 
                     float.PositiveInfinity, deltaTime);
-                m_SqrSpeed = m_Velocity.sqrMagnitude;
             }
             m_Pos = pos;
             m_HavePos = true;
         }
 
+        /// <summary>Predict the target's position change over a given time from now</summary>
+        /// <param name="lookaheadTime">How far ahead in time to predict</param>
+        /// <returns>The predicted position change (current velocity * lokahead time)</returns>
         public Vector3 PredictPositionDelta(float lookaheadTime)
         {
             return m_Velocity * lookaheadTime;
         }
 
+        /// <summary>Predict the target's position a given time from now</summary>
+        /// <param name="lookaheadTime">How far ahead in time to predict</param>
+        /// <returns>The predicted position</returns>
         public Vector3 PredictPosition(float lookaheadTime)
         {
             return m_Pos + PredictPositionDelta(lookaheadTime);
@@ -203,7 +226,7 @@ namespace Cinemachine.Utility
                 Item item = new Item();
                 item.velocity = velocity;
                 item.weight = weight;
-                item.time = Time.time;
+                item.time = CinemachineCore.CurrentTime;
                 if (mCount == FilterSize)
                     PopBottom();
                 ++mCount;
@@ -222,7 +245,7 @@ namespace Cinemachine.Utility
         {
             if (mCount > 0)
             {
-                float time = Time.time;
+                float time = CinemachineCore.CurrentTime;
                 Item item = mHistory[mBottom];
                 if (++mBottom == FilterSize)
                     mBottom = 0;
@@ -239,7 +262,7 @@ namespace Cinemachine.Utility
         /// <summary>Decay the history.  This should be called every frame.</summary>
         public void DecayHistory()
         {
-            float time = Time.time;
+            float time = CinemachineCore.CurrentTime;
             float decay = Decay(time - mWeightTime);
             mWeightSum *= decay;
             mWeightTime = time;

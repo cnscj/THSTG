@@ -5,14 +5,16 @@ using System.Collections.Generic;
 namespace Cinemachine.Editor
 {
     [CustomEditor(typeof(CinemachineOrbitalTransposer))]
+    [CanEditMultipleObjects]
     internal class CinemachineOrbitalTransposerEditor : BaseEditor<CinemachineOrbitalTransposer>
     {
+        /// <summary>Get the property names to exclude in the inspector.</summary>
+        /// <param name="excluded">Add the names to this list</param>
         protected override void GetExcludedPropertiesInInspector(List<string> excluded)
         {
             base.GetExcludedPropertiesInInspector(excluded);
             if (Target.m_HeadingIsSlave)
             {
-                excluded.Add(FieldPath(x => x.m_FollowOffset));
                 excluded.Add(FieldPath(x => x.m_BindingMode));
                 excluded.Add(FieldPath(x => x.m_Heading));
                 excluded.Add(FieldPath(x => x.m_XAxis));
@@ -66,15 +68,13 @@ namespace Cinemachine.Editor
             }
         }
 
-        private void OnEnable()
-        {
-            Target.UpdateInputAxisProvider();
-        }
-
         public override void OnInspectorGUI()
         {
             BeginInspector();
-            if (Target.FollowTarget == null)
+            bool needWarning = false;
+            for (int i = 0; !needWarning && i < targets.Length; ++i)
+                needWarning = (targets[i] as CinemachineOrbitalTransposer).FollowTarget == null;
+            if (needWarning)
                 EditorGUILayout.HelpBox(
                     "Orbital Transposer requires a Follow target.",
                     MessageType.Warning);
@@ -82,22 +82,7 @@ namespace Cinemachine.Editor
                 = (Target.m_BindingMode == CinemachineTransposer.BindingMode.SimpleFollowWithWorldUp);
             DrawRemainingPropertiesInInspector();
         }
-
-        /// Process a position drag from the user.
-        /// Called "magically" by the vcam editor, so don't change the signature.
-        private void OnVcamPositionDragged(Vector3 delta)
-        {
-            Undo.RegisterCompleteObjectUndo(Target, "Camera drag"); // GML do we need this?
-            Quaternion targetOrientation = Target.GetReferenceOrientation(Target.VcamState.ReferenceUp);
-            targetOrientation = targetOrientation * Quaternion.Euler(0, Target.m_Heading.m_Bias, 0);
-            Vector3 localOffset = Quaternion.Inverse(targetOrientation) * delta;
-            localOffset.x = 0;
-            FindProperty(x => x.m_FollowOffset).vector3Value += localOffset;
-            serializedObject.ApplyModifiedProperties();
-            FindProperty(x => x.m_FollowOffset).vector3Value = Target.EffectiveOffset;
-            serializedObject.ApplyModifiedProperties();
-        }
-
+        
         [DrawGizmo(GizmoType.Active | GizmoType.Selected, typeof(CinemachineOrbitalTransposer))]
         static void DrawTransposerGizmos(CinemachineOrbitalTransposer target, GizmoType selectionType)
         {
@@ -136,5 +121,49 @@ namespace Cinemachine.Editor
             }
             Gizmos.matrix = prevMatrix;
         }
+        
+        protected virtual void OnEnable()
+        {
+            for (int i = 0; i < targets.Length; ++i)
+                (targets[i] as CinemachineOrbitalTransposer).UpdateInputAxisProvider();
+
+#if UNITY_2021_2_OR_NEWER
+            if (!Target.HideOffsetInInspector)
+            {
+                CinemachineSceneToolUtility.RegisterTool(typeof(FollowOffsetTool));
+            }
+#endif
+        }
+        
+        protected virtual void OnDisable()
+        {
+#if UNITY_2021_2_OR_NEWER
+            if (!Target.HideOffsetInInspector)
+            {
+                CinemachineSceneToolUtility.UnregisterTool(typeof(FollowOffsetTool));
+            }
+#endif
+        }
+        
+#if UNITY_2021_2_OR_NEWER
+        void OnSceneGUI()
+        {
+            DrawSceneTools();
+        }
+
+        void DrawSceneTools()
+        {
+            var orbitalTransposer = Target;
+            if (orbitalTransposer == null || !orbitalTransposer.IsValid || orbitalTransposer.HideOffsetInInspector)
+            {
+                return;
+            }
+            
+            if (CinemachineSceneToolUtility.IsToolActive(typeof(FollowOffsetTool)))
+            {
+                CinemachineSceneToolHelpers.TransposerFollowOffsetTool(orbitalTransposer);
+            }
+        }
+#endif
     }
 }

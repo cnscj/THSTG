@@ -5,61 +5,49 @@ using System;
 
 namespace Cinemachine.Editor
 {
+    /// <summary>
+    /// This is a collection of utilities surrounding ScriptableObjects
+    /// </summary>
     public class ScriptableObjectUtility : ScriptableObject
     {
+        /// <summary>
+        /// The default relative path to the root directory where Cinemachine is installed
+        /// </summary>
         public static string kPackageRoot = "Packages/com.unity.cinemachine";
 
-        /// <summary>Get the Cinemachine package install path.  Works whether CM is
-        /// a packman package or an ordinary asset.</summary>
+        /// <summary>Get the Cinemachine package install path.</summary>
         public static string CinemachineInstallPath
         {
             get
             {
-                // First see if we're a UPM package - use some asset that we expect to find
-                string path = Path.GetFullPath(kPackageRoot + "/Editor/EditorResources/cm_logo_sm.png");
-                int index = path.LastIndexOf("/Editor");
-                if (index < 0 || !File.Exists(path))
-                {
-                    // Try as an ordinary asset
-                    ScriptableObject dummy = ScriptableObject.CreateInstance<ScriptableObjectUtility>();
-                    path = AssetDatabase.GetAssetPath(MonoScript.FromScriptableObject(dummy));
-                    if (path.Length > 0)
-                        path = Path.GetFullPath(path);
-                    DestroyImmediate(dummy);
-                }
+                string path = Path.GetFullPath(kPackageRoot);
                 path = path.Replace('\\', '/'); // because of GetFullPath()
-                index = path.LastIndexOf("/Editor");
-                if (index >= 0)
-                    path = path.Substring(0, index);
-                if (path.Length > 0)
-                    path = Path.GetFullPath(path);  // stupid backslashes
                 return path;
             }
         }
 
-        /// <summary>Get the Cinemachine package install path.  Works whether CM is
-        /// a packman package or an ordinary asset.</summary>
+        /// <summary>Get the relative Cinemachine package install path.</summary>
         public static string CinemachineRealativeInstallPath
         {
             get
             {
-                ScriptableObject dummy = ScriptableObject.CreateInstance<ScriptableObjectUtility>();
-                var path = AssetDatabase.GetAssetPath(MonoScript.FromScriptableObject(dummy));
-                DestroyImmediate(dummy);
-                var index = path.LastIndexOf("/Editor");
-                if (index >= 0)
-                    path = path.Substring(0, index);
-                return path;
+                return kPackageRoot;
             }
         }
 
         /// <summary>Create a scriptable object asset</summary>
+        /// <typeparam name="T">The type of asset to create</typeparam>
+        /// <param name="assetPath">The full path and filename of the asset to create</param>
+        /// <returns>The newly-created asset</returns>
         public static T CreateAt<T>(string assetPath) where T : ScriptableObject
         {
             return CreateAt(typeof(T), assetPath) as T;
         }
 
         /// <summary>Create a scriptable object asset</summary>
+        /// <param name="assetType">The type of asset to create</param>
+        /// <param name="assetPath">The full path and filename of the asset to create</param>
+        /// <returns>The newly-created asset</returns>
         public static ScriptableObject CreateAt(Type assetType, string assetPath)
         {
             ScriptableObject asset = ScriptableObject.CreateInstance(assetType);
@@ -72,6 +60,10 @@ namespace Cinemachine.Editor
             return asset;
         }
 
+        /// <summary>Create a ScriptableObject asset</summary>
+        /// <typeparam name="T">The type of asset to create</typeparam>
+        /// <param name="prependFolderName">If true, prepend the selected asset folder name to the asset name</param>
+        /// <param name="trimName">If true, remove instances of the "Asset", "Attributes", "Container" strings from the name</param>
         public static void Create<T>(bool prependFolderName = false, bool trimName = true) where T : ScriptableObject
         {
             string className = typeof(T).Name;

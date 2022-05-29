@@ -52,7 +52,7 @@ namespace Cinemachine.Editor
         private UnityEditor.Editor m_Editor = null;
         private UnityEditor.Editor m_Owner = null;
 
-        const int kIndentOffset = 6;
+        const int kIndentOffset = 3;
 
         /// <summary>
         /// Call this from OnInspectorGUI.  Will draw the asset reference field, and
@@ -64,7 +64,7 @@ namespace Cinemachine.Editor
         {
             SerializedProperty property = m_Owner.serializedObject.FindProperty(m_PropertyName);
             if (m_Editor == null)
-                UpdateEditor();
+                UpdateEditor(property);
             if (m_Editor == null)
                 AssetFieldWithCreateButton(property, title, defaultName, extension, message);
             else
@@ -77,7 +77,7 @@ namespace Cinemachine.Editor
                 if (EditorGUI.EndChangeCheck())
                 {
                     m_Owner.serializedObject.ApplyModifiedProperties();
-                    UpdateEditor();
+                    UpdateEditor(property);
                 }
                 if (m_Editor != null)
                 {
@@ -91,7 +91,9 @@ namespace Cinemachine.Editor
                     if (property.isExpanded)
                     {
                         EditorGUILayout.Separator();
-                        EditorGUILayout.HelpBox("This is a shared asset.  Changes made here will apply to all users of this asset.", MessageType.Info);
+                        EditorGUILayout.HelpBox(
+                            "This is a shared asset.  Changes made here will apply to all users of this asset.", 
+                            MessageType.Info);
                         EditorGUI.BeginChangeCheck();
                         if (indent)
                             ++EditorGUI.indentLevel;
@@ -102,14 +104,14 @@ namespace Cinemachine.Editor
                             OnChanged(property.objectReferenceValue as T);
                     }
                     GUI.enabled = true;
-                    if(m_Editor.target != null)
+                    if (m_Editor.target != null)
                     {
-			if (!canEditAsset && GUILayout.Button("Check out"))
-			{
+                        if (!canEditAsset && GUILayout.Button("Check out"))
+                        {
                             Task task = Provider.Checkout(AssetDatabase.GetAssetPath(m_Editor.target), CheckoutMode.Asset);
-			    task.Wait();
-			}
-		    }
+                            task.Wait();
+                        }
+                    }
                 }
                 EditorGUILayout.EndVertical();
             }
@@ -141,7 +143,7 @@ namespace Cinemachine.Editor
             if (EditorGUI.EndChangeCheck())
             {
                 m_Owner.serializedObject.ApplyModifiedProperties();
-                UpdateEditor();
+                UpdateEditor(property);
             }
         }
 
@@ -153,14 +155,15 @@ namespace Cinemachine.Editor
                 m_Editor = null;
             }
         }
-
-        public void UpdateEditor()
+        
+        public void UpdateEditor(SerializedProperty property)
         {
-            DestroyEditor();
-            SerializedProperty property = m_Owner.serializedObject.FindProperty(m_PropertyName);
-            if (property.objectReferenceValue != null)
+            var target = property.objectReferenceValue;
+            if (m_Editor != null && m_Editor.target != target)
+                DestroyEditor();
+            if (target != null)
             {
-                m_Editor = UnityEditor.Editor.CreateEditor(property.objectReferenceValue);
+                m_Editor = UnityEditor.Editor.CreateEditor(target);
                 if (OnCreateEditor != null)
                     OnCreateEditor(m_Editor);
             }

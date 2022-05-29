@@ -29,13 +29,10 @@ namespace Cinemachine
     /// </summary>
     [DocumentationSorting(DocumentationSortingAttribute.Level.UserRef)]
     [DisallowMultipleComponent]
-#if UNITY_2018_3_OR_NEWER
     [ExecuteAlways]
-#else
-    [ExecuteInEditMode]
-#endif
     [ExcludeFromPreset]
     [AddComponentMenu("Cinemachine/CinemachineClearShot")]
+    [HelpURL(Documentation.BaseURL + "manual/CinemachineClearShot.html")]
     public class CinemachineClearShot : CinemachineVirtualCameraBase
     {
         /// <summary>Default object for the camera children to look at (the aim target), if not specified in a child camera.  May be empty.</summary>
@@ -103,7 +100,7 @@ namespace Cinemachine
 
         /// <summary>Get the current "best" child virtual camera, that would be chosen
         /// if the ClearShot camera were active.</summary>
-        public ICinemachineCamera LiveChild { set; get; }
+        public ICinemachineCamera LiveChild { get; set; }
 
         /// <summary>The CameraState of the currently live child</summary>
         public override CameraState State { get { return m_State; } }
@@ -210,11 +207,11 @@ namespace Cinemachine
             }
             else if (LiveChild != null)
             {
-                if (TransitioningFrom != null)
-                    LiveChild.OnTransitionFromCamera(TransitioningFrom, worldUp, deltaTime);
+                if (m_TransitioningFrom != null)
+                    LiveChild.OnTransitionFromCamera(m_TransitioningFrom, worldUp, deltaTime);
                 m_State =  LiveChild.State;
             }
-            TransitioningFrom = null;
+            m_TransitioningFrom = null;
             InvokePostPipelineStageCallback(this, CinemachineCore.Stage.Finalize, ref m_State, deltaTime);
             PreviousStateIsValid = true;
         }
@@ -229,6 +226,9 @@ namespace Cinemachine
             CinemachineDebug.OnGUIHandlers += OnGuiHandler;
         }
 
+        /// <summary>
+        /// Uninstall the GUI handler
+        /// </summary>
         protected override void OnDisable()
         {
             base.OnDisable();
@@ -259,7 +259,12 @@ namespace Cinemachine
         }
 
         /// <summary>Is there a blend in progress?</summary>
-        public bool IsBlending { get { return mActiveBlend != null; } }
+        public bool IsBlending => mActiveBlend != null;
+
+        /// <summary>
+        /// Get the current active blend in progress.  Will return null if no blend is in progress.
+        /// </summary>
+        public CinemachineBlend ActiveBlend => mActiveBlend;
 
         CameraState m_State = CameraState.Default;
 
@@ -351,7 +356,7 @@ namespace Cinemachine
             }
             mRandomizeNow = false;
 
-            float now = Time.time;
+            float now = CinemachineCore.CurrentTime;
             if (mActivationTime != 0)
             {
                 // Is it active now?
@@ -450,7 +455,7 @@ namespace Cinemachine
         {
             base.OnTransitionFromCamera(fromCam, worldUp, deltaTime);
             InvokeOnTransitionInExtensions(fromCam, worldUp, deltaTime);
-            TransitioningFrom = fromCam;
+            m_TransitioningFrom = fromCam;
             if (m_RandomizeChoice && mActiveBlend == null)
             {
                 m_RandomizedChilden = null;
@@ -459,7 +464,7 @@ namespace Cinemachine
             InternalUpdateCameraState(worldUp, deltaTime);
         }
 
-        ICinemachineCamera TransitioningFrom { get; set; }
+        ICinemachineCamera m_TransitioningFrom;
     }
 #endif
 }

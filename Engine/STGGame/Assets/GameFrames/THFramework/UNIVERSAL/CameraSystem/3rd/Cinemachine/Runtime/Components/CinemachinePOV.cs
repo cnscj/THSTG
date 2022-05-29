@@ -132,10 +132,13 @@ namespace Cinemachine
             // If we have a transform parent, then apply POV in the local space of the parent
             Quaternion rot = Quaternion.Euler(m_VerticalAxis.Value, m_HorizontalAxis.Value, 0);
             Transform parent = VirtualCamera.transform.parent;
+            var up = Vector3.up;
             if (parent != null)
+            {
                 rot = parent.rotation * rot;
-            else
-                rot = rot * Quaternion.FromToRotation(Vector3.up, curState.ReferenceUp);
+                up = parent.up;
+            }
+            rot = Quaternion.FromToRotation(up, curState.ReferenceUp) * rot;
             curState.RawOrientation = rot;
         }
 
@@ -159,9 +162,15 @@ namespace Cinemachine
                 if (parent != null)
                     fwd = parent.rotation * fwd;
                 var v = Quaternion.FromToRotation(Vector3.forward, fwd).eulerAngles;
-                return new Vector2(v.y, v.x);
+                return new Vector2(NormalizeAngle(v.y), NormalizeAngle(v.x));
             }
             return Vector2.zero;
+        }
+
+        // Normalize angle value to [-180, 180] degrees.
+        static float NormalizeAngle(float angle)
+        {
+            return ((angle + 180) % 360) - 180; 
         }
 
         /// <summary>
@@ -180,6 +189,7 @@ namespace Cinemachine
         /// <param name="fromCam">The camera being deactivated.  May be null.</param>
         /// <param name="worldUp">Default world Up, set by the CinemachineBrain</param>
         /// <param name="deltaTime">Delta time for time-based effects (ignore if less than or equal to 0)</param>
+        /// <param name="transitionParams">Transition settings for this vcam</param>
         /// <returns>True if the vcam should do an internal update as a result of this call</returns>
         public override bool OnTransitionFromCamera(
             ICinemachineCamera fromCam, Vector3 worldUp, float deltaTime,
@@ -189,13 +199,17 @@ namespace Cinemachine
             m_VerticalRecentering.DoRecentering(ref m_VerticalAxis, -1, 0);
             m_HorizontalRecentering.CancelRecentering();
             m_VerticalRecentering.CancelRecentering();
-            if (fromCam != null && transitionParams.m_InheritPosition)
+            if (fromCam != null && transitionParams.m_InheritPosition  
+                && !CinemachineCore.Instance.IsLiveInBlend(VirtualCamera))
             {
                 SetAxesForRotation(fromCam.State.RawOrientation);
                 return true;
             }
             return false;
         }
+        
+        /// <summary>POV is controlled by input.</summary>
+        public override bool RequiresUserInput => true;
 
         void SetAxesForRotation(Quaternion targetRot)
         {

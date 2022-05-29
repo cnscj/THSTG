@@ -5,8 +5,11 @@ using System.Collections.Generic;
 namespace Cinemachine.Editor
 {
     [CustomEditor(typeof(CinemachineTransposer))]
-    internal sealed class CinemachineTransposerEditor : BaseEditor<CinemachineTransposer>
+    [CanEditMultipleObjects]
+    internal class CinemachineTransposerEditor : BaseEditor<CinemachineTransposer>
     {
+        /// <summary>Get the property names to exclude in the inspector.</summary>
+        /// <param name="excluded">Add the names to this list</param>
         protected override void GetExcludedPropertiesInInspector(List<string> excluded)
         {
             base.GetExcludedPropertiesInInspector(excluded);
@@ -59,46 +62,44 @@ namespace Cinemachine.Editor
         public override void OnInspectorGUI()
         {
             BeginInspector();
-            if (Target.FollowTarget == null)
+            bool needWarning = false;
+            for (int i = 0; !needWarning && i < targets.Length; ++i)
+                needWarning = (targets[i] as CinemachineTransposer).FollowTarget == null;
+            if (needWarning)
                 EditorGUILayout.HelpBox(
                     "Transposer requires a Follow Target.  Change Body to Do Nothing if you don't want a Follow target.",
                     MessageType.Warning);
             DrawRemainingPropertiesInInspector();
         }
-
-        /// Process a position drag from the user.
-        /// Called "magically" by the vcam editor, so don't change the signature.
-        public void OnVcamPositionDragged(Vector3 delta)
+#if UNITY_2021_2_OR_NEWER
+        void OnSceneGUI()
         {
-            Undo.RegisterCompleteObjectUndo(Target, "Camera drag"); // GML do we need this?
-            Quaternion targetOrientation = Target.GetReferenceOrientation(Target.VcamState.ReferenceUp);
-            Vector3 localOffset = Quaternion.Inverse(targetOrientation) * delta;
-            FindProperty(x => x.m_FollowOffset).vector3Value += localOffset;
-            serializedObject.ApplyModifiedProperties();
-            FindProperty(x => x.m_FollowOffset).vector3Value = Target.EffectiveOffset;
-            serializedObject.ApplyModifiedProperties();
+            DrawSceneTools();
+        }
+        
+        protected virtual void OnEnable()
+        {
+            CinemachineSceneToolUtility.RegisterTool(typeof(FollowOffsetTool));
         }
 
-        [DrawGizmo(GizmoType.Active | GizmoType.Selected, typeof(CinemachineTransposer))]
-        static void DrawTransposerGizmos(CinemachineTransposer target, GizmoType selectionType)
+        protected virtual void OnDisable()
         {
-            if (target.IsValid  & !target.HideOffsetInInspector)
+            CinemachineSceneToolUtility.UnregisterTool(typeof(FollowOffsetTool));
+        }
+        
+        void DrawSceneTools()
+        {
+            var transposer = Target;
+            if (transposer == null || !transposer.IsValid)
             {
-                Color originalGizmoColour = Gizmos.color;
-                Gizmos.color = CinemachineCore.Instance.IsLive(target.VirtualCamera)
-                    ? CinemachineSettings.CinemachineCoreSettings.ActiveGizmoColour
-                    : CinemachineSettings.CinemachineCoreSettings.InactiveGizmoColour;
+                return;
+            }
 
-                Vector3 up = Vector3.up;
-                CinemachineBrain brain = CinemachineCore.Instance.FindPotentialTargetBrain(target.VirtualCamera);
-                if (brain != null)
-                    up = brain.DefaultWorldUp;
-                Vector3 targetPos = target.FollowTargetPosition;
-                Vector3 desiredPos = target.GetTargetCameraPosition(up);
-                Gizmos.DrawLine(targetPos, desiredPos);
-                //Gizmos.DrawWireSphere(desiredPos, HandleUtility.GetHandleSize(desiredPos) / 20);
-                Gizmos.color = originalGizmoColour;
+            if (CinemachineSceneToolUtility.IsToolActive(typeof(FollowOffsetTool)))
+            {
+                CinemachineSceneToolHelpers.TransposerFollowOffsetTool(transposer);
             }
         }
+#endif
     }
 }

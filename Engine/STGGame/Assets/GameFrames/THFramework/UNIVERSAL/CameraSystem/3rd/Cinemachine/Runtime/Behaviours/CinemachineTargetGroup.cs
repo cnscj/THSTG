@@ -4,6 +4,10 @@ using Cinemachine.Utility;
 
 namespace Cinemachine
 {
+    /// <summary>
+    /// Interface representing something that can be used as a vcam target.  
+    /// It has a transform, a bounding box, and a bounding sphere.
+    /// </summary>
     public interface ICinemachineTargetGroup
     {
         /// <summary>
@@ -53,11 +57,9 @@ namespace Cinemachine
     [DocumentationSorting(DocumentationSortingAttribute.Level.UserRef)]
     [AddComponentMenu("Cinemachine/CinemachineTargetGroup")]
     [SaveDuringPlay]
-#if UNITY_2018_3_OR_NEWER
     [ExecuteAlways]
-#else
-    [ExecuteInEditMode]
-#endif
+    [DisallowMultipleComponent]
+    [HelpURL(Documentation.BaseURL + "manual/CinemachineTargetGroup.html")]
     public class CinemachineTargetGroup : MonoBehaviour, ICinemachineTargetGroup
     {
         /// <summary>Holds the information that represents a member of the group</summary>
@@ -66,7 +68,8 @@ namespace Cinemachine
         {
             /// <summary>The target objects.  This object's position and orientation will contribute to the
             /// group's average position and orientation, in accordance with its weight</summary>
-            [Tooltip("The target objects.  This object's position and orientation will contribute to the group's average position and orientation, in accordance with its weight")]
+            [Tooltip("The target objects.  This object's position and orientation will contribute to the "
+                + "group's average position and orientation, in accordance with its weight")]
             public Transform target;
             /// <summary>How much weight to give the target when averaging.  Cannot be negative</summary>
             [Tooltip("How much weight to give the target when averaging.  Cannot be negative")]
@@ -87,7 +90,8 @@ namespace Cinemachine
         }
 
         /// <summary>How the group's position is calculated</summary>
-        [Tooltip("How the group's position is calculated.  Select GroupCenter for the center of the bounding box, and GroupAverage for a weighted average of the positions of the members.")]
+        [Tooltip("How the group's position is calculated.  Select GroupCenter for the center of the bounding box, "
+            + "and GroupAverage for a weighted average of the positions of the members.")]
         public PositionMode m_PositionMode = PositionMode.GroupCenter;
 
         /// <summary>How the group's orientation is calculated</summary>
@@ -101,7 +105,8 @@ namespace Cinemachine
         }
 
         /// <summary>How the group's orientation is calculated</summary>
-        [Tooltip("How the group's rotation is calculated.  Select Manual to use the value in the group's transform, and GroupAverage for a weighted average of the orientations of the members.")]
+        [Tooltip("How the group's rotation is calculated.  Select Manual to use the value in the group's transform, "
+            + "and GroupAverage for a weighted average of the orientations of the members.")]
         public RotationMode m_RotationMode = RotationMode.Manual;
 
         /// <summary>This enum defines the options available for the update method.</summary>
@@ -122,7 +127,8 @@ namespace Cinemachine
         /// <summary>The target objects, together with their weights and radii, that will
         /// contribute to the group's average position, orientation, and size</summary>
         [NoSaveDuringPlay]
-        [Tooltip("The target objects, together with their weights and radii, that will contribute to the group's average position, orientation, and size.")]
+        [Tooltip("The target objects, together with their weights and radii, that will contribute to the "
+            + "group's average position, orientation, and size.")]
         public Target[] m_Targets = new Target[0];
 
         /// <summary>
@@ -136,14 +142,7 @@ namespace Cinemachine
 
         /// <summary>The bounding sphere of the group, computed using the
         /// targets positions and radii</summary>
-        public BoundingSphere Sphere
-        {
-            get
-            {
-                Bounds b = BoundingBox;
-                return new BoundingSphere(b.center, ((b.max - b.min) / 2).magnitude);
-            }
-        }
+        public BoundingSphere Sphere { get => m_BoundingSphere; }
 
         /// <summary>Return true if there are no members with weight > 0</summary>
         public bool IsEmpty
@@ -158,6 +157,9 @@ namespace Cinemachine
         }
 
         /// <summary>Add a member to the group</summary>
+        /// <param name="t">The member to add</param>
+        /// <param name="weight">The new member's weight</param>
+        /// <param name="radius">The new member's radius</param>
         public void AddMember(Transform t, float weight, float radius)
         {
             int index = 0;
@@ -176,6 +178,7 @@ namespace Cinemachine
         }
 
         /// <summary>Remove a member from the group</summary>
+        /// <param name="t">The member to remove</param>
         public void RemoveMember(Transform t)
         {
             int index = FindMember(t);
@@ -190,7 +193,9 @@ namespace Cinemachine
             }
         }
 
-        /// <summary>Locate a member's index in the group. Returns -1 if not a member</summary>
+        /// <summary>Locate a member's index in the group.</summary>
+        /// <param name="t">The member to find</param>
+        /// <returns>Member index, or -1 if not a member</returns>
         public int FindMember(Transform t)
         {
             if (m_Targets != null)
@@ -207,12 +212,12 @@ namespace Cinemachine
         /// As the member's weight goes to 0, the position lerps to the group average position.
         /// </summary>
         /// <param name="index">Member index</param>
-        /// <returns></returns>
+        /// <returns>The weighted bounding sphere</returns>
         public BoundingSphere GetWeightedBoundsForMember(int index)
         {
             if (index < 0 || index >= m_Targets.Length)
                 return Sphere;
-            return WeightedMemberBounds(m_Targets[index], mAveragePos, mMaxWeight);
+            return WeightedMemberBounds(m_Targets[index], m_AveragePos, m_MaxWeight);
         }
 
         /// <summary>The axis-aligned bounding box of the group, in a specific reference frame</summary>
@@ -221,7 +226,7 @@ namespace Cinemachine
         public Bounds GetViewSpaceBoundingBox(Matrix4x4 observer)
         {
             Matrix4x4 inverseView = observer.inverse;
-            Bounds b = new Bounds(inverseView.MultiplyPoint3x4(mAveragePos), Vector3.zero);
+            Bounds b = new Bounds(inverseView.MultiplyPoint3x4(m_AveragePos), Vector3.zero);
             for (int i = 0; i < m_Targets.Length; ++i)
             {
                 BoundingSphere s = GetWeightedBoundsForMember(i);
@@ -248,8 +253,9 @@ namespace Cinemachine
             return new BoundingSphere(Vector3.Lerp(avgPos, pos, w), t.radius * w);
         }
 
-        private float mMaxWeight;
-        private Vector3 mAveragePos;
+        private float m_MaxWeight;
+        private Vector3 m_AveragePos;
+        private BoundingSphere m_BoundingSphere;
 
         /// <summary>
         /// Update the group's transform right now, depending on the transforms of the members.
@@ -257,16 +263,17 @@ namespace Cinemachine
         /// </summary>
         public void DoUpdate()
         {
-            mAveragePos = CalculateAveragePosition(out mMaxWeight);
-            BoundingBox = CalculateBoundingBox(mAveragePos, mMaxWeight);
+            m_AveragePos = CalculateAveragePosition(out m_MaxWeight);
+            BoundingBox = CalculateBoundingBox(m_AveragePos, m_MaxWeight);
+            m_BoundingSphere = CalculateBoundingSphere(m_MaxWeight);
 
             switch (m_PositionMode)
             {
                 case PositionMode.GroupCenter:
-                    transform.position = BoundingBox.center;
+                    transform.position = Sphere.position;
                     break;
                 case PositionMode.GroupAverage:
-                    transform.position = mAveragePos;
+                    transform.position = m_AveragePos;
                     break;
             }
 
@@ -280,9 +287,41 @@ namespace Cinemachine
             }
         }
 
+        /// <summary>
+        /// Use Ritter's algorithm for calculating an approximate bounding sphere
+        /// </summary>
+        /// <param name="maxWeight">The maximum weight of members in the group</param>
+        /// <returns>An approximate bounding sphere.  Will be slightly large.</returns>
+        BoundingSphere CalculateBoundingSphere(float maxWeight)
+        {
+            var sphere = new BoundingSphere { position = transform.position };
+            bool gotOne = false;
+
+            for (int i = 0; i < m_Targets.Length; ++i)
+            {
+                if (m_Targets[i].target == null || m_Targets[i].weight < UnityVectorExtensions.Epsilon)
+                    continue;
+                BoundingSphere s = WeightedMemberBounds(m_Targets[i], m_AveragePos, maxWeight);
+                if (!gotOne)
+                {
+                    gotOne = true;
+                    sphere = s;
+                    continue;
+                }
+                var distance = (s.position - sphere.position).magnitude + s.radius;
+                if (distance > sphere.radius)
+                {
+                    // Point is outside current sphere: update
+                    sphere.radius = (sphere.radius + distance) * 0.5f;
+                    sphere.position = (sphere.radius * sphere.position + (distance - sphere.radius) * s.position) / distance;
+                }
+            }
+            return sphere;
+        }
+
         Vector3 CalculateAveragePosition(out float maxWeight)
         {
-            Vector3 pos = Vector3.zero;
+            var pos = Vector3.zero;
             float weight = 0;
             maxWeight = 0;
             for (int i = 0; i < m_Targets.Length; ++i)
@@ -304,7 +343,7 @@ namespace Cinemachine
 
         Quaternion CalculateAverageOrientation()
         {
-            if (mMaxWeight <= UnityVectorExtensions.Epsilon)
+            if (m_MaxWeight <= UnityVectorExtensions.Epsilon)
             {
                 return transform.rotation;
             }
@@ -315,7 +354,7 @@ namespace Cinemachine
             {
                 if (m_Targets[i].target != null)
                 {
-                    float scaledWeight = m_Targets[i].weight / mMaxWeight;
+                    var scaledWeight = m_Targets[i].weight / m_MaxWeight;
                     var rot = TargetPositionCache.GetTargetRotation(m_Targets[i].target);
                     r *= Quaternion.Slerp(Quaternion.identity, rot, scaledWeight);
                     weightedAverage += scaledWeight;
@@ -333,7 +372,7 @@ namespace Cinemachine
                 {
                     if (m_Targets[i].target != null)
                     {
-                        BoundingSphere s = WeightedMemberBounds(m_Targets[i], mAveragePos, maxWeight);
+                        var s = WeightedMemberBounds(m_Targets[i], m_AveragePos, maxWeight);
                         b.Encapsulate(new Bounds(s.position, s.radius * 2 * Vector3.one));
                     }
                 }

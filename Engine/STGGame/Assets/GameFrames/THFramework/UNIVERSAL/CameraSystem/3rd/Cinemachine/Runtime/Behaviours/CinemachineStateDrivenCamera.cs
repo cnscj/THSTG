@@ -1,3 +1,7 @@
+#if !UNITY_2019_3_OR_NEWER
+#define CINEMACHINE_UNITY_ANIMATION
+#endif
+
 using Cinemachine.Utility;
 using System;
 using System.Collections.Generic;
@@ -5,6 +9,7 @@ using UnityEngine;
 
 namespace Cinemachine
 {
+#if CINEMACHINE_UNITY_ANIMATION
     /// <summary>
     /// This is a virtual camera "manager" that owns and manages a collection
     /// of child Virtual Cameras.  These child vcams are mapped to individual states in
@@ -19,23 +24,26 @@ namespace Cinemachine
     /// </summary>
     [DocumentationSorting(DocumentationSortingAttribute.Level.UserRef)]
     [DisallowMultipleComponent]
-#if UNITY_2018_3_OR_NEWER
     [ExecuteAlways]
-#else
-    [ExecuteInEditMode]
-#endif
     [ExcludeFromPreset]
     [AddComponentMenu("Cinemachine/CinemachineStateDrivenCamera")]
+    [HelpURL(Documentation.BaseURL + "manual/CinemachineStateDrivenCamera.html")]
     public class CinemachineStateDrivenCamera : CinemachineVirtualCameraBase
     {
-        /// <summary>Default object for the camera children to look at (the aim target), if not specified in a child rig.  May be empty</summary>
-        [Tooltip("Default object for the camera children to look at (the aim target), if not specified in a child camera.  May be empty if all of the children define targets of their own.")]
+        /// <summary>Default object for the camera children to look at (the aim target), 
+        /// if not specified in a child rig.  May be empty</summary>
+        [Tooltip("Default object for the camera children to look at (the aim target), "
+            + "if not specified in a child camera.  May be empty if all of the children "
+            + "define targets of their own.")]
         [NoSaveDuringPlay]
         [VcamTargetProperty]
         public Transform m_LookAt = null;
 
-        /// <summary>Default object for the camera children wants to move with (the body target), if not specified in a child rig.  May be empty</summary>
-        [Tooltip("Default object for the camera children wants to move with (the body target), if not specified in a child camera.  May be empty if all of the children define targets of their own.")]
+        /// <summary>Default object for the camera children wants to move with (the body target), 
+        /// if not specified in a child rig.  May be empty</summary>
+        [Tooltip("Default object for the camera children wants to move with (the body target), "
+            + "if not specified in a child camera.  May be empty if all of the children "
+            + "define targets of their own.")]
         [NoSaveDuringPlay]
         [VcamTargetProperty]
         public Transform m_Follow = null;
@@ -51,8 +59,10 @@ namespace Cinemachine
         [NoSaveDuringPlay]
         public int m_LayerIndex;
 
-        /// <summary>When enabled, the current camera and blend will be indicated in the game window, for debugging</summary>
-        [Tooltip("When enabled, the current child camera and blend will be indicated in the game window, for debugging")]
+        /// <summary>When enabled, the current camera and blend will be indicated in 
+        /// the game window, for debugging</summary>
+        [Tooltip("When enabled, the current child camera and blend will be indicated in "
+            + "the game window, for debugging")]
         public bool m_ShowDebugText = false;
 
         /// <summary>Internal API for the editor.  Do not use this field</summary>
@@ -73,7 +83,8 @@ namespace Cinemachine
             public CinemachineVirtualCameraBase m_VirtualCamera;
             /// <summary>How long to wait (in seconds) before activating the virtual camera.
             /// This filters out very short state durations</summary>
-            [Tooltip("How long to wait (in seconds) before activating the virtual camera. This filters out very short state durations")]
+            [Tooltip("How long to wait (in seconds) before activating the virtual camera. "
+                + "This filters out very short state durations")]
             public float m_ActivateAfter;
             /// <summary>The minimum length of time (in seconds) to keep a virtual camera active</summary>
             [Tooltip("The minimum length of time (in seconds) to keep a virtual camera active")]
@@ -82,7 +93,8 @@ namespace Cinemachine
 
         /// <summary>The set of instructions associating virtual cameras with states.
         /// These instructions are used to choose the live child at any given moment</summary>
-        [Tooltip("The set of instructions associating virtual cameras with states.  These instructions are used to choose the live child at any given moment")]
+        [Tooltip("The set of instructions associating virtual cameras with states.  "
+        + "These instructions are used to choose the live child at any given moment")]
         public Instruction[] m_Instructions;
 
         /// <summary>
@@ -136,7 +148,7 @@ namespace Cinemachine
 
         /// <summary>Get the current "best" child virtual camera, that would be chosen
         /// if the State Driven Camera were active.</summary>
-        public ICinemachineCamera LiveChild { set; get; }
+        public ICinemachineCamera LiveChild { get; set; }
 
         /// <summary>Check whether the vcam a live child of this camera.</summary>
         /// <param name="vcam">The Virtual Camera to check</param>
@@ -201,11 +213,11 @@ namespace Cinemachine
         {
             base.OnTransitionFromCamera(fromCam, worldUp, deltaTime);
             InvokeOnTransitionInExtensions(fromCam, worldUp, deltaTime);
-            TransitioningFrom = fromCam;
+            m_TransitioningFrom  = fromCam;
             InternalUpdateCameraState(worldUp, deltaTime);
         }
 
-        ICinemachineCamera TransitioningFrom { get; set; }
+        ICinemachineCamera m_TransitioningFrom;
 
         /// <summary>Internal use only.  Do not call this method.
         /// Called by CinemachineCore at designated update time
@@ -264,11 +276,11 @@ namespace Cinemachine
             }
             else if (LiveChild != null)
             {
-                if (TransitioningFrom != null)
-                    LiveChild.OnTransitionFromCamera(TransitioningFrom, worldUp, deltaTime);
+                if (m_TransitioningFrom  != null)
+                    LiveChild.OnTransitionFromCamera(m_TransitioningFrom , worldUp, deltaTime);
                 m_State =  LiveChild.State;
             }
-            TransitioningFrom = null;
+            m_TransitioningFrom  = null;
             InvokePostPipelineStageCallback(this, CinemachineCore.Stage.Finalize, ref m_State, deltaTime);
             PreviousStateIsValid = true;
         }
@@ -283,6 +295,9 @@ namespace Cinemachine
             CinemachineDebug.OnGUIHandlers += OnGuiHandler;
         }
 
+        /// <summary>
+        /// Uninstall the GUI handler
+        /// </summary>
         protected override void OnDisable()
         {
             base.OnDisable();
@@ -317,11 +332,19 @@ namespace Cinemachine
         public CinemachineVirtualCameraBase[] ChildCameras { get { UpdateListOfChildren(); return m_ChildCameras; }}
 
         /// <summary>Is there a blend in progress?</summary>
-        public bool IsBlending { get { return mActiveBlend != null; } }
+        public bool IsBlending => mActiveBlend != null;
+
+        /// <summary>
+        /// Get the current active blend in progress.  Will return null if no blend is in progress.
+        /// </summary>
+        public CinemachineBlend ActiveBlend => mActiveBlend;
 
         /// <summary>API for the inspector editor.  Animation module does not have hashes
         /// for state parents, so we have to invent them in order to implement nested state
         /// handling</summary>
+        /// <param name="parentHash">Parent state's hash</param>
+        /// <param name="clip">The clip to create the fake hash for</param>
+        /// <returns>The fake hash</returns>
         public static int CreateFakeHash(int parentHash, AnimationClip clip)
         {
             return Animator.StringToHash(parentHash.ToString() + "_" + clip.name);
@@ -345,6 +368,7 @@ namespace Cinemachine
                     return list[i].hash;
             int newHash = CreateFakeHash(parentHash, clip);
             list.Add(new HashPair() { parentHash = parentHash, hash = newHash });
+            mStateParentLookup[newHash] = parentHash;
             return newHash;
         }
 
@@ -395,6 +419,7 @@ namespace Cinemachine
                     mStateParentLookup[i.m_Hash] = i.m_ParentHash;
 
             // Zap the cached current instructions
+            mHashCache = null;
             mActivationTime = mPendingActivationTime = 0;
             mActiveBlend = null;
         }
@@ -423,29 +448,21 @@ namespace Cinemachine
             {
                 // Force "current" state to be the state we're transitioning to
                 AnimatorStateInfo info = m_AnimatedTarget.GetNextAnimatorStateInfo(m_LayerIndex);
-                hash = info.fullPathHash;
-                if (m_AnimatedTarget.GetNextAnimatorClipInfoCount(m_LayerIndex) > 1)
-                {
-                    m_AnimatedTarget.GetNextAnimatorClipInfo(m_LayerIndex, m_clipInfoList);
-                    hash = GetClipHash(info.fullPathHash, m_clipInfoList);
-                }
+                m_AnimatedTarget.GetNextAnimatorClipInfo(m_LayerIndex, m_clipInfoList);
+                hash = GetClipHash(info.fullPathHash, m_clipInfoList);
             }
             else
             {
                 AnimatorStateInfo info = m_AnimatedTarget.GetCurrentAnimatorStateInfo(m_LayerIndex);
-                hash = info.fullPathHash;
-                if (m_AnimatedTarget.GetCurrentAnimatorClipInfoCount(m_LayerIndex) > 1)
-                {
-                    m_AnimatedTarget.GetCurrentAnimatorClipInfo(m_LayerIndex, m_clipInfoList);
-                    hash = GetClipHash(info.fullPathHash, m_clipInfoList);
-                }
+                m_AnimatedTarget.GetCurrentAnimatorClipInfo(m_LayerIndex, m_clipInfoList);
+                hash = GetClipHash(info.fullPathHash, m_clipInfoList);
             }
 
             // If we don't have an instruction for this state, find a suitable default
             while (hash != 0 && !mInstructionDictionary.ContainsKey(hash))
                 hash = mStateParentLookup.ContainsKey(hash) ? mStateParentLookup[hash] : 0;
 
-            float now = Time.time;
+            float now = CinemachineCore.CurrentTime;
             if (mActivationTime != 0)
             {
                 // Is it active now?
@@ -515,19 +532,16 @@ namespace Cinemachine
 
         int GetClipHash(int hash, List<AnimatorClipInfo> clips)
         {
-            // Is there an animation clip substate?
-            if (clips.Count > 1)
-            {
-                // Find the strongest-weighted one
-                int bestClip = -1;
-                for (int i = 0; i < clips.Count; ++i)
-                    if (bestClip < 0 || clips[i].weight > clips[bestClip].weight)
-                        bestClip = i;
+            // Find the strongest-weighted animation clip substate
+            int bestClip = -1;
+            for (int i = 0; i < clips.Count; ++i)
+                if (bestClip < 0 || clips[i].weight > clips[bestClip].weight)
+                    bestClip = i;
 
-                // Use its hash
-                if (bestClip >= 0 && clips[bestClip].weight > 0)
-                    hash = LookupFakeHash(hash, clips[bestClip].clip);
-            }
+            // Use its hash
+            if (bestClip >= 0 && clips[bestClip].weight > 0)
+                hash = LookupFakeHash(hash, clips[bestClip].clip);
+
             return hash;
         }
 
@@ -548,4 +562,5 @@ namespace Cinemachine
             return blend;
         }
     }
+#endif
 }

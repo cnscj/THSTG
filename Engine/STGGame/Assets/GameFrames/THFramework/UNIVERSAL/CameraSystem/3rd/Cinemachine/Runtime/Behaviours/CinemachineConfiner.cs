@@ -19,11 +19,9 @@ namespace Cinemachine
     [DocumentationSorting(DocumentationSortingAttribute.Level.UserRef)]
     [AddComponentMenu("")] // Hide in menu
     [SaveDuringPlay]
-#if UNITY_2018_3_OR_NEWER
     [ExecuteAlways]
-#else
-    [ExecuteInEditMode]
-#endif
+    [DisallowMultipleComponent]
+    [HelpURL(Documentation.BaseURL + "manual/CinemachineConfiner.html")]
     public class CinemachineConfiner : CinemachineExtension
     {
 #if CINEMACHINE_PHYSICS && CINEMACHINE_PHYSICS_2D
@@ -63,7 +61,7 @@ namespace Cinemachine
             + "Higher numbers are more gradual.")]
         [Range(0, 10)]
         public float m_Damping = 0;
-
+        
         /// <summary>See whether the virtual camera has been moved by the confiner</summary>
         /// <param name="vcam">The virtual camera in question.  This might be different from the
         /// virtual camera that owns the confiner, in the event that the camera has children</param>
@@ -87,11 +85,19 @@ namespace Cinemachine
             m_Damping = Mathf.Max(0, m_Damping);
         }
 
+        /// <summary>
+        /// Called when connecting to a virtual camera
+        /// </summary>
+        /// <param name="connect">True if connecting, false if disconnecting</param>
+        protected override void ConnectToVcam(bool connect)
+        {
+            base.ConnectToVcam(connect);
+        }
+
         class VcamExtraState
         {
             public Vector3 m_previousDisplacement;
             public float confinerDisplacement;
-            public bool applyAfterAim;
         };
 
         /// <summary>Check if the bounding volume is defined</summary>
@@ -100,35 +106,16 @@ namespace Cinemachine
             get
             {
 #if CINEMACHINE_PHYSICS && !CINEMACHINE_PHYSICS_2D
-                return m_BoundingVolume != null;
+                return m_BoundingVolume != null && m_BoundingVolume.enabled && m_BoundingVolume.gameObject.activeInHierarchy;
 #elif CINEMACHINE_PHYSICS_2D && !CINEMACHINE_PHYSICS
-                return m_BoundingShape2D != null;
+                return m_BoundingShape2D != null && m_BoundingShape2D.enabled && m_BoundingShape2D.gameObject.activeInHierarchy;
 #else
-                return (m_ConfineMode == Mode.Confine3D && m_BoundingVolume != null)
-                    || (m_ConfineMode == Mode.Confine2D && m_BoundingShape2D != null);
+                return (m_ConfineMode == Mode.Confine3D && m_BoundingVolume != null && m_BoundingVolume.enabled && m_BoundingVolume.gameObject.activeInHierarchy)
+                       || (m_ConfineMode == Mode.Confine2D && m_BoundingShape2D != null && m_BoundingShape2D.enabled && m_BoundingShape2D.gameObject.activeInHierarchy);
 #endif
             }
         }
 
-        protected override void ConnectToVcam(bool connect)
-        {
-            base.ConnectToVcam(connect);
-
-            CinemachineVirtualCamera vcam = VirtualCamera as CinemachineVirtualCamera;
-            if (vcam == null) return;
-            
-            var components = vcam.GetComponentPipeline();
-            foreach (var component in components)
-            {
-                if (component.BodyAppliesAfterAim)
-                {
-                    var extraState = GetExtraState<VcamExtraState>(vcam);
-                    extraState.applyAfterAim = true;
-                    break;
-                }
-            }
-        }
-        
         /// <summary>
         /// Report maximum damping time needed for this component.
         /// </summary>
@@ -138,34 +125,35 @@ namespace Cinemachine
             return m_Damping;
         }
 
-        /// <summary>Callback to to the camera confining</summary>
+        /// <summary>
+        /// Callback to do the camera confining
+        /// </summary>
+        /// <param name="vcam">The virtual camera being processed</param>
+        /// <param name="stage">The current pipeline stage</param>
+        /// <param name="state">The current virtual camera state</param>
+        /// <param name="deltaTime">The current applicable deltaTime</param>
         protected override void PostPipelineStageCallback(
             CinemachineVirtualCameraBase vcam,
             CinemachineCore.Stage stage, ref CameraState state, float deltaTime)
         {
-            if (IsValid)
+            if (IsValid && stage == CinemachineCore.Stage.Body)
             {
                 var extra = GetExtraState<VcamExtraState>(vcam);
-                if ((extra.applyAfterAim && stage == CinemachineCore.Stage.Finalize)
-                    ||
-                    (!extra.applyAfterAim && stage == CinemachineCore.Stage.Body))
-                {
-                    Vector3 displacement;
-                    if (m_ConfineScreenEdges && state.Lens.Orthographic)
-                        displacement = ConfineScreenEdges(vcam, ref state);
-                    else
-                        displacement = ConfinePoint(state.CorrectedPosition);
+                Vector3 displacement;
+                if (m_ConfineScreenEdges && state.Lens.Orthographic)
+                    displacement = ConfineScreenEdges(vcam, ref state);
+                else
+                    displacement = ConfinePoint(state.CorrectedPosition);
 
-                    if (m_Damping > 0 && deltaTime >= 0 && VirtualCamera.PreviousStateIsValid)
-                    {
-                        Vector3 delta = displacement - extra.m_previousDisplacement;
-                        delta = Damper.Damp(delta, m_Damping, deltaTime);
-                        displacement = extra.m_previousDisplacement + delta;
-                    }
-                    extra.m_previousDisplacement = displacement;
-                    state.PositionCorrection += displacement;
-                    extra.confinerDisplacement = displacement.magnitude;
+                if (m_Damping > 0 && deltaTime >= 0 && VirtualCamera.PreviousStateIsValid)
+                {
+                    Vector3 delta = displacement - extra.m_previousDisplacement;
+                    delta = Damper.Damp(delta, m_Damping, deltaTime);
+                    displacement = extra.m_previousDisplacement + delta;
                 }
+                extra.m_previousDisplacement = displacement;
+                state.PositionCorrection += displacement;
+                extra.confinerDisplacement = displacement.magnitude;
             }
         }
 
@@ -175,8 +163,10 @@ namespace Cinemachine
         /// <summary>Call this if the bounding shape's points change at runtime</summary>
         public void InvalidatePathCache()
         {
+#if CINEMACHINE_PHYSICS_2D
             m_pathCache = null;
             m_BoundingShape2DCache = null;
+#endif
         }
 
         bool ValidatePathCache()
@@ -261,10 +251,12 @@ namespace Cinemachine
                 int numPoints = m_pathCache[i].Count;
                 if (numPoints > 0)
                 {
-                    Vector2 v0 = m_BoundingShape2D.transform.TransformPoint(m_pathCache[i][numPoints - 1]);
+                    Vector2 v0 = m_BoundingShape2D.transform.TransformPoint(m_pathCache[i][numPoints - 1] 
+                                                                            + m_BoundingShape2D.offset);
                     for (int j = 0; j < numPoints; ++j)
                     {
-                        Vector2 v = m_BoundingShape2D.transform.TransformPoint(m_pathCache[i][j]);
+                        Vector2 v = m_BoundingShape2D.transform.TransformPoint(m_pathCache[i][j] 
+                                                                               + m_BoundingShape2D.offset);
                         Vector2 c = Vector2.Lerp(v0, v, p.ClosestPointOnSegment(v0, v));
                         float d = Vector2.SqrMagnitude(p - c);
                         if (d < bestDistance)

@@ -1,6 +1,7 @@
 #if CINEMACHINE_EXPERIMENTAL_VCAM
 using UnityEngine;
 using System;
+using System.Linq;
 
 namespace Cinemachine
 {
@@ -13,11 +14,7 @@ namespace Cinemachine
     /// </summary>
     [DocumentationSorting(DocumentationSortingAttribute.Level.UserRef)]
     [DisallowMultipleComponent]
-#if UNITY_2018_3_OR_NEWER
     [ExecuteAlways]
-#else
-    [ExecuteInEditMode]
-#endif
     [AddComponentMenu("Cinemachine/CinemachineNewVirtualCamera")]
     public class CinemachineNewVirtualCamera : CinemachineVirtualCameraBase
     {
@@ -35,16 +32,13 @@ namespace Cinemachine
 
         /// <summary>Specifies the LensSettings of this Virtual Camera.
         /// These settings will be transferred to the Unity camera when the vcam is live.</summary>
-        [Tooltip("Specifies the lens properties of this Virtual Camera.  This generally mirrors the Unity Camera's lens settings, and will be used to drive the Unity camera when the vcam is active.")]
-        [LensSettingsProperty]
+        [Tooltip("Specifies the lens properties of this Virtual Camera.  This generally mirrors the "
+            + "Unity Camera's lens settings, and will be used to drive the Unity camera when the vcam is active.")]
         public LensSettings m_Lens = LensSettings.Default;
 
         /// <summary> Collection of parameters that influence how this virtual camera transitions from
         /// other virtual cameras </summary>
         public TransitionParams m_Transitions;
-
-        /// <summary>API for the editor, to make the dragging of position handles behave better.</summary>
-        public bool UserIsDragging { get; set; }
 
         /// <summary>Updates the child rig cache</summary>
         protected override void OnEnable()
@@ -56,6 +50,13 @@ namespace Cinemachine
         void Reset()
         {
             DestroyComponents();
+        }
+
+        /// <summary>Validates the settings avter inspector edit</summary>
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            m_Lens.Validate();
         }
 
         /// <summary>The camera state, which will be a blend of the child rig states</summary>
@@ -146,12 +147,10 @@ namespace Cinemachine
             base.OnTransitionFromCamera(fromCam, worldUp, deltaTime);
             InvokeOnTransitionInExtensions(fromCam, worldUp, deltaTime);
             bool forceUpdate = false;
-            if (m_Transitions.m_InheritPosition && fromCam != null)
+            if (m_Transitions.m_InheritPosition && fromCam != null  
+                && !CinemachineCore.Instance.IsLiveInBlend(this))
             {
-                transform.position = fromCam.State.RawPosition;
-                //transform.rotation = fromCam.State.RawOrientation;
-                PreviousStateIsValid = false;
-                forceUpdate = true;
+                ForceCameraPosition(fromCam.State.FinalPosition, fromCam.State.FinalOrientation);
             }
             UpdateComponentCache();
             for (int i = 0; i < m_Components.Length; ++i)
@@ -179,6 +178,8 @@ namespace Cinemachine
         /// <param name="deltaTime">Delta time for time-based effects (ignore if less than 0)</param>
         override public void InternalUpdateCameraState(Vector3 worldUp, float deltaTime)
         {
+            UpdateTargetCache();
+
             FollowTargetAttachment = 1;
             LookAtTargetAttachment = 1;
 
@@ -192,16 +193,23 @@ namespace Cinemachine
 
             // Push the raw position back to the game object's transform, so it
             // moves along with the camera.
-            if (!UserIsDragging)
-            {
-                if (Follow != null)
-                    transform.position = State.RawPosition;
-                if (LookAt != null)
-                    transform.rotation = State.RawOrientation;
-            }
+            if (Follow != null)
+                transform.position = State.RawPosition;
+            if (LookAt != null)
+                transform.rotation = State.RawOrientation;
+            
             // Signal that it's all done
             InvokePostPipelineStageCallback(this, CinemachineCore.Stage.Finalize, ref m_State, deltaTime);
             PreviousStateIsValid = true;
+        }
+        
+        /// <summary>
+        /// Returns true, when the vcam has extensions or components that require input.
+        /// </summary>
+        internal override bool RequiresUserInput()
+        {
+            return base.RequiresUserInput() ||
+                m_Components != null && m_Components.Any(t => t != null && t.RequiresUserInput);
         }
 
         private Transform mCachedLookAtTarget;
@@ -248,21 +256,28 @@ namespace Cinemachine
             for (CinemachineCore.Stage stage = CinemachineCore.Stage.Body;
                 stage <= CinemachineCore.Stage.Finalize; ++stage)
             {
-                if (stage == CinemachineCore.Stage.Finalize && postAimBody != null)
-                    postAimBody.MutateCameraState(ref state, deltaTime);
-
                 var c = m_Components[(int)stage];
                 if (c != null)
                 {
                     if (stage == CinemachineCore.Stage.Body && c.BodyAppliesAfterAim)
+                    {
                         postAimBody = c;
-                    else
-                        c.MutateCameraState(ref state, deltaTime);
+                        continue; // do the body stage of the pipeline after Aim
+                    }
+                    c.MutateCameraState(ref state, deltaTime);
                 }
-                else if (stage == CinemachineCore.Stage.Aim)
-                    state.BlendHint |= CameraState.BlendHintValue.IgnoreLookAtTarget; // no aim
-
                 InvokePostPipelineStageCallback(this, stage, ref state, deltaTime);
+                if (stage == CinemachineCore.Stage.Aim)
+                {
+                    if (c == null)
+                        state.BlendHint |= CameraState.BlendHintValue.IgnoreLookAtTarget; // no aim
+                     // If we have saved a Body for after Aim, do it now
+                    if (postAimBody != null)
+                    {
+                        postAimBody.MutateCameraState(ref state, deltaTime);
+                        InvokePostPipelineStageCallback(this, CinemachineCore.Stage.Body, ref state, deltaTime);
+                    }
+                }
             }
 
             return state;
@@ -397,8 +412,8 @@ namespace Cinemachine
         /// <summary>Add a component to the cinemachine pipeline.</summary>
         public T AddCinemachineComponent<T>() where T : CinemachineComponentBase
         {
-            T c = gameObject.AddComponent<T>();
             var components = ComponentCache;
+            T c = gameObject.AddComponent<T>();
             var oldC = components[(int)c.Stage];
             if (oldC != null)
             {

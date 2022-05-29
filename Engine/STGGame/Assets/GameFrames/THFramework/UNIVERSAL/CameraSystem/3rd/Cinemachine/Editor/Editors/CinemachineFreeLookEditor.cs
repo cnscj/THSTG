@@ -3,13 +3,19 @@ using UnityEditor;
 using Cinemachine.Editor;
 using System.Collections.Generic;
 using Cinemachine.Utility;
+using Matrix4x4 = UnityEngine.Matrix4x4;
+using Quaternion = UnityEngine.Quaternion;
+using Vector3 = UnityEngine.Vector3;
 
 namespace Cinemachine
 {
     [CustomEditor(typeof(CinemachineFreeLook))]
+    [CanEditMultipleObjects]
     internal sealed class CinemachineFreeLookEditor
         : CinemachineVirtualCameraBaseEditor<CinemachineFreeLook>
     {
+        /// <summary>Get the property names to exclude in the inspector.</summary>
+        /// <param name="excluded">Add the names to this list</param>
         protected override void GetExcludedPropertiesInInspector(List<string> excluded)
         {
             base.GetExcludedPropertiesInInspector(excluded);
@@ -27,6 +33,13 @@ namespace Cinemachine
         {
             base.OnEnable();
             Target.UpdateInputAxisProvider();
+            
+#if UNITY_2021_2_OR_NEWER
+            CinemachineSceneToolUtility.RegisterTool(typeof(FoVTool));
+            CinemachineSceneToolUtility.RegisterTool(typeof(FarNearClipTool));
+            CinemachineSceneToolUtility.RegisterTool(typeof(FollowOffsetTool));
+            CinemachineSceneToolUtility.RegisterTool(typeof(FreelookRigSelection));
+#endif
         }
         
         protected override void OnDisable()
@@ -34,10 +47,15 @@ namespace Cinemachine
             base.OnDisable();
 
             // Must destroy child editors or we get exceptions
-            if (m_editors != null)
-                foreach (UnityEditor.Editor e in m_editors)
-                    if (e != null)
-                        UnityEngine.Object.DestroyImmediate(e);
+            if (m_rigEditor != null)
+                UnityEngine.Object.DestroyImmediate(m_rigEditor);
+        
+#if UNITY_2021_2_OR_NEWER
+            CinemachineSceneToolUtility.UnregisterTool(typeof(FoVTool));
+            CinemachineSceneToolUtility.UnregisterTool(typeof(FarNearClipTool));
+            CinemachineSceneToolUtility.UnregisterTool(typeof(FollowOffsetTool));
+            CinemachineSceneToolUtility.UnregisterTool(typeof(FreelookRigSelection));
+#endif
         }
 
         public override void OnInspectorGUI()
@@ -50,6 +68,9 @@ namespace Cinemachine
             DrawHeaderInInspector();
             DrawPropertyInInspector(FindProperty(x => x.m_Priority));
             DrawTargetsInInspector(FindProperty(x => x.m_Follow), FindProperty(x => x.m_LookAt));
+            DrawPropertyInInspector(FindProperty(x => x.m_StandbyUpdate));
+            DrawPropertyInInspector(FindProperty(x => x.m_CommonLens));
+            DrawLensSettingsInInspector(FindProperty(x => x.m_Lens));
             DrawRemainingPropertiesInInspector();
 
             // Orbits
@@ -69,45 +90,123 @@ namespace Cinemachine
                 serializedObject.ApplyModifiedProperties();
 
             // Rigs
-            UpdateRigEditors();
-            for (int i = 0; i < m_editors.Length; ++i)
+            if (Selection.objects.Length == 1)
             {
-                if (m_editors[i] == null)
-                    continue;
                 EditorGUILayout.Separator();
-                EditorGUILayout.BeginVertical(GUI.skin.box);
-                EditorGUILayout.LabelField(RigNames[i], EditorStyles.boldLabel);
-                ++EditorGUI.indentLevel;
-                m_editors[i].OnInspectorGUI();
-                --EditorGUI.indentLevel;
-                EditorGUILayout.EndVertical();
+                EditorGUILayout.Separator();
+                SetSelectedRig(Target, GUILayout.Toolbar(GetSelectedRig(Target), s_RigNames));
+                UpdateRigEditor();
+                if (m_rigEditor != null)
+                {
+                    EditorGUILayout.BeginVertical(GUI.skin.box);
+                    ++EditorGUI.indentLevel;
+                    m_rigEditor.OnInspectorGUI();
+                    --EditorGUI.indentLevel;
+                    EditorGUILayout.EndVertical();
+                }
             }
-
+            
             // Extensions
             DrawExtensionsWidgetInInspector();
         }
 
-        string[] RigNames;
-        CinemachineVirtualCameraBase[] m_rigs;
-        UnityEditor.Editor[] m_editors;
-        void UpdateRigEditors()
+        void OnSceneGUI()
         {
-            RigNames = CinemachineFreeLook.RigNames;
-            if (m_rigs == null)
-                m_rigs = new CinemachineVirtualCameraBase[RigNames.Length];
-            if (m_editors == null)
-                m_editors = new UnityEditor.Editor[RigNames.Length];
-            for (int i = 0; i < RigNames.Length; ++i)
+            // Forward to embedded rig editor
+            if (m_rigEditor != null && m_RigEditorOnSceneGUI != null)
+                m_RigEditorOnSceneGUI.Invoke(m_rigEditor, null);
+
+#if UNITY_2021_2_OR_NEWER
+            DrawSceneTools();
+#endif
+        }
+        
+#if UNITY_2021_2_OR_NEWER
+        void DrawSceneTools()
+        {
+            var freelook = Target;
+            if (freelook == null || !freelook.IsValid)
             {
-                CinemachineVirtualCamera rig = Target.GetRig(i);
-                if (rig == null || rig != m_rigs[i])
+                return;
+            }
+
+            var originalColor = Handles.color;
+            Handles.color = Handles.preselectionColor;
+            if (freelook.m_CommonLens && CinemachineSceneToolUtility.IsToolActive(typeof(FoVTool)))
+            {
+                CinemachineSceneToolHelpers.FovToolHandle(freelook, 
+                    new SerializedObject(freelook).FindProperty(() => freelook.m_Lens), 
+                    freelook.m_Lens, IsHorizontalFOVUsed());
+            }
+            else if (freelook.m_CommonLens && CinemachineSceneToolUtility.IsToolActive(typeof(FarNearClipTool)))
+            {
+                CinemachineSceneToolHelpers.NearFarClipHandle(freelook, 
+                    new SerializedObject(freelook).FindProperty(() => freelook.m_Lens));
+            }
+            else if (freelook.Follow != null && CinemachineSceneToolUtility.IsToolActive(typeof(FollowOffsetTool)))
+            {
+                var draggedRig = CinemachineSceneToolHelpers.OrbitControlHandle(freelook,
+                    new SerializedObject(freelook).FindProperty(() => freelook.m_Orbits));
+                if (draggedRig >= 0)
+                    SetSelectedRig(Target, draggedRig);
+            }
+            Handles.color = originalColor;
+        }
+#endif
+
+        static GUIContent[] s_RigNames = 
+        {
+            new GUIContent("Top Rig"), 
+            new GUIContent("Middle Rig"), 
+            new GUIContent("Bottom Rig")
+        };
+        internal static GUIContent[] RigNames => s_RigNames;
+
+        static int GetSelectedRig(CinemachineFreeLook freelook)
+        {
+            return freelook.m_YAxis.Value < 0.33f ? 2 : (freelook.m_YAxis.Value > 0.66f ? 0 : 1);
+        }
+
+        internal static void SetSelectedRig(CinemachineFreeLook freelook, int rigIndex)
+        {
+            Debug.Assert(rigIndex >= 0 && rigIndex < 3);
+            if (GetSelectedRig(freelook) != rigIndex)
+            {
+                var prop = new SerializedObject(freelook).FindProperty(
+                    () => freelook.m_YAxis).FindPropertyRelative(() => freelook.m_YAxis.Value);
+                prop.floatValue = rigIndex == 0 ? 1 : (rigIndex == 1 ? 0.5f : 0);
+                prop.serializedObject.ApplyModifiedProperties();
+                freelook.InternalUpdateCameraState(Vector3.up, -1);
+            }
+#if UNITY_2021_2_OR_NEWER
+            // Push current selection to the rig selection tool
+            FreelookRigSelection.SelectedRig = rigIndex;
+#endif
+        }
+
+        UnityEditor.Editor m_rigEditor;
+        System.Reflection.MethodInfo m_RigEditorOnSceneGUI;
+        CinemachineVirtualCameraBase m_EditedRig = null;
+
+        void UpdateRigEditor()
+        {
+            var selectedRig = GetSelectedRig(Target);
+            CinemachineVirtualCamera rig = Target.GetRig(selectedRig);
+            if (m_EditedRig != rig || m_rigEditor == null)
+            {
+                m_EditedRig = rig;
+                m_RigEditorOnSceneGUI = null;
+                if (m_rigEditor != null)
                 {
-                    m_rigs[i] = rig;
-                    if (m_editors[i] != null)
-                        UnityEngine.Object.DestroyImmediate(m_editors[i]);
-                    m_editors[i] = null;
-                    if (rig != null)
-                        CreateCachedEditor(rig, null, ref m_editors[i]);
+                    UnityEngine.Object.DestroyImmediate(m_rigEditor);
+                    m_rigEditor = null;
+                }
+                if (rig != null)
+                {
+                    CreateCachedEditor(rig, null, ref m_rigEditor);
+                    if (m_rigEditor != null)
+                        m_RigEditorOnSceneGUI = m_rigEditor.GetType().GetMethod("OnSceneGUI", 
+                            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                 }
             }
         }
@@ -124,7 +223,7 @@ namespace Cinemachine
                     = (CinemachineFreeLook vcam, string name, CinemachineVirtualCamera copyFrom) =>
                     {
                         // Create a new rig with default components
-                        GameObject go = InspectorUtility.CreateGameObject(name);
+                        GameObject go = ObjectFactory.CreateGameObject(name);
                         Undo.RegisterCreatedObjectUndo(go, "created rig");
                         Undo.SetTransformParent(go.transform, vcam.transform, "parenting rig");
                         CinemachineVirtualCamera rig = Undo.AddComponent<CinemachineVirtualCamera>(go);

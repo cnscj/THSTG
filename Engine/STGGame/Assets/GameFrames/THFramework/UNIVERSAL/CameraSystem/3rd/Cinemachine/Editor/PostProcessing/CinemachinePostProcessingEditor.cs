@@ -10,8 +10,7 @@ namespace Cinemachine.PostFX.Editor
 {
 #if CINEMACHINE_POST_PROCESSING_V2
     [CustomEditor(typeof(CinemachinePostProcessing))]
-    public sealed class CinemachinePostProcessingEditor
-        : Cinemachine.Editor.BaseEditor<CinemachinePostProcessing>
+    public sealed class CinemachinePostProcessingEditor : Cinemachine.Editor.BaseEditor<CinemachinePostProcessing>
     {
         SerializedProperty m_Profile;
         SerializedProperty m_FocusTracking;
@@ -48,6 +47,8 @@ namespace Cinemachine.PostFX.Editor
                 m_EffectList.Init(asset, new SerializedObject(asset));
         }
 
+        /// <summary>Get the property names to exclude in the inspector.</summary>
+        /// <param name="excluded">Add the names to this list</param>
         protected override void GetExcludedPropertiesInInspector(List<string> excluded)
         {
             base.GetExcludedPropertiesInInspector(excluded);

@@ -5,9 +5,12 @@ using UnityEngine;
 namespace Cinemachine.Editor
 {
     [CustomEditor(typeof(CinemachineBlendListCamera))]
+    [CanEditMultipleObjects]
     internal sealed class CinemachineBlendListCameraEditor
         : CinemachineVirtualCameraBaseEditor<CinemachineBlendListCamera>
     {
+        /// <summary>Get the property names to exclude in the inspector.</summary>
+        /// <param name="excluded">Add the names to this list</param>
         protected override void GetExcludedPropertiesInInspector(List<string> excluded)
         {
             base.GetExcludedPropertiesInInspector(excluded);
@@ -43,19 +46,26 @@ namespace Cinemachine.Editor
             DrawTargetsInInspector(FindProperty(x => x.m_Follow), FindProperty(x => x.m_LookAt));
             DrawRemainingPropertiesInInspector();
 
-            // Instructions
-            UpdateCameraCandidates();
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.Separator();
-            mInstructionList.DoLayoutList();
-
-            // vcam children
-            EditorGUILayout.Separator();
-            mChildList.DoLayoutList();
-            if (EditorGUI.EndChangeCheck())
+            if (targets.Length == 1)
             {
-                serializedObject.ApplyModifiedProperties();
-                Target.ValidateInstructions();
+                // Instructions
+                UpdateCameraCandidates();
+                EditorGUI.BeginChangeCheck();
+                EditorGUILayout.Separator();
+                mInstructionList.DoLayoutList();
+
+                EditorGUILayout.Separator();
+
+                mChildList.DoLayoutList();
+                if (EditorGUI.EndChangeCheck())
+                {
+                    serializedObject.ApplyModifiedProperties();
+                    Target.ValidateInstructions();
+                }   
+            }
+            else
+            {
+                EditorGUILayout.HelpBox(Styles.virtualCameraChildrenInfoMsg.text, MessageType.Info);
             }
 
             // Extensions

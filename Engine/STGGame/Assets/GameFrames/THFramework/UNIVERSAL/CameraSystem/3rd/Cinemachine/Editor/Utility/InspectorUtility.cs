@@ -6,12 +6,19 @@ using System.IO;
 
 namespace Cinemachine.Editor
 {
+    /// <summary>
+    /// Collection of tools and helpers for drawing inspectors
+    /// </summary>
     public class InspectorUtility
     {
         /// <summary>Put multiple properties on a single inspector line, with
         /// optional label overrides.  Passing null as a label (or sublabel) override will
         /// cause the property's displayName to be used as a label.  For no label at all,
         /// pass GUIContent.none.</summary>
+        /// <param name="rect">Rect in which to draw</param>
+        /// <param name="label">Main label</param>
+        /// <param name="props">Properties to place on the line</param>
+        /// <param name="subLabels">Sublabels for the properties</param>
         public static void MultiPropertyOnLine(
             Rect rect,
             GUIContent label,
@@ -84,44 +91,21 @@ namespace Cinemachine.Editor
             EditorGUI.indentLevel = indentLevel;
         }
 
+        /// <summary>
+        /// Normalize a curve so that each of X and Y axes ranges from 0 to 1
+        /// </summary>
+        /// <param name="curve">Curve to normalize</param>
+        /// <returns>The normalized curve</returns>
         public static AnimationCurve NormalizeCurve(AnimationCurve curve)
         {
-            Keyframe[] keys = curve.keys;
-            if (keys.Length > 0)
-            {
-                float minTime = keys[0].time;
-                float maxTime = minTime;
-                float minVal = keys[0].value;
-                float maxVal = minVal;
-                for (int i = 0; i < keys.Length; ++i)
-                {
-                    minTime = Mathf.Min(minTime, keys[i].time);
-                    maxTime = Mathf.Max(maxTime, keys[i].time);
-                    minVal = Mathf.Min(minVal, keys[i].value);
-                    maxVal = Mathf.Max(maxVal, keys[i].value);
-                }
-                float range = maxTime - minTime;
-                float timeScale = range < 0.0001f ? 1 : 1 / range;
-                range = maxVal - minVal;
-                float valScale = range < 1 ? 1 : 1 / range;
-                float valOffset = 0;
-                if (range < 1)
-                {
-                    if (minVal > 0 && minVal + range <= 1)
-                        valOffset = minVal;
-                    else
-                        valOffset = 1 - range;
-                }
-                for (int i = 0; i < keys.Length; ++i)
-                {
-                    keys[i].time = (keys[i].time - minTime) * timeScale;
-                    keys[i].value = ((keys[i].value - minVal) * valScale) + valOffset;
-                }
-                curve.keys = keys;
-            }
-            return curve;
+            return RuntimeUtility.NormalizeCurve(curve, true, true);
         }
 
+        /// <summary>
+        /// Remove the "Cinemachine" prefix, then call the standard Unity Nicify.
+        /// </summary>
+        /// <param name="name">The name to nicify</param>
+        /// <returns>The nicified name</returns>
         public static string NicifyClassName(string name)
         {
             if (name.StartsWith("Cinemachine"))
@@ -129,6 +113,12 @@ namespace Cinemachine.Editor
             return ObjectNames.NicifyVariableName(name);
         }
 
+        /// <summary>
+        /// Add to a list all assets of a given type found in a given location
+        /// </summary>
+        /// <param name="type">The asset type to look for</param>
+        /// <param name="assets">The list to add found assets to</param>
+        /// <param name="path">The location in which to look.  Path is relative to package root.</param>
         public static void AddAssetsFromPackageSubDirectory(
             Type type, List<ScriptableObject> assets, string path)
         {
@@ -154,15 +144,22 @@ namespace Cinemachine.Editor
         }
 
         // Temporarily here
+        /// <summary>
+        /// Creates a new GameObject.
+        /// </summary>
+        /// <param name="name">Name to give the object.</param>
+        /// <param name="types">Optional components to add.</param>
+        /// <returns>The GameObject that was created.</returns>
+        [Obsolete("Use ObjectFactory.CreateGameObject(string name, params Type[] types) instead.")]
         public static GameObject CreateGameObject(string name, params Type[] types)
         {
-#if UNITY_2018_3_OR_NEWER
             return ObjectFactory.CreateGameObject(name, types);
-#else
-            return new GameObject(name, types);
-#endif
         }
 
+        /// <summary>
+        /// Force a repaint of the Game View
+        /// </summary>
+        /// <param name="unused">Like it says</param>
         public static void RepaintGameView(UnityEngine.Object unused = null)
         {
             EditorApplication.QueuePlayerLoopUpdate();

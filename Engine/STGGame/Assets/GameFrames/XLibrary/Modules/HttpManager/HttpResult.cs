@@ -25,14 +25,5 @@ namespace XLibGame
         {
             return _webRequest.downloadHandler.data;
         }
-
-        public byte[] ToUnzipBytes()
-        {
-            var oriData = ToBytes();
-            var unzipData = ZipUtility.DecompressDeflate(oriData);
-            return unzipData;
-        }
-
-        
     }
 }

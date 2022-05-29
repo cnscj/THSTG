@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -51,13 +52,10 @@ namespace Cinemachine
     /// <seealso cref="CinemachineBasicMultiChannelPerlin"/>
     [DocumentationSorting(DocumentationSortingAttribute.Level.UserRef)]
     [DisallowMultipleComponent]
-#if UNITY_2018_3_OR_NEWER
     [ExecuteAlways]
-#else
-    [ExecuteInEditMode]
-#endif
     [ExcludeFromPreset]
     [AddComponentMenu("Cinemachine/CinemachineVirtualCamera")]
+    [HelpURL(Documentation.BaseURL + "manual/CinemachineVirtualCamera.html")]
     public class CinemachineVirtualCamera : CinemachineVirtualCameraBase
     {
         /// <summary>The object that the camera wants to look at (the Aim target).
@@ -65,7 +63,8 @@ namespace Cinemachine
         /// will refer to this target and orient the vcam in accordance with rules and
         /// settings that are provided to it.
         /// If this is null, then the vcam's Transform orientation will be used.</summary>
-        [Tooltip("The object that the camera wants to look at (the Aim target).  If this is null, then the vcam's Transform orientation will define the camera's orientation.")]
+        [Tooltip("The object that the camera wants to look at (the Aim target).  "
+            + "If this is null, then the vcam's Transform orientation will define the camera's orientation.")]
         [NoSaveDuringPlay]
         [VcamTargetProperty]
         public Transform m_LookAt = null;
@@ -75,7 +74,8 @@ namespace Cinemachine
         /// will refer to this target and position the vcam in accordance with rules and
         /// settings that are provided to it.
         /// If this is null, then the vcam's Transform position will be used.</summary>
-        [Tooltip("The object that the camera wants to move with (the Body target).  If this is null, then the vcam's Transform position will define the camera's position.")]
+        [Tooltip("The object that the camera wants to move with (the Body target).  "
+            + "If this is null, then the vcam's Transform position will define the camera's position.")]
         [NoSaveDuringPlay]
         [VcamTargetProperty]
         public Transform m_Follow = null;
@@ -83,8 +83,9 @@ namespace Cinemachine
         /// <summary>Specifies the LensSettings of this Virtual Camera.
         /// These settings will be transferred to the Unity camera when the vcam is live.</summary>
         [FormerlySerializedAs("m_LensAttributes")]
-        [Tooltip("Specifies the lens properties of this Virtual Camera.  This generally mirrors the Unity Camera's lens settings, and will be used to drive the Unity camera when the vcam is active.")]
-        [LensSettingsProperty]
+        [Tooltip("Specifies the lens properties of this Virtual Camera.  This generally "
+            + "mirrors the Unity Camera's lens settings, and will be used to drive the "
+            + "Unity camera when the vcam is active.")]
         public LensSettings m_Lens = LensSettings.Default;
 
         /// <summary> Collection of parameters that influence how this virtual camera transitions from
@@ -95,7 +96,7 @@ namespace Cinemachine
         [SerializeField] [HideInInspector]
         [FormerlySerializedAs("m_BlendHint")]
         [FormerlySerializedAs("m_PositionBlending")] private BlendHint m_LegacyBlendHint;
-
+        
         /// <summary>This is the name of the hidden GameObject that will be created as a child object
         /// of the virtual camera.  This hidden game object acts as a container for the polymorphic
         /// CinemachineComponent pipeline.  The Inspector UI for the Virtual Camera
@@ -133,6 +134,7 @@ namespace Cinemachine
         public override float GetMaxDampTime()
         {
             float maxDamp = base.GetMaxDampTime();
+            UpdateComponentPipeline();
             if (m_ComponentPipeline != null)
                 for (int i = 0; i < m_ComponentPipeline.Length; ++i)
                     maxDamp = Mathf.Max(maxDamp, m_ComponentPipeline[i].GetMaxDampTime());
@@ -143,21 +145,23 @@ namespace Cinemachine
         /// Called by CinemachineCore at the appropriate Update time
         /// so the vcam can position itself and track its targets.  This class will
         /// invoke its pipeline and generate a CameraState for this frame.</summary>
+        /// <param name="worldUp">Effective world up</param>
+        /// <param name="deltaTime">Effective deltaTime</param>
         override public void InternalUpdateCameraState(Vector3 worldUp, float deltaTime)
         {
+            UpdateTargetCache();
+
             // Update the state by invoking the component pipeline
             m_State = CalculateNewState(worldUp, deltaTime);
             ApplyPositionBlendMethod(ref m_State, m_Transitions.m_BlendHint);
 
             // Push the raw position back to the game object's transform, so it
             // moves along with the camera.
-            if (!UserIsDragging)
-            {
-                if (Follow != null)
-                    transform.position = State.RawPosition;
-                if (LookAt != null)
-                    transform.rotation = State.RawOrientation;
-            }
+            if (Follow != null)
+                transform.position = State.RawPosition;
+            if (LookAt != null)
+                transform.rotation = State.RawOrientation;
+            
             PreviousStateIsValid = true;
         }
 
@@ -258,10 +262,7 @@ namespace Cinemachine
                 if (child.GetComponent<CinemachinePipeline>() != null)
                     oldPipeline.Add(child);
 
-#if UNITY_EDITOR
-            bool isPrefab = gameObject.scene.name == null; // causes a small GC alloc
-            if (!isPrefab)
-#endif
+            if (!RuntimeUtility.IsPrefab(gameObject))
             {
                 foreach (Transform child in oldPipeline)
                 {
@@ -307,10 +308,12 @@ namespace Cinemachine
         public void InvalidateComponentPipeline() { m_ComponentPipeline = null; }
 
         /// <summary>Get the hidden CinemachinePipeline child object.</summary>
+        /// <returns>The hidden CinemachinePipeline child object</returns>
         public Transform GetComponentOwner() { UpdateComponentPipeline(); return m_ComponentOwner; }
 
         /// <summary>Get the component pipeline owned by the hidden child pipline container.
         /// For most purposes, it is preferable to use the GetCinemachineComponent method.</summary>
+        /// <returns>The component pipeline</returns>
         public CinemachineComponentBase[] GetComponentPipeline() { UpdateComponentPipeline(); return m_ComponentPipeline; }
 
         /// <summary>Get the component set for a specific stage.</summary>
@@ -327,6 +330,8 @@ namespace Cinemachine
         }
 
         /// <summary>Get an existing component of a specific type from the cinemachine pipeline.</summary>
+        /// <typeparam name="T">The type of component to get</typeparam>
+        /// <returns>The component if it's present, or null</returns>
         public T GetCinemachineComponent<T>() where T : CinemachineComponentBase
         {
             CinemachineComponentBase[] components = GetComponentPipeline();
@@ -337,7 +342,10 @@ namespace Cinemachine
             return null;
         }
 
-        /// <summary>Add a component to the cinemachine pipeline.</summary>
+        /// <summary>Add a component to the cinemachine pipeline.  
+        /// Existing components at the new component's stage are removed</summary>
+        /// <typeparam name="T">The type of component to add</typeparam>
+        /// <returns>The new component</returns>
         public T AddCinemachineComponent<T>() where T : CinemachineComponentBase
         {
             // Get the existing components
@@ -364,7 +372,8 @@ namespace Cinemachine
             return component;
         }
 
-        /// <summary>Remove a component from the cinemachine pipeline.</summary>
+        /// <summary>Remove a component from the cinemachine pipeline if it's present.</summary>
+        /// <typeparam name="T">The type of component to remove</typeparam>
         public void DestroyCinemachineComponent<T>() where T : CinemachineComponentBase
         {
             CinemachineComponentBase[] components = GetComponentPipeline();
@@ -382,21 +391,17 @@ namespace Cinemachine
             }
         }
 
-        /// <summary>API for the editor, to make the dragging of position handles behave better.</summary>
-        public bool UserIsDragging { get; set; }
-
         CameraState m_State = CameraState.Default; // Current state this frame
 
         CinemachineComponentBase[] m_ComponentPipeline = null;
         [SerializeField][HideInInspector] private Transform m_ComponentOwner = null;   // serialized to handle copy/paste
         void UpdateComponentPipeline()
         {
-            bool isPrefab = false;
+            bool isPrefab = RuntimeUtility.IsPrefab(gameObject);
 #if UNITY_EDITOR
             // Did we just get copy/pasted?
             if (m_ComponentOwner != null && m_ComponentOwner.parent != transform)
             {
-                isPrefab = gameObject.scene.name == null; // causes a small GC alloc
                 if (!isPrefab) // can't paste to a prefab
                 {
                     CinemachineVirtualCamera copyFrom = (m_ComponentOwner.parent != null)
@@ -427,7 +432,6 @@ namespace Cinemachine
             }
 
             // Make sure we have a pipeline owner
-            isPrefab = gameObject.scene.name == null; // causes a small GC alloc
             if (m_ComponentOwner == null && !isPrefab)
                 m_ComponentOwner = CreatePipeline(null);
 
@@ -495,29 +499,38 @@ namespace Cinemachine
             else
             {
                 for (int i = 0; i < m_ComponentPipeline.Length; ++i)
-                    m_ComponentPipeline[i].PrePipelineMutateCameraState(ref state, deltaTime);
+                    if (m_ComponentPipeline[i] != null)
+                        m_ComponentPipeline[i].PrePipelineMutateCameraState(ref state, deltaTime);
 
-                CinemachineComponentBase postAimBody = null;
                 int componentIndex = 0;
+                CinemachineComponentBase postAimBody = null;
                 for (var stage = CinemachineCore.Stage.Body; stage <= CinemachineCore.Stage.Finalize; ++stage)
                 {
-                    if (stage == CinemachineCore.Stage.Finalize && postAimBody != null)
-                        postAimBody.MutateCameraState(ref state, deltaTime);
-
                     var c = componentIndex < m_ComponentPipeline.Length 
                         ? m_ComponentPipeline[componentIndex] : null;
                     if (c != null && stage == c.Stage)
                     {
                         ++componentIndex;
                         if (stage == CinemachineCore.Stage.Body && c.BodyAppliesAfterAim)
+                        {
                             postAimBody = c;
-                        else
-                            c.MutateCameraState(ref state, deltaTime);
+                            continue; // do the body stage of the pipeline after Aim
+                        }
+                        c.MutateCameraState(ref state, deltaTime);
                     }
-                    else if (stage == CinemachineCore.Stage.Aim)
-                        state.BlendHint |= CameraState.BlendHintValue.IgnoreLookAtTarget;
-
                     InvokePostPipelineStageCallback(this, stage, ref state, deltaTime);
+
+                    if (stage == CinemachineCore.Stage.Aim)
+                    {
+                        if (c == null)
+                            state.BlendHint |= CameraState.BlendHintValue.IgnoreLookAtTarget;
+                        // If we have saved a Body for after Aim, do it now
+                        if (postAimBody != null)
+                        {
+                            postAimBody.MutateCameraState(ref state, deltaTime);
+                            InvokePostPipelineStageCallback(this, CinemachineCore.Stage.Body, ref state, deltaTime);
+                        }
+                    }
                 }
             }
             return state;
@@ -579,13 +592,10 @@ namespace Cinemachine
             InvokeOnTransitionInExtensions(fromCam, worldUp, deltaTime);
             bool forceUpdate = false;
 
-            if (m_Transitions.m_InheritPosition && fromCam != null)
-            {
-                transform.position = fromCam.State.FinalPosition;
-                //transform.rotation = fromCam.State.RawOrientation;
-                PreviousStateIsValid = false;
-                forceUpdate = true;
-            }
+            if (m_Transitions.m_InheritPosition && fromCam != null
+                 && !CinemachineCore.Instance.IsLiveInBlend(this))
+                ForceCameraPosition(fromCam.State.FinalPosition, fromCam.State.FinalOrientation);
+
             UpdateComponentPipeline(); // avoid GetComponentPipeline() here because of GC
             if (m_ComponentPipeline != null)
             {
@@ -603,6 +613,16 @@ namespace Cinemachine
                 UpdateCameraState(worldUp, deltaTime);
             if (m_Transitions.m_OnCameraLive != null)
                 m_Transitions.m_OnCameraLive.Invoke(this, fromCam);
+        }
+        
+        /// <summary>
+        /// Returns true, when the vcam has an extension or components that require input.
+        /// </summary>
+        internal override bool RequiresUserInput()
+        {
+            if (base.RequiresUserInput())
+                return true;
+            return m_ComponentPipeline != null && m_ComponentPipeline.Any(c => c != null && c.RequiresUserInput);
         }
     }
 }

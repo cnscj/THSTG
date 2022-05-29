@@ -38,6 +38,8 @@ namespace Cinemachine.Editor
                 mRepeatProperties[1].displayName, mRepeatProperties[1].tooltip);
         }
 
+        /// <summary>Get the property names to exclude in the inspector.</summary>
+        /// <param name="excluded">Add the names to this list</param>
         protected override void GetExcludedPropertiesInInspector(List<string> excluded)
         {
             base.GetExcludedPropertiesInInspector(excluded);
@@ -80,6 +82,7 @@ namespace Cinemachine.Editor
                 if (isBoost)
                     EditorGUILayout.PropertyField(property.FindPropertyRelative(() => def.m_BoostAmount));
 
+#if CINEMACHINE_TIMELINE
                 bool isPlay = actionProp.intValue == (int)CinemachineTriggerAction.ActionSettings.Mode.Play;
                 if (isPlay)
                 {
@@ -95,7 +98,7 @@ namespace Cinemachine.Editor
                     InspectorUtility.MultiPropertyOnLine(
                         EditorGUILayout.GetControlRect(), null, props, sublabels);
                 }
-
+#endif
                 if (actionProp.intValue == (int)CinemachineTriggerAction.ActionSettings.Mode.Custom)
                 {
                     EditorGUILayout.HelpBox("Use the Event() list below to call custom methods", MessageType.Info);
@@ -115,7 +118,7 @@ namespace Cinemachine.Editor
                     if (value != null && (value as Behaviour) == null)
                         EditorGUILayout.HelpBox("Target must be a Behaviour in order to Enable/Disable", MessageType.Warning);
                 }
-
+#if CINEMACHINE_TIMELINE
                 bool isPlayStop = isPlay
                     || actionProp.intValue == (int)CinemachineTriggerAction.ActionSettings.Mode.Stop;
                 if (isPlayStop)
@@ -126,7 +129,7 @@ namespace Cinemachine.Editor
                         EditorGUILayout.HelpBox("Target must have a PlayableDirector or Animator in order to Play/Stop", MessageType.Warning);
                     }
                 }
-
+#endif
                 if (!isCustom && targetProp.objectReferenceValue == null)
                     EditorGUILayout.HelpBox("No action will be taken because target is not valid", MessageType.Info);
 

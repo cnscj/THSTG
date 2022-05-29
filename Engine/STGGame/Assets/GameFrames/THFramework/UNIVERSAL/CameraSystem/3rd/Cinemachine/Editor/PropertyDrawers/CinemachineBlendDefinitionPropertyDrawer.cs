@@ -16,20 +16,22 @@ namespace Cinemachine.Editor
             GUIContent timeText = new GUIContent(" s", timeProp.tooltip);
             var textDimensions = GUI.skin.label.CalcSize(timeText);
 
-            rect = EditorGUI.PrefixLabel(rect, label);
+            rect = EditorGUI.PrefixLabel(rect, EditorGUI.BeginProperty(rect, label, property));
 
             rect.y += vSpace; rect.height = EditorGUIUtility.singleLineHeight;
             rect.width -= floatFieldWidth + textDimensions.x;
 
             SerializedProperty styleProp = property.FindPropertyRelative(() => myClass.m_Style);
-            if (styleProp.enumValueIndex != (int)CinemachineBlendDefinition.Style.Custom)
-                EditorGUI.PropertyField(rect, styleProp, GUIContent.none);
-            else
+            bool isCustom = styleProp.enumValueIndex == (int)CinemachineBlendDefinition.Style.Custom;
+            var r = rect;
+            if (isCustom)
+                r.width -= 2 * r.height;
+            EditorGUI.PropertyField(r, styleProp, GUIContent.none);
+            if (isCustom)
             {
                 SerializedProperty curveProp = property.FindPropertyRelative(() => myClass.m_CustomCurve);
-                Rect r = rect;
-                r.width -= rect.height;
-                r.height -= 1;
+                r.x += r.width;
+                r.width = 2 * rect.height;
                 EditorGUI.BeginChangeCheck();
                 EditorGUI.PropertyField(r, curveProp, GUIContent.none);
                 if (EditorGUI.EndChangeCheck())
@@ -37,8 +39,6 @@ namespace Cinemachine.Editor
                     curveProp.animationCurveValue = InspectorUtility.NormalizeCurve(curveProp.animationCurveValue);
                     curveProp.serializedObject.ApplyModifiedProperties();
                 }
-                r.x += r.width; r.width = r.height; ++r.height;
-                EditorGUI.PropertyField(r, styleProp, GUIContent.none);
             }
             if (styleProp.intValue != (int)CinemachineBlendDefinition.Style.Cut)
             {

@@ -1,3 +1,7 @@
+#if !UNITY_2019_3_OR_NEWER
+#define CINEMACHINE_UNITY_IMGUI
+#endif
+
 using Cinemachine.Utility;
 using System;
 using System.Collections.Generic;
@@ -14,38 +18,39 @@ namespace Cinemachine
     /// </summary>
     [DocumentationSorting(DocumentationSortingAttribute.Level.UserRef)]
     [DisallowMultipleComponent]
-#if UNITY_2018_3_OR_NEWER
     [ExecuteAlways]
-#else
-    [ExecuteInEditMode]
-#endif
     [ExcludeFromPreset]
     [AddComponentMenu("Cinemachine/CinemachineBlendListCamera")]
+    [HelpURL(Documentation.BaseURL + "manual/CinemachineBlendListCamera.html")]
     public class CinemachineBlendListCamera : CinemachineVirtualCameraBase
     {
-        /// <summary>Default object for the camera children to look at (the aim target), if not specified in a child rig.  May be empty</summary>
-        [Tooltip("Default object for the camera children to look at (the aim target), if not specified in a child camera.  May be empty if all of the children define targets of their own.")]
+        /// <summary>Default object for the camera children to look at (the aim target), 
+        /// if not specified in a child rig.  May be empty</summary>
+        [Tooltip("Default object for the camera children to look at (the aim target), if not "
+            + "specified in a child camera.  May be empty if all of the children define targets of their own.")]
         [NoSaveDuringPlay]
         [VcamTargetProperty]
-        public Transform m_LookAt = null;
+        public Transform m_LookAt;
 
-        /// <summary>Default object for the camera children wants to move with (the body target), if not specified in a child rig.  May be empty</summary>
-        [Tooltip("Default object for the camera children wants to move with (the body target), if not specified in a child camera.  May be empty if all of the children define targets of their own.")]
+        /// <summary>Default object for the camera children wants to move with (the body target), 
+        /// if not specified in a child rig.  May be empty</summary>
+        [Tooltip("Default object for the camera children wants to move with (the body target), "
+            + "if not specified in a child camera.  May be empty if all of the children define targets of their own.")]
         [NoSaveDuringPlay]
         [VcamTargetProperty]
-        public Transform m_Follow = null;
+        public Transform m_Follow;
 
         /// <summary>When enabled, the current camera and blend will be indicated in the game window, for debugging</summary>
         [Tooltip("When enabled, the current child camera and blend will be indicated in the game window, for debugging")]
-        public bool m_ShowDebugText = false;
+        public bool m_ShowDebugText;
 
-        /// <summary>When enabled, the child vcams will cycle indefinitely instead of just stopping at the last onesummary>
+        /// <summary>When enabled, the child vcams will cycle indefinitely instead of just stopping at the last one</summary>
         [Tooltip("When enabled, the child vcams will cycle indefinitely instead of just stopping at the last one")]
-        public bool m_Loop = false;
+        public bool m_Loop;
 
         /// <summary>Internal API for the editor.  Do not use this field</summary>
         [SerializeField][HideInInspector][NoSaveDuringPlay]
-        internal CinemachineVirtualCameraBase[] m_ChildCameras = null;
+        internal CinemachineVirtualCameraBase[] m_ChildCameras;
 
         /// <summary>This represents a single entry in the instrunction list of the BlendListCamera.</summary>
         [Serializable]
@@ -88,9 +93,19 @@ namespace Cinemachine
             }
         }
 
+        void Reset()
+        {
+            m_LookAt = null;
+            m_Follow = null;
+            m_ShowDebugText = false;
+            m_Loop = false;
+            m_Instructions = null;
+            m_ChildCameras = null;
+        }
+        
         /// <summary>Get the current "best" child virtual camera, that would be chosen
         /// if the State Driven Camera were active.</summary>
-        public ICinemachineCamera LiveChild { set; get; }
+        public ICinemachineCamera LiveChild { get; set; }
 
         /// <summary>Check whether the vcam a live child of this camera.</summary>
         /// <param name="vcam">The Virtual Camera to check</param>
@@ -155,15 +170,15 @@ namespace Cinemachine
         {
             base.OnTransitionFromCamera(fromCam, worldUp, deltaTime);
             InvokeOnTransitionInExtensions(fromCam, worldUp, deltaTime);
-            mActivationTime = Time.time;
+            mActivationTime = CinemachineCore.CurrentTime;
             mCurrentInstruction = 0;
             LiveChild = null;
             mActiveBlend = null;
-            TransitioningFrom = fromCam;
+            m_TransitioningFrom = fromCam;
             InternalUpdateCameraState(worldUp, deltaTime);
         }
 
-        ICinemachineCamera TransitioningFrom { get; set; }
+        ICinemachineCamera m_TransitioningFrom;
 
         /// <summary>Called by CinemachineCore at designated update time
         /// so the vcam can position itself and track its targets.  This implementation
@@ -234,11 +249,11 @@ namespace Cinemachine
             }
             else if (LiveChild != null)
             {
-                if (TransitioningFrom != null)
-                    LiveChild.OnTransitionFromCamera(TransitioningFrom, worldUp, deltaTime);
+                if (m_TransitioningFrom != null)
+                    LiveChild.OnTransitionFromCamera(m_TransitioningFrom, worldUp, deltaTime);
                 m_State =  LiveChild.State;
             }
-            TransitioningFrom = null;
+            m_TransitioningFrom = null;
             InvokePostPipelineStageCallback(
                 this, CinemachineCore.Stage.Finalize, ref m_State, deltaTime);
             PreviousStateIsValid = true;
@@ -255,6 +270,9 @@ namespace Cinemachine
             CinemachineDebug.OnGUIHandlers += OnGuiHandler;
         }
 
+        /// <summary>
+        /// Uninstall the GUI handler
+        /// </summary>
         protected override void OnDisable()
         {
             base.OnDisable();
@@ -267,9 +285,10 @@ namespace Cinemachine
             InvalidateListOfChildren();
         }
 
-        ///  Will only be called if Unity Editor - never in build
+        /// Will only be called if Unity Editor - never in build
         private void OnGuiHandler()
         {
+#if CINEMACHINE_UNITY_IMGUI
             if (!m_ShowDebugText)
                 CinemachineDebug.ReleaseScreenPos(this);
             else
@@ -281,6 +300,7 @@ namespace Cinemachine
                 GUI.Label(r, text, GUI.skin.box);
                 CinemachineDebug.ReturnToPool(sb);
             }
+#endif
         }
 
         CameraState m_State = CameraState.Default;
@@ -339,7 +359,7 @@ namespace Cinemachine
                 return;
             }
 
-            float now = Time.time;
+            float now = CinemachineCore.CurrentTime;
             if (mCurrentInstruction < 0 || deltaTime < 0)
             {
                 mActivationTime = now;
@@ -352,7 +372,7 @@ namespace Cinemachine
             }
 
             var holdTime = m_Instructions[mCurrentInstruction].m_Hold 
-                + m_Instructions[mCurrentInstruction].m_Blend.m_Time;
+                + m_Instructions[mCurrentInstruction].m_Blend.BlendTime;
             var minHold = mCurrentInstruction < m_Instructions.Length - 1 || m_Loop 
                 ? 0 : float.MaxValue;
             if (now - mActivationTime > Mathf.Max(minHold, holdTime))

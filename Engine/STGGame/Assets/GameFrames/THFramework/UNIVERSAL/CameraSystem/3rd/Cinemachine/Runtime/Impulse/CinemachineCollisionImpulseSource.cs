@@ -24,6 +24,7 @@ namespace Cinemachine
     /// </summary>
     [DocumentationSorting(DocumentationSortingAttribute.Level.UserRef)]
     [SaveDuringPlay]
+    [HelpURL(Documentation.BaseURL + "manual/CinemachineCollisionImpulseSource.html")]
     public class CinemachineCollisionImpulseSource : CinemachineImpulseSource
     {
         /// <summary>Only collisions with objects on these layers will generate Impulse events.</summary>
@@ -122,13 +123,13 @@ namespace Cinemachine
             // Calculate the signal direction and magnitude
             float mass = GetMassAndVelocity(other, ref vel);
             if (m_ScaleImpactWithSpeed)
-                mass *= vel.magnitude;
-            Vector3 dir = Vector3.down;
+                mass *= Mathf.Sqrt(vel.magnitude);
+            Vector3 dir = m_DefaultVelocity;
             if (m_UseImpactDirection && !vel.AlmostZero())
-                dir = -vel.normalized;
+                dir = -vel.normalized * dir.magnitude;
 
             // Fire it off!
-            GenerateImpulse(dir * mass);
+            GenerateImpulseWithVelocity(dir * mass);
         }
 #endif
 
@@ -190,13 +191,13 @@ namespace Cinemachine
             // Calculate the signal direction and magnitude
             float mass = GetMassAndVelocity2D(other2d, ref vel);
             if (m_ScaleImpactWithSpeed)
-                mass *= vel.magnitude;
-            Vector3 dir = Vector3.down;
+                mass *= Mathf.Sqrt(vel.magnitude);
+            Vector3 dir = m_DefaultVelocity;
             if (m_UseImpactDirection && !vel.AlmostZero())
-                dir = -vel.normalized;
+                dir = -vel.normalized * dir.magnitude;
 
             // Fire it off!
-            GenerateImpulse(dir * mass);
+            GenerateImpulseWithVelocity(dir * mass);
         }
 #endif
     }

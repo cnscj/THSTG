@@ -10,6 +10,8 @@ namespace Cinemachine.Editor
     {
         private UnityEditorInternal.ReorderableList mTargetList;
 
+        /// <summary>Get the property names to exclude in the inspector.</summary>
+        /// <param name="excluded">Add the names to this list</param>
         protected override void GetExcludedPropertiesInInspector(List<string> excluded)
         {
             base.GetExcludedPropertiesInInspector(excluded);
@@ -112,5 +114,15 @@ namespace Cinemachine.Editor
                     elemProp.FindPropertyRelative(() => def.weight).floatValue = 1;
                 };
         }
+
+#if false // enable for debugging
+        [DrawGizmo(GizmoType.Active | GizmoType.InSelectionHierarchy, typeof(CinemachineTargetGroup))]
+        private static void DrawGroupComposerGizmos(CinemachineTargetGroup target, GizmoType selectionType)
+        {
+                Gizmos.color = Color.yellow;
+                var sphere = target.Sphere;
+                Gizmos.DrawWireSphere(sphere.position, sphere.radius);
+        }
+#endif
     }
 }

@@ -9,24 +9,11 @@ using UnityEditor;
 namespace Cinemachine.Editor
 {
     [InitializeOnLoad]
-    internal class CinemachineStoryboardMute
+    static class CinemachineStoryboardMute
     {
-        const string StoryboardGlobalMuteMenuName = "Cinemachine/Storyboard Global Mute";
-        [MenuItem(StoryboardGlobalMuteMenuName, false)]
-        public static void StoryboardGlobalMute()
-        {
-            bool enable = !CinemachineStoryboardMute.Enabled;
-            CinemachineStoryboardMute.Enabled = enable;
-        }
-
         static CinemachineStoryboardMute()
         {
             CinemachineStoryboard.s_StoryboardGlobalMute = Enabled;
-
-             /// Delaying until first editor tick so that the menu
-             /// will be populated before setting check state, and
-             /// re-apply correct action
-             EditorApplication.delayCall += () => { UnityEditor.Menu.SetChecked(StoryboardGlobalMuteMenuName, Enabled); };
         }
 
         public static string kEnabledKey = "StoryboardMute_Enabled";
@@ -39,8 +26,6 @@ namespace Cinemachine.Editor
                 {
                     EditorPrefs.SetBool(kEnabledKey, value);
                     CinemachineStoryboard.s_StoryboardGlobalMute = value;
-                    UnityEditor.Menu.SetChecked(StoryboardGlobalMuteMenuName, value);
-
                     InspectorUtility.RepaintGameView();
                 }
             }
@@ -48,6 +33,7 @@ namespace Cinemachine.Editor
     }
 
     [CustomEditor(typeof(CinemachineStoryboard))]
+    [CanEditMultipleObjects]
     internal sealed class CinemachineStoryboardEditor : BaseEditor<CinemachineStoryboard>
     {
         public void OnDisable()
@@ -57,7 +43,8 @@ namespace Cinemachine.Editor
 
         const float FastWaveformUpdateInterval = 0.1f;
         float mLastSplitScreenEventTime = 0;
-
+        static bool sAdvancedFoldout;
+        
         public override void OnInspectorGUI()
         {
             float now = Time.realtimeSinceStartup;
@@ -91,21 +78,30 @@ namespace Cinemachine.Editor
                 EditorGUI.LabelField(rect, "Scale");
                 rect.x += EditorGUIUtility.labelWidth; rect.width -= EditorGUIUtility.labelWidth;
                 rect.width /= 3;
+                serializedObject.SetIsDifferentCacheDirty(); // prop.hasMultipleDifferentValues always results in false if the SO isn't refreshed here
                 var prop = FindProperty(x => x.m_SyncScale);
+                var syncHasDifferentValues = prop.hasMultipleDifferentValues;
                 GUIContent syncLabel = new GUIContent("Sync", prop.tooltip);
+                EditorGUI.showMixedValue = syncHasDifferentValues;
                 prop.boolValue = EditorGUI.ToggleLeft(rect, syncLabel, prop.boolValue);
+                EditorGUI.showMixedValue = false;
                 rect.x += rect.width;
-                if (prop.boolValue)
+                if (prop.boolValue || targets.Length > 1 && syncHasDifferentValues)
                 {
                     prop = FindProperty(x => x.m_Scale);
                     float[] values = new float[1] { prop.vector2Value.x };
+                    EditorGUI.showMixedValue = prop.hasMultipleDifferentValues;
                     EditorGUI.MultiFloatField(rect, new GUIContent[1] { new GUIContent("X") }, values);
+                    EditorGUI.showMixedValue = false;
                     prop.vector2Value = new Vector2(values[0], values[0]);
                 }
                 else
                 {
                     rect.width *= 2;
-                    EditorGUI.PropertyField(rect, FindProperty(x => x.m_Scale), GUIContent.none);
+                    prop = FindProperty(x => x.m_Scale);
+                    EditorGUI.showMixedValue = prop.hasMultipleDifferentValues;
+                    EditorGUI.PropertyField(rect, prop, GUIContent.none);
+                    EditorGUI.showMixedValue = false;
                 }
                 EditorGUILayout.PropertyField(FindProperty(x => x.m_MuteCamera));
             }
@@ -128,6 +124,28 @@ namespace Cinemachine.Editor
             rect.x += EditorGUIUtility.labelWidth;
             if (GUI.Button(rect, "Open"))
                 WaveformWindow.OpenWindow();
+
+            EditorGUILayout.Space();
+            sAdvancedFoldout = EditorGUILayout.Foldout(sAdvancedFoldout, "Advanced");
+            if (sAdvancedFoldout)
+            {
+                ++EditorGUI.indentLevel;
+                
+                EditorGUI.BeginChangeCheck();
+                var renderModeProperty = FindProperty(x => x.m_RenderMode);
+                EditorGUILayout.PropertyField(renderModeProperty);
+                EditorGUILayout.PropertyField(FindProperty(x => x.m_SortingOrder));
+                if (renderModeProperty.enumValueIndex == (int) RenderMode.ScreenSpaceCamera)
+                {
+                    EditorGUILayout.PropertyField(FindProperty(x => x.m_PlaneDistance));
+                }
+                if (EditorGUI.EndChangeCheck())
+                {
+                    serializedObject.ApplyModifiedProperties();
+                }
+                
+                --EditorGUI.indentLevel;
+            }
         }
     }
 }

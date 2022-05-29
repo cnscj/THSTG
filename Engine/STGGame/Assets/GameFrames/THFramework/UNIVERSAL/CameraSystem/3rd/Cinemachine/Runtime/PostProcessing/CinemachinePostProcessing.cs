@@ -9,9 +9,26 @@ namespace Cinemachine.PostFX
 {
 #if !CINEMACHINE_POST_PROCESSING_V2
     // Workaround for Unity scripting bug
+    /// <summary>
+    /// This behaviour is a liaison between Cinemachine with the Post-Processing v2 module.  You must
+    /// have the Post-Processing V2 stack package installed in order to use this behaviour.
+    ///
+    /// As a component on the Virtual Camera, it holds
+    /// a Post-Processing Profile asset that will be applied to the Unity camera whenever
+    /// the Virtual camera is live.  It also has the optional functionality of animating
+    /// the Focus Distance and DepthOfField properties of the Camera State, and
+    /// applying them to the current Post-Processing profile, provided that profile has a
+    /// DepthOfField effect that is enabled.
+    /// </summary>
+    [SaveDuringPlay]
     [AddComponentMenu("")] // Hide in menu
     public class CinemachinePostProcessing : CinemachineExtension 
     {
+        /// <summary>Apply PostProcessing effects</summary>
+        /// <param name="vcam">The virtual camera being processed</param>
+        /// <param name="stage">The current pipeline stage</param>
+        /// <param name="state">The current virtual camera state</param>
+        /// <param name="deltaTime">The current applicable deltaTime</param>
         protected override void PostPipelineStageCallback(
             CinemachineVirtualCameraBase vcam,
             CinemachineCore.Stage stage, ref CameraState state, float deltaTime) {}
@@ -29,15 +46,20 @@ namespace Cinemachine.PostFX
     /// DepthOfField effect that is enabled.
     /// </summary>
     [DocumentationSorting(DocumentationSortingAttribute.Level.UserRef)]
-#if UNITY_2018_3_OR_NEWER
     [ExecuteAlways]
-#else
-    [ExecuteInEditMode]
-#endif
     [AddComponentMenu("")] // Hide in menu
     [SaveDuringPlay]
+    [DisallowMultipleComponent]
+    [HelpURL(Documentation.BaseURL + "manual/CinemachinePostProcessing.html")]
     public class CinemachinePostProcessing : CinemachineExtension
     {
+        /// <summary>
+        /// This is the priority for the vcam's PostProcessing volumes.  It's set to a high
+        /// number in order to ensure that it overrides other volumes for the active vcam.
+        /// You can change this value if necessary to work with other systems.
+        /// </summary>
+        static public float s_VolumePriority = 1000f;
+
         /// <summary>This is obsolete, please use m_FocusTracking</summary>
         [HideInInspector]
         public bool m_FocusTracksTarget;
@@ -75,6 +97,9 @@ namespace Cinemachine.PostFX
             + "Offsets the sharpest point away from the location of the focus target.")]
         public float m_FocusOffset;
 
+        /// <summary>
+        /// This Post-Processing profile will be applied whenever this virtual camera is live
+        /// </summary>
         [Tooltip("This Post-Processing profile will be applied whenever this virtual camera is live")]
         public PostProcessProfile m_Profile;
 
@@ -116,9 +141,9 @@ namespace Cinemachine.PostFX
                 list[i].DestroyProfileCopy();
         }
 
-        protected override void Awake()
+        protected override void OnEnable()
         {
-            base.Awake();
+            base.OnEnable();
 
             // Map legacy m_FocusTracksTarget to focus mode
             if (m_FocusTracksTarget)
@@ -135,13 +160,17 @@ namespace Cinemachine.PostFX
             base.OnDestroy();
         }
 
+        /// <summary>Apply PostProcessing effects</summary>
+        /// <param name="vcam">The virtual camera being processed</param>
+        /// <param name="stage">The current pipeline stage</param>
+        /// <param name="state">The current virtual camera state</param>
+        /// <param name="deltaTime">The current applicable deltaTime</param>
         protected override void PostPipelineStageCallback(
             CinemachineVirtualCameraBase vcam,
             CinemachineCore.Stage stage, ref CameraState state, float deltaTime)
         {
             // Set the focus after the camera has been fully positioned.
-            // GML todo: what about collider?
-            if (stage == CinemachineCore.Stage.Aim)
+            if (stage == CinemachineCore.Stage.Finalize)
             {
                 var extra = GetExtraState<VcamExtraState>(vcam);
                 if (!IsValid)
@@ -162,16 +191,20 @@ namespace Cinemachine.PostFX
                         if (profile.TryGetSettings(out dof))
                         {
                             float focusDistance = m_FocusOffset;
-                            Transform focusTarget = null;
-                            switch (m_FocusTracking)
+                            if (m_FocusTracking == FocusTrackingMode.LookAtTarget)
+                                focusDistance += (state.FinalPosition - state.ReferenceLookAt).magnitude;
+                            else
                             {
-                                default: break;
-                                case FocusTrackingMode.LookAtTarget: focusTarget = VirtualCamera.LookAt; break;
-                                case FocusTrackingMode.FollowTarget: focusTarget = VirtualCamera.Follow; break;
-                                case FocusTrackingMode.CustomTarget: focusTarget = m_FocusTarget; break;
+                                Transform focusTarget = null;
+                                switch (m_FocusTracking)
+                                {
+                                    default: break;
+                                    case FocusTrackingMode.FollowTarget: focusTarget = VirtualCamera.Follow; break;
+                                    case FocusTrackingMode.CustomTarget: focusTarget = m_FocusTarget; break;
+                                }
+                                if (focusTarget != null)
+                                    focusDistance += (state.FinalPosition - focusTarget.position).magnitude;
                             }
-                            if (focusTarget != null)
-                                focusDistance += (state.FinalPosition - focusTarget.position).magnitude;
                             dof.focusDistance.value = Mathf.Max(0, focusDistance);
                         }
                     }
@@ -218,7 +251,7 @@ namespace Cinemachine.PostFX
                         firstVolume = v;
                     v.sharedProfile = profile;
                     v.isGlobal = true;
-                    v.priority = float.MaxValue-(numBlendables-i)-1;
+                    v.priority = s_VolumePriority - (numBlendables - i) - 1;
                     v.weight = b.m_Weight;
                     ++numPPblendables;
                 }
@@ -285,36 +318,47 @@ namespace Cinemachine.PostFX
             if (layer != null)
                 return layer;   // layer is valid and in our lookup
 
-            if (found)
+            // If the layer in the lookup table is a deleted object, we must remove
+            // the brain's callback for it
+            if (found && !ReferenceEquals(layer, null))
             {
-                if (layer) // note: this is not the same check as (layer == null)
-                {
-                    // layer is a deleted object
-                    brain.m_CameraCutEvent.RemoveListener(OnCameraCut);
-                    mBrainToLayer.Remove(brain);
-                    layer = null;
-                }
+                // layer is a deleted object
+                brain.m_CameraCutEvent.RemoveListener(OnCameraCut);
+                mBrainToLayer.Remove(brain);
+                layer = null;
+                found = false;
             }
-            else
-            {
-                // Brain is not in our lookup - add it
+
+            // Brain is not in our lookup - add it.
 #if UNITY_2019_2_OR_NEWER
-                brain.TryGetComponent(out layer);
+            brain.TryGetComponent(out layer);
+            if (layer != null)
+            {
+                brain.m_CameraCutEvent.AddListener(OnCameraCut); // valid layer
+                mBrainToLayer[brain] = layer;
+            }
 #else
+            // In order to avoid calling GetComponent() every frame in the case
+            // where there is legitimately no layer on the brain, we will add
+            // null to the lookup table if no layer is present.
+            if (!found)
+            {
                 layer = brain.GetComponent<PostProcessLayer>();
-#endif
                 if (layer != null)
                     brain.m_CameraCutEvent.AddListener(OnCameraCut); // valid layer
-#if UNITY_EDITOR
-                // Never add null in edit mode in case user adds a layer dynamically
-                if (Application.isPlaying)  
-#endif
+
+                // Exception: never add null in the case where user adds a layer while
+                // in the editor.  If we were to add null in this case, then the new
+                // layer would not be detected.  We are willing to live with
+                // calling GetComponent() every frame while in edit mode.
+                if (Application.isPlaying || layer != null)
                     mBrainToLayer[brain] = layer;
             }
+#endif
             return layer;
         }
 
-        static void OnSceneUnloaded(Scene scene)
+        static void CleanupLookupTable()
         {
             var iter = mBrainToLayer.GetEnumerator();
             while (iter.MoveNext())
@@ -328,17 +372,24 @@ namespace Cinemachine.PostFX
 
 #if UNITY_EDITOR
         [UnityEditor.InitializeOnLoad]
-        class EditorInitialize { static EditorInitialize() { InitializeModule(); } }
+        class EditorInitialize 
+        { 
+            static EditorInitialize() 
+            { 
+                UnityEditor.EditorApplication.playModeStateChanged += (pmsc) => CleanupLookupTable();
+                InitializeModule(); 
+            } 
+        }
 #endif
         [RuntimeInitializeOnLoadMethod]
         static void InitializeModule()
         {
-            // Afetr the brain pushes the state to the camera, hook in to the PostFX
+            // After the brain pushes the state to the camera, hook in to the PostFX
             CinemachineCore.CameraUpdatedEvent.RemoveListener(ApplyPostFX);
             CinemachineCore.CameraUpdatedEvent.AddListener(ApplyPostFX);
 
             // Clean up our resources
-            SceneManager.sceneUnloaded += OnSceneUnloaded;
+            SceneManager.sceneUnloaded += (scene) => CleanupLookupTable();
         }
     }
 #endif

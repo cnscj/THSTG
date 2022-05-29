@@ -6,16 +6,23 @@ using System.IO;
 
 namespace Cinemachine.Editor
 {
+    /// <summary>
+    /// Inspector for CinemachineBrain
+    /// </summary>
     [CustomEditor(typeof(CinemachineBrain))]
+    [CanEditMultipleObjects]
     public sealed class CinemachineBrainEditor : BaseEditor<CinemachineBrain>
     {
         EmbeddeAssetEditor<CinemachineBlenderSettings> m_BlendsEditor;
         bool mEventsExpanded = false;
 
-        /// <summary>Obsolete, do not use</summary>
+        /// <summary>Obsolete, do not use.  Use the overload, which is more performant</summary>
+        /// <returns>List of property names to exclude</returns>
         protected override List<string> GetExcludedPropertiesInInspector() 
             { return base.GetExcludedPropertiesInInspector(); }
 
+        /// <summary>Get the property names to exclude in the inspector.</summary>
+        /// <param name="excluded">Add the names to this list</param>
         protected override void GetExcludedPropertiesInInspector(List<string> excluded)
         {
             base.GetExcludedPropertiesInInspector(excluded);
@@ -26,12 +33,8 @@ namespace Cinemachine.Editor
 
         private void OnEnable()
         {
-            m_BlendsEditor = new EmbeddeAssetEditor<CinemachineBlenderSettings>(
-                    FieldPath(x => x.m_CustomBlends), this);
-            m_BlendsEditor.OnChanged = (CinemachineBlenderSettings b) =>
-                {
-                    InspectorUtility.RepaintGameView();
-                };
+            m_BlendsEditor = new EmbeddeAssetEditor<CinemachineBlenderSettings>(FieldPath(x => x.m_CustomBlends), this);
+            m_BlendsEditor.OnChanged = (CinemachineBlenderSettings b) => { InspectorUtility.RepaintGameView(); };
         }
 
         private void OnDisable()
@@ -40,6 +43,7 @@ namespace Cinemachine.Editor
                 m_BlendsEditor.OnDisable();
         }
 
+        /// <summary>Create the contents of the inspector panel</summary>
         public override void OnInspectorGUI()
         {
             BeginInspector();
@@ -58,25 +62,28 @@ namespace Cinemachine.Editor
             // Normal properties
             DrawRemainingPropertiesInInspector();
 
-            // Blender
-            m_BlendsEditor.DrawEditorCombo(
-                "Create New Blender Asset",
-                Target.gameObject.name + " Blends", "asset", string.Empty,
-                "Custom Blends", false);
-
-            mEventsExpanded = EditorGUILayout.Foldout(mEventsExpanded, "Events", true);
-            if (mEventsExpanded)
+            if (targets.Length == 1)
             {
-                EditorGUILayout.PropertyField(FindProperty(x => x.m_CameraCutEvent));
-                EditorGUILayout.PropertyField(FindProperty(x => x.m_CameraActivatedEvent));
+                // Blender
+                m_BlendsEditor.DrawEditorCombo(
+                    "Create New Blender Asset",
+                    Target.gameObject.name + " Blends", "asset", string.Empty,
+                    "Custom Blends", false);
+
+                mEventsExpanded = EditorGUILayout.Foldout(mEventsExpanded, "Events", true);
+                if (mEventsExpanded)
+                {
+                    EditorGUILayout.PropertyField(FindProperty(x => x.m_CameraCutEvent));
+                    EditorGUILayout.PropertyField(FindProperty(x => x.m_CameraActivatedEvent));
+                }
+                serializedObject.ApplyModifiedProperties(); 
             }
-            serializedObject.ApplyModifiedProperties();
         }
 
         [DrawGizmo(GizmoType.Selected | GizmoType.NonSelected, typeof(CinemachineBrain))]
         private static void DrawBrainGizmos(CinemachineBrain brain, GizmoType drawType)
         {
-            if (brain.OutputCamera != null && brain.m_ShowCameraFrustum)
+            if (brain.OutputCamera != null && brain.m_ShowCameraFrustum && brain.isActiveAndEnabled)
             {
                 DrawCameraFrustumGizmo(
                     brain, LensSettings.FromCamera(brain.OutputCamera),
@@ -99,6 +106,7 @@ namespace Cinemachine.Editor
 
             Matrix4x4 originalMatrix = Gizmos.matrix;
             Color originalGizmoColour = Gizmos.color;
+            
             Gizmos.color = color;
             Gizmos.matrix = transform;
             if (ortho)
@@ -106,7 +114,7 @@ namespace Cinemachine.Editor
                 Vector3 size = new Vector3(
                         aspect * lens.OrthographicSize * 2,
                         lens.OrthographicSize * 2,
-                        lens.NearClipPlane + lens.FarClipPlane);
+                        lens.FarClipPlane - lens.NearClipPlane);
                 Gizmos.DrawWireCube(
                     new Vector3(0, 0, (size.z / 2) + lens.NearClipPlane), size);
             }
@@ -120,6 +128,9 @@ namespace Cinemachine.Editor
             Gizmos.color = originalGizmoColour;
         }
 
+        /// <summary>Draw the gizmo for a virtual camera in the scene view</summary>
+        /// <param name="vcam">The virtual camera</param>
+        /// <param name="selectionType">How the object is selected</param>
         [DrawGizmo(GizmoType.Active | GizmoType.InSelectionHierarchy | GizmoType.Pickable, typeof(CinemachineVirtualCameraBase))]
         public static void DrawVirtualCameraBaseGizmos(CinemachineVirtualCameraBase vcam, GizmoType selectionType)
         {

@@ -10,7 +10,9 @@ namespace Cinemachine
     /// This is an add-on to override the legacy input system and read input using the
     /// UnityEngine.Input package API.  Add this behaviour to any CinemachineVirtualCamera 
     /// or FreeLook that requires user input, and drag in the the desired actions.
+    /// If the Input System Package is not installed, then this behaviour does nothing.
     /// </summary>
+    [HelpURL(Documentation.BaseURL + "manual/CinemachineAlternativeInput.html")]
     public class CinemachineInputProvider : MonoBehaviour, AxisState.IInputAxisProvider
     {
         /// <summary>
@@ -22,6 +24,10 @@ namespace Cinemachine
             + "For multi-player games, set this to be the player index, and the actions will "
             + "be read from that player's controls")]
         public int PlayerIndex = -1;
+
+        /// <summary>If set, Input Actions will be auto-enabled at start</summary>
+        [Tooltip("If set, Input Actions will be auto-enabled at start")]
+        public bool AutoEnableInputs = true;
 
         /// <summary>Vector2 action for XY movement</summary>
         [Tooltip("Vector2 action for XY movement")]
@@ -40,14 +46,17 @@ namespace Cinemachine
         /// <returns>The current axis value</returns>
         public virtual float GetAxisValue(int axis)
         {
-            var action = ResolveForPlayer(axis, axis == 2 ? ZAxis : XYAxis);
-            if (action != null)
+            if (enabled)
             {
-                switch (axis)
+                var action = ResolveForPlayer(axis, axis == 2 ? ZAxis : XYAxis);
+                if (action != null)
                 {
-                    case 0: return action.ReadValue<Vector2>().x;
-                    case 1: return action.ReadValue<Vector2>().y;
-                    case 2: return action.ReadValue<float>();
+                    switch (axis)
+                    {
+                        case 0: return action.ReadValue<Vector2>().x;
+                        case 1: return action.ReadValue<Vector2>().y;
+                        case 2: return action.ReadValue<float>();
+                    }
                 }
             }
             return 0;
@@ -76,20 +85,30 @@ namespace Cinemachine
                 m_cachedActions = new InputAction[NUM_AXES];
             if (m_cachedActions[axis] != null && actionRef.action.id != m_cachedActions[axis].id)
                 m_cachedActions[axis] = null;
+            
             if (m_cachedActions[axis] == null)
             {
                 m_cachedActions[axis] = actionRef.action;
                 if (PlayerIndex != -1)
-                {
-                    var user = InputUser.all[PlayerIndex];
-                    m_cachedActions[axis] = user.actions.First(x => x.id == actionRef.action.id);
-                }
+                    m_cachedActions[axis] = GetFirstMatch(InputUser.all[PlayerIndex], actionRef);
+        
+                if (AutoEnableInputs && actionRef != null && actionRef.action != null)
+                    actionRef.action.Enable();
             }
-            // Auto-enable it if disabled
-            if (m_cachedActions[axis] != null && !m_cachedActions[axis].enabled)
-                m_cachedActions[axis].Enable();
-
+            // Update enabled status
+            if (m_cachedActions[axis] != null && m_cachedActions[axis].enabled != actionRef.action.enabled)
+            {
+                if (actionRef.action.enabled)
+                    m_cachedActions[axis].Enable();
+                else
+                    m_cachedActions[axis].Disable();
+            }
+            
             return m_cachedActions[axis];
+            
+            // local function to wrap the lambda which otherwise causes a tiny gc
+            InputAction GetFirstMatch(in InputUser user, InputActionReference aRef) => 
+                user.actions.First(x => x.id == aRef.action.id);
         }
 
         // Clean up
@@ -104,6 +123,12 @@ using UnityEngine;
 
 namespace Cinemachine
 {
+    /// <summary>
+    /// This is an add-on to override the legacy input system and read input using the
+    /// UnityEngine.Input package API.  Add this behaviour to any CinemachineVirtualCamera 
+    /// or FreeLook that requires user input, and drag in the the desired actions.
+    /// If the Input System Package is not installed, then this behaviour does nothing.
+    /// </summary>
     [AddComponentMenu("")] // Hide in menu
     public class CinemachineInputProvider : MonoBehaviour {}
 }
