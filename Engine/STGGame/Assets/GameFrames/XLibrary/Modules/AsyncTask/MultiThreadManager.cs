@@ -81,7 +81,7 @@ namespace XLibGame
             runningActions.Clear();
         }
 
-        void OnDestroy()
+        private void OnDestroy()
         {
             for (int i = 0; i < taskList.Count; i++)
             {

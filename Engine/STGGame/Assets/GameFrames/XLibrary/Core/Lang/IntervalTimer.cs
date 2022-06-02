@@ -1,7 +1,7 @@
 
 using System;
 using System.Timers;
-namespace XLibrary
+namespace XLibrary.Lang
 {
     public class IntervalTimer
     {
