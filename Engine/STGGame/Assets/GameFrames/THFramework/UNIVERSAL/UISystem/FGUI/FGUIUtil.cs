@@ -73,6 +73,7 @@ namespace THGame.UI
         public class LoaderArgs : BaseArgs
         {
             public string url;
+            public NTexture texture;
         }
         ///////////////////////////
 
@@ -146,7 +147,14 @@ namespace THGame.UI
             InitBaseArgs(fLoader, loaderArgs);
             if (loaderArgs != null)
             {
-                fLoader.SetUrl(loaderArgs.url);
+                if (loaderArgs.texture != null)
+                {
+                    fLoader.SetTexture(loaderArgs.texture);
+                }
+                else
+                {
+                    fLoader.SetUrl(loaderArgs.url);
+                }
             }
             
             return fLoader;

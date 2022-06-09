@@ -657,7 +657,7 @@ namespace THGame.UI
         private Dictionary<string, TaskInfo> m_taskInfoDict;
         private Queue<TaskInfo> m_taskCache;
 
-        public int Load(string url, Action<Texture> onSuccess, Action<int> onFailed)
+        public int Load(string url, Action<Texture> onSuccess, Action<int> onFailed = null)
         {
             //Url地址严格大小写
             if (string.IsNullOrEmpty(url))
@@ -793,7 +793,7 @@ namespace THGame.UI
         private void OnRequestCallback(TaskInfo taskInfo, UnityWebRequest webRequest)
         {
             bool isSuccess = true;
-            if (webRequest.isNetworkError || webRequest.isHttpError)
+            if (webRequest.result != UnityWebRequest.Result.Success)
             {
                 taskInfo.Failed(UITextureLoadStatus.NETWORK_ERROR);
                 isSuccess = false;

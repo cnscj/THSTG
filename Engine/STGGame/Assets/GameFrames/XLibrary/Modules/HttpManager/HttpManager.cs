@@ -82,10 +82,7 @@ namespace XLibGame
                 if (addTime > requestCount)
                 {
                     addTime = 0;
-                    if (callfunc != null)
-                    {
-                        callfunc(ping.time);
-                    }
+                    callfunc?.Invoke(ping.time);
                     yield break;
                 }
                 addTime++;
@@ -96,10 +93,7 @@ namespace XLibGame
             // 链接成功
             if (ping.isDone)
             {
-                if (callfunc != null)
-                {
-                    callfunc(ping.time);
-                }
+                callfunc?.Invoke(ping.time);
                 yield return null;
             }
         }
