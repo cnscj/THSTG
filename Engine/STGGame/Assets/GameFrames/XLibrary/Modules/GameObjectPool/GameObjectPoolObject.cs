@@ -24,18 +24,21 @@ namespace XLibGame
         /// <summary>
         /// 所属对象池
         /// </summary>
-        public GameObjectPool poolObj;
+        [HideInInspector] public GameObjectPool ownPool;
 
         private float m_stayTick;
+        private Coroutine m_releaseCor;
 
-        void OnEnable()
+        private void OnDestroy()
         {
-            if (!enabled)
-                return;
+            StopCountDown();
+        }
 
+        public void TryCountDown()
+        {
             if (lifeTime > 0)
             {
-                StartCoroutine(CountDown());
+                StartCountDown();
             }
         }
 
@@ -59,14 +62,27 @@ namespace XLibGame
         public void Release()
         {
             //将对象加入对象池
-            if (poolObj != null)
+            StopCountDown();
+
+            if (ownPool != null)
             {
-                poolObj.Release(gameObject);
+                ownPool.Release(gameObject);
             }
             else
             {
                 Destroy(gameObject);
             }
+        }
+
+        private void StartCountDown()
+        {
+            StopCountDown();
+            m_releaseCor = StartCoroutine(CountDown());
+        }
+        private void StopCountDown()
+        {
+            if (m_releaseCor != null) StopCoroutine(m_releaseCor);
+            m_releaseCor = null;
         }
 
         IEnumerator CountDown()
